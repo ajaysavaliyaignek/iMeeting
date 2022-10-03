@@ -1,0 +1,25 @@
+export const Colors = {
+  primary: "#144B8D",
+  bold: "#0A111F",
+  secondary: "#6C7078",
+  white: "#ffffff",
+  line: "#CECFD2",
+  gray:"#f8f8f8",
+  Approved:"#81AB96",
+  Verified:"#658EB4" ,
+  Rejected:"#DD7878" ,
+  Pending:"#E6C54F" ,
+  Transfered:"#E79D73" ,
+  BG_Meeting:"rgba(101, 142, 180, 0.1)",
+  BG_Appointment:"rgba(171, 158, 200, 0.1)",
+  BG_Video:"rgba(231, 157, 115, 0.1)",
+  BG_Tasks:"rgba(221, 120, 120, 0.1)",
+  BG_Approved:"rgba(129, 171, 150, 0.1)",
+  BG_Verified:"rgba(101, 142, 180, 0.1)" ,
+  BG_Rejected:"rgba(221, 120, 120, 0.1)" ,
+  BG_Pending:"rgba(230, 197, 79, 0.1)  " ,
+  BG_Transferred:"rgba(231, 157, 115, 0.1)  " ,
+  Blue_Light:"rgba(243, 246, 249,1)" ,
+  switch:"#81AB96"
+
+};
