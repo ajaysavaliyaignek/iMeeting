@@ -6,53 +6,41 @@ import { ApolloProvider } from '@apollo/client';
 import { client } from './src/ApolloClient/Client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { CredentialContext } from './src/context';
 import MainStack from './routes';
 
 const App = () => {
-  const [storeCredentials, setStoreCredentials] = useState('');
+  const [token, setToken] = useState('');
 
-  const checkLogin = async () => {
+  const getToken = async () => {
     try {
-      let userData = await AsyncStorage.getItem('@user').then((res) => {
-        return JSON.parse(res);
-      });
-      console.log(`async user data ${JSON.stringify(userData)}`);
-
-      if (userData !== null) {
-        setStoreCredentials(userData);
-
-        console.log('storeCredentials---', storeCredentials);
-      } else {
-        setStoreCredentials(null);
-      }
+      await AsyncStorage.getItem('@user')
+        .then((result) => {
+          if (result !== null) {
+            setToken(JSON.parse(result)?.dataToken);
+            console.log('token', token.toString());
+          } else setToken(null);
+        })
+        .catch((e) => console.log(e));
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
-    checkLogin();
-  }, []);
+    getToken();
+  });
 
   return (
     <ApolloProvider client={client}>
       <PaperProvider>
-        <CredentialContext.Provider
-          value={{ storeCredentials, setStoreCredentials }}
-        >
-          <CredentialContext.Consumer>
-            {({ storeCredentials }) => (
-              <NavigationContainer>
-                {storeCredentials ? (
-                  <MainStack initialRouteName="MainBottomTab" />
-                ) : (
-                  // <StackAuth />
-                  <MainStack initialRouteName="Login" />
-                )}
-              </NavigationContainer>
-            )}
-          </CredentialContext.Consumer>
-        </CredentialContext.Provider>
+        <NavigationContainer>
+          {token !== '' ? (
+            <MainStack initialRouteName="MainBottomTab" />
+          ) : (
+            // <StackAuth />
+            <MainStack initialRouteName="MainBottomTab" />
+          )}
+        </NavigationContainer>
       </PaperProvider>
     </ApolloProvider>
   );

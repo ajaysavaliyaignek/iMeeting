@@ -10,9 +10,36 @@ import IconName from '../Icon/iconName';
 import EditDeleteModal from '../EditDeleteModal';
 import { SIZES } from '../../themes/Sizes';
 
-const MeetingsCard = ({ item }) => {
+const MeetingsCard = ({ item, text, index }) => {
   const navigation = useNavigation();
   const [editModal, setEditModal] = useState(false);
+
+  const getHighlightedText = (txt) => {
+    const parts = txt.split(new RegExp(`(${text})`, 'gi'));
+    return (
+      <Text>
+        {parts.map((part) =>
+          part === text ? (
+            <Text
+              style={[
+                styles.txtCommitteeTitle,
+                {
+                  backgroundColor: '#E6C54F'
+                }
+              ]}
+              numberOfLines={1}
+            >
+              {part}
+            </Text>
+          ) : (
+            <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
+              {part}
+            </Text>
+          )
+        )}
+      </Text>
+    );
+  };
 
   const onDeleteHandler = () => {
     setEditModal(false);
@@ -43,7 +70,7 @@ const MeetingsCard = ({ item }) => {
 
   return (
     <TouchableOpacity activeOpacity={1} onPress={() => setEditModal(false)}>
-      <Divider style={styles.divider} />
+      {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
       <View
@@ -54,9 +81,10 @@ const MeetingsCard = ({ item }) => {
         }}
         activeOpacity={0.5}
       >
-        <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
+        {getHighlightedText(item.title)}
+        {/* <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
           {item.title}
-        </Text>
+        </Text> */}
 
         <RowData name={'Date & Time'} discription={item.DateTime} />
         <RowData name={'Location'} discription={item.Location} />

@@ -119,6 +119,16 @@ const Icon = ({ name, height = SIZES[24], width = SIZES[24], fill }) => {
         );
       case IconName.Speaker:
         return <SVGImage.Speaker height={height} width={width} fill={fill} />;
+      case IconName.Download_Primary:
+        return (
+          <SVGImage.Download_Primary
+            height={height}
+            width={width}
+            fill={fill}
+          />
+        );
+      case IconName.CopyText:
+        return <SVGImage.CopyText height={height} width={width} fill={fill} />;
 
       default:
         return null;

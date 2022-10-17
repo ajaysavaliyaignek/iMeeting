@@ -12,13 +12,12 @@ import { Divider, TextInput } from 'react-native-paper';
 import { useLazyQuery } from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Fonts } from '../../themes';
-import { Icon, IconName } from '../../component';
-import { Button } from '../../component/button/Button';
-import Input from '../../component/Input/Input';
-import { Colors } from '../../themes/Colors';
-import { GET_AUTH } from '../../graphql/query';
-import { SIZES } from '../../themes/Sizes';
+import { Icon, IconName } from '../../../component';
+import { Button } from '../../../component/button/Button';
+import Input from '../../../component/Input/Input';
+import { GET_AUTH } from '../../../graphql/query';
+import { SIZES } from '../../../themes/Sizes';
+import { styles } from './styles';
 
 const LoginScreen = ({ navigation }) => {
   const [url, setUrl] = useState('');
@@ -61,7 +60,7 @@ const LoginScreen = ({ navigation }) => {
     console.log('password', password);
 
     if (clientId !== '' && clientSecret !== '') {
-      fetch(`https://${url}/o/oauth2/token`, {
+      fetch(`http://128.199.26.43:9080/o/oauth2/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -83,6 +82,7 @@ const LoginScreen = ({ navigation }) => {
               clientSecret: clientSecret,
               dataToken: dataToken
             };
+            console.log(user);
             storeToken(user);
 
             const interval = setInterval(() => {
@@ -109,7 +109,7 @@ const LoginScreen = ({ navigation }) => {
     console.log('password', password);
 
     if (clientId !== '' && clientSecret !== '') {
-      fetch(`https://${url}/o/oauth2/token`, {
+      fetch(`http://128.199.26.43:9080/o/oauth2/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -271,58 +271,3 @@ const LoginScreen = ({ navigation }) => {
 };
 
 export default LoginScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.white
-  },
-  subContainer: {
-    padding: SIZES[16]
-  },
-  txtHeader: {
-    ...Fonts.PoppinsBold[32],
-    color: Colors.bold,
-    marginVertical: SIZES[32]
-  },
-  textInput: {
-    backgroundColor: Colors.white,
-    height: SIZES[62],
-    ...Fonts.PoppinsRegular[14]
-  },
-  divider: {
-    width: '100%',
-    height: SIZES[1],
-    backgroundColor: Colors.line,
-    marginTop: SIZES[16]
-  },
-  createButtonContainer: {
-    alignSelf: 'center',
-    borderBottomColor: Colors.primary,
-    borderBottomWidth: SIZES[1]
-  },
-  txtCreateAccount: {
-    ...Fonts.PoppinsSemiBold[14],
-    color: Colors.primary,
-    borderBottomWidth: SIZES[1],
-    borderBottomColor: Colors.primary
-  },
-  loginButton: {
-    marginVertical: SIZES[12],
-    width: '100%'
-  },
-  txtButton: {
-    ...Fonts.PoppinsSemiBold[14],
-    color: Colors.white
-  },
-  errorView: {
-    paddingHorizontal: SIZES[20],
-    paddingVertical: SIZES[10],
-    borderWidth: SIZES[1],
-    borderColor: 'red',
-    alignSelf: 'center'
-  },
-  btnView: {
-    paddingHorizontal: SIZES[16]
-  }
-});

@@ -8,7 +8,13 @@ import Icon from '../Icon';
 import IconName from '../Icon/iconName';
 import { SIZES } from '../../themes/Sizes';
 
-const EditDeleteModal = ({ onPressView, onPressEdit, onPressDelete }) => {
+const EditDeleteModal = ({
+  onPressView,
+  onPressEdit,
+  onPressDelete,
+  subjectStatus,
+  onPressDownload
+}) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.btnView} onPress={onPressView}>
@@ -24,12 +30,24 @@ const EditDeleteModal = ({ onPressView, onPressEdit, onPressDelete }) => {
         <Text style={styles.txtEditBtn}>Edit</Text>
         <Icon name={IconName.Edit} height={SIZES[18]} width={SIZES[18]} />
       </TouchableOpacity>
-
       <Divider style={styles.divider} />
-      <TouchableOpacity style={styles.btnView} onPress={onPressDelete}>
-        <Text style={styles.txtDeleteBtn}>Delete</Text>
-        <Icon name={IconName.Delete} height={SIZES[20]} width={SIZES[18]} />
+      <TouchableOpacity style={styles.btnView} onPress={onPressDownload}>
+        <Text style={styles.txtEditBtn}>Download</Text>
+        <Icon
+          name={IconName.Download_Primary}
+          height={SIZES[18]}
+          width={SIZES[16]}
+        />
       </TouchableOpacity>
+      {subjectStatus !== 'Deleted' && (
+        <View>
+          <Divider style={styles.divider} />
+          <TouchableOpacity style={styles.btnView} onPress={onPressDelete}>
+            <Text style={styles.txtDeleteBtn}>Delete</Text>
+            <Icon name={IconName.Delete} height={SIZES[20]} width={SIZES[18]} />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -40,7 +58,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.gray,
     borderRadius: SIZES[6],
-    width: SIZES[124]
+    width: SIZES[130]
   },
   btnView: {
     paddingVertical: SIZES[10],

@@ -31,7 +31,9 @@ const IconName = {
   Edit: 'Edit',
   Delete: 'Delete',
   Eye_Primary: 'Eye_Primary',
-  Speaker: 'Speaker'
+  Speaker: 'Speaker',
+  Download_Primary: 'Download_Primary',
+  CopyText: 'CopyText'
 };
 
 export default IconName;

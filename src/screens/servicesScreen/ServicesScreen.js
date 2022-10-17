@@ -1,19 +1,12 @@
-import {
-  View,
-  Text,
-  useWindowDimensions,
-  StyleSheet,
-  SafeAreaView
-} from 'react-native';
+import { View, Text, useWindowDimensions, SafeAreaView } from 'react-native';
 import React from 'react';
-import DeviceInfo from 'react-native-device-info';
 
 import Header from '../../component/header/Header';
 import { Colors } from '../../themes/Colors';
-import { Fonts } from '../../themes';
 import DashboardCard from '../../component/Cards/ServicesCard';
 import { IconName } from '../../component';
 import { SIZES } from '../../themes/Sizes';
+import { styles } from './styles';
 
 const ServicesScreen = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
@@ -121,28 +114,3 @@ const ServicesScreen = ({ navigation }) => {
 };
 
 export default ServicesScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  subContainer: {
-    backgroundColor: Colors.white,
-    height: '100%',
-    width: '100%',
-    paddingTop: DeviceInfo.isTablet() ? SIZES[40] : SIZES[16],
-    paddingLeft: DeviceInfo.isTablet() ? 186 : SIZES[16],
-    paddingRight: DeviceInfo.isTablet() ? 170 : 0
-  },
-  txtHeading: {
-    ...Fonts.PoppinsSemiBold[12],
-    color: Colors.bold
-  },
-  generalView: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: SIZES[24]
-    // justifyContent:"space-between"
-  }
-});

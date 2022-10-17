@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TextInput,
-  StyleSheet,
-  ScrollView
-} from 'react-native';
+import { View, Text, SafeAreaView, TextInput, ScrollView } from 'react-native';
 import React, { useState, useCallback } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
@@ -14,13 +7,14 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { Divider } from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 
-import { IconName } from '../../../component';
-import { Colors } from '../../../themes/Colors';
-import { Fonts } from '../../../themes';
-import FilesCard from '../../../component/Cards/FilesCard';
-import { Button } from '../../../component/button/Button';
-import Header from '../../../component/header/Header';
-import { SIZES } from '../../../themes/Sizes';
+import { IconName } from '../../../../component';
+import { Colors } from '../../../../themes/Colors';
+import { Fonts } from '../../../../themes';
+import FilesCard from '../../../../component/Cards/FilesCard';
+import { Button } from '../../../../component/button/Button';
+import Header from '../../../../component/header/Header';
+import { SIZES } from '../../../../themes/Sizes';
+import { styles } from './styles';
 
 const AddMeetingGeneralScreen = () => {
   const navigation = useNavigation();
@@ -157,68 +151,3 @@ const AddMeetingGeneralScreen = () => {
 };
 
 export default AddMeetingGeneralScreen;
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  subContainer: {
-    paddingHorizontal: SIZES[16],
-    paddingTop: SIZES[16],
-    backgroundColor: Colors.white,
-    flex: 1
-  },
-  txtAddSubjectTitle: { ...Fonts.PoppinsBold[24], color: Colors.bold },
-  buttonContainer: {
-    paddingHorizontal: SIZES[16]
-  },
-
-  nextBtnLayout: {
-    marginVertical: SIZES[12]
-  },
-  txtNextBtn: {
-    ...Fonts.PoppinsSemiBold[14],
-    color: Colors.white
-  },
-  divider: {
-    width: '100%',
-    height: SIZES[1],
-    backgroundColor: Colors.line
-  },
-  titleContainer: {
-    marginTop: SIZES[16],
-    borderBottomWidth: SIZES[1],
-    borderBottomColor: Colors.line
-  },
-  txtTitle: { ...Fonts.PoppinsRegular[12], color: Colors.secondary },
-
-  discriptionContainer: {
-    marginTop: SIZES[24],
-    borderBottomWidth: SIZES[1],
-    borderBottomColor: Colors.line
-  },
-  textInput: {
-    paddingVertical: SIZES[10],
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.bold
-  },
-  categoryContainer: {
-    marginTop: SIZES[24],
-    borderBottomWidth: SIZES[1],
-    borderBottomColor: Colors.line,
-    zIndex: 20
-  },
-  txtAttachFile: {
-    ...Fonts.PoppinsRegular[12],
-    color: Colors.secondary,
-    marginBottom: SIZES[22]
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: SIZES[16]
-  },
-  txtProgress: {
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.secondary
-  }
-});

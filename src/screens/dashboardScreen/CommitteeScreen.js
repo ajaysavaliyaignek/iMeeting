@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
@@ -8,116 +8,35 @@ import { IconName } from '../../component';
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
 import { SIZES } from '../../themes/Sizes';
+import { useQuery } from '@apollo/client';
+import { GET_All_COMMITTEE } from '../../graphql/query';
+import Loader from '../../component/Loader/Loader';
 
 const CommitteeScreen = () => {
   const navigation = useNavigation();
   const ref = useRef();
   const [isChecked, setChecked] = useState(false);
+  const [committee, setCommittee] = useState([]);
 
-  //   {
-  //     committeeReportName: "English Learner Stackholder",
-  //     committeeCode: "00001",
-  //     committeeType: "2",
-  //     committeeId: 1,
-  //     committeeName: "English Learner Stackholder",
-  //   },
-  //   {
-  //     committeeReportName: "Special Education Advisory Panel (S...",
-  //     committeeCode: "00001",
-  //     committeeType: "2",
-  //     committeeId: 1,
-  //     committeeName: "Special Education Advisory Panel (S...",
-  //     childs: [
-  //       {
-  //         committeeReportName: "English Learner Stackholder",
-  //         committeeCode: "00001",
-  //         committeeType: "2",
-  //         committeeId: 1,
-  //         committeeName: "English Learner Stackholder",
-  //         childs: [
-  //           {
-  //             committeeReportName: "English Learner Stackholder",
-  //             committeeCode: "00001",
-  //             committeeType: "2",
-  //             committeeId: 1,
-  //             committeeName: "English Learner Stackholder",
-  //           },
-  //           {
-  //             committeeReportName: "English Learner Stackholder",
-  //             committeeCode: "00001",
-  //             committeeType: "2",
-  //             committeeId: 1,
-  //             committeeName: "English Learner Stackholder",
-  //           },
-  //         ],
-  //       },
-  //       {
-  //         committeeReportName: "English Learner Stackholder",
-  //         committeeCode: "00001",
-  //         committeeType: "2",
-  //         committeeId: 1,
-  //         committeeName: "English Learner Stackholder",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     committeeReportName: "English Learner Stakeholder Input Gr...",
-  //     committeeCode: "00001",
-  //     committeeType: "2",
-  //     committeeId: 1,
-  //     committeeName: "English Learner Stakeholder Input Gr...",
-  //     childs: [],
-  //   },
-  //   {
-  //     committeeReportName: "Objectives & Targets",
-  //     committeeCode: "00001",
-  //     committeeType: "2",
-  //     committeeId: 1,
-  //     committeeName: "Objectives & Targets",
-  //     childs: [],
-  //   },
-  //   {
-  //     committeeReportName: "Assess Role of Category.",
-  //     committeeCode: "00001",
-  //     committeeType: "2",
-  //     committeeId: 1,
-  //     committeeName: "Assess Role of Category.",
-  //     childs: [],
-  //   },
-  //   {
-  //     committeeReportName: "Nonpublic Education Council",
-  //     committeeCode: "00001",
-  //     committeeType: "2",
-  //     committeeId: 1,
-  //     committeeName: "Nonpublic Education Council",
-  //     childs: [],
-  //   },
-  // ];
+  const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
+    GET_All_COMMITTEE,
+    {
+      variables: { isDeleted: true },
+      onCompleted: (data) => {
+        if (data) {
+          console.log('committees', data?.committees.items);
+          setCommittee(data.committees.items);
+        }
+      }
+    }
+  );
+  if (CommitteeError) {
+    console.log('commitee error', CommitteeError);
+  }
 
-  // useEffect(() => {
-  //   if (ref && ref.current) {
-  //     ref.current.setSelectedItem([
-  //       {
-  //         committeeReportName: "English Learner Stackholder",
-  //         committeeCode: "00001",
-  //         committeeType: "2",
-  //         committeeId: 1,
-  //         committeeName: "English Learner Stackholder",
-  //       },
-  //       {
-  //         committeeReportName: "Name 2",
-  //         committeeCode: "00002",
-  //         committeeType: "3",
-  //         committeeId: 2,
-  //         committeeName: "Name 2",
-  //       },
-  //     ]);
-  //   }
-  // }, [ref]);
-
-  const rowData = ({ title }) => {
+  const rowData = ({ title, index }) => {
     return (
-      <View style={styles.rowDataContainer}>
+      <View style={styles.rowDataContainer} key={index}>
         <Checkbox
           color={Colors.primary}
           value={isChecked}
@@ -144,14 +63,27 @@ const CommitteeScreen = () => {
         >
           Committees
         </Text>
-
+        {CommitteeLoading ? (
+          <Loader />
+        ) : CommitteeError ? (
+          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <Text>{CommitteeError}</Text>
+          </View>
+        ) : (
+          <ScrollView>
+            {committee.map((item, index) => {
+              return rowData({ title: item.committeeTitle, index });
+            })}
+          </ScrollView>
+        )}
+        {/* 
         {rowData({ title: 'Advisory Committee on Financial Management' })}
         {rowData({ title: 'Assessment Accommodations Review Panel' })}
         {rowData({ title: 'English Learner Stakeholder Input Group (ELSIG)' })}
         {rowData({ title: 'Indigenous Education Action Team' })}
         {rowData({ title: 'Local Assessment Advisory Committee (LAAC)' })}
         {rowData({ title: 'Nonpublic Education Council' })}
-        {rowData({ title: 'Special Education Advisory Panel (SEAP)' })}
+        {rowData({ title: 'Special Education Advisory Panel (SEAP)' })} */}
       </View>
     </SafeAreaView>
   );

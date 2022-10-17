@@ -22,7 +22,7 @@ const Input = ({
       onPressOut={onPressOut}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
-      onSubmitEditing={onChange}
+      onBlur={onChange}
       value={value}
       label={
         <Text

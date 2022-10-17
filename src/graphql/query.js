@@ -101,6 +101,73 @@ export const GET_SUBJECT_BY_ID = gql`
       subjectTitle
       userId
       subjectStatus
+      commentThreadId
+    }
+  }
+`;
+
+export const GET_FILE = gql`
+  query uploadedFile($fileEntryId: Long) {
+    uploadedFile(fileEntryId: $fileEntryId) {
+      contentUrl
+      downloadUrl
+      fileEnteryId
+      groupId
+      name
+      size
+      type
+    }
+  }
+`;
+
+export const GET_All_COMMITTEE = gql`
+  query committees(
+    $page: Int
+    $pageSize: Int
+    $searchValue: String
+    $sort: String
+    $isDeleted: Boolean
+  ) {
+    committees(
+      page: $page
+      pageSize: $pageSize
+      searchValue: $searchValue
+      sort: $sort
+      isDeleted: $isDeleted
+    ) {
+      items {
+        attachDocumentIds
+        committeeId
+        committeeCategoryId
+        committeeTitle
+        description
+        expirationDate
+        organizationId
+        parentCommitteeId
+        isDisable
+        setUpDate
+        userIds
+        status
+      }
+      pageSize
+      pageSize
+      totalCount
+    }
+  }
+`;
+
+export const GET_All_COMMENTS_THREAD = gql`
+  query comments($commentCategoryId: Long, $sort: String) {
+    comments(commentCategoryId: $commentCategoryId, sort: $sort) {
+      items {
+        childComment
+        comment
+        commentId
+        userId
+        userName
+      }
+      page
+      totalCount
     }
   }
 `;

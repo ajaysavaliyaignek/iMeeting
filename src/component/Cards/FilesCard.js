@@ -6,27 +6,41 @@ import { Colors } from '../../themes/Colors';
 import Icon from '../Icon';
 import IconName from '../Icon/iconName';
 import { SIZES } from '../../themes/Sizes';
+import ConvertBytes from '../convertBytes/ConvertBytes';
 
 const FilesCard = ({
   filePath,
   fileSize,
   onDownloadPress,
-  onClosePress,
-  style
+  onRemovePress,
+  style,
+  download,
+  deleted
 }) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.rightView}>
-        <Text style={styles.txtPath}>{filePath}</Text>
-        <Text style={styles.txtSize}>{fileSize}</Text>
+        <Text style={styles.txtPath} numberOfLines={1}>
+          {filePath}
+        </Text>
+        <Text style={styles.txtSize}>{ConvertBytes(fileSize)}</Text>
       </View>
+
       <View style={styles.leftView}>
-        <TouchableOpacity onPress={onDownloadPress}>
-          <Icon name={IconName.Download} height={SIZES[18]} width={SIZES[18]} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onClosePress}>
-          <Icon name={IconName.Close} height={SIZES[12]} width={SIZES[12]} />
-        </TouchableOpacity>
+        {download && (
+          <TouchableOpacity onPress={onDownloadPress}>
+            <Icon
+              name={IconName.Download}
+              height={SIZES[18]}
+              width={SIZES[18]}
+            />
+          </TouchableOpacity>
+        )}
+        {deleted && (
+          <TouchableOpacity onPress={onRemovePress}>
+            <Icon name={IconName.Close} height={SIZES[12]} width={SIZES[12]} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -47,12 +61,14 @@ const styles = StyleSheet.create({
   },
   txtPath: {
     ...Fonts.PoppinsSemiBold[14],
-    color: Colors.bold
+    color: Colors.bold,
+    width: '50%'
   },
   txtSize: {
     ...Fonts.PoppinsRegular[14],
     color: Colors.secondary,
-    marginLeft: SIZES[12]
+    marginLeft: SIZES[12],
+    alignSelf: 'center'
   },
   rightView: {
     flexDirection: 'row',

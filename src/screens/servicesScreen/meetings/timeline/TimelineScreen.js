@@ -1,12 +1,22 @@
-import { View, SafeAreaView, StyleSheet, Dimensions } from 'react-native';
-import React from 'react';
+import {
+  View,
+  SafeAreaView,
+  StyleSheet,
+  Dimensions,
+  Text,
+  TouchableOpacity
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Agenda } from 'react-native-calendars';
 
-import { SIZES } from '../../../themes/Sizes';
-import { Colors } from '../../../themes/Colors';
-import Header from '../../../component/header/Header';
-import { IconName } from '../../../component';
+import { SIZES } from '../../../../themes/Sizes';
+import { Colors } from '../../../../themes/Colors';
+import Header from '../../../../component/header/Header';
+import { Icon, IconName } from '../../../../component';
+import { styles } from './styles';
+import EventCalendar from 'react-native-events-calendar';
+import { Divider } from 'react-native-paper';
 
 const NUM_ITEMS = 10;
 function getColor(i) {
@@ -19,56 +29,48 @@ function getColor(i) {
 
 const TimelineScreen = () => {
   const navigation = useNavigation();
-  // const [events, setEvents] = useState([
-  //         {
-  //           start: '2020-01-01 00:00:00',
-  //           end: '2020-01-01 02:00:00',
-  //           title: 'New Year Party',
-  //           summary: 'xyz Location',
-
-  //         },
-  //         {
-  //           start: '2020-01-01 01:00:00',
-  //           end: '2020-01-01 02:00:00',
-  //           title: 'New Year Wishes',
-  //           summary: 'Call to every one',
-
-  //         },
-  //         {
-  //           start: '2020-01-02 00:30:00',
-  //           end: '2020-01-02 01:30:00',
-  //           title: 'Parag Birthday Party',
-  //           summary: 'Call him',
-
-  //         },
-  //         {
-  //           start: '2022-09-29 01:30:00',
-  //           end: '2020-01-03 02:20:00',
-  //           title: 'My Birthday Party',
-  //           summary: 'Lets Enjoy',
-
-  //         },
-  //         {
-  //           start: '2020-02-04 04:10:00',
-  //           end: '2020-02-04 04:40:00',
-  //           title: 'Engg Expo 2020',
-  //           summary: 'Expoo Vanue not confirm',
-
-  //         },
-  //       ]);
-
-  const events = [
+  const [events, setEvents] = useState([
     {
-      title: 'Meeting',
-      start: new Date(2022, 9, 30, 11, 0),
-      end: new Date(2022, 9, 30, 11, 30)
+      start: '2022-10-14 00:00:00',
+      end: '2022-10-14 02:00:00',
+      title: 'New Year Party',
+      summary: 'xyz Location'
     },
     {
-      title: 'Coffee break',
-      start: new Date(2020, 1, 11, 15, 45),
-      end: new Date(2020, 1, 11, 16, 30)
+      start: '2022-10-14 00:00:00',
+      end: '2022-10-14 02:00:00',
+      title: 'New Year Wishes',
+      summary: 'Call to every one'
+    },
+    {
+      start: '2022-10-14 00:00:00',
+      end: '2022-10-14 02:00:00',
+      title: 'New Year Wishes',
+      summary: 'Call to every one'
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    const initialDate = `${new Date().getFullYear()}-${
+      new Date().getMonth() < 10
+        ? '0' + new Date().getMonth()
+        : new Date().getMonth()
+    }-${new Date().getDate()}`;
+    console.log(initialDate);
+  });
+
+  // const events = [
+  //   {
+  //     title: 'Meeting',
+  //     start: new Date(2022, 9, 30, 11, 0),
+  //     end: new Date(2022, 9, 30, 11, 30)
+  //   },
+  //   {
+  //     title: 'Coffee break',
+  //     start: new Date(2020, 1, 11, 15, 45),
+  //     end: new Date(2020, 1, 11, 16, 30)
+  //   }
+  // ];
 
   const eventClicked = (event) => {
     //On Click of event showing alert from here
@@ -85,30 +87,62 @@ const TimelineScreen = () => {
       />
 
       <View style={styles.subContainer}>
+        <TouchableOpacity
+          style={styles.usersView}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Committee')}
+        >
+          <Text style={styles.txtUsers}>Users</Text>
+          <View style={styles.btnCommittees}>
+            <Text style={styles.txtBtnCommittees}>Selected 7 users</Text>
+            <Icon
+              name={IconName.Arrow_Right}
+              height={SIZES[12]}
+              width={SIZES[6]}
+            />
+          </View>
+        </TouchableOpacity>
+        <Divider style={styles.divider} />
         {/* <EventCalendar
-
           eventTapped={eventClicked}
           // Function on event press
           events={events}
           // Passing the Array of event
-          width={width}
+          width={400}
           // Container width
           size={60}
           // number of date will render before and after initDate
           // (default is 30 will render 30 day before initDate
           // and 29 day after initDate)
-          initDate={'2020-01-01'}
+          initDate={
+            '2022-10-14'
+            //   `${new Date().getFullYear()}-${
+            //   new Date().getMonth() < 10
+            //     ? '0' + new Date().getMonth()
+            //     : new Date().getMonth()
+            // }-${
+            //   new Date().getDate() < 10
+            //     ? '0' + new Date().getDate()
+            //     : new Date().getDate()
+            //   }`
+          }
           // Show initial date (default is today)
           scrollToFirst
           // Scroll to first event of the day (default true)
-          renderEvent={(event) => <Text style={{backgroundColor:getColor(event.index)}}>{event.title}</Text>}
+          renderEvent={(event) => (
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={{ backgroundColor: getColor(event.index) }}>
+                {event.title}
+              </Text>
+            </View>
+          )}
         /> */}
         <Agenda
           // The list of items that have to be displayed in agenda. If you want to render item as empty date
           // the value of date key has to be an empty array []. If there exists no value for date key it is
           // considered that the date in question is not yet loaded
           items={{
-            '2012-05-22': [{ name: 'item 1 - any js object' }],
+            '2012-05-16': [{ name: 'item 1 - any js object' }],
             '2012-05-23': [{ name: 'item 2 - any js object', height: 80 }],
             '2012-05-24': [],
             '2012-05-25': [
@@ -140,11 +174,16 @@ const TimelineScreen = () => {
           maxDate={'2012-05-30'}
           // Max amount of months allowed to scroll to the past. Default = 50
           pastScrollRange={50}
+          scrollEnabled={true}
           // Max amount of months allowed to scroll to the future. Default = 50
           futureScrollRange={50}
           // Specify how each item should be rendered in agenda
           renderItem={(item, firstItemInDay) => {
-            return <View />;
+            return (
+              <View>
+                <Text>{item.name}</Text>
+              </View>
+            );
           }}
           // Specify how each date should be rendered. day can be undefined if the item is not first in that day
           renderDay={(day, item) => {
@@ -196,7 +235,7 @@ const TimelineScreen = () => {
             agendaKnobColor: 'blue'
           }}
           // Agenda container style
-          style={{}}
+          // style={{ flex: 1 }}
         />
       </View>
     </SafeAreaView>
@@ -204,15 +243,3 @@ const TimelineScreen = () => {
 };
 
 export default TimelineScreen;
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  subContainer: {
-    paddingHorizontal: SIZES[16],
-    paddingTop: SIZES[16],
-    backgroundColor: Colors.white,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-});
