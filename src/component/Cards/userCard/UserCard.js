@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
-import { Colors } from '../../themes/Colors';
-import { Fonts } from '../../themes';
-import Icon from '../Icon';
-import IconName from '../Icon/iconName';
-import { SIZES } from '../../themes/Sizes';
-import Avatar from '../Avatar/Avatar';
-import EditDeleteModal from '../EditDeleteModal';
+import { Colors } from '../../../themes/Colors';
+import { Fonts } from '../../../themes';
+import Icon from '../../Icon';
+import IconName from '../../Icon/iconName';
+import { SIZES } from '../../../themes/Sizes';
+import Avatar from '../../Avatar/Avatar';
+import EditDeleteModal from '../../EditDeleteModal';
+import { styles } from './styles';
 
 const UserCard = ({ item, index }) => {
   const navigation = useNavigation();
@@ -63,7 +64,17 @@ const UserCard = ({ item, index }) => {
 
         <RowData name={'E-mail'} discription={item.email} />
         <RowData name={'Role'} discription={item.role} />
-        <RowData name={'Available'} discription={item.available} />
+        <RowData
+          name={'Available'}
+          discription={item.available}
+          style={{
+            height: SIZES[8],
+            width: SIZES[8],
+            backgroundColor: '#81AB96',
+            borderRadius: SIZES[4],
+            marginRight: SIZES[8]
+          }}
+        />
         <RowData
           name={'Answer'}
           discription={item.answer}
@@ -93,55 +104,3 @@ const UserCard = ({ item, index }) => {
 };
 
 export default UserCard;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SIZES[12]
-  },
-  divider: {
-    width: '100%',
-    height: SIZES[1],
-    backgroundColor: Colors.line
-  },
-  txtCommitteeName: {
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.secondary,
-    width: '30%'
-  },
-  discription: {
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.bold
-  },
-  committeeDetailView: {
-    paddingVertical: SIZES[24],
-
-    width: '90%'
-  },
-  txtCommitteeTitle: {
-    ...Fonts.PoppinsBold[20],
-    color: Colors.bold,
-    marginLeft: SIZES[12]
-  },
-  dotsView: {
-    position: 'absolute',
-    right: SIZES[16],
-    top: SIZES[32]
-  },
-  availableView: {
-    height: SIZES[8],
-    width: SIZES[8],
-    borderRadius: 100,
-    backgroundColor: Colors.switch
-  },
-  userDetails: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  modalView: {
-    position: 'absolute',
-    top: SIZES[60],
-    right: SIZES[8]
-  }
-});

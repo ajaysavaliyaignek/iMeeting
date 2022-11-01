@@ -45,46 +45,46 @@ export const subjectData = [
 
 export const meetingsData = [
   {
-    title: 'Advisory Committee on Fi....',
-    DateTime: '13 Aug 2021,08:00 AM ',
-    Location: 'Meeting room 2',
-    Status: 'Scheduled'
+    meetingTitle: 'Advisory Committee on Fi....',
+    setDate: '13 Aug 2021,08:00 AM ',
+    location: 'Meeting room 2',
+    status: 'Scheduled'
   },
   {
-    title: 'Assessment Accommodatio...',
-    DateTime: '13 Aug 2021,08:00 AM ',
-    Location: 'Meeting room 2',
-    Status: 'Scheduled'
+    meetingTitle: 'Assessment Accommodatio...',
+    setDate: '13 Aug 2021,08:00 AM ',
+    location: 'Meeting room 2',
+    status: 'Scheduled'
   },
   {
-    title: 'Assessment Accommodatio...',
-    DateTime: '13 Aug 2021,08:00 AM ',
-    Location: 'Meeting room 2',
-    Status: 'Scheduled'
+    meetingTitle: 'Assessment Accommodatio...',
+    setDate: '13 Aug 2021,08:00 AM ',
+    location: 'Meeting room 2',
+    status: 'Scheduled'
   },
   {
-    title: 'Assessment Accommodatio...',
-    DateTime: '13 Aug 2021,08:00 AM ',
-    Location: 'Meeting room 2',
-    Status: 'Scheduled'
+    meetingTitle: 'Assessment Accommodatio...',
+    setDate: '13 Aug 2021,08:00 AM ',
+    location: 'Meeting room 2',
+    status: 'Scheduled'
   },
   {
-    title: 'Assessment Accommodatio...',
-    DateTime: '13 Aug 2021,08:00 AM ',
-    Location: 'Meeting room 2',
-    Status: 'Scheduled'
+    meetingTitle: 'Assessment Accommodatio...',
+    setDate: '13 Aug 2021,08:00 AM ',
+    location: 'Meeting room 2',
+    status: 'Scheduled'
   },
   {
-    title: 'Assessment Accommodatio...',
-    DateTime: '13 Aug 2021,08:00 AM ',
-    Location: 'Meeting room 2',
-    Status: 'Scheduled'
+    meetingTitle: 'Assessment Accommodatio...',
+    setDate: '13 Aug 2021,08:00 AM ',
+    location: 'Meeting room 2',
+    status: 'Scheduled'
   },
   {
-    title: 'Assessment Accommodatio...',
-    DateTime: '13 Aug 2021,08:00 AM ',
-    Location: 'Meeting room 2',
-    Status: 'Scheduled'
+    meetingTitle: 'Assessment Accommodatio...',
+    setDate: '13 Aug 2021,08:00 AM ',
+    location: 'Meeting room 2',
+    status: 'Scheduled'
   }
 ];
 
@@ -194,5 +194,40 @@ export const userDetails = [
     email: 'marvin.mc@exam.com',
     number: '(423) 342-4235',
     role: 'Secretary'
+  }
+];
+
+export const AppointmentsData = [
+  {
+    id: 1,
+    title: 'Advisory Committee on Fina...',
+    committee: 'iMeeting',
+    YourRole: 'Head',
+    DateTime: '13 Aug 2021, 08:00 AM',
+    Location: 'Meeting room 2'
+  },
+  {
+    id: 2,
+    title: 'Assessment Accommodatio...',
+    committee: 'Accounting',
+    YourRole: 'Secretary',
+    DateTime: '21 Sep 2021, 01:00 AM',
+    Location: 'Office 32'
+  },
+  {
+    id: 3,
+    title: 'English Learner Stakeholder I...',
+    committee: 'Sport comittee',
+    YourRole: 'Member',
+    DateTime: '13 Aug 2021, 08:00 AM',
+    Location: 'Meeting room 2'
+  },
+  {
+    id: 4,
+    title: 'Assessment Accommodatio...',
+    committee: 'iMeeting',
+    YourRole: 'Head',
+    DateTime: '13 Aug 2021, 08:00 AM',
+    Location: 'Meeting room 2'
   }
 ];

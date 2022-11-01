@@ -165,9 +165,114 @@ export const GET_All_COMMENTS_THREAD = gql`
         commentId
         userId
         userName
+        commentDate
+        parentCommentId
+        profilePicture
       }
       page
       totalCount
+    }
+  }
+`;
+
+export const GET_ZIP_PDF_DOWNLOAD = gql`
+  query report(
+    $attachFile: Boolean
+    $comments: Boolean
+    $format: String
+    $id: Int
+    $type: Int
+  ) {
+    report(
+      attachFile: $attachFile
+      comments: $comments
+      format: $format
+      id: $id
+      type: $type
+    ) {
+      fileData
+    }
+  }
+`;
+
+export const GET_All_MEETING = gql`
+  query meeting(
+    $comitteeId: Long
+    $date: Date
+    $onlyMyMeeting: Boolean
+    $page: Int
+    $pageSize: Int
+    $searchValue: String
+    $sort: String
+  ) {
+    meetings(
+      comitteeId: $comitteeId
+      date: $date
+      onlyMyMeeting: $onlyMyMeeting
+      page: $page
+      pageSize: $pageSize
+      searchValue: $searchValue
+      sort: $sort
+    ) {
+      items {
+        committeeId
+        creatorName
+        description
+        endDate
+        locationId
+        meetingId
+        meetingStatusId
+        meetingTitle
+        plateformlink
+        platformId
+        repeat
+        setDate
+        status
+        timeZone
+        workHours
+        answers
+        userDetails {
+          answer
+          appointmentId
+          email
+          isAvailable
+          isRequired
+          meetingId
+          roleId
+          roleName
+          suggestedTime
+          userId
+          userName
+          videoConferenceId
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_LOCATION_BY_ID = gql`
+  query location($locationId: Long) {
+    location(locationId: $locationId) {
+      building
+      city
+      floor
+      locationId
+      googleMapURL
+      peopleCapacity
+      room
+      street
+      title
+    }
+  }
+`;
+
+export const GET_ALL_LOCATION = gql`
+  query locations($locationType: Int) {
+    locations(locationType: $locationType) {
+      items {
+        title
+        locationId
+      }
     }
   }
 `;

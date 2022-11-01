@@ -22,7 +22,7 @@ const SubjectsCard = ({ item, index, text, search }) => {
     const { value } = text;
     const parts = txt.split(new RegExp(`(${text})`, 'gi'));
     return (
-      <Text>
+      <Text numberOfLines={1}>
         {parts.map((part) =>
           part === text ? (
             <Text
@@ -37,7 +37,11 @@ const SubjectsCard = ({ item, index, text, search }) => {
               {part}
             </Text>
           ) : (
-            <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
+            <Text
+              style={styles.txtCommitteeTitle}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {part}
             </Text>
           )
@@ -183,7 +187,10 @@ const SubjectsCard = ({ item, index, text, search }) => {
       {editModal && (
         <View style={styles.modalView}>
           <EditDeleteModal
-            onPressDownload={() => navigation.navigate('SubjectDownload')}
+            onPressDownload={() => {
+              navigation.navigate('SubjectDownload', { item });
+              setEditModal(false);
+            }}
             subjectStatus={item.subjectStatus}
             onPressDelete={() => {
               onDeleteHandler(item.subjectId);

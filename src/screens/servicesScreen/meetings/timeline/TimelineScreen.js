@@ -17,6 +17,7 @@ import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
 import EventCalendar from 'react-native-events-calendar';
 import { Divider } from 'react-native-paper';
+import Calendar from 'react-native-big-calendar';
 
 const NUM_ITEMS = 10;
 function getColor(i) {
@@ -29,52 +30,51 @@ function getColor(i) {
 
 const TimelineScreen = () => {
   const navigation = useNavigation();
-  const [events, setEvents] = useState([
-    {
-      start: '2022-10-14 00:00:00',
-      end: '2022-10-14 02:00:00',
-      title: 'New Year Party',
-      summary: 'xyz Location'
-    },
-    {
-      start: '2022-10-14 00:00:00',
-      end: '2022-10-14 02:00:00',
-      title: 'New Year Wishes',
-      summary: 'Call to every one'
-    },
-    {
-      start: '2022-10-14 00:00:00',
-      end: '2022-10-14 02:00:00',
-      title: 'New Year Wishes',
-      summary: 'Call to every one'
-    }
-  ]);
-
-  useEffect(() => {
-    const initialDate = `${new Date().getFullYear()}-${
-      new Date().getMonth() < 10
-        ? '0' + new Date().getMonth()
-        : new Date().getMonth()
-    }-${new Date().getDate()}`;
-    console.log(initialDate);
-  });
-
-  // const events = [
+  // const [events, setEvents] = useState([
   //   {
-  //     title: 'Meeting',
-  //     start: new Date(2022, 9, 30, 11, 0),
-  //     end: new Date(2022, 9, 30, 11, 30)
+  //     start: '2022-10-14 00:00:00',
+  //     end: '2022-10-14 02:00:00',
+  //     title: 'New Year Party',
+  //     summary: 'xyz Location'
   //   },
   //   {
-  //     title: 'Coffee break',
-  //     start: new Date(2020, 1, 11, 15, 45),
-  //     end: new Date(2020, 1, 11, 16, 30)
+  //     start: '2022-10-14 00:00:00',
+  //     end: '2022-10-14 02:00:00',
+  //     title: 'New Year Wishes',
+  //     summary: 'Call to every one'
+  //   },
+  //   {
+  //     start: '2022-10-14 00:00:00',
+  //     end: '2022-10-14 02:00:00',
+  //     title: 'New Year Wishes',
+  //     summary: 'Call to every one'
   //   }
-  // ];
+  // ]);
+
+  const events = [
+    {
+      title: 'Meeting',
+      start: new Date(2022, 10, 28, 11, 0),
+      end: new Date(2022, 10, 28, 11, 30)
+    },
+    {
+      title: 'Coffee break',
+      start: new Date(2022, 10, 28, 15, 45),
+      end: new Date(2020, 10, 28, 16, 30)
+    }
+  ];
 
   const eventClicked = (event) => {
     //On Click of event showing alert from here
     alert(JSON.stringify(event));
+  };
+
+  const renderEvent = (event) => {
+    return (
+      <TouchableOpacity style={{ width: 1000 }}>
+        <Text>{`My custom event: ${event.title} `}</Text>
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -137,7 +137,17 @@ const TimelineScreen = () => {
             </View>
           )}
         /> */}
-        <Agenda
+        <Calendar
+          events={events}
+          height={600}
+          mode="week"
+          swipeEnabled={true}
+          // hourRowHeight={300}
+          showAllDayEventCell={true}
+          renderEvent={(event) => renderEvent(event)}
+          ampm={true}
+        />
+        {/* <Calendar
           // The list of items that have to be displayed in agenda. If you want to render item as empty date
           // the value of date key has to be an empty array []. If there exists no value for date key it is
           // considered that the date in question is not yet loaded
@@ -236,7 +246,7 @@ const TimelineScreen = () => {
           }}
           // Agenda container style
           // style={{ flex: 1 }}
-        />
+        /> */}
       </View>
     </SafeAreaView>
   );

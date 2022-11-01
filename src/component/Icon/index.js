@@ -129,6 +129,14 @@ const Icon = ({ name, height = SIZES[24], width = SIZES[24], fill }) => {
         );
       case IconName.CopyText:
         return <SVGImage.CopyText height={height} width={width} fill={fill} />;
+      case IconName.Arrow_Right_Black:
+        return (
+          <SVGImage.Arrow_Right_Black
+            height={height}
+            width={width}
+            fill={fill}
+          />
+        );
 
       default:
         return null;

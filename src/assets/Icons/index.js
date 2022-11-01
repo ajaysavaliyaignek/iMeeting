@@ -29,6 +29,7 @@ export { default as Minus } from './Dashboard/Minus.svg';
 
 // dashboard screen
 export { default as Arrow_Right } from './Dashboard/Arrow_Right.svg';
+export { default as Arrow_Right_Black } from './Dashboard/Arrow_Right_Black.svg';
 export { default as Meetings_Dashboard } from './Dashboard/Meetings_Dashboard.svg';
 export { default as Add_White } from './Dashboard/Add_White.svg';
 

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import React, { useRef, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 
 import Header from '../../component/header/Header';
@@ -11,8 +11,12 @@ import { SIZES } from '../../themes/Sizes';
 import { useQuery } from '@apollo/client';
 import { GET_All_COMMITTEE } from '../../graphql/query';
 import Loader from '../../component/Loader/Loader';
+import { Divider } from 'react-native-paper';
+import { Button } from '../../component/button/Button';
 
 const CommitteeScreen = () => {
+  const route = useRoute();
+  const { setSelectCommittee } = route?.params;
   const navigation = useNavigation();
   const ref = useRef();
   const [isChecked, setChecked] = useState(false);
@@ -66,8 +70,12 @@ const CommitteeScreen = () => {
         {CommitteeLoading ? (
           <Loader />
         ) : CommitteeError ? (
-          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-            <Text>{CommitteeError}</Text>
+          <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+              {CommitteeError.message}
+            </Text>
           </View>
         ) : (
           <ScrollView>
@@ -85,6 +93,34 @@ const CommitteeScreen = () => {
         {rowData({ title: 'Nonpublic Education Council' })}
         {rowData({ title: 'Special Education Advisory Panel (SEAP)' })} */}
       </View>
+      <View
+        style={{
+          backgroundColor: Colors.white,
+          justifyContent: 'flex-end'
+        }}
+      >
+        {/* Divider */}
+        <Divider style={styles.divider} />
+        <View style={styles.buttonContainer}>
+          <Button
+            title={'Cancel'}
+            onPress={() => navigation.goBack()}
+            layoutStyle={styles.cancelBtnLayout}
+            textStyle={styles.txtCancelButton}
+          />
+          <Button
+            title={'Save'}
+            onPress={() => {
+              // navigation.navigate('Details', {
+              //   title: 'Subjects',
+              //   active: '1'
+              // });
+            }}
+            layoutStyle={styles.nextBtnLayout}
+            textStyle={styles.txtNextBtn}
+          />
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -96,7 +132,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     width: '100%',
     padding: SIZES[16],
-    height: '100%'
+    height: '100%',
+    flex: 1
   },
   wrapItem: {
     flexDirection: 'row',
@@ -119,5 +156,32 @@ const styles = StyleSheet.create({
     color: Colors.bold,
     marginLeft: SIZES[16],
     marginRight: SIZES[16]
+  },
+  buttonContainer: {
+    paddingHorizontal: SIZES[16],
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  cancelBtnLayout: {
+    backgroundColor: '#F3F6F9',
+    marginVertical: SIZES[12],
+    width: '48%'
+  },
+  txtCancelButton: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.primary
+  },
+  nextBtnLayout: {
+    marginVertical: SIZES[12],
+    width: '48%'
+  },
+  txtNextBtn: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.white
+  },
+  divider: {
+    width: '100%',
+    height: SIZES[1],
+    backgroundColor: Colors.line
   }
 });

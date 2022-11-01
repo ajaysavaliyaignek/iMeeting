@@ -292,6 +292,8 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
+  - react-native-voice (1.1.9):
+    - React
   - React-perflogger (0.70.0)
   - React-RCTActionSheet (0.70.0):
     - React-Core/RCTActionSheetHeaders (= 0.70.0)
@@ -428,6 +430,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - "react-native-voice (from `../node_modules/@react-native-community/voice`)"
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -512,6 +515,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-voice:
+    :path: "../node_modules/@react-native-community/voice"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -592,6 +597,7 @@ SPEC CHECKSUMS:
   React-logger: 48d82b9be8e44d86668de4453fdb60255516388b
   react-native-document-picker: f68191637788994baed5f57d12994aa32cf8bf88
   react-native-safe-area-context: b456e1c40ec86f5593d58b275bd0e9603169daca
+  react-native-voice: eb6b7c7f752310f72a6f4d64c2fba6ee724d6604
   React-perflogger: 77947e49d84e31eb87d454d4ef327542dcfeaebc
   React-RCTActionSheet: 9f5fd6c1666c1a834ab7f45a452ed08b1de44eb8
   React-RCTAnimation: 6fd3db6ca387c8432fd6a26428e940a081bcb476

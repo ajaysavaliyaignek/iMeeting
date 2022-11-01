@@ -9,10 +9,39 @@ import Icon from '../Icon';
 import IconName from '../Icon/iconName';
 import EditDeleteModal from '../EditDeleteModal';
 import { SIZES } from '../../themes/Sizes';
+import moment from 'moment';
+import { GET_ALL_LOCATION_BY_ID } from '../../graphql/query';
+import { useQuery } from '@apollo/client';
 
 const MeetingsCard = ({ item, text, index }) => {
   const navigation = useNavigation();
   const [editModal, setEditModal] = useState(false);
+  const [location, setLocation] = useState('');
+
+  // get location
+  const {
+    loading: loadingLocation,
+    error: errorLocation,
+    data: dataLocation
+  } = useQuery(GET_ALL_LOCATION_BY_ID, {
+    variables: {
+      locationId: item.locationId
+    },
+    onCompleted: (data) => {
+      console.log('location', data);
+      if (data) {
+        setLocation(data.location);
+      }
+    }
+  });
+
+  if (dataLocation) {
+    console.log('dataLocation', dataLocation.location);
+  }
+
+  if (errorLocation) {
+    console.log('errorLocation', errorLocation);
+  }
 
   const getHighlightedText = (txt) => {
     const parts = txt.split(new RegExp(`(${text})`, 'gi'));
@@ -81,28 +110,36 @@ const MeetingsCard = ({ item, text, index }) => {
         }}
         activeOpacity={0.5}
       >
-        {getHighlightedText(item.title)}
+        {getHighlightedText(item.meetingTitle)}
         {/* <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
           {item.title}
         </Text> */}
 
-        <RowData name={'Date & Time'} discription={item.DateTime} />
-        <RowData name={'Location'} discription={item.Location} />
+        <RowData
+          name={'Date & Time'}
+          discription={moment(item.setDate).format('D MMMM YYYY,hh:mm A')}
+        />
+        <RowData name={'Location'} discription={item.location} />
         <RowData
           name={'Status'}
-          discription={item.Status}
+          discription={item.status}
           style={{
-            color: item.Status === 'Scheduled' ? Colors.bold : Colors.bold,
+            color:
+              item.status !== null && item.status === 'Scheduled'
+                ? Colors.bold
+                : Colors.bold,
             ...Fonts.PoppinsSemiBold[14]
           }}
           marginLeft={24}
           btnStyle={{
             backgroundColor:
-              item.Status === 'Scheduled' ? Colors.white : Colors.white,
-            marginLeft: SIZES[24],
-            borderColor: Colors.line,
-            borderWidth: SIZES[1],
-            borderRadius: SIZES[8]
+              item.status !== null && item.status === 'Scheduled'
+                ? Colors.white
+                : Colors.white,
+            marginLeft: item.status !== null && SIZES[24],
+            borderColor: item.status !== null && Colors.line,
+            borderWidth: item.status !== null && SIZES[1],
+            borderRadius: item.status !== null && SIZES[8]
           }}
         />
       </View>
@@ -116,7 +153,19 @@ const MeetingsCard = ({ item, text, index }) => {
       </TouchableOpacity>
       {editModal && (
         <View style={styles.modalView}>
-          <EditDeleteModal onPressDelete={onDeleteHandler} />
+          <EditDeleteModal
+            onPressDelete={() => {
+              onDeleteHandler();
+              setEditModal(false);
+            }}
+            onPressView={() => {
+              navigation.navigate('MeetingDetails');
+              setEditModal(false);
+            }}
+            onPressEdit={() => {
+              setEditModal(false);
+            }}
+          />
         </View>
       )}
     </TouchableOpacity>

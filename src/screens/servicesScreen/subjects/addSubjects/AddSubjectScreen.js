@@ -16,6 +16,7 @@ import { Button } from '../../../../component/button/Button';
 import Header from '../../../../component/header/Header';
 import {
   GET_All_COMMITTEE,
+  GET_All_MEETING,
   GET_All_SUBJECTS,
   GET_All_SUBJECTS_CATEGORY,
   GET_FILE
@@ -23,6 +24,7 @@ import {
 import { UPDATE_SUBJECTS } from '../../../../graphql/mutation';
 import Loader from '../../../../component/Loader/Loader';
 import { SIZES } from '../../../../themes/Sizes';
+import { BASE_URL } from '../../../../ApolloClient/Client';
 
 const AddSubjectScreen = () => {
   const navigation = useNavigation();
@@ -39,20 +41,10 @@ const AddSubjectScreen = () => {
   const [token, setToken] = useState('');
   const [category, setCategory] = useState([]);
   const [committees, setCommittee] = useState([]);
+  const [meetings, setMeetings] = useState([]);
   const [items, setItems] = useState([{ label: 'Design', value: 'design' }]);
   let fileId = [];
 
-  // useEffect(() => {
-  //   getToken();
-  // }, []);
-
-  // const getToken = async () => {
-  //   const user = await AsyncStorage.getItem('@user').catch((e) =>
-  //     console.log(e)
-  //   );
-  //   setToken(JSON.parse(user)?.dataToken);
-  //   console.log('token', token);
-  // };
   // fetch file
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
@@ -88,6 +80,22 @@ const AddSubjectScreen = () => {
     console.log('commitee error', CommitteeError);
   }
 
+  // fetch meetings
+  const { loading: MeetingLoading, error: MeetingError } = useQuery(
+    GET_All_MEETING,
+    {
+      onCompleted: (data) => {
+        if (data) {
+          console.log('meetings', data?.meetings.items);
+          setMeetings(data.meetings.items);
+        }
+      }
+    }
+  );
+  if (MeetingError) {
+    console.log('MeetingError', MeetingError);
+  }
+
   useEffect(() => {
     getToken();
   }, [token]);
@@ -98,21 +106,21 @@ const AddSubjectScreen = () => {
     );
     setToken(JSON.parse(user)?.dataToken);
   };
-
+  console.log('token from add subject', token);
   const handleDocumentSelection = useCallback(async () => {
     try {
       const response = await DocumentPicker.pickMultiple({
         presentationStyle: 'fullScreen',
         type: [DocumentPicker.types.allFiles]
       });
-
+      console.log('file response', response);
       response.map((res) => {
         if (res !== null) {
           const formData = new FormData();
           formData.append('file', res);
           console.log('formdata', formData);
 
-          fetch(`http://128.199.26.43:9080/o/imeeting-rest/v1.0/file-upload`, {
+          fetch(`${BASE_URL}/o/imeeting-rest/v1.0/file-upload`, {
             method: 'POST',
             headers: {
               Authorization: 'Bearer ' + `${token}`,
@@ -146,7 +154,7 @@ const AddSubjectScreen = () => {
                 );
               }
             })
-            .then(() => {})
+
             .catch((e) => console.log('file upload error--', e));
         }
       });
@@ -183,170 +191,166 @@ const AddSubjectScreen = () => {
       />
 
       <View style={styles.container}>
-        {SubjectCategoryLoading ? (
-          <Loader />
-        ) : (
-          <ScrollView
-            style={styles.subContainer}
-            nestedScrollEnabled={true}
-            showsVerticalScrollIndicator={false}
-          >
-            <Text style={styles.txtAddSubjectTitle}>Add subject</Text>
-            {/* title */}
-            <View style={styles.titleContainer}>
-              <Text style={styles.txtTitle}>TITLE</Text>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={(text) => setTitle(text)}
-              />
-            </View>
-            <View style={styles.discriptionContainer}>
-              <Text style={styles.txtTitle}>DISCRIPTION</Text>
-              <TextInput
-                style={styles.textInput}
-                multiline={true}
-                onChangeText={(text) => setDescription(text)}
-              />
-            </View>
-            <View style={styles.categoryContainer}>
-              <Text style={styles.txtTitle}>SUBJECT CATEGORY</Text>
-              <DropDownPicker
-                listMode="SCROLLVIEW"
-                open={openCategory}
-                value={valueCategory}
-                items={category.map((item) => ({
-                  label: item.categoryTitle,
-                  value: item.id
-                }))}
-                setOpen={() => {
-                  setOpenCommitee(false);
-                  setOpenCategory(!openCategory);
-                }}
-                setValue={setValueCategory}
-                setItems={setItems}
-                placeholder={'Select category'}
-                placeholderStyle={{
-                  ...Fonts.PoppinsRegular[12],
-                  color: Colors.secondary
-                }}
-                arrowIconStyle={{
-                  height: SIZES[12],
-                  width: SIZES[14]
-                }}
-                style={{
-                  borderWidth: 0,
-                  paddingRight: SIZES[16],
-                  paddingLeft: 0
-                }}
-                textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              />
-            </View>
-            <View style={styles.committeeContainer}>
-              <Text style={styles.txtTitle}>SELECT COMMITTEE</Text>
-              <DropDownPicker
-                listMode="SCROLLVIEW"
-                open={openCommittee}
-                value={valueCommittee}
-                items={committees?.map((item) => ({
-                  label: item.committeeTitle,
-                  value: item.organizationId
-                }))}
-                setOpen={() => {
-                  setOpenCommitee(!openCommittee);
-                  setOpenCategory(false);
-                }}
-                setValue={setValueCommittee}
-                setItems={setItems}
-                placeholder={'Select committee'}
-                placeholderStyle={{
-                  ...Fonts.PoppinsRegular[12],
-                  color: Colors.secondary
-                }}
-                arrowIconStyle={{
-                  height: SIZES[12],
-                  width: SIZES[14]
-                }}
-                style={{
-                  borderWidth: 0,
-                  paddingRight: SIZES[16],
-                  paddingLeft: 0
-                }}
-                textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              />
-            </View>
+        <ScrollView
+          style={styles.subContainer}
+          nestedScrollEnabled={true}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.txtAddSubjectTitle}>Add subject</Text>
+          {/* title */}
+          <View style={styles.titleContainer}>
+            <Text style={styles.txtTitle}>TITLE</Text>
+            <TextInput
+              style={styles.textInput}
+              onChangeText={(text) => setTitle(text)}
+            />
+          </View>
+          <View style={styles.discriptionContainer}>
+            <Text style={styles.txtTitle}>DISCRIPTION</Text>
+            <TextInput
+              style={styles.textInput}
+              multiline={true}
+              onChangeText={(text) => setDescription(text)}
+            />
+          </View>
+          <View style={styles.categoryContainer}>
+            <Text style={styles.txtTitle}>SUBJECT CATEGORY</Text>
+            <DropDownPicker
+              listMode="SCROLLVIEW"
+              open={openCategory}
+              value={valueCategory}
+              items={category.map((item) => ({
+                label: item.categoryTitle,
+                value: item.id
+              }))}
+              setOpen={() => {
+                setOpenCommitee(false);
+                setOpenCategory(!openCategory);
+              }}
+              setValue={setValueCategory}
+              setItems={setItems}
+              placeholder={'Select category'}
+              placeholderStyle={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary
+              }}
+              arrowIconStyle={{
+                height: SIZES[12],
+                width: SIZES[14]
+              }}
+              style={{
+                borderWidth: 0,
+                paddingRight: SIZES[16],
+                paddingLeft: 0
+              }}
+              textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            />
+          </View>
+          <View style={styles.committeeContainer}>
+            <Text style={styles.txtTitle}>SELECT COMMITTEE</Text>
+            <DropDownPicker
+              listMode="SCROLLVIEW"
+              open={openCommittee}
+              value={valueCommittee}
+              items={committees?.map((item) => ({
+                label: item.committeeTitle,
+                value: item.organizationId
+              }))}
+              setOpen={() => {
+                setOpenCommitee(!openCommittee);
+                setOpenCategory(false);
+              }}
+              setValue={setValueCommittee}
+              setItems={setItems}
+              placeholder={'Select committee'}
+              placeholderStyle={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary
+              }}
+              arrowIconStyle={{
+                height: SIZES[12],
+                width: SIZES[14]
+              }}
+              style={{
+                borderWidth: 0,
+                paddingRight: SIZES[16],
+                paddingLeft: 0
+              }}
+              textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            />
+          </View>
 
-            <View style={styles.meetingContainer}>
-              <Text style={styles.txtTitle}>SELECT MEETING</Text>
-              <DropDownPicker
-                listMode="SCROLLVIEW"
-                open={openMeeting}
-                value={valueMeeting}
-                items={committees?.map((item) => ({
-                  label: item.committeeTitle,
-                  value: item.organizationId
-                }))}
-                setOpen={() => {
-                  setOpenMeeting(!openMeeting);
-                  setOpenCategory(false);
-                  setOpenCommitee(false);
-                }}
-                setValue={setValueMeeting}
-                setItems={setItems}
-                placeholder={'Select meeting'}
-                placeholderStyle={{
-                  ...Fonts.PoppinsRegular[12],
-                  color: Colors.secondary
-                }}
-                arrowIconStyle={{
-                  height: SIZES[12],
-                  width: SIZES[14]
-                }}
-                style={{
-                  borderWidth: 0,
-                  paddingRight: SIZES[16],
-                  paddingLeft: 0
-                }}
-                textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              />
-            </View>
+          <View style={styles.meetingContainer}>
+            <Text style={styles.txtTitle}>SELECT MEETING</Text>
+            <DropDownPicker
+              listMode="SCROLLVIEW"
+              open={openMeeting}
+              value={valueMeeting}
+              items={committees?.map((item) => ({
+                label: item.committeeTitle,
+                value: item.organizationId
+              }))}
+              setOpen={() => {
+                setOpenMeeting(!openMeeting);
+                setOpenCategory(false);
+                setOpenCommitee(false);
+              }}
+              setValue={setValueMeeting}
+              setItems={setItems}
+              placeholder={'Select meeting'}
+              placeholderStyle={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary
+              }}
+              arrowIconStyle={{
+                height: SIZES[12],
+                width: SIZES[14]
+              }}
+              style={{
+                borderWidth: 0,
+                paddingRight: SIZES[16],
+                paddingLeft: 0
+              }}
+              textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            />
+          </View>
 
-            <View style={{ marginTop: 24 }}>
-              <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
-              {fileResponse?.map((file, index) => {
-                console.log('from retuen', file);
-                return (
-                  <FilesCard
-                    key={index}
-                    filePath={file.name}
-                    fileSize={file.size}
-                    onDownloadPress={() =>
-                      navigation.navigate('SubjectDownload')
-                    }
-                    fileType={file.type}
-                    onRemovePress={() => removeFile(file.fileEnteryId)}
-                    style={{
-                      borderBottomWidth: SIZES[1],
-                      borderBottomColor: Colors.Approved
-                    }}
-                  />
-                );
-              })}
+          <View style={{ marginTop: 24 }}>
+            <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
+            {fileResponse?.map((file, index) => {
+              console.log('from retuen', file);
+              return (
+                <FilesCard
+                  download={true}
+                  deleted={true}
+                  key={index}
+                  filePath={file.name}
+                  fileSize={file.size}
+                  onDownloadPress={() => navigation.navigate('SubjectDownload')}
+                  fileType={file.type}
+                  onRemovePress={() => removeFile(file.fileEnteryId)}
+                  style={{
+                    borderBottomWidth: SIZES[1],
+                    borderBottomColor: Colors.Approved
+                  }}
+                />
+              );
+            })}
 
-              <Button
-                title={'Attach file'}
-                layoutStyle={{
-                  backgroundColor: 'rgba(243, 246, 249,1)',
-                  marginBottom: 32
-                }}
-                textStyle={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.primary
-                }}
-                onPress={() => handleDocumentSelection()}
-              />
-            </View>
-          </ScrollView>
-        )}
+            <Button
+              title={'Attach file'}
+              layoutStyle={{
+                backgroundColor: 'rgba(243, 246, 249,1)',
+                marginBottom: 32
+              }}
+              textStyle={{
+                ...Fonts.PoppinsSemiBold[14],
+                color: Colors.primary
+              }}
+              onPress={() => handleDocumentSelection()}
+            />
+          </View>
+        </ScrollView>
 
         <View
           style={{

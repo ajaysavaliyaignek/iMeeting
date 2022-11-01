@@ -31,7 +31,8 @@ export const styles = StyleSheet.create({
   titleContainer: {
     marginTop: SIZES[16],
     borderBottomWidth: SIZES[1],
-    borderBottomColor: Colors.line
+    borderBottomColor: Colors.line,
+    zIndex: 20
   },
   txtTitle: { ...Fonts.PoppinsRegular[12], color: Colors.secondary },
 
@@ -48,8 +49,7 @@ export const styles = StyleSheet.create({
   categoryContainer: {
     marginTop: SIZES[24],
     borderBottomWidth: SIZES[1],
-    borderBottomColor: Colors.line,
-    zIndex: 20
+    borderBottomColor: Colors.line
   },
   txtAttachFile: {
     ...Fonts.PoppinsRegular[12],

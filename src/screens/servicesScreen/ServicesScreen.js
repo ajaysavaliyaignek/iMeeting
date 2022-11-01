@@ -44,6 +44,7 @@ const ServicesScreen = ({ navigation }) => {
             width={SIZES[20]}
             title={'Appointments'}
             textStyle={{ marginTop: SIZES[23] }}
+            onPress={() => navigation.navigate('AppointmentsList')}
           />
           <DashboardCard
             backgroundColor={Colors.BG_Video}

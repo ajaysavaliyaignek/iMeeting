@@ -41,7 +41,8 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.line
   },
   addressContainer: {
-    marginTop: SIZES[8]
+    marginTop: SIZES[8],
+    marginBottom: SIZES[24]
   },
   buttonContainer: {
     flexDirection: 'row',

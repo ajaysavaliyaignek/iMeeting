@@ -25,14 +25,24 @@ export const styles = StyleSheet.create({
   generalContainer: {
     marginVertical: SIZES[16]
   },
-
+  txtTitle: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.secondary,
+    marginTop: SIZES[16]
+  },
+  discription: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold,
+    marginVertical: SIZES[10]
+  },
   divider: {
     width: '100%',
     height: SIZES[1],
     backgroundColor: Colors.line
   },
   addressContainer: {
-    marginTop: SIZES[8]
+    marginTop: SIZES[8],
+    marginBottom: SIZES[24]
   },
   buttonContainer: {
     flexDirection: 'row',

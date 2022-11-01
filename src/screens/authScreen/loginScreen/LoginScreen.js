@@ -18,14 +18,20 @@ import Input from '../../../component/Input/Input';
 import { GET_AUTH } from '../../../graphql/query';
 import { SIZES } from '../../../themes/Sizes';
 import { styles } from './styles';
+import { BASE_URL } from '../../../ApolloClient/Client';
 
 const LoginScreen = ({ navigation }) => {
   const [url, setUrl] = useState('');
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
-  const [clientId, setClientId] = useState('');
-  const [clientSecret, setClientSecret] = useState('');
+  const [clientId, setClientId] = useState(
+    'id-ddddf11b-f44f-cd72-59c9-40e239822d'
+  );
+  const [clientSecret, setClientSecret] = useState(
+    'secret-d45c341b-b192-645b-fee9-202aa3a4edc'
+  );
+
   const [error, setError] = useState('');
 
   const [getAuth, { loading, data }] = useLazyQuery(GET_AUTH, {
@@ -45,6 +51,14 @@ const LoginScreen = ({ navigation }) => {
       console.log(error);
     }
   };
+  const storeUserToken = (token) => {
+    console.log('store data called-----');
+    try {
+      AsyncStorage.setItem('@token', token);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const Login = () => {
     const formData = new URLSearchParams();
@@ -60,7 +74,7 @@ const LoginScreen = ({ navigation }) => {
     console.log('password', password);
 
     if (clientId !== '' && clientSecret !== '') {
-      fetch(`http://128.199.26.43:9080/o/oauth2/token`, {
+      fetch(`${BASE_URL}/o/oauth2/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -84,6 +98,7 @@ const LoginScreen = ({ navigation }) => {
             };
             console.log(user);
             storeToken(user);
+            storeUserToken(dataToken);
 
             const interval = setInterval(() => {
               refreshToken();
@@ -109,7 +124,7 @@ const LoginScreen = ({ navigation }) => {
     console.log('password', password);
 
     if (clientId !== '' && clientSecret !== '') {
-      fetch(`http://128.199.26.43:9080/o/oauth2/token`, {
+      fetch(`${BASE_URL}/o/oauth2/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -134,6 +149,7 @@ const LoginScreen = ({ navigation }) => {
             };
             console.log(user);
             storeToken(user);
+            storeUserToken(dataToken);
           }
         });
     }
@@ -159,10 +175,10 @@ const LoginScreen = ({ navigation }) => {
           // onPressOut={()=>{
           //   console.log("i am called from press out", url)
           //   getAuth({variables:{domainName:url}})}}
-          onChange={() => {
-            console.log('i am called', url);
-            getAuth({ variables: { domainName: url } });
-          }}
+          // onChange={() => {
+          //   console.log('i am called', url);
+          //   getAuth({ variables: { domainName: url } });
+          // }}
           value={url}
           label={'URL- address company'}
           right={

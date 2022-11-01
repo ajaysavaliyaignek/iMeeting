@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import Checkbox from 'expo-checkbox';
 
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
@@ -11,6 +10,7 @@ import IconName from '../Icon/iconName';
 import { SIZES } from '../../themes/Sizes';
 import Avatar from '../Avatar/Avatar';
 import EditDeleteModal from '../EditDeleteModal';
+import CheckBox from '../checkBox/CheckBox';
 
 const UsersCard = ({
   item,
@@ -89,13 +89,12 @@ const UsersCard = ({
               <RowData name={'Number'} discription={item.number} />
             )}
           </View>
-          <Checkbox
-            color={Colors.primary}
-            value={selectAllUser || selectAllExternal ? true : selectUser}
-            onValueChange={() => {
+          <CheckBox
+            // value={selectAllUser || selectAllExternal ? true : selectUser}
+            onPress={() => {
               setSelectUser(!selectUser);
             }}
-            style={styles.Checkbox}
+            selected={selectUser}
           />
         </View>
       </TouchableOpacity>

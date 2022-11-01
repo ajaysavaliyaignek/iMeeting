@@ -3,7 +3,8 @@ import {
   Text,
   SafeAreaView,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  ScrollView
 } from 'react-native';
 import React from 'react';
 import Header from '../../../../component/header/Header';
@@ -25,7 +26,10 @@ const AddLocation = () => {
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
-      <View style={styles.subContainer}>
+      <ScrollView
+        style={styles.subContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.txtLocationDetailsTitle}>Add location</Text>
         <View style={styles.generalContainer}>
           <Text style={styles.txtTitleGeneral}>General</Text>
@@ -92,7 +96,7 @@ const AddLocation = () => {
           </View>
           <Divider style={styles.divider} />
         </View>
-      </View>
+      </ScrollView>
       <View
         style={{
           backgroundColor: Colors.white,

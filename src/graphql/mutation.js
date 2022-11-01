@@ -16,3 +16,13 @@ export const DELETE_SUBJECTS = gql`
     }
   }
 `;
+
+export const UPDATE_COMMENT = gql`
+  mutation addComment(
+    $comment: Inputcom_imeeting_portal_rest_dto_v1_0_Comment!
+  ) {
+    addComment(comment: $comment) {
+      status
+    }
+  }
+`;

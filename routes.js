@@ -20,7 +20,6 @@ import CommitteesDetails from './src/screens/dashboardScreen/CommitteesDetails';
 import StatisticScreen from './src/screens/dashboardScreen/StatisticScreen';
 import CommitteeScreen from './src/screens/dashboardScreen/CommitteeScreen';
 import SubjectDownload from './src/screens/servicesScreen/subjects/subjectDowmload/SubjectDownload';
-import MeetingDetails from './src/screens/servicesScreen/meetings/MeetingDetails';
 import EditMeeting from './src/screens/servicesScreen/meetings/EditMeeting';
 import AddMeetingGeneralScreen from './src/screens/servicesScreen/meetings/addMeetingGeneral/AddMeetingGeneral';
 import AddMeetingUser from './src/screens/servicesScreen/meetings/addMeetingUser/AddMeetingUser';
@@ -37,6 +36,16 @@ import AddMeetingLocation from './src/screens/servicesScreen/meetings/addMeeting
 import LocationDetails from './src/screens/servicesScreen/meetings/locationDetails/LocationDetails';
 import AddLocation from './src/screens/servicesScreen/meetings/addLocation/AddLocation';
 import AddMeetingSubjects from './src/screens/servicesScreen/meetings/addMeetingSubjects/AddMeetingSubjects';
+import DeadlineSuggestion from './src/screens/servicesScreen/meetings/deadlineSuggestion/DeadlineSuggestion';
+import SelectSubjects from './src/screens/servicesScreen/meetings/selectSubjects/SelectSubjects';
+import Role from './src/screens/servicesScreen/meetings/role/Role';
+import AppointmentsList from './src/screens/servicesScreen/appointments/appointmetList/AppointmentsList';
+import MeetingDetails from './src/screens/servicesScreen/meetings/meetingDetails/MeetingDetails';
+import Users from './src/screens/servicesScreen/meetings/users/Users';
+import AddAppointmentGeneral from './src/screens/servicesScreen/appointments/addAppointmentGeneral/AddAppointmentGeneral';
+import AddAppointmentUsers from './src/screens/servicesScreen/appointments/addAppointmentUsers/AddAppointmentUsers';
+import AddAppointmentDateAndTime from './src/screens/servicesScreen/appointments/addAppointmentDateAndTime/AddAppointmentDateAndTime';
+import AddAppointmentLocation from './src/screens/servicesScreen/appointments/addAppointmentLocation/AddAppointmentLocation';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -237,7 +246,6 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="SubjectDetails" component={SubjectDetails} />
       <Stack.Screen name="EditSubject" component={EditSubjectScreen} />
       <Stack.Screen name="SubjectDownload" component={SubjectDownload} />
-      <Stack.Screen name="MeetingDetails" component={MeetingDetails} />
       <Stack.Screen
         name="AddMeetingGeneral"
         component={AddMeetingGeneralScreen}
@@ -255,6 +263,28 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="Timeline" component={TimelineScreen} />
       <Stack.Screen name="SelectUsers" component={SelectUsers} />
       <Stack.Screen name="AddExternalUser" component={AddExternalUser} />
+      <Stack.Screen name="DeadlineSuggestion" component={DeadlineSuggestion} />
+      <Stack.Screen name="SelectSubjects" component={SelectSubjects} />
+      <Stack.Screen name="Role" component={Role} />
+      <Stack.Screen name="MeetingDetails" component={MeetingDetails} />
+      <Stack.Screen name="AppointmentsList" component={AppointmentsList} />
+      <Stack.Screen
+        name="AddAppointmentGeneral"
+        component={AddAppointmentGeneral}
+      />
+      <Stack.Screen
+        name="AddAppointmentUsers"
+        component={AddAppointmentUsers}
+      />
+      <Stack.Screen
+        name="AddAppointmentDateAndTime"
+        component={AddAppointmentDateAndTime}
+      />
+      <Stack.Screen
+        name="AddAppointmentLocation"
+        component={AddAppointmentLocation}
+      />
+      <Stack.Screen name="Users" component={Users} />
     </Stack.Navigator>
   );
 };

@@ -33,7 +33,8 @@ const IconName = {
   Eye_Primary: 'Eye_Primary',
   Speaker: 'Speaker',
   Download_Primary: 'Download_Primary',
-  CopyText: 'CopyText'
+  CopyText: 'CopyText',
+  Arrow_Right_Black: 'Arrow_Right_Black'
 };
 
 export default IconName;

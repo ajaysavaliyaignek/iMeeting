@@ -1,4 +1,10 @@
-import { View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  ScrollView
+} from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -20,7 +26,10 @@ const LocationDetails = () => {
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
-      <View style={styles.subContainer}>
+      <ScrollView
+        style={styles.subContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.txtLocationDetailsTitle}>Location details</Text>
         <View style={styles.generalContainer}>
           <Text style={styles.txtTitleGeneral}>General</Text>
@@ -73,7 +82,7 @@ const LocationDetails = () => {
           </View>
           <Divider style={styles.divider} />
         </View>
-      </View>
+      </ScrollView>
       <View
         style={{
           backgroundColor: Colors.white,

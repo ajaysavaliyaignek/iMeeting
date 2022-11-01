@@ -16,6 +16,7 @@ import { Button } from '../../../../component/button/Button';
 import Header from '../../../../component/header/Header';
 import {
   GET_All_COMMITTEE,
+  GET_All_MEETING,
   GET_All_SUBJECTS,
   GET_All_SUBJECTS_CATEGORY,
   GET_FILE
@@ -42,6 +43,7 @@ const EditSubjectScreen = () => {
   const [token, setToken] = useState('');
   const [category, setCategory] = useState([]);
   const [committees, setCommittee] = useState([]);
+  const [meetings, setMeetings] = useState([]);
   const [items, setItems] = useState([{ label: item, value: 'design' }]);
   let fileId = [];
 
@@ -85,7 +87,7 @@ const EditSubjectScreen = () => {
   const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
     GET_All_COMMITTEE,
     {
-      // variables: { isDeleted: false },
+      variables: { isDeleted: false },
       onCompleted: (data) => {
         if (data) {
           console.log('committees', data?.committees.items);
@@ -96,6 +98,22 @@ const EditSubjectScreen = () => {
   );
   if (CommitteeError) {
     console.log('commitee error', CommitteeError);
+  }
+
+  // fetch meetings
+  const { loading: MeetingLoading, error: MeetingError } = useQuery(
+    GET_All_MEETING,
+    {
+      onCompleted: (data) => {
+        if (data) {
+          console.log('meetings', data?.meetings.items);
+          setMeetings(data.meetings.items);
+        }
+      }
+    }
+  );
+  if (MeetingError) {
+    console.log('commitee error', MeetingError);
   }
 
   useEffect(() => {
@@ -395,7 +413,7 @@ const EditSubjectScreen = () => {
                 addSubject({
                   variables: {
                     subject: {
-                      subjectId: 0,
+                      subjectId: item.subjectId,
                       committeeId: valueCommittee,
                       subjectTitle: title,
                       description: discription,

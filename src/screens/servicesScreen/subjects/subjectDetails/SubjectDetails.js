@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  PermissionsAndroid
+  PermissionsAndroid,
+  FlatList
 } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -30,7 +31,7 @@ import {
   GET_FILE,
   GET_SUBJECT_BY_ID
 } from '../../../../graphql/query';
-import { DELETE_SUBJECTS } from '../../../../graphql/mutation';
+import { DELETE_SUBJECTS, UPDATE_COMMENT } from '../../../../graphql/mutation';
 
 const SubjectDetails = () => {
   const navigation = useNavigation();
@@ -40,7 +41,10 @@ const SubjectDetails = () => {
 
   const [openReply, setOpenReply] = useState(false);
   const [fileId, setFileId] = useState(item?.attachFileIds);
+  const [commentThreadId, setCommentThreadId] = useState(null);
   const [fileResponse, setFileResponse] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [commenttext, setCommentText] = useState('');
   const keyboardVerticalOffset = Platform.OS === 'ios' ? -350 : -600;
 
   const checkPermission = async (file) => {
@@ -138,33 +142,75 @@ const SubjectDetails = () => {
 
   console.log('file response', fileResponse);
 
-  const { loading: SubjectLoading, error: SubjectError } = useQuery(
-    GET_SUBJECT_BY_ID,
-    {
-      variables: { subjectId: item.subjectId },
-      onCompleted: (data) => {
-        console.log('subject data', data);
+  const {
+    loading: SubjectLoading,
+    error: SubjectError,
+    data: SubjectsData
+  } = useQuery(GET_SUBJECT_BY_ID, {
+    variables: { subjectId: item.subjectId },
+    onCompleted: (data) => {
+      console.log('subject data', data);
+      if (data) {
+        setCommentThreadId(data.subject.commentThreadId);
       }
     }
-  );
+  });
+
+  if (SubjectsData) {
+    console.log('SubjectsData', SubjectsData.subject);
+  }
 
   if (SubjectError) {
     console.log('subject error', SubjectError);
   }
 
-  // const { loading: CommentsLoading, error: CommentsError } = useQuery(
-  //   GET_All_COMMENTS_THREAD,
-  //   {
-  //     variables: { commentCategoryId: {} },
-  //     onCompleted: (data) => {
-  //       console.log('comments data', data);
-  //     }
-  //   }
-  // );
+  console.log('commentThreadId', commentThreadId);
 
-  // if (CommentsError) {
-  //   console.log('CommentsError error', CommentsError);
-  // }
+  const {
+    loading: CommentsLoading,
+    error: CommentsError,
+    data: CommentsData
+  } = useQuery(GET_All_COMMENTS_THREAD, {
+    variables: { commentCategoryId: commentThreadId },
+    onCompleted: (data) => {
+      if (data) {
+        console.log('comments data', data.comments.items);
+        setComments(data.comments.items);
+      } else {
+        console.log('no comments');
+      }
+    }
+  });
+
+  if (CommentsData) {
+    console.log('CommentsData', CommentsData.comments.items);
+  }
+
+  if (CommentsError) {
+    console.log('CommentsError error', CommentsError);
+  }
+
+  // addComment
+  const [
+    addComment,
+    { data: AddCommentData, loading: AddCommentLoading, error: AddCommentError }
+  ] = useMutation(UPDATE_COMMENT, {
+    // export const GET_All_SUBJECTS = gql`
+    refetchQueries: [
+      {
+        query: GET_All_COMMENTS_THREAD,
+
+        variables: { commentCategoryId: commentThreadId }
+      }
+    ]
+  });
+
+  if (AddCommentData) {
+    console.log('addComment', AddCommentData);
+  }
+  if (AddCommentError) {
+    console.log('addCommentError', AddCommentError);
+  }
 
   const [deleteSubject, { data, loading, error }] = useMutation(
     DELETE_SUBJECTS,
@@ -261,10 +307,18 @@ const SubjectDetails = () => {
           {/* comments     */}
           <Text style={styles.txtcommentsTitle}>Comments</Text>
 
-          <View style={{ marginTop: SIZES[24] }}>
-            <CommentCard />
+          <View>
+            <FlatList
+              data={comments[0]?.childComment}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={({ item, index }) => `${item?.commentId}`}
+              renderItem={({ item, index }) => (
+                <CommentCard item={item} commentThreadId={commentThreadId} />
+              )}
+            />
+            {/* <CommentCard /> */}
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => setOpenReply(!openReply)}
               style={{
                 flexDirection: 'row',
@@ -287,23 +341,24 @@ const SubjectDetails = () => {
               >
                 Show 2 replies
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
-          {openReply && (
-            <View style={{ marginLeft: SIZES[24], marginTop: SIZES[24] }}>
-              <CommentCard />
-              <Text
-                style={{
-                  ...Fonts.PoppinsRegular[14],
-                  color: '#144B8D',
-                  marginTop: SIZES[16]
-                }}
-              >
-                Reply
-              </Text>
-            </View>
-          )}
+          {/* {openReply && (
+              <View style={{ marginLeft: SIZES[24], marginTop: SIZES[24] }}>
+                {comments}
+                <CommentCard />
+                <Text
+                  style={{
+                    ...Fonts.PoppinsRegular[14],
+                    color: '#144B8D',
+                    marginTop: SIZES[16]
+                  }}
+                >
+                  Reply
+                </Text>
+              </View>
+            )} */}
           <View
             style={{
               paddingVertical: SIZES[14],
@@ -323,11 +378,28 @@ const SubjectDetails = () => {
                 height: SIZES[30],
                 backgroundColor: Colors.white
               }}
+              value={commenttext}
               underlineColor={Colors.white}
               activeUnderlineColor={Colors.white}
               placeholder={'Your comment'}
+              onChangeText={(text) => setCommentText(text)}
             />
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('commenttext', commenttext);
+                console.log('parentCommentId', comments[0]?.parentCommentId);
+                addComment({
+                  variables: {
+                    comment: {
+                      comment: commenttext,
+                      commentId: 0,
+                      parentCommentId: comments[0]?.commentId
+                    }
+                  }
+                });
+                setCommentText('');
+              }}
+            >
               <Icon name={IconName.Send} height={SIZES[22]} width={SIZES[20]} />
             </TouchableOpacity>
           </View>

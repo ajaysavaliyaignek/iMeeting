@@ -16,11 +16,13 @@ import { SIZES } from '../../../themes/Sizes';
 import { meetingsData } from '../../../Constans/data';
 import MeetingsCard from '../../../component/Cards/MeetingdCard';
 import { Button } from '../../../component/button/Button';
-import { GET_All_SUBJECTS } from '../../../graphql/query';
+import { GET_All_MEETING, GET_All_SUBJECTS } from '../../../graphql/query';
 import { Icon, IconName } from '../../../component';
 import { Colors } from '../../../themes/Colors';
 import Loader from '../../../component/Loader/Loader';
 import { styles } from './styles';
+import { Fonts } from '../../../themes';
+import { searchFilter } from '../../../component/searchFilter/SearchFilter';
 
 const DetailsScreen = () => {
   const route = useRoute();
@@ -35,11 +37,16 @@ const DetailsScreen = () => {
   const [filterData, setFilterData] = useState([]);
   const [subjectData, setSubjectData] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [meetingData, setMeetingData] = useState(meetingsData);
-  const [filterMeetingData, setFilterMeetingData] = useState(meetingsData);
+  const [meetingData, setMeetingData] = useState([]);
+  const [filterMeetingData, setFilterMeetingData] = useState([]);
+  const [selectCommittee, setSelectCommittee] = useState(null);
 
   // get ALL SUBJECTS
-  const { loading, error, data } = useQuery(GET_All_SUBJECTS, {
+  const {
+    loading: SubjectsLoading,
+    error: SubjectsError,
+    data: SubjectsData
+  } = useQuery(GET_All_SUBJECTS, {
     onCompleted: (data) => {
       setFilterData(data?.subjects.items);
 
@@ -47,11 +54,35 @@ const DetailsScreen = () => {
     }
   });
 
-  if (data) {
-    console.log('subjects---', data.subjects.items);
+  if (SubjectsData) {
+    console.log('subjects---', SubjectsData.subjects.items);
   }
-  if (error) {
-    console.log('subjects error---', error);
+  if (SubjectsError) {
+    console.log('subjects error---', SubjectsError);
+  }
+
+  // get ALL MEETINGS
+  const {
+    loading: loadingGetMeetings,
+    error: errorGetMeetings,
+    data: dataGetMeetings
+  } = useQuery(GET_All_MEETING, {
+    variables: { onlyMyMeeting: onlyMyMeetings },
+    onCompleted: (data) => {
+      console.log('meetings', data);
+      if (data) {
+        setFilterMeetingData(data?.meetings.items);
+
+        setMeetingData(data?.meetings.items);
+      }
+    }
+  });
+
+  if (dataGetMeetings) {
+    console.log('dataGetMeetings---', dataGetMeetings.meetings.items);
+  }
+  if (errorGetMeetings) {
+    console.log('GetMeetings error---', errorGetMeetings.message);
   }
 
   // const handleChangeText = (param) => {
@@ -74,40 +105,27 @@ const DetailsScreen = () => {
         const textData = text;
         return itemData.indexOf(textData) > -1;
       });
-      // const newMeetingData = meetingData.filter((item) => {
-      //   const itemMeetingData = item.title ? item.title : '';
-      //   const textMeetingData = text;
-      //   return itemMeetingData.indexOf(textMeetingData) > -1;
-      // });
       setSearchText(text);
       setFilterData(newData);
-      // setFilterMeetingData(newMeetingData);
     } else {
       setSearchText(text);
       setFilterData(subjectData);
-      // setFilterMeetingData(meetingData);
     }
   };
 
   const searchFilterMeeting = (text) => {
     if (text) {
       const newData = meetingData.filter((item) => {
-        const itemData = item.title ? item.title : '';
+        const itemData = item.meetingTitle ? item.meetingTitle : '';
         const textData = text;
         return itemData.indexOf(textData) > -1;
       });
-      // const newMeetingData = meetingData.filter((item) => {
-      //   const itemMeetingData = item.title ? item.title : '';
-      //   const textMeetingData = text;
-      //   return itemMeetingData.indexOf(textMeetingData) > -1;
-      // });
+
       setSearchText(text);
       setFilterMeetingData(newData);
-      // setFilterMeetingData(newMeetingData);
     } else {
       setSearchText(text);
       setFilterMeetingData(meetingData);
-      // setFilterMeetingData(meetingData);
     }
   };
 
@@ -193,7 +211,9 @@ const DetailsScreen = () => {
             <TouchableOpacity
               style={styles.committeeView}
               activeOpacity={0.5}
-              onPress={() => navigation.navigate('Committee')}
+              onPress={() =>
+                navigation.navigate('Committee', { setSelectCommittee })
+              }
             >
               <Text style={styles.txtCommittee}>Committee</Text>
               <View style={styles.btnCommittees}>
@@ -206,7 +226,7 @@ const DetailsScreen = () => {
               </View>
             </TouchableOpacity>
 
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { marginLeft: SIZES[16] }]} />
             <View style={styles.btnContainer}>
               <Button
                 title={'Meetings'}
@@ -272,14 +292,35 @@ const DetailsScreen = () => {
               />
             </View>
             <Divider style={styles.divider} />
+            {/* {loadingGetMeetings ? (
+              <Loader />
+            ) : errorGetMeetings ? (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Text
+                  style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}
+                >
+                  {errorGetMeetings.message}
+                </Text>
+              </View>
+            ) : ( */}
             <FlatList
-              data={filterMeetingData}
+              data={
+                meetingsData
+                // filterMeetingData
+              }
               keyExtractor={(item, index) => `${index}`}
               renderItem={({ item, index }) => (
                 <MeetingsCard item={item} index={index} text={searchText} />
               )}
               showsVerticalScrollIndicator={false}
             />
+            {/* )} */}
           </View>
         )}
 
@@ -287,11 +328,21 @@ const DetailsScreen = () => {
 
         {activeTab === '1' && (
           <View style={{ flex: 1 }}>
-            {loading ? (
+            {SubjectsLoading ? (
               <Loader />
-            ) : error ? (
-              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <Text>{error}</Text>
+            ) : SubjectsError ? (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Text
+                  style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}
+                >
+                  {SubjectsError.message}
+                </Text>
               </View>
             ) : (
               <FlatList

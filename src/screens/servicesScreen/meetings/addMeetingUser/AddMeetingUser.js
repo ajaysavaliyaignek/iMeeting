@@ -18,7 +18,7 @@ import { Icon, IconName } from '../../../../component';
 import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
 import { usersData } from '../../../../Constans/data';
-import UserCard from '../../../../component/Cards/UserCard';
+import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { styles } from './styles';
 
 const AddMeetingUser = () => {

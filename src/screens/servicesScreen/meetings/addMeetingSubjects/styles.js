@@ -66,7 +66,8 @@ export const styles = StyleSheet.create({
   },
   deadlineContainer: {
     marginTop: SIZES[40],
-    paddingHorizontal: SIZES[16]
+    paddingHorizontal: SIZES[16],
+    marginBottom: SIZES[24]
   },
   selectsubjectBtnLayout: {
     backgroundColor: '#F3F6F9',
@@ -92,5 +93,33 @@ export const styles = StyleSheet.create({
   txtNextBtn: {
     ...Fonts.PoppinsSemiBold[14],
     color: Colors.white
+  },
+  txtCommitteeTitle: {
+    ...Fonts.PoppinsBold[20],
+    color: Colors.bold
+  },
+  txtSubjectsTitle: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.secondary,
+    width: '30%'
+  },
+  txtDiscription: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold
+  },
+  modalView: {
+    position: 'absolute',
+    top: SIZES[60],
+    right: SIZES[8]
+  },
+  committeeDetailView: {
+    paddingVertical: SIZES[24],
+    paddingHorizontal: SIZES[16],
+    width: '90%'
+  },
+  dotsView: {
+    position: 'absolute',
+    right: SIZES[16],
+    top: SIZES[32]
   }
 });
