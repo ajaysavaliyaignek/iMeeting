@@ -8,21 +8,96 @@ import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
 import { Fonts } from '../../../../themes';
 import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
+import { useQuery } from '@apollo/client';
+import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 
 const AddMeetingLocation = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    attachFiles,
+    committee,
+    title,
+    discription,
+    users,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    TimeZone,
+    Repeat
+  } = route?.params;
+  console.log('meeting data from addmeetinglocation', {
+    attachFiles,
+    committee,
+    title,
+    discription,
+    users,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    TimeZone,
+    Repeat
+  });
   const [openLocation, setOpenLocation] = useState(false);
   const [valueLocation, setValueLocation] = useState(null);
   const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(null);
+  const [platform, setPlatform] = useState(null);
+  const [location, setLocation] = useState([]);
   const [items, setItems] = useState([
-    { label: 'Office 2', value: 'Office 2' }
+    { label: 'Google meet', value: 1 },
+    { label: 'Team meet', value: 2 }
   ]);
+
+  const {
+    loading: LocationLoading,
+    error: LocationError,
+    data: LocationData
+  } = useQuery(GET_ALL_LOCATION, {
+    variables: {
+      locationType: 1
+    },
+
+    onCompleted: (data) => {
+      console.log('get location', data?.locations);
+      // setSubjectData(data?.subjects.items);
+
+      setLocation(data?.locations.items);
+    }
+  });
+  if (LocationError) {
+    console.log('LocationError', LocationError);
+  }
+
+  // get platform link
+  const {
+    loading: platformLoading,
+    error: platformError,
+    data: platformData
+  } = useQuery(GET_PLATFORMLINK, {
+    variables: {
+      platformId: valueVideoConference
+    },
+
+    onCompleted: (data) => {
+      console.log('get platform link', data.videoConferencePlateformLink);
+      // setSubjectData(data?.subjects.items);
+      if (data) {
+        setPlatform(data?.videoConferencePlateformLink);
+      }
+    }
+  });
+  if (platformError) {
+    console.log('platformError', platformError);
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -49,13 +124,10 @@ const AddMeetingLocation = () => {
             listMode="SCROLLVIEW"
             open={openLocation}
             value={valueLocation}
-            items={
-              items
-              //               category.map((item) => ({
-              // label: item.categoryTitle,
-              // value: item.id
-              //               }))
-            }
+            items={location?.map((item) => ({
+              label: item.title,
+              value: item.locationId
+            }))}
             arrowIconStyle={{
               height: SIZES[12],
               width: SIZES[14]
@@ -65,7 +137,7 @@ const AddMeetingLocation = () => {
             }}
             setValue={setValueLocation}
             setItems={setItems}
-            placeholder={'Location'}
+            placeholder={''}
             placeholderStyle={{
               ...Fonts.PoppinsRegular[12],
               color: Colors.secondary
@@ -83,13 +155,20 @@ const AddMeetingLocation = () => {
         <View style={styles.buttonContainer}>
           <Button
             title={'View details'}
-            onPress={() => navigation.navigate('LocationDetails')}
+            onPress={() =>
+              navigation.navigate('LocationDetails', {
+                locationId: valueLocation,
+                platform: platform
+              })
+            }
             layoutStyle={styles.cancelBtnLayout}
             textStyle={styles.txtCancelButton}
           />
           <Button
             title={'Add location'}
-            onPress={() => navigation.navigate('AddLocation')}
+            onPress={() =>
+              navigation.navigate('AddLocation', { locationType: 1 })
+            }
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,
@@ -106,13 +185,16 @@ const AddMeetingLocation = () => {
             listMode="SCROLLVIEW"
             open={openVideoConference}
             value={valueVideoConference}
-            items={
-              items
-              //               category.map((item) => ({
-              // label: item.categoryTitle,
-              // value: item.id
-              //               }))
-            }
+            items={[
+              {
+                value: 1,
+                label: 'Google Meet'
+              },
+              {
+                value: 2,
+                label: 'Microsoft Teams'
+              }
+            ]}
             arrowIconStyle={{
               height: SIZES[12],
               width: SIZES[14]
@@ -122,7 +204,7 @@ const AddMeetingLocation = () => {
             }}
             setValue={setValueVideoConference}
             setItems={setItems}
-            placeholder={'Video conference'}
+            placeholder={''}
             placeholderStyle={{
               ...Fonts.PoppinsRegular[12],
               color: Colors.secondary
@@ -156,7 +238,23 @@ const AddMeetingLocation = () => {
           />
           <Button
             title={'Next'}
-            onPress={() => navigation.navigate('AddMeetingSubjects')}
+            onPress={() =>
+              navigation.navigate('AddMeetingSubjects', {
+                attachFiles,
+                committee,
+                title,
+                discription,
+                users,
+                startDate,
+                endDate,
+                startTime,
+                endTime,
+                TimeZone,
+                Repeat,
+                platform: platform,
+                location: valueLocation
+              })
+            }
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

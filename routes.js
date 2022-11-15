@@ -20,7 +20,6 @@ import CommitteesDetails from './src/screens/dashboardScreen/CommitteesDetails';
 import StatisticScreen from './src/screens/dashboardScreen/StatisticScreen';
 import CommitteeScreen from './src/screens/dashboardScreen/CommitteeScreen';
 import SubjectDownload from './src/screens/servicesScreen/subjects/subjectDowmload/SubjectDownload';
-import EditMeeting from './src/screens/servicesScreen/meetings/EditMeeting';
 import AddMeetingGeneralScreen from './src/screens/servicesScreen/meetings/addMeetingGeneral/AddMeetingGeneral';
 import AddMeetingUser from './src/screens/servicesScreen/meetings/addMeetingUser/AddMeetingUser';
 import TimelineScreen from './src/screens/servicesScreen/meetings/timeline/TimelineScreen';
@@ -46,6 +45,22 @@ import AddAppointmentGeneral from './src/screens/servicesScreen/appointments/add
 import AddAppointmentUsers from './src/screens/servicesScreen/appointments/addAppointmentUsers/AddAppointmentUsers';
 import AddAppointmentDateAndTime from './src/screens/servicesScreen/appointments/addAppointmentDateAndTime/AddAppointmentDateAndTime';
 import AddAppointmentLocation from './src/screens/servicesScreen/appointments/addAppointmentLocation/AddAppointmentLocation';
+import AddSubjectCategory from './src/screens/servicesScreen/subjects/addSubjectCategory/AddSubjectCategory';
+import EditLocation from './src/screens/servicesScreen/meetings/editLocation/EditLocation';
+import EditMeetingGeneralScreen from './src/screens/servicesScreen/meetings/editMeetingGeneral /EditMeetingGeneral';
+import EditMeetingUser from './src/screens/servicesScreen/meetings/editMeetingUser/EditMeetingUser';
+import EditMeetingDateAndTime from './src/screens/servicesScreen/meetings/editMeetingDateAndTime/EditMeetingDateAndTime';
+import EditMeetingLocation from './src/screens/servicesScreen/meetings/editMeetingLocation/EditMeetingLocation';
+import EditMeetingSubjects from './src/screens/servicesScreen/meetings/editMeetingSubjects/EditMeetingSubjects';
+import YourAnswer from './src/screens/servicesScreen/meetings/yourAnswer/YourAnswer';
+import Subjects from './src/screens/servicesScreen/Subjects';
+import AddDraftSubject from './src/screens/servicesScreen/subjects/addDraftSybject/AddDraftSubject';
+import EditAppointmentDateAndTime from './src/screens/servicesScreen/appointments/EditAppointmentDateAndTime /EditAppointmentDateAndTime';
+import EditAppointmentGeneral from './src/screens/servicesScreen/appointments/EditAppointmentGeneral/EditAppointmentGeneral';
+import EditAppointmentLocation from './src/screens/servicesScreen/appointments/EditAppointmentLocation/EditAppointmentLocation';
+import EditAppointmentUsers from './src/screens/servicesScreen/appointments/EditAppointmentUsers/EditAppointmentUsers';
+import SelectUser from './src/screens/servicesScreen/meetings/selectUser/SelectUser';
+import AppointmentsDetails from './src/screens/servicesScreen/appointments/appointmentDetails/AppointmentDetails';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -243,6 +258,8 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="Committee" component={CommitteeScreen} />
       <Stack.Screen name="Details" component={DetailsScreen} />
       <Stack.Screen name="AddSubject" component={AddSubjectScreen} />
+      <Stack.Screen name="AddSubjectCategory" component={AddSubjectCategory} />
+      <Stack.Screen name="AddDraftSubject" component={AddDraftSubject} />
       <Stack.Screen name="SubjectDetails" component={SubjectDetails} />
       <Stack.Screen name="EditSubject" component={EditSubjectScreen} />
       <Stack.Screen name="SubjectDownload" component={SubjectDownload} />
@@ -250,16 +267,34 @@ const MainStack = ({ initialRouteName }) => {
         name="AddMeetingGeneral"
         component={AddMeetingGeneralScreen}
       />
+      <Stack.Screen
+        name="EditMeetingGeneral"
+        component={EditMeetingGeneralScreen}
+      />
       <Stack.Screen name="AddMeetingUser" component={AddMeetingUser} />
+      <Stack.Screen name="EditMeetingUser" component={EditMeetingUser} />
       <Stack.Screen
         name="AddMeetingDateAndTime"
         component={AddMeetingDateAndTime}
       />
+      <Stack.Screen
+        name="EditMeetingDateAndTime"
+        component={EditMeetingDateAndTime}
+      />
       <Stack.Screen name="AddMeetingLocation" component={AddMeetingLocation} />
+      <Stack.Screen
+        name="EditMeetingLocation"
+        component={EditMeetingLocation}
+      />
       <Stack.Screen name="AddMeetingSubjects" component={AddMeetingSubjects} />
+      <Stack.Screen
+        name="EditMeetingSubjects"
+        component={EditMeetingSubjects}
+      />
       <Stack.Screen name="LocationDetails" component={LocationDetails} />
       <Stack.Screen name="AddLocation" component={AddLocation} />
-      <Stack.Screen name="EditMeeting" component={EditMeeting} />
+      <Stack.Screen name="EditLocation" component={EditLocation} />
+      <Stack.Screen name="SelectUser" component={SelectUser} />
       <Stack.Screen name="Timeline" component={TimelineScreen} />
       <Stack.Screen name="SelectUsers" component={SelectUsers} />
       <Stack.Screen name="AddExternalUser" component={AddExternalUser} />
@@ -267,22 +302,41 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="SelectSubjects" component={SelectSubjects} />
       <Stack.Screen name="Role" component={Role} />
       <Stack.Screen name="MeetingDetails" component={MeetingDetails} />
+      <Stack.Screen name="AppointmentDetails" component={AppointmentsDetails} />
       <Stack.Screen name="AppointmentsList" component={AppointmentsList} />
+      <Stack.Screen name="YourAnswer" component={YourAnswer} />
+      <Stack.Screen name="subjects" component={Subjects} />
       <Stack.Screen
         name="AddAppointmentGeneral"
         component={AddAppointmentGeneral}
+      />
+      <Stack.Screen
+        name="EditAppointmentGeneral"
+        component={EditAppointmentGeneral}
       />
       <Stack.Screen
         name="AddAppointmentUsers"
         component={AddAppointmentUsers}
       />
       <Stack.Screen
+        name="EditAppointmentUsers"
+        component={EditAppointmentUsers}
+      />
+      <Stack.Screen
         name="AddAppointmentDateAndTime"
         component={AddAppointmentDateAndTime}
       />
       <Stack.Screen
+        name="EditAppointmentDateAndTime"
+        component={EditAppointmentDateAndTime}
+      />
+      <Stack.Screen
         name="AddAppointmentLocation"
         component={AddAppointmentLocation}
+      />
+      <Stack.Screen
+        name="EditAppointmentLocation"
+        component={EditAppointmentLocation}
       />
       <Stack.Screen name="Users" component={Users} />
     </Stack.Navigator>

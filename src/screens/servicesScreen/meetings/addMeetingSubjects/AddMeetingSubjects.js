@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   ScrollView
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Voice from '@react-native-community/voice';
 
 import Header from '../../../../component/header/Header';
@@ -21,17 +21,67 @@ import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 import { subjectData } from '../../../../Constans/data';
 import AddSubjectsCard from './AddSubjectsCard';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_All_MEETING, GET_All_SUBJECTS } from '../../../../graphql/query';
+import { UPDATE_MEETING } from '../../../../graphql/mutation';
+import { UserContext } from '../../../../context';
 
 const AddMeetingSubjects = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
+  const { selectedSubjects } = useContext(UserContext);
+  const {
+    attachFiles,
+    committee,
+    title,
+    discription,
+    users,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    TimeZone,
+    Repeat,
+    platform,
+    location
+  } = route?.params;
+  console.log('meeting data from add meeting subjects', {
+    attachFiles,
+    committee,
+    title,
+    discription,
+    users,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    TimeZone,
+    Repeat,
+    platform,
+    location
+  });
+
+  console.log('selected subjects from add meeting subjects', selectedSubjects);
   const [calendarValue, setCalendarValue] = useState('5-11 September');
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState(subjectData);
-  const [subjectDatas, setSubjectDatas] = useState(subjectData);
+  const [subjectData, setSubjectData] = useState(selectedSubjects);
+  const [subjectsId, setSubjectsId] = useState([]);
+
+  useEffect(() => {
+    if (selectedSubjects.length > 0) {
+      const subjectId = selectedSubjects?.map((subject) => {
+        return subject.subjectId;
+      });
+      subjectsId.push(subjectId);
+    }
+  }, [selectedSubjects]);
+  console.log('subjectId', subjectsId);
 
   const searchFilterSubject = (text) => {
     if (text) {
-      const newData = subjectData.filter((item) => {
+      const newData = selectedSubjects.filter((item) => {
         const itemData = item.subjectTitle ? item.subjectTitle : '';
         const textData = text;
         return itemData.indexOf(textData) > -1;
@@ -41,73 +91,57 @@ const AddMeetingSubjects = () => {
       setFilterData(newData);
     } else {
       setSearchText(text);
-      setFilterData(subjectData);
+      setFilterData(selectedSubjects);
     }
   };
 
-  //   useEffect(() => {
-  //     function onSpeechStart(e) {
-  //       console.log('onSpeechStart: ', e);
-  //     }
-  //     function onSpeechResults(e) {
-  //       console.log('onSpeechResults: ', e);
-  //     }
-  //     function onSpeechPartialResults(e) {
-  //       console.log('onSpeechPartialResults: ', e);
-  //     }
-  //     function onSpeechVolumeChanged(e) {
-  //       console.log('onSpeechVolumeChanged: ', e);
-  //     }
-  //     function onSpeechError(e) {
-  //       console.log('onSpeechError: ', e);
-  //     }
-  //     function onSpeechEnd(e) {
-  //       console.log('onSpeechEnd: ', e);
-  //     }
-  //     Voice.onSpeechStart = onSpeechStart;
-  //     Voice.onSpeechEnd = onSpeechEnd;
-  //     Voice.onSpeechError = onSpeechError;
-  //     Voice.onSpeechResults = onSpeechResults;
-  //     Voice.onSpeechPartialResults = onSpeechPartialResults;
-  //     Voice.onSpeechVolumeChanged = onSpeechVolumeChanged;
-  //     return () => {
-  //       Voice.destroy().then(Voice.removeAllListeners);
-  //     };
-  //   }, []);
+  // get ALL SUBJECTS
+  // const {
+  //   loading: SubjectsLoading,
+  //   error: SubjectsError,
+  //   data: SubjectsData
+  // } = useQuery(GET_All_SUBJECTS, {
+  //   variables: {
+  //     searchValue: searchText
+  //   },
 
-  //   _startRecognizing = async () => {
-  //     try {
-  //       await Voice.start('en-US');
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   };
-  //   _stopRecognizing = async () => {
-  //     //Stops listening for speech
-  //     try {
-  //       await Voice.stop();
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   };
-  //   _cancelRecognizing = async () => {
-  //     //Cancels the speech recognition
-  //     try {
-  //       await Voice.cancel();
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //     error(e);
-  //   };
+  //   onCompleted: (data) => {
+  //     setFilterData(data?.subjects.items);
+  //     console.log(data.subjects.items, 'commiitee by id');
+  //     setSubjectData(data?.subjects.items);
+  //   }
+  // });
 
-  //   _destroyRecognizer = async () => {
-  //     //Destroys the current SpeechRecognizer instance
-  //     try {
-  //       await Voice.destroy();
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   };
+  // if (SubjectsError) {
+  //   console.log('subjects error---', SubjectsError);
+  // }
+
+  const [addMeeting, { data, loading, error }] = useMutation(UPDATE_MEETING, {
+    // export const GET_All_SUBJECTS = gql`
+    refetchQueries: [
+      {
+        query: GET_All_MEETING,
+        variables: {
+          onlyMyMeeting: false,
+          screen: 0
+        }
+      }
+    ],
+    onCompleted: (data) => {
+      if (data.updateMeeting.status[0].statusCode == '200') {
+        navigation.navigate('Details', {
+          title: 'Meetings',
+          active: '0'
+        });
+      }
+    }
+  });
+  if (data) {
+    console.log('addmeeting data', data.updateMeeting);
+  }
+  if (error) {
+    console.log('addmeeting error--', error);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -148,7 +182,7 @@ const AddMeetingSubjects = () => {
         <Divider style={styles.divider} />
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          {filterData?.map((subject, index) => {
+          {selectedSubjects?.map((subject, index) => {
             return (
               <AddSubjectsCard
                 item={subject}
@@ -199,8 +233,53 @@ const AddMeetingSubjects = () => {
             textStyle={styles.txtCancelButton}
           />
           <Button
-            title={'Next'}
-            onPress={() => navigation.navigate('AddMeetingSubjects')}
+            title={'Submit'}
+            onPress={() => {
+              console.log('data on press', {
+                attachFiles,
+                committee,
+                discription,
+                endDate,
+                endTime,
+                location,
+                title,
+                platformlink: platform.platformlink,
+                platformId: platform.platformId,
+                Repeat,
+                startDate,
+                startTime,
+                subjectid: subjectsId[0],
+                TimeZone,
+                users
+              });
+              addMeeting({
+                variables: {
+                  meeting: {
+                    attachFileIds: attachFiles,
+                    committeeId: committee,
+                    creatorName: '',
+                    description: discription,
+                    endDate: endDate,
+                    endTime: endTime,
+                    locationId: location,
+                    meetingId: 0,
+                    meetingTitle: title,
+                    platformlink: platform.platformlink,
+                    platformId: platform.platformId,
+                    repeat: 0,
+                    repeatName: Repeat,
+                    required: [],
+                    setDate: startDate,
+                    setTime: startTime,
+                    subjectIds: subjectsId[0],
+                    timeZone: TimeZone,
+                    userIds: users,
+                    subjectStatusIds: [],
+                    meetingStatusId: 0
+                  }
+                }
+              });
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

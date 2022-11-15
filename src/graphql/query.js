@@ -1,5 +1,139 @@
 import { gql } from '@apollo/client';
 
+export const GET_ALL_SUBJECTS_STATUS = gql`
+  query subjectStatus {
+    subjectStatus {
+      items {
+        subjectStatusId
+        subjectStatus
+      }
+    }
+  }
+`;
+
+export const GET_TIMEZONE = gql`
+  query timeZone {
+    timeZone {
+      items {
+        timeZone
+        timeZoneId
+      }
+    }
+  }
+`;
+
+export const GET_APPOINTMENT_BY_ID = gql`
+  query appointment($id: Long) {
+    appointment(id: $id) {
+      appointmentDescription
+      appointmentId
+      appointmentTitle
+      attachFileIds
+      committeeId
+      committeeName
+      yourRoleId
+      yourRoleName
+      creatorName
+      endDate
+      endTime
+      locationName
+      setDate
+      setTime
+      platformlink
+      platformName
+      locationId
+      repeat
+      repeatName
+      timeZone
+      userDetails {
+        answer
+        email
+        roleId
+        roleName
+        userName
+        isAvailable
+        isRequired
+        userId
+        suggestedTime
+      }
+    }
+  }
+`;
+
+export const GET_All_APPOINTMENT = gql`
+  query appointments(
+    $page: Int
+    $pageSize: Int
+    $searchValue: String
+    $sort: String
+  ) {
+    appointments(
+      page: $page
+      pageSize: $pageSize
+      searchValue: $searchValue
+      sort: $sort
+    ) {
+      items {
+        appointmentId
+        appointmentTitle
+        committeeName
+        creatorName
+        yourRoleName
+        locationName
+        setDate
+        isDisable
+        answers
+      }
+      page
+      totalCount
+      pageSize
+    }
+  }
+`;
+
+export const GET_All_USERS = gql`
+  query committeeMembersList(
+    $page: Int
+    $pageSize: Int
+    $roleFilterIds: String
+    $searchValue: String
+    $sort: String
+    $externalUser: Boolean
+    $organizationId: Long
+    $isDeleted: Boolean
+  ) {
+    committeeMembersList(
+      page: $page
+      pageSize: $pageSize
+      roleFilterIds: $roleFilterIds
+      searchValue: $searchValue
+      sort: $sort
+      externalUser: $externalUser
+      organizationId: $organizationId
+      isDeleted: $isDeleted
+    ) {
+      items {
+        userId
+        firstName
+        secondName
+        familyName
+        emails
+        phoneNumber
+        isDisable
+        roles
+        organizations
+        privateDetails
+        externalUser
+        organizationIds
+        status
+      }
+      page
+      pageSize
+      totalCount
+    }
+  }
+`;
+
 export const GET_AUTH = gql`
   query oAuth2Application($domainName: String) {
     oAuth2Application(domainName: $domainName) {
@@ -17,6 +151,7 @@ export const GET_All_SUBJECTS = gql`
     $searchValue: String
     $sort: String
     $deadline: Boolean
+    $screen: Int
   ) {
     subjects(
       page: $page
@@ -25,6 +160,7 @@ export const GET_All_SUBJECTS = gql`
       sort: $sort
       committeeId: $committeeId
       deadline: $deadline
+      screen: $screen
     ) {
       items {
         attachFileIds
@@ -156,6 +292,25 @@ export const GET_All_COMMITTEE = gql`
   }
 `;
 
+export const GET_COMMITTEE_BY_ID = gql`
+  query committee($organizationId: Long) {
+    committee(organizationId: $organizationId) {
+      attachDocumentIds
+      categoryTitle
+      committeeCategoryId
+      committeeId
+      committeeTitle
+      description
+      expirationDate
+      organizationId
+      parentCommitteeId
+      roleIds
+      setUpDate
+      userIds
+    }
+  }
+`;
+
 export const GET_All_COMMENTS_THREAD = gql`
   query comments($commentCategoryId: Long, $sort: String) {
     comments(commentCategoryId: $commentCategoryId, sort: $sort) {
@@ -197,22 +352,24 @@ export const GET_ZIP_PDF_DOWNLOAD = gql`
 
 export const GET_All_MEETING = gql`
   query meeting(
-    $comitteeId: Long
-    $date: Date
+    $committeeId: Long
+    $date: String
     $onlyMyMeeting: Boolean
     $page: Int
     $pageSize: Int
     $searchValue: String
     $sort: String
+    $screen: Int
   ) {
     meetings(
-      comitteeId: $comitteeId
+      committeeId: $committeeId
       date: $date
       onlyMyMeeting: $onlyMyMeeting
       page: $page
       pageSize: $pageSize
       searchValue: $searchValue
       sort: $sort
+      screen: $screen
     ) {
       items {
         committeeId
@@ -223,7 +380,7 @@ export const GET_All_MEETING = gql`
         meetingId
         meetingStatusId
         meetingTitle
-        plateformlink
+        platformlink
         platformId
         repeat
         setDate
@@ -231,6 +388,8 @@ export const GET_All_MEETING = gql`
         timeZone
         workHours
         answers
+        meetingStatusTitle
+        yourRoleName
         userDetails {
           answer
           appointmentId
@@ -245,6 +404,47 @@ export const GET_All_MEETING = gql`
           userName
           videoConferenceId
         }
+      }
+    }
+  }
+`;
+
+export const GET_MEETING_BY_ID = gql`
+  query meeting($meetingId: Long) {
+    meeting(meetingId: $meetingId) {
+      attachFileIds
+      availableId
+      committeeId
+      creatorName
+      description
+      endDate
+      locationId
+      meetingId
+      meetingStatusId
+      meetingTitle
+      organizationIds
+      platformlink
+      platformId
+      repeat
+      required
+      setDate
+      status
+      subjectIds
+      subjectStatusIds
+      timeZone
+      userIds
+      workHours
+      yourRoleName
+      userDetails {
+        answer
+        email
+        roleId
+        roleName
+        userName
+        isAvailable
+        isRequired
+        userId
+        suggestedTime
       }
     }
   }
@@ -273,6 +473,23 @@ export const GET_ALL_LOCATION = gql`
         title
         locationId
       }
+    }
+  }
+`;
+
+export const GET_PLATFORMLINK = gql`
+  query videoConferencePlatformLink($platformId: Long) {
+    videoConferencePlatformLink(platformId: $platformId) {
+      platformlink
+      platformId
+    }
+  }
+`;
+
+export const GET_ROLES = gql`
+  query roleList($taskRole: Boolean) {
+    roleList(taskRole: $taskRole) {
+      roles
     }
   }
 `;

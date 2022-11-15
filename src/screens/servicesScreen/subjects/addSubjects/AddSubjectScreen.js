@@ -1,4 +1,11 @@
-import { View, Text, SafeAreaView, TextInput, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TextInput,
+  ScrollView,
+  TouchableOpacity
+} from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -48,6 +55,80 @@ const AddSubjectScreen = () => {
   // fetch file
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
+  const checkPermission = async (file) => {
+    console.log('check permission');
+    if (Platform.OS === 'ios') {
+      downloadFile(file);
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage Permission Required',
+            message: 'Application needs access to your storage to download File'
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // Start downloading
+          downloadFile(file);
+          console.log('Storage Permission Granted.');
+        } else {
+          // If permission denied then show alert
+          Alert.alert('Error', 'Storage Permission Not Granted');
+        }
+      } catch (err) {
+        // To handle permission related exception
+        console.log('++++' + err);
+      }
+    }
+  };
+
+  const downloadFile = (file) => {
+    console.log('downloadfile');
+    // Get today's date to add the time suffix in filename
+    let date = new Date();
+    // File URL which we want to download
+    let FILE_URL = file;
+    // Function to get extention of the file url
+    let file_ext = getFileExtention(FILE_URL);
+
+    file_ext = '.' + file_ext[0];
+
+    // config: To get response by passing the downloading related options
+    // fs: Root directory path to download
+    const { config, fs } = RNFetchBlob;
+    let RootDir = fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        path:
+          RootDir +
+          '/file_' +
+          Math.floor(date.getTime() + date.getSeconds() / 2) +
+          file_ext,
+        description: 'downloading file...',
+        notification: true,
+        // useDownloadManager works with Android only
+        useDownloadManager: true
+      }
+    };
+    config(options)
+      .fetch('GET', FILE_URL)
+      .then((res) => {
+        // Alert after successful downloading
+        console.log('res -> ', res.respInfo.redirects[0]);
+        alert('File Downloaded Successfully.');
+        if (Platform.OS == 'ios') {
+          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
+        }
+      });
+  };
+
+  const getFileExtention = (fileUrl) => {
+    // To get the file extension
+    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
+  };
+
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =
     useQuery(GET_All_SUBJECTS_CATEGORY, {
@@ -84,6 +165,7 @@ const AddSubjectScreen = () => {
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,
     {
+      variables: { onlyMyMeeting: false, screen: 1 },
       onCompleted: (data) => {
         if (data) {
           console.log('meetings', data?.meetings.items);
@@ -107,6 +189,7 @@ const AddSubjectScreen = () => {
     setToken(JSON.parse(user)?.dataToken);
   };
   console.log('token from add subject', token);
+
   const handleDocumentSelection = useCallback(async () => {
     try {
       const response = await DocumentPicker.pickMultiple({
@@ -130,6 +213,7 @@ const AddSubjectScreen = () => {
           })
             .then((response) => response.json())
             .then((responseData) => {
+              console.log('response fron file upload', responseData);
               // setFileId(responseData?.fileEnteryId);
               fileId.push(responseData?.fileEnteryId);
               console.log('fileId', fileId);
@@ -145,6 +229,7 @@ const AddSubjectScreen = () => {
                       console.log(data, 'inner file dartas');
                       setFileResponse((prev) => {
                         console.log('prev', prev);
+                        console.log('id', id);
                         if (prev.fileEnteryId !== id) {
                           return [...prev, data.uploadedFile];
                         }
@@ -165,11 +250,9 @@ const AddSubjectScreen = () => {
 
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
     // export const GET_All_SUBJECTS = gql`
-    refetchQueries: [{ query: GET_All_SUBJECTS }]
+    refetchQueries: [{ query: GET_All_SUBJECTS, variables: { screen: 0 } }]
   });
-  if (data) {
-    console.log(data);
-  }
+
   if (error) {
     console.log('addsubject error--', error);
   }
@@ -190,62 +273,21 @@ const AddSubjectScreen = () => {
         onRightPress={() => navigation.goBack()}
       />
 
-      <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() => {
+          setOpenMeeting(false);
+          setOpenCategory(false);
+          setOpenCommitee(false);
+        }}
+        activeOpacity={1}
+      >
         <ScrollView
           style={styles.subContainer}
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.txtAddSubjectTitle}>Add subject</Text>
-          {/* title */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>TITLE</Text>
-            <TextInput
-              style={styles.textInput}
-              onChangeText={(text) => setTitle(text)}
-            />
-          </View>
-          <View style={styles.discriptionContainer}>
-            <Text style={styles.txtTitle}>DISCRIPTION</Text>
-            <TextInput
-              style={styles.textInput}
-              multiline={true}
-              onChangeText={(text) => setDescription(text)}
-            />
-          </View>
-          <View style={styles.categoryContainer}>
-            <Text style={styles.txtTitle}>SUBJECT CATEGORY</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              open={openCategory}
-              value={valueCategory}
-              items={category.map((item) => ({
-                label: item.categoryTitle,
-                value: item.id
-              }))}
-              setOpen={() => {
-                setOpenCommitee(false);
-                setOpenCategory(!openCategory);
-              }}
-              setValue={setValueCategory}
-              setItems={setItems}
-              placeholder={'Select category'}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              arrowIconStyle={{
-                height: SIZES[12],
-                width: SIZES[14]
-              }}
-              style={{
-                borderWidth: 0,
-                paddingRight: SIZES[16],
-                paddingLeft: 0
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            />
-          </View>
           <View style={styles.committeeContainer}>
             <Text style={styles.txtTitle}>SELECT COMMITTEE</Text>
             <DropDownPicker
@@ -259,10 +301,11 @@ const AddSubjectScreen = () => {
               setOpen={() => {
                 setOpenCommitee(!openCommittee);
                 setOpenCategory(false);
+                setOpenMeeting(false);
               }}
               setValue={setValueCommittee}
               setItems={setItems}
-              placeholder={'Select committee'}
+              placeholder={''}
               placeholderStyle={{
                 ...Fonts.PoppinsRegular[12],
                 color: Colors.secondary
@@ -286,9 +329,9 @@ const AddSubjectScreen = () => {
               listMode="SCROLLVIEW"
               open={openMeeting}
               value={valueMeeting}
-              items={committees?.map((item) => ({
-                label: item.committeeTitle,
-                value: item.organizationId
+              items={meetings?.map((item) => ({
+                label: item.meetingTitle,
+                value: item.meetingId
               }))}
               setOpen={() => {
                 setOpenMeeting(!openMeeting);
@@ -297,7 +340,7 @@ const AddSubjectScreen = () => {
               }}
               setValue={setValueMeeting}
               setItems={setItems}
-              placeholder={'Select meeting'}
+              placeholder={''}
               placeholderStyle={{
                 ...Fonts.PoppinsRegular[12],
                 color: Colors.secondary
@@ -314,8 +357,68 @@ const AddSubjectScreen = () => {
               textStyle={{ ...Fonts.PoppinsRegular[14] }}
             />
           </View>
+          {/* title */}
+          <View style={styles.titleContainer}>
+            <Text style={styles.txtTitle}>TITLE</Text>
+            <TextInput
+              style={styles.textInput}
+              onChangeText={(text) => setTitle(text)}
+            />
+          </View>
+          <View style={styles.discriptionContainer}>
+            <Text style={styles.txtTitle}>DISCRIPTION</Text>
+            <TextInput
+              style={styles.textInput}
+              multiline={true}
+              onChangeText={(text) => setDescription(text)}
+            />
+          </View>
+          <View style={styles.categoryContainer}>
+            <View style={styles.categoryTitleView}>
+              <Text style={styles.txtTitle}>SUBJECT CATEGORY</Text>
+              <Button
+                title={'Add category'}
+                textStyle={{ ...Fonts.PoppinsRegular[12] }}
+                layoutStyle={{ paddingHorizontal: SIZES[10] }}
+                onPress={() => navigation.navigate('AddSubjectCategory')}
+              />
+            </View>
+            <DropDownPicker
+              dropDownDirection="TOP"
+              listMode="SCROLLVIEW"
+              open={openCategory}
+              value={valueCategory}
+              items={category.map((item) => ({
+                label: item.categoryTitle,
+                value: item.id
+              }))}
+              setOpen={() => {
+                setOpenCommitee(false);
+                setOpenCategory(!openCategory);
+                setOpenMeeting(false);
+              }}
+              setValue={setValueCategory}
+              setItems={setItems}
+              placeholder={''}
+              placeholderStyle={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary
+              }}
+              arrowIconStyle={{
+                height: SIZES[12],
+                width: SIZES[14]
+              }}
+              style={{
+                borderWidth: 0,
+                paddingRight: SIZES[16],
+                paddingLeft: 0
+              }}
+              textStyle={{ ...Fonts.PoppinsRegular[14] }}
+              listItemContainerStyle={{ height: SIZES[50] }}
+            />
+          </View>
 
-          <View style={{ marginTop: 24 }}>
+          <View style={{ marginTop: SIZES[24] }}>
             <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
             {fileResponse?.map((file, index) => {
               console.log('from retuen', file);
@@ -326,8 +429,9 @@ const AddSubjectScreen = () => {
                   key={index}
                   filePath={file.name}
                   fileSize={file.size}
-                  onDownloadPress={() => navigation.navigate('SubjectDownload')}
+                  onDownloadPress={() => checkPermission(file.downloadUrl)}
                   fileType={file.type}
+                  fileUrl={file.downloadUrl}
                   onRemovePress={() => removeFile(file.fileEnteryId)}
                   style={{
                     borderBottomWidth: SIZES[1],
@@ -384,14 +488,18 @@ const AddSubjectScreen = () => {
                       description: discription,
                       subjectCategoryId: valueCategory,
                       draft: false,
-                      attachFileIds: filesId
+                      attachFileIds: filesId,
+                      meetingId: valueMeeting
                     }
                   },
-                  onCompleted: () => {
-                    navigation.navigate('Details', {
-                      title: 'Subjects',
-                      active: '1'
-                    });
+                  onCompleted: (data) => {
+                    console.log(data.updateSubject.status[0]);
+                    if (data.updateSubject.status[0].statusCode == '200') {
+                      navigation.navigate('Details', {
+                        title: 'Subjects',
+                        active: '1'
+                      });
+                    }
                   }
                 });
 
@@ -411,7 +519,7 @@ const AddSubjectScreen = () => {
             />
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

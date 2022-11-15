@@ -1,5 +1,12 @@
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import React, { useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  FlatList
+} from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 
@@ -13,14 +20,20 @@ import { GET_All_COMMITTEE } from '../../graphql/query';
 import Loader from '../../component/Loader/Loader';
 import { Divider } from 'react-native-paper';
 import { Button } from '../../component/button/Button';
+import CommitteeCard from '../../component/Cards/committeeCard/CommitteeCard';
+import CheckBox from '../../component/checkBox/CheckBox';
+import { UserContext } from '../../context';
 
 const CommitteeScreen = () => {
-  const route = useRoute();
-  const { setSelectCommittee } = route?.params;
   const navigation = useNavigation();
+  const route = useRoute();
+  const { Data, activeTab } = route?.params;
   const ref = useRef();
+  const { setCommittee } = useContext(UserContext);
+  const [committees, setCommittees] = useState([]);
+  const [selectCommittee, setSelectCommittee] = useState(null);
   const [isChecked, setChecked] = useState(false);
-  const [committee, setCommittee] = useState([]);
+  console.log('COMMITTE FROM COMMITTE SCRREN', selectCommittee);
 
   const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
     GET_All_COMMITTEE,
@@ -29,7 +42,7 @@ const CommitteeScreen = () => {
       onCompleted: (data) => {
         if (data) {
           console.log('committees', data?.committees.items);
-          setCommittee(data.committees.items);
+          setCommittees(data.committees.items);
         }
       }
     }
@@ -38,18 +51,12 @@ const CommitteeScreen = () => {
     console.log('commitee error', CommitteeError);
   }
 
-  const rowData = ({ title, index }) => {
-    return (
-      <View style={styles.rowDataContainer} key={index}>
-        <Checkbox
-          color={Colors.primary}
-          value={isChecked}
-          onValueChange={setChecked}
-        />
-        <Text style={styles.txtCheckboxTitle}>{title}</Text>
-      </View>
-    );
-  };
+  useEffect(() => {
+    if (isChecked) {
+      setCommittee(Data);
+    }
+  }, [isChecked]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header
@@ -78,11 +85,26 @@ const CommitteeScreen = () => {
             </Text>
           </View>
         ) : (
-          <ScrollView>
-            {committee.map((item, index) => {
-              return rowData({ title: item.committeeTitle, index });
-            })}
-          </ScrollView>
+          <View>
+            <View style={styles.rowDataContainer}>
+              <CheckBox
+                color={Colors.primary}
+                value={isChecked}
+                onValueChange={() => {
+                  setChecked(!isChecked);
+                }}
+              />
+              <Text style={styles.txtCheckboxTitle}>All</Text>
+            </View>
+            <FlatList
+              data={committees}
+              keyExtractor={(item, index) => `${index}`}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
+                return <CommitteeCard item={item} index={index} />;
+              }}
+            />
+          </View>
         )}
         {/* 
         {rowData({ title: 'Advisory Committee on Financial Management' })}
@@ -111,10 +133,7 @@ const CommitteeScreen = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              // navigation.navigate('Details', {
-              //   title: 'Subjects',
-              //   active: '1'
-              // });
+              navigation.goBack();
             }}
             layoutStyle={styles.nextBtnLayout}
             textStyle={styles.txtNextBtn}
@@ -183,5 +202,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: SIZES[1],
     backgroundColor: Colors.line
+  },
+  rowDataContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SIZES[24]
+  },
+  txtCheckboxTitle: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold,
+    marginLeft: SIZES[16],
+    marginRight: SIZES[16]
   }
 });

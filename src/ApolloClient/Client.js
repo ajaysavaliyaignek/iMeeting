@@ -4,7 +4,7 @@ import { ApolloLink } from 'apollo-link';
 import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';
 
-export const BASE_URL = 'http://localhost:8080/';
+export const BASE_URL = 'https://imeetingpro.com/';
 
 const httpLink = createUploadLink({
   uri: `${BASE_URL}/o/graphql`
@@ -23,7 +23,6 @@ const authLink = setContext(async (req, { headers }) => {
   };
 });
 
-console.log('authLink', authLink);
 export const client = new ApolloClient({
   link: ApolloLink.from([authLink, httpLink]),
   cache: new InMemoryCache()

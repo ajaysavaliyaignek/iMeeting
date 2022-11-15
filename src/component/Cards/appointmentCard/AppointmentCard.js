@@ -9,46 +9,45 @@ import IconName from '../../Icon/iconName';
 import { Divider } from 'react-native-paper';
 import EditDeleteModal from '../../EditDeleteModal';
 import { SIZES } from '../../../themes/Sizes';
-import { useMutation } from '@apollo/client';
-import { GET_All_SUBJECTS } from '../../../graphql/query';
-import { DELETE_SUBJECTS } from '../../../graphql/mutation';
+import { useMutation, useQuery } from '@apollo/client';
+import {
+  GET_All_APPOINTMENT,
+  GET_APPOINTMENT_BY_ID
+} from '../../../graphql/query';
+import { DELETE_APPOINTMENT, DELETE_SUBJECTS } from '../../../graphql/mutation';
 import { styles } from './styles';
+import { getHighlightedText } from '../../highlitedText/HighlitedText';
+import moment from 'moment';
 
 const AppoinmentCard = ({ item, index, text, search }) => {
   const navigation = useNavigation();
   const [editModal, setEditModal] = useState(false);
+  const [data, setData] = useState('');
 
-  const getHighlightedText = (txt) => {
-    const { value } = text;
-    const parts = txt.split(new RegExp(`(${text})`, 'gi'));
-    return (
-      <Text numberOfLines={1}>
-        {parts.map((part) =>
-          part === text ? (
-            <Text
-              style={[
-                styles.txtCommitteeTitle,
-                {
-                  backgroundColor: '#E6C54F'
-                }
-              ]}
-              numberOfLines={1}
-            >
-              {part}
-            </Text>
-          ) : (
-            <Text
-              style={styles.txtCommitteeTitle}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {part}
-            </Text>
-          )
-        )}
-      </Text>
-    );
-  };
+  const LocationById = useQuery(GET_APPOINTMENT_BY_ID, {
+    variables: {
+      id: item.appointmentId
+    },
+    onCompleted: (data) => {
+      console.log('appointment by id', data.appointment);
+      if (data) {
+        setData(data.appointment);
+      }
+    }
+  });
+
+  const [deleteAppointment] = useMutation(DELETE_APPOINTMENT, {
+    // export const GET_All_SUBJECTS = gql`
+    refetchQueries: [
+      {
+        query: GET_All_APPOINTMENT
+      }
+    ],
+    onCompleted: (data) => {
+      console.log('delete appointment', data.deleteAppointment.status);
+    }
+  });
+
   // <View> {getHighlightedText(item.subjectTitle)} </View>;
 
   const onDeleteHandler = (id) => {
@@ -58,9 +57,9 @@ const AppoinmentCard = ({ item, index, text, search }) => {
       {
         text: 'Delete',
         onPress: () =>
-          deleteSubject({
+          deleteAppointment({
             variables: {
-              subjectId: id
+              id: id
             }
           }),
         style: 'destructive'
@@ -118,13 +117,18 @@ const AppoinmentCard = ({ item, index, text, search }) => {
         }}
         activeOpacity={0.5}
       >
-        {getHighlightedText(item.title)}
+        {getHighlightedText(item.appointmentTitle, text)}
 
         {/* subject details */}
-        <RowData name={'Committee'} discription={item.committee} />
-        <RowData name={'Your role'} discription={item.YourRole} />
-        <RowData name={'Date & Time'} discription={item.DateTime} />
-        <RowData name={'Location'} discription={item.Location} />
+        <RowData name={'Committee'} discription={item.committeeName} />
+        <RowData name={'Your role'} discription={item.yourRoleName} />
+        <RowData
+          name={'Date & Time'}
+          discription={`${moment(item.setTime).format('DD MMM YYYY')},${
+            data.setTime
+          }`}
+        />
+        <RowData name={'Location'} discription={item.locationName} />
       </View>
 
       {/* dotsView */}
@@ -140,17 +144,27 @@ const AppoinmentCard = ({ item, index, text, search }) => {
             onPressDownload={() => navigation.navigate('SubjectDownload')}
             subjectStatus={item.subjectStatus}
             onPressDelete={() => {
-              onDeleteHandler(item.subjectId);
+              onDeleteHandler(item.appointmentId);
               setEditModal(false);
             }}
             onPressEdit={() => {
-              navigation.navigate('EditSubject', { item });
+              navigation.navigate('EditAppointmentGeneral', { data });
               setEditModal(false);
             }}
             onPressView={() => {
-              navigation.navigate('SubjectDetails', { item });
+              navigation.navigate('AppointmentDetails', { item });
               setEditModal(false);
             }}
+            editable={
+              item.yourRoleName == 'Head' || item.yourRoleName == 'Secretory'
+                ? true
+                : false
+            }
+            deleted={
+              item.yourRoleName == 'Head' || item.yourRoleName == 'Secretory'
+                ? true
+                : false
+            }
           />
         </View>
       )}

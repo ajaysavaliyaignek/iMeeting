@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  TextInput,
-  FlatList
-} from 'react-native';
+import { View, SafeAreaView, TextInput, FlatList } from 'react-native';
 import React from 'react';
 import { styles } from './styles';
 import Header from '../../../../component/header/Header';
@@ -37,7 +30,7 @@ const Users = () => {
           data={usersData}
           keyExtractor={({ item, index }) => `user-${index}`}
           renderItem={({ item, index }) => (
-            <UserCard item={item} index={index} />
+            <UserCard item={item} index={index} isSwitchOnRow={true} />
           )}
           showsVerticalScrollIndicator={false}
         />

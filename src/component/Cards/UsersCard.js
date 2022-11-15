@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { PreventRemoveContext, useNavigation } from '@react-navigation/native';
 
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
@@ -11,20 +11,51 @@ import { SIZES } from '../../themes/Sizes';
 import Avatar from '../Avatar/Avatar';
 import EditDeleteModal from '../EditDeleteModal';
 import CheckBox from '../checkBox/CheckBox';
+import { getHighlightedText } from '../highlitedText/HighlitedText';
 
 const UsersCard = ({
   item,
   index,
   external,
-  selectAllUser,
-  selectAllExternal
+  setSelectAll,
+  selectAll,
+  allUserButton,
+  searchText,
+  selectUser,
+  setSelectUser
 }) => {
   const navigation = useNavigation();
   const [editModal, setEditModal] = useState(false);
-  const [selectUser, setSelectUser] = useState(false);
+  // const [selectUser, setSelectUser] = useState(false);
   const [isSwitchOn, setIsSwitchOn] = useState(false);
   const [isCheckAll, setIsCheckAll] = useState(false);
-  const [isCheck, setIsCheck] = useState([]);
+  const [user, setUser] = useState([]);
+  let user_list = [];
+
+  useEffect(() => {
+    if (isCheckAll) {
+      // setUser([...user, item]);
+      user_list.push(item);
+      setSelectUser((pre) => {
+        return [...pre, user_list];
+      });
+    } else {
+      // let user_list = [];
+      selectUser.filter((ite) => {
+        ite.userId != item.userId;
+      });
+      // setUser(user_list);
+    }
+
+    // if (!isCheckAll) {
+    //   const removeUser = user.filter((list) => {
+    //     return list.userId !== item.userId;
+    //   });
+    //   setUser([...user, removeUser]);
+    // }
+  }, [isCheckAll]);
+
+  console.log('user', user);
 
   const onDeleteHandler = () => {
     setEditModal(false);
@@ -50,51 +81,70 @@ const UsersCard = ({
         {switchView ? (
           <Switch
             color={Colors.switch}
-            value={isSwitchOn}
-            onValueChange={() => setIsSwitchOn(!isSwitchOn)}
+            value={item.privateDetails}
+            // onValueChange={() => setIsSwitchOn(!isSwitchOn)}
           />
         ) : (
-          <Text style={styles.discription}>{discription}</Text>
+          <Text style={styles.discription} numberOfLines={1}>
+            {discription}
+          </Text>
         )}
       </View>
     );
   };
 
   const handleSelectAll = (e) => {
-    setIsCheckAll(!isCheckAll);
-    setIsCheck(list.map((li) => li.id));
-    if (isCheckAll) {
-      setIsCheck([]);
+    setSelectAll(!selectAll);
+    setIsCheck(item?.map((li) => li.userId));
+    if (selectAll) {
+      console.log('select all user', item);
     }
   };
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={() => setEditModal(false)}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={() => setEditModal(false)}
+      key={item.id}
+    >
       {index == 0 ? null : <Divider style={styles.divider} />}
 
       {/* committee details */}
       <TouchableOpacity style={styles.committeeDetailView} activeOpacity={0.5}>
         <View style={styles.userDetails}>
-          <Avatar name={item.name} source={item.profile} size={SIZES[32]} />
-          <Text style={styles.txtCommitteeTitle}>{item.name}</Text>
+          <Avatar name={item.firstName} size={SIZES[32]} />
+          <Text style={{ marginLeft: SIZES[12] }}>
+            {getHighlightedText(
+              `${item.firstName} ${item.secondName}`,
+              searchText
+            )}
+          </Text>
+          {/* <Text style={styles.txtCommitteeTitle}>
+            {item.firstName} {item.secondName}
+          </Text> */}
         </View>
         <View style={styles.userDetailsContainer}>
           <View>
-            <RowData name={'ID'} discription={item.id} />
-            <RowData name={'E-mail'} discription={item.email} />
-            <RowData name={'Role'} discription={item.role} />
+            <RowData name={'ID'} discription={item.userId} />
+            <RowData name={'E-mail'} discription={item.emails} />
+            <RowData name={'Role'} discription={item.roles} />
             {external ? (
               <RowData name={'Private'} switchView={true} />
             ) : (
-              <RowData name={'Number'} discription={item.number} />
+              <RowData name={'Number'} discription={item.phoneNumber} />
             )}
           </View>
           <CheckBox
             // value={selectAllUser || selectAllExternal ? true : selectUser}
-            onPress={() => {
-              setSelectUser(!selectUser);
+            onValueChange={() => {
+              allUserButton
+                ? setSelectAll(!selectAll)
+                : setIsCheckAll(!isCheckAll);
+              // if (isCheckAll) {
+              //   user.push(item);
+              // } else user.pop(item);
             }}
-            selected={selectUser}
+            value={allUserButton ? true : isCheckAll}
           />
         </View>
       </TouchableOpacity>
@@ -108,7 +158,7 @@ const UsersCard = ({
       </TouchableOpacity>
       {editModal && (
         <View style={styles.modalView}>
-          <EditDeleteModal onPressDelete={onDeleteHandler} />
+          <EditDeleteModal onPressDelete={onDeleteHandler} download />
         </View>
       )}
     </TouchableOpacity>
@@ -135,7 +185,8 @@ const styles = StyleSheet.create({
   },
   discription: {
     ...Fonts.PoppinsRegular[14],
-    color: Colors.bold
+    color: Colors.bold,
+    width: '60%'
   },
   committeeDetailView: {
     paddingVertical: SIZES[24]

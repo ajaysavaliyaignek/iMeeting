@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView } from 'react-native';
 import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { PreventRemoveContext, useNavigation } from '@react-navigation/native';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
@@ -10,12 +10,59 @@ import { Colors } from '../../../../themes/Colors';
 import { Button } from '../../../../component/button/Button';
 import { SIZES } from '../../../../themes/Sizes';
 import CheckBox from '../../../../component/checkBox/CheckBox';
+import { useQuery } from '@apollo/client';
+import { GET_ROLES } from '../../../../graphql/query';
 
 const Role = () => {
   const navigation = useNavigation();
-  const [checkValueHead, setCheckValueHead] = useState(false);
-  const [checkValueSecretary, setCheckValueSecretary] = useState(false);
-  const [checkValueMember, setCheckValueMember] = useState(false);
+  const [checkValue, setCheckValue] = useState(false);
+
+  const [roles, setRoles] = useState([]);
+  const [rolesId, setRolesId] = useState([]);
+
+  if (checkValue) {
+    console.log('checkvalue', checkValue);
+  }
+
+  onChangeValue = (item, index, newValue) => {
+    const newData = roles.map((newItem) => {
+      if (newItem.id == item.id) {
+        setCheckValue(!checkValue);
+        return {
+          ...newItem,
+          selected: newValue
+        };
+      }
+      if (newItem.id !== item.id) {
+        setCheckValue(false);
+      }
+      return newItem;
+    });
+
+    setRolesId(newData);
+  };
+
+  console.log(rolesId);
+  // get roles
+  const {
+    loading: rolesLoading,
+    error: rolesError,
+    data: rolesData
+  } = useQuery(GET_ROLES, {
+    variables: {
+      taskRole: false
+    },
+
+    onCompleted: (data) => {
+      console.log('get roles', data.roleList.roles);
+      setRoles(data?.roleList.roles);
+    }
+  });
+
+  if (rolesError) {
+    console.log('rolesError error---', rolesError);
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -25,27 +72,24 @@ const Role = () => {
       />
       <View style={styles.subContainer}>
         <Text style={styles.txtAddSubjectTitle}>Role</Text>
-        <View style={styles.rowContainer}>
-          <CheckBox
-            value={checkValueHead}
-            onValueChange={() => setCheckValueHead(!checkValueHead)}
-          />
-          <Text style={styles.txtRole}>Head</Text>
-        </View>
-        <View style={styles.rowContainer}>
-          <CheckBox
-            value={checkValueSecretary}
-            onValueChange={() => setCheckValueSecretary(!checkValueSecretary)}
-          />
-          <Text style={styles.txtRole}>Secretary</Text>
-        </View>
-        <View style={styles.rowContainer}>
-          <CheckBox
-            value={checkValueMember}
-            onValueChange={() => setCheckValueMember(!checkValueMember)}
-          />
-          <Text style={styles.txtRole}>Member</Text>
-        </View>
+        {roles?.map((role, index) => {
+          return (
+            <View style={styles.rowContainer} key={index}>
+              <CheckBox
+                value={checkValue[role.id]}
+                // setCheckValue(!checkValue)
+                onValueChange={(newValue) =>
+                  setCheckValue({
+                    ...checkValue,
+                    [role.id]: newValue,
+                    [role.name]: role
+                  })
+                }
+              />
+              <Text style={styles.txtRole}>{role?.name}</Text>
+            </View>
+          );
+        })}
       </View>
 
       <View
@@ -59,7 +103,7 @@ const Role = () => {
         <View style={styles.buttonContainer}>
           <Button
             title={'Save'}
-            onPress={() => navigation.navigate('AddMeetingDateAndTime')}
+            onPress={() => navigation.navigate('SelectSubjects')}
             layoutStyle={{ marginVertical: SIZES[12] }}
           />
         </View>

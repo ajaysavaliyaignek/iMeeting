@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 
 import { SIZES } from '../../../../themes/Sizes';
@@ -17,12 +17,28 @@ import { Colors } from '../../../../themes/Colors';
 import { Icon, IconName } from '../../../../component';
 import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
-import { usersData } from '../../../../Constans/data';
 import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { styles } from './styles';
+import { UserContext } from '../../../../context';
 
 const AddAppointmentUsers = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const [searchText, setSearchText] = useState('');
+  const [users, setUsers] = useState([]);
+  const [required, setRequired] = useState([]);
+  const { attachFiles, committee, title, discription } = route?.params;
+  const { selectedUsers } = useContext(UserContext);
+
+  useEffect(() => {
+    if (selectedUsers?.length > 0) {
+      const userId = selectedUsers?.map((item) => {
+        return item.userId;
+      });
+      setUsers(userId);
+    }
+  }, [selectedUsers]);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -45,13 +61,17 @@ const AddAppointmentUsers = () => {
         <Text style={styles.txtAddSubjectTitle}>Users</Text>
         <View style={styles.searchContainer}>
           <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput style={styles.textInput} placeholder={'Search'} />
+          <TextInput
+            style={styles.textInput}
+            placeholder={'Search'}
+            onChangeText={(text) => setSearchText(text)}
+          />
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
         </View>
         <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('Timeline')}
+          onPress={() => navigation.navigate('Timeline', { selectedUsers })}
         >
           <Text style={styles.txtCommittee}>Timeline</Text>
           <View style={styles.btnCommittees}>
@@ -66,11 +86,13 @@ const AddAppointmentUsers = () => {
         <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('SelectUsers')}
+          onPress={() => navigation.navigate('SelectUsers', { committee })}
         >
           <Text style={styles.txtCommittee}>Users</Text>
           <View style={styles.btnCommittees}>
-            <Text style={styles.txtBtnCommittees}>Select 3</Text>
+            <Text style={styles.txtBtnCommittees}>
+              Select {selectedUsers?.length > 0 ? selectedUsers?.length : ''}
+            </Text>
             <Icon
               name={IconName.Arrow_Right}
               height={SIZES[12]}
@@ -81,10 +103,17 @@ const AddAppointmentUsers = () => {
         <Divider style={styles.divider} />
 
         <FlatList
-          data={usersData}
+          data={selectedUsers}
           keyExtractor={({ item, index }) => `user-${index}`}
           renderItem={({ item, index }) => (
-            <UserCard item={item} index={index} />
+            <UserCard
+              item={item}
+              index={index}
+              text={searchText}
+              required={required}
+              setRequired={setRequired}
+              isSwitchOnRow={true}
+            />
           )}
           showsVerticalScrollIndicator={false}
         />
@@ -107,7 +136,15 @@ const AddAppointmentUsers = () => {
           />
           <Button
             title={'Next'}
-            onPress={() => navigation.navigate('AddAppointmentDateAndTime')}
+            onPress={() =>
+              navigation.navigate('AddAppointmentDateAndTime', {
+                attachFiles,
+                committee,
+                title,
+                discription,
+                users
+              })
+            }
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

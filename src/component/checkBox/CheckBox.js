@@ -4,13 +4,14 @@ import Checkbox from 'expo-checkbox';
 import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
 
-const CheckBox = ({ value, onValueChange }) => {
+const CheckBox = ({ value, onValueChange, disabled }) => {
   return (
     <Checkbox
       color={Colors.primary}
       style={styles.Checkbox}
       value={value}
       onValueChange={onValueChange}
+      disabled={disabled}
     />
   );
 };

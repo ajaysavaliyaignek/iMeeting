@@ -39,8 +39,7 @@ export const styles = StyleSheet.create({
   },
   txtEditSubject: {
     ...Fonts.PoppinsBold[24],
-    color: Colors.bold,
-    marginBottom: SIZES[16]
+    color: Colors.bold
   },
   titleContainer: {
     borderBottomWidth: SIZES[1],
@@ -64,7 +63,7 @@ export const styles = StyleSheet.create({
     zIndex: 20
   },
   committeeContainer: {
-    marginTop: SIZES[24],
+    marginTop: SIZES[16],
     borderBottomWidth: SIZES[1],
     borderBottomColor: Colors.line,
     zIndex: 10
@@ -73,7 +72,8 @@ export const styles = StyleSheet.create({
     marginTop: SIZES[24],
     borderBottomWidth: SIZES[1],
     borderBottomColor: Colors.line,
-    zIndex: 5
+    zIndex: 5,
+    marginBottom: SIZES[24]
   },
   txtAttachFile: {
     ...Fonts.PoppinsRegular[12],

@@ -8,52 +8,42 @@ import { SIZES } from '../../../../themes/Sizes';
 import { Colors } from '../../../../themes/Colors';
 import { Icon, IconName } from '../../../../component';
 import { Divider } from 'react-native-paper';
+import { getHighlightedText } from '../../../../component/highlitedText/HighlitedText';
+import { useMutation, useQuery } from '@apollo/client';
+import { UPDATE_SUBJECT_STATUS } from '../../../../graphql/mutation';
+import { GET_ALL_SUBJECTS_STATUS } from '../../../../graphql/query';
 
 const AddSubjectsCard = ({ item, searchText, index }) => {
+  console.log(item);
   const [editModal, setEditModal] = useState(false);
   const [valueStatus, setValueStatus] = useState('Created');
   const [openStatus, setOpenStatus] = useState(false);
-  const [items, setItems] = useState([
-    { label: 'Approved', value: 'Approved' },
-    { label: 'Verified', value: 'Verified' },
-    { label: 'Rejected', value: 'Rejected' },
-    { label: 'Deleted', value: 'Deleted' },
-    { label: 'Pending', value: 'Pending' },
-    { label: 'Transfered', value: 'Transfered' }
-  ]);
+  const [subjectStatus, setSubectStatus] = useState([]);
 
-  const getHighlightedText = (txt) => {
-    const parts = txt.split(new RegExp(`(${searchText})`, 'gi'));
-    return (
-      <Text>
-        {parts.map((part) =>
-          part === searchText ? (
-            <Text
-              style={[
-                styles.txtCommitteeTitle,
-                {
-                  backgroundColor: '#E6C54F'
-                }
-              ]}
-              numberOfLines={1}
-            >
-              {part}
-            </Text>
-          ) : (
-            <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
-              {part}
-            </Text>
-          )
-        )}
-      </Text>
-    );
-  };
+  const getSubjectStatus = useQuery(GET_ALL_SUBJECTS_STATUS, {
+    onCompleted: (data) => {
+      console.log('subject status', data.subjectStatus.item);
+      if (data) {
+        setSubectStatus(data.subjectStatus.item);
+      }
+    },
+    onError: (data) => {
+      console.log('subject status error', data);
+    }
+  });
+
+  const [updateSubjectStatus] = useMutation(UPDATE_SUBJECT_STATUS, {
+    onCompleted: (data) => {
+      console.log('update subject status', data.updateSubjectStatus.status);
+    },
+    onError: (data) => console.log('update subject status error', data)
+  });
 
   return (
     <TouchableOpacity
       activeOpacity={1}
       key={index}
-      style={{ flex: 1 }}
+      style={{ flex: 1, zIndex: 20 }}
       onPress={() => {
         setEditModal(false);
       }}
@@ -67,7 +57,7 @@ const AddSubjectsCard = ({ item, searchText, index }) => {
         }}
         activeOpacity={0.5}
       >
-        {getHighlightedText(item.subjectTitle)}
+        {getHighlightedText(item.subjectTitle, searchText)}
 
         {/* subject details */}
         <View

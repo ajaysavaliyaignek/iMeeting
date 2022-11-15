@@ -7,7 +7,8 @@ export const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: SIZES[12]
+    marginTop: SIZES[12],
+    zIndex: 10
   },
   divider: {
     width: '100%',
@@ -45,6 +46,7 @@ export const styles = StyleSheet.create({
   modalView: {
     position: 'absolute',
     top: SIZES[60],
-    right: SIZES[8]
+    right: SIZES[8],
+    zIndex: 20
   }
 });

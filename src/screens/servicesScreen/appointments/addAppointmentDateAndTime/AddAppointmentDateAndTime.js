@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import * as Progress from 'react-native-progress';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
@@ -22,13 +22,35 @@ import moment from 'moment';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Fonts } from '../../../../themes';
 import { Button } from '../../../../component/button/Button';
+import { useQuery } from '@apollo/client';
+import { GET_TIMEZONE } from '../../../../graphql/query';
 
 const AddAppointmentDateAndTime = () => {
   const navigation = useNavigation();
-  const [startDate, setStartdate] = useState('17 Feb, 2022');
+  const route = useRoute();
+  const { attachFiles, committee, title, discription, users } = route?.params;
+  console.log('meeting data from date and time', {
+    attachFiles,
+    committee,
+    title,
+    discription,
+    users
+  });
+  const [startDate, setStartdate] = useState(
+    moment(new Date()).format('DD MMM,YYYY')
+  );
+  const [startNewDate, setStartNewDate] = useState(
+    moment(new Date()).format('YYYY-MM-DD')
+  );
+  const [endNewDate, setEndNewdate] = useState(
+    moment(new Date()).format('YYYY-MM-DD')
+  );
   const [startTime, setStartTime] = useState('08:00 PM');
-  const [endDate, setEnddate] = useState('17 Feb, 2022');
+  const [endDate, setEnddate] = useState(
+    moment(new Date()).format('DD MMM,YYYY')
+  );
   const [endTime, setEndTime] = useState('08:00 PM');
+  const [timeZone, setTimeZone] = useState([]);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [openClock, setOpenClock] = useState(false);
   const [value, setValue] = useState('');
@@ -57,14 +79,30 @@ const AddAppointmentDateAndTime = () => {
     console.log('A date has been picked: ', date);
     setOpenCalendar(false);
     const Date = moment(date).format('DD MMM,YYYY');
+    const newDate = moment(date).format('YYYY-MM-DD');
+    console.log('new date', newDate);
     console.log('time', Date);
     if (value == 'startDate') {
       setStartdate(Date);
+      setStartNewDate(newDate);
     }
     if (value == 'endDate') {
       setEnddate(Date);
+      setEndNewdate(newDate);
     }
   };
+
+  const TimeZone = useQuery(GET_TIMEZONE, {
+    onCompleted: (data) => {
+      console.log(data.timeZone.items);
+      if (data) {
+        setTimeZone(data.timeZone.items);
+      }
+    },
+    onError: (data) => {
+      console.log('timezone error', data);
+    }
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -182,13 +220,10 @@ const AddAppointmentDateAndTime = () => {
               listMode="SCROLLVIEW"
               open={openTimeZone}
               value={valueTimeZone}
-              items={
-                items
-                //               category.map((item) => ({
-                // label: item.categoryTitle,
-                // value: item.id
-                //               }))
-              }
+              items={timeZone?.map((item) => ({
+                label: item.timeZone,
+                value: item.timeZoneId
+              }))}
               arrowIconStyle={{
                 height: SIZES[12],
                 width: SIZES[14]
@@ -199,7 +234,7 @@ const AddAppointmentDateAndTime = () => {
               }}
               setValue={setValueTimeZone}
               setItems={setItems}
-              placeholder={'TIMEZONE'}
+              placeholder={''}
               placeholderStyle={{
                 ...Fonts.PoppinsRegular[12],
                 color: Colors.secondary
@@ -219,13 +254,28 @@ const AddAppointmentDateAndTime = () => {
               listMode="SCROLLVIEW"
               open={openRepeat}
               value={valueRepeat}
-              items={
-                items
-                //               category.map((item) => ({
-                // label: item.categoryTitle,
-                // value: item.id
-                //               }))
-              }
+              items={[
+                {
+                  label: "Dosen't repeat",
+                  value: 0
+                },
+                {
+                  label: 'Repeat daily',
+                  value: 1
+                },
+                {
+                  value: 2,
+                  label: 'Repeat weekly'
+                },
+                {
+                  value: 3,
+                  label: 'Repeat monthly'
+                },
+                {
+                  value: 4,
+                  label: 'Repeat yearly'
+                }
+              ]}
               arrowIconStyle={{
                 height: SIZES[12],
                 width: SIZES[14]
@@ -236,7 +286,7 @@ const AddAppointmentDateAndTime = () => {
               }}
               setValue={setValueRepeat}
               setItems={setItems}
-              placeholder={'REPEAT'}
+              placeholder={''}
               placeholderStyle={{
                 ...Fonts.PoppinsRegular[12],
                 color: Colors.secondary
@@ -302,7 +352,21 @@ const AddAppointmentDateAndTime = () => {
           />
           <Button
             title={'Next'}
-            onPress={() => navigation.navigate('AddAppointmentLocation')}
+            onPress={() =>
+              navigation.navigate('AddAppointmentLocation', {
+                attachFiles,
+                committee,
+                title,
+                discription,
+                users,
+                startDate: startNewDate,
+                endDate: endNewDate,
+                startTime: startTime,
+                endTime: endTime,
+                TimeZone: valueTimeZone,
+                Repeat: valueRepeat
+              })
+            }
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

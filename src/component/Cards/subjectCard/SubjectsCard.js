@@ -13,43 +13,14 @@ import { useMutation } from '@apollo/client';
 import { GET_All_SUBJECTS } from '../../../graphql/query';
 import { DELETE_SUBJECTS } from '../../../graphql/mutation';
 import { styles } from './styles';
+import { ModalContext } from '../../../context';
+import { getHighlightedText } from '../../highlitedText/HighlitedText';
 
-const SubjectsCard = ({ item, index, text, search }) => {
+const SubjectsCard = ({ item, index, searchText, search }) => {
+  console.log('index', index);
   const navigation = useNavigation();
   const [editModal, setEditModal] = useState(false);
 
-  const getHighlightedText = (txt) => {
-    const { value } = text;
-    const parts = txt.split(new RegExp(`(${text})`, 'gi'));
-    return (
-      <Text numberOfLines={1}>
-        {parts.map((part) =>
-          part === text ? (
-            <Text
-              style={[
-                styles.txtCommitteeTitle,
-                {
-                  backgroundColor: '#E6C54F'
-                }
-              ]}
-              numberOfLines={1}
-            >
-              {part}
-            </Text>
-          ) : (
-            <Text
-              style={styles.txtCommitteeTitle}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {part}
-            </Text>
-          )
-        )}
-      </Text>
-    );
-  };
-  // <View> {getHighlightedText(item.subjectTitle)} </View>;
   const [deleteSubject, { data, loading, error }] = useMutation(
     DELETE_SUBJECTS,
     {
@@ -121,11 +92,7 @@ const SubjectsCard = ({ item, index, text, search }) => {
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={() => setEditModal(false)}
-      key={index}
-    >
+    <TouchableOpacity activeOpacity={1} onPress={() => setEditModal(false)}>
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
@@ -137,7 +104,8 @@ const SubjectsCard = ({ item, index, text, search }) => {
         }}
         activeOpacity={0.5}
       >
-        {getHighlightedText(item.subjectTitle)}
+        {getHighlightedText(item.subjectTitle, searchText)}
+        {/* {getHighlightedText(item.subjectTitle)} */}
 
         {/* subject details */}
         <RowData name={'ID'} discription={item.subjectId} />
@@ -204,6 +172,9 @@ const SubjectsCard = ({ item, index, text, search }) => {
               navigation.navigate('SubjectDetails', { item });
               setEditModal(false);
             }}
+            download={true}
+            editable={item.subjectStatus === 'Deleted' ? false : true}
+            deleted={item.subjectStatus === 'Deleted' ? true : false}
           />
         </View>
       )}

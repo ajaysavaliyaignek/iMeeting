@@ -1,4 +1,11 @@
-import { View, Text, SafeAreaView, TextInput, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TextInput,
+  ScrollView,
+  TouchableOpacity
+} from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -24,6 +31,7 @@ import {
 import { UPDATE_SUBJECTS } from '../../../../graphql/mutation';
 import Loader from '../../../../component/Loader/Loader';
 import { SIZES } from '../../../../themes/Sizes';
+import { BASE_URL } from '../../../../ApolloClient/Client';
 
 const EditSubjectScreen = () => {
   const navigation = useNavigation();
@@ -65,6 +73,80 @@ const EditSubjectScreen = () => {
       console.log('file error', error);
     }
   });
+
+  const checkPermission = async (file) => {
+    console.log('check permission');
+    if (Platform.OS === 'ios') {
+      downloadFile(file);
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage Permission Required',
+            message: 'Application needs access to your storage to download File'
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // Start downloading
+          downloadFile(file);
+          console.log('Storage Permission Granted.');
+        } else {
+          // If permission denied then show alert
+          Alert.alert('Error', 'Storage Permission Not Granted');
+        }
+      } catch (err) {
+        // To handle permission related exception
+        console.log('++++' + err);
+      }
+    }
+  };
+
+  const downloadFile = (file) => {
+    console.log('downloadfile');
+    // Get today's date to add the time suffix in filename
+    let date = new Date();
+    // File URL which we want to download
+    let FILE_URL = file;
+    // Function to get extention of the file url
+    let file_ext = getFileExtention(FILE_URL);
+
+    file_ext = '.' + file_ext[0];
+
+    // config: To get response by passing the downloading related options
+    // fs: Root directory path to download
+    const { config, fs } = RNFetchBlob;
+    let RootDir = fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        path:
+          RootDir +
+          '/file_' +
+          Math.floor(date.getTime() + date.getSeconds() / 2) +
+          file_ext,
+        description: 'downloading file...',
+        notification: true,
+        // useDownloadManager works with Android only
+        useDownloadManager: true
+      }
+    };
+    config(options)
+      .fetch('GET', FILE_URL)
+      .then((res) => {
+        // Alert after successful downloading
+        console.log('res -> ', res.respInfo.redirects[0]);
+        alert('File Downloaded Successfully.');
+        if (Platform.OS == 'ios') {
+          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
+        }
+      });
+  };
+
+  const getFileExtention = (fileUrl) => {
+    // To get the file extension
+    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
+  };
   // fetch file
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
@@ -140,7 +222,7 @@ const EditSubjectScreen = () => {
           formData.append('file', res);
           console.log('formdata', formData);
 
-          fetch(`http://128.199.26.43:9080/o/imeeting-rest/v1.0/file-upload`, {
+          fetch(`${BASE_URL}/o/imeeting-rest/v1.0/file-upload`, {
             method: 'POST',
             headers: {
               Authorization: 'Bearer ' + `${token}`,
@@ -185,7 +267,7 @@ const EditSubjectScreen = () => {
 
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
     // export const GET_All_SUBJECTS = gql`
-    refetchQueries: [{ query: GET_All_SUBJECTS }]
+    refetchQueries: [{ query: GET_All_SUBJECTS, variables: { screen: 0 } }]
   });
   if (data) {
     console.log(data);
@@ -211,242 +293,251 @@ const EditSubjectScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        name={'Edit subject'}
-        rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
-      />
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        activeOpacity={1}
+        onPress={() => {
+          setOpenCommitee(false);
+          setOpenCategory(false);
+          setOpenMeeting(false);
+        }}
+      >
+        <Header
+          name={'Edit subject'}
+          rightIconName={IconName.Close}
+          onRightPress={() => navigation.goBack()}
+        />
 
-      <View style={styles.container}>
-        {SubjectCategoryLoading ? (
-          <Loader />
-        ) : (
-          <ScrollView
-            style={styles.subContainer}
-            nestedScrollEnabled={true}
-            showsVerticalScrollIndicator={false}
+        <View style={styles.container}>
+          {SubjectCategoryLoading ? (
+            <Loader />
+          ) : (
+            <ScrollView
+              style={styles.subContainer}
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={false}
+            >
+              <Text style={styles.txtEditSubject}>Edit subject</Text>
+              <View style={styles.committeeContainer}>
+                <Text style={styles.txtTitle}>SELECT COMMITTEE</Text>
+                <DropDownPicker
+                  listMode="SCROLLVIEW"
+                  open={openCommittee}
+                  value={valueCommittee}
+                  items={committees?.map((item) => ({
+                    label: item.committeeTitle,
+                    value: item.organizationId
+                  }))}
+                  setOpen={() => {
+                    setOpenCommitee(!openCommittee);
+                    setOpenCategory(false);
+                    setOpenMeeting(false);
+                  }}
+                  setValue={setValueCommittee}
+                  setItems={setItems}
+                  placeholder={'SELECT COMMITTEE'}
+                  placeholderStyle={{
+                    ...Fonts.PoppinsRegular[12],
+                    color: Colors.secondary
+                  }}
+                  arrowIconStyle={{
+                    height: SIZES[12],
+                    width: SIZES[14]
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    paddingRight: SIZES[16],
+                    paddingLeft: 0
+                  }}
+                  textStyle={{ ...Fonts.PoppinsRegular[14] }}
+                />
+              </View>
+              <View style={styles.meetingContainer}>
+                <Text style={styles.txtTitle}>SELECT MEETING</Text>
+                <DropDownPicker
+                  listMode="SCROLLVIEW"
+                  open={openMeeting}
+                  value={valueMeeting}
+                  items={committees?.map((item) => ({
+                    label: item.committeeTitle,
+                    value: item.organizationId
+                  }))}
+                  setOpen={() => {
+                    setOpenMeeting(!openMeeting);
+                    setOpenCategory(false);
+                    setOpenCommitee(false);
+                  }}
+                  setValue={setValueMeeting}
+                  setItems={setItems}
+                  placeholder={'SELECT MEETING'}
+                  placeholderStyle={{
+                    ...Fonts.PoppinsRegular[12],
+                    color: Colors.secondary
+                  }}
+                  arrowIconStyle={{
+                    height: SIZES[12],
+                    width: SIZES[14]
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    paddingRight: SIZES[16],
+                    paddingLeft: 0
+                  }}
+                  textStyle={{ ...Fonts.PoppinsRegular[14] }}
+                />
+              </View>
+              {/* title */}
+              <View style={styles.titleContainer}>
+                <Text style={styles.txtTitle}>TITLE</Text>
+                <TextInput
+                  value={title}
+                  style={styles.textInput}
+                  onChangeText={(text) => setTitle(text)}
+                />
+              </View>
+              <View style={styles.discriptionContainer}>
+                <Text style={styles.txtTitle}>DISCRIPTION</Text>
+                <TextInput
+                  value={discription}
+                  style={styles.textInput}
+                  multiline={true}
+                  onChangeText={(text) => setDescription(text)}
+                />
+              </View>
+              <View style={styles.categoryView}>
+                <Text style={styles.txtTitle}>SUBJECT CATEGORY</Text>
+                <DropDownPicker
+                  listMode="SCROLLVIEW"
+                  open={openCategory}
+                  value={valueCategory}
+                  items={category.map((item) => ({
+                    label: item.categoryTitle,
+                    value: item.id
+                  }))}
+                  setOpen={() => {
+                    setOpenCommitee(false);
+                    setOpenCategory(!openCategory);
+                    setOpenMeeting(false);
+                  }}
+                  setValue={setValueCategory}
+                  setItems={setItems}
+                  placeholder={item.subjectCategoryName}
+                  placeholderStyle={{
+                    ...Fonts.PoppinsRegular[12],
+                    color: Colors.secondary
+                  }}
+                  arrowIconStyle={{
+                    height: SIZES[12],
+                    width: SIZES[14]
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    paddingRight: SIZES[16],
+                    paddingLeft: 0
+                  }}
+                  textStyle={{ ...Fonts.PoppinsRegular[14] }}
+                />
+              </View>
+
+              <View style={{ marginTop: 24 }}>
+                <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
+                {fileResponse?.map((file, index) => {
+                  console.log('from retuen', file);
+                  return (
+                    <FilesCard
+                      key={index}
+                      filePath={file.name}
+                      fileSize={file.size}
+                      onDownloadPress={() => checkPermission(file.downloadUrl)}
+                      fileType={file.type}
+                      onRemovePress={() => removeFile(file.fileEnteryId)}
+                      download={true}
+                      deleted={true}
+                      style={{
+                        borderBottomWidth: SIZES[1],
+                        borderBottomColor: Colors.Approved
+                      }}
+                    />
+                  );
+                })}
+
+                <Button
+                  title={'Attach file'}
+                  layoutStyle={{
+                    backgroundColor: 'rgba(243, 246, 249,1)',
+                    marginBottom: 32
+                  }}
+                  textStyle={{
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.primary
+                  }}
+                  onPress={() => handleDocumentSelection()}
+                />
+              </View>
+            </ScrollView>
+          )}
+
+          <View
+            style={{
+              backgroundColor: Colors.white,
+              justifyContent: 'flex-end'
+            }}
           >
-            <Text style={styles.txtEditSubject}>Edit subject</Text>
-            {/* title */}
-            <View style={styles.titleContainer}>
-              <Text style={styles.txtTitle}>TITLE</Text>
-              <TextInput
-                value={title}
-                style={styles.textInput}
-                onChangeText={(text) => setTitle(text)}
-              />
-            </View>
-            <View style={styles.discriptionContainer}>
-              <Text style={styles.txtTitle}>DISCRIPTION</Text>
-              <TextInput
-                value={discription}
-                style={styles.textInput}
-                multiline={true}
-                onChangeText={(text) => setDescription(text)}
-              />
-            </View>
-            <View style={styles.categoryView}>
-              <Text style={styles.txtTitle}>SUBJECT CATEGORY</Text>
-              <DropDownPicker
-                listMode="SCROLLVIEW"
-                open={openCategory}
-                value={valueCategory}
-                items={category.map((item) => ({
-                  label: item.categoryTitle,
-                  value: item.id
-                }))}
-                setOpen={() => {
-                  setOpenCommitee(false);
-                  setOpenCategory(!openCategory);
-                  setOpenMeeting(false);
-                }}
-                setValue={setValueCategory}
-                setItems={setItems}
-                placeholder={item.subjectCategoryName}
-                placeholderStyle={{
-                  ...Fonts.PoppinsRegular[12],
-                  color: Colors.secondary
-                }}
-                arrowIconStyle={{
-                  height: SIZES[12],
-                  width: SIZES[14]
-                }}
-                style={{
-                  borderWidth: 0,
-                  paddingRight: SIZES[16],
-                  paddingLeft: 0
-                }}
-                textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              />
-            </View>
-            <View style={styles.committeeContainer}>
-              <Text style={styles.txtTitle}>SELECT COMMITTEE</Text>
-              <DropDownPicker
-                listMode="SCROLLVIEW"
-                open={openCommittee}
-                value={valueCommittee}
-                items={committees?.map((item) => ({
-                  label: item.committeeTitle,
-                  value: item.organizationId
-                }))}
-                setOpen={() => {
-                  setOpenCommitee(!openCommittee);
-                  setOpenCategory(false);
-                  setOpenMeeting(false);
-                }}
-                setValue={setValueCommittee}
-                setItems={setItems}
-                placeholder={'SELECT COMMITTEE'}
-                placeholderStyle={{
-                  ...Fonts.PoppinsRegular[12],
-                  color: Colors.secondary
-                }}
-                arrowIconStyle={{
-                  height: SIZES[12],
-                  width: SIZES[14]
-                }}
-                style={{
-                  borderWidth: 0,
-                  paddingRight: SIZES[16],
-                  paddingLeft: 0
-                }}
-                textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              />
-            </View>
-            <View style={styles.meetingContainer}>
-              <Text style={styles.txtTitle}>SELECT MEETING</Text>
-              <DropDownPicker
-                listMode="SCROLLVIEW"
-                open={openMeeting}
-                value={valueMeeting}
-                items={committees?.map((item) => ({
-                  label: item.committeeTitle,
-                  value: item.organizationId
-                }))}
-                setOpen={() => {
-                  setOpenMeeting(!openMeeting);
-                  setOpenCategory(false);
-                  setOpenCommitee(false);
-                }}
-                setValue={setValueMeeting}
-                setItems={setItems}
-                placeholder={'SELECT MEETING'}
-                placeholderStyle={{
-                  ...Fonts.PoppinsRegular[12],
-                  color: Colors.secondary
-                }}
-                arrowIconStyle={{
-                  height: SIZES[12],
-                  width: SIZES[14]
-                }}
-                style={{
-                  borderWidth: 0,
-                  paddingRight: SIZES[16],
-                  paddingLeft: 0
-                }}
-                textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              />
-            </View>
-            <View style={{ marginTop: 24 }}>
-              <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
-              {fileResponse?.map((file, index) => {
-                console.log('from retuen', file);
-                return (
-                  <FilesCard
-                    key={index}
-                    filePath={file.name}
-                    fileSize={file.size}
-                    onDownloadPress={() =>
-                      navigation.navigate('SubjectDownload')
-                    }
-                    fileType={file.type}
-                    onRemovePress={() => removeFile(file.fileEnteryId)}
-                    download={true}
-                    deleted={true}
-                    style={{
-                      borderBottomWidth: SIZES[1],
-                      borderBottomColor: Colors.Approved
-                    }}
-                  />
-                );
-              })}
-
+            {/* Divider */}
+            <Divider style={styles.divider} />
+            <View style={styles.buttonContainer}>
               <Button
-                title={'Attach file'}
-                layoutStyle={{
-                  backgroundColor: 'rgba(243, 246, 249,1)',
-                  marginBottom: 32
+                title={'Cancel'}
+                onPress={() => navigation.goBack()}
+                layoutStyle={styles.cancelBtnLayout}
+                textStyle={styles.txtCancelButton}
+              />
+              <Button
+                title={'Save'}
+                onPress={() => {
+                  console.log('subjectTitle', title);
+                  console.log('description', discription);
+                  console.log('attachFileIds', filesId);
+                  console.log('valueCommittee', valueCommittee);
+                  console.log('valueCategory', valueCategory);
+                  addSubject({
+                    variables: {
+                      subject: {
+                        subjectId: item.subjectId,
+                        committeeId: valueCommittee,
+                        subjectTitle: title,
+                        description: discription,
+                        subjectCategoryId: valueCategory,
+                        draft: false,
+                        attachFileIds: filesId
+                      }
+                    },
+                    onCompleted: () => {
+                      navigation.navigate('Details', {
+                        title: 'Subjects',
+                        active: '1'
+                      });
+                    }
+                  });
+
+                  // navigation.navigate('Details', {
+                  //   title: 'Subjects',
+                  //   active: '1'
+                  // });
                 }}
-                textStyle={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.primary
-                }}
-                onPress={() => handleDocumentSelection()}
+                disable={title === '' || discription === '' ? true : false}
+                layoutStyle={[
+                  {
+                    opacity: title === '' || discription === '' ? 0.5 : null
+                  },
+                  styles.nextBtnLayout
+                ]}
+                textStyle={styles.txtNextBtn}
               />
             </View>
-          </ScrollView>
-        )}
-
-        <View
-          style={{
-            backgroundColor: Colors.white,
-            justifyContent: 'flex-end'
-          }}
-        >
-          {/* Divider */}
-          <Divider style={styles.divider} />
-          <View style={styles.buttonContainer}>
-            <Button
-              title={'Cancel'}
-              onPress={() => navigation.goBack()}
-              layoutStyle={styles.cancelBtnLayout}
-              textStyle={styles.txtCancelButton}
-            />
-            <Button
-              title={'Save'}
-              onPress={() => {
-                console.log('subjectTitle', title);
-                console.log('description', discription);
-                console.log('attachFileIds', filesId);
-                console.log('valueCommittee', valueCommittee);
-                console.log('valueCategory', valueCategory);
-                addSubject({
-                  variables: {
-                    subject: {
-                      subjectId: item.subjectId,
-                      committeeId: valueCommittee,
-                      subjectTitle: title,
-                      description: discription,
-                      subjectCategoryId: valueCategory,
-                      draft: false,
-                      attachFileIds: filesId
-                    }
-                  },
-                  onCompleted: () => {
-                    navigation.navigate('Details', {
-                      title: 'Subjects',
-                      active: '1'
-                    });
-                  }
-                });
-
-                // navigation.navigate('Details', {
-                //   title: 'Subjects',
-                //   active: '1'
-                // });
-              }}
-              disable={title === '' || discription === '' ? true : false}
-              layoutStyle={[
-                {
-                  opacity: title === '' || discription === '' ? 0.5 : null
-                },
-                styles.nextBtnLayout
-              ]}
-              textStyle={styles.txtNextBtn}
-            />
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

@@ -8,21 +8,121 @@ import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
 import { Fonts } from '../../../../themes';
 import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
+import { useMutation, useQuery } from '@apollo/client';
+import {
+  GET_All_APPOINTMENT,
+  GET_ALL_LOCATION,
+  GET_PLATFORMLINK
+} from '../../../../graphql/query';
+import { UPDATE_APPOINTMENT } from '../../../../graphql/mutation';
 
 const AddAppointmentLocation = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const {
+    attachFiles,
+    committee,
+    title,
+    discription,
+    users,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    TimeZone,
+    Repeat
+  } = route?.params;
+  console.log('meeting data from addmeetinglocation', {
+    attachFiles,
+    committee,
+    title,
+    discription,
+    users,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    TimeZone,
+    Repeat
+  });
   const [openLocation, setOpenLocation] = useState(false);
   const [valueLocation, setValueLocation] = useState(null);
   const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(null);
+  const [platform, setPlatform] = useState(null);
+  const [location, setLocation] = useState([]);
   const [items, setItems] = useState([
     { label: 'Office 2', value: 'Office 2' }
   ]);
+
+  const {
+    loading: LocationLoading,
+    error: LocationError,
+    data: LocationData
+  } = useQuery(GET_ALL_LOCATION, {
+    variables: {
+      locationType: 2
+    },
+
+    onCompleted: (data) => {
+      console.log('get location', data?.locations);
+      // setSubjectData(data?.subjects.items);
+
+      setLocation(data?.locations.items);
+    }
+  });
+  if (LocationError) {
+    console.log('LocationError', LocationError);
+  }
+
+  // get platform link
+  const {
+    loading: platformLoading,
+    error: platformError,
+    data: platformData
+  } = useQuery(GET_PLATFORMLINK, {
+    variables: {
+      platformId: valueVideoConference
+    },
+
+    onCompleted: (data) => {
+      console.log('get platform link', data.videoConferencePlatformLink);
+      // setSubjectData(data?.subjects.items);
+      if (data) {
+        setPlatform(data?.videoConferencePlatformLink);
+      }
+    }
+  });
+  if (platformError) {
+    console.log('platformError', platformError);
+  }
+
+  const [addAppointment] = useMutation(UPDATE_APPOINTMENT, {
+    // export const GET_All_SUBJECTS = gql`
+    refetchQueries: [
+      {
+        query: GET_All_APPOINTMENT,
+        variables: {
+          searchValue: ''
+        }
+      }
+    ],
+    onCompleted: (data) => {
+      console.log('add appointment', data.updateAppointment);
+      if (data.updateAppointment.status[0].statusCode == '200') {
+        navigation.navigate('AppointmentsList');
+      }
+    },
+    onError: (data) => {
+      console.log('add appointment error', data);
+    }
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -49,13 +149,10 @@ const AddAppointmentLocation = () => {
             listMode="SCROLLVIEW"
             open={openLocation}
             value={valueLocation}
-            items={
-              items
-              //               category.map((item) => ({
-              // label: item.categoryTitle,
-              // value: item.id
-              //               }))
-            }
+            items={location?.map((item) => ({
+              label: item.title,
+              value: item.locationId
+            }))}
             arrowIconStyle={{
               height: SIZES[12],
               width: SIZES[14]
@@ -65,7 +162,7 @@ const AddAppointmentLocation = () => {
             }}
             setValue={setValueLocation}
             setItems={setItems}
-            placeholder={'Location'}
+            placeholder={''}
             placeholderStyle={{
               ...Fonts.PoppinsRegular[12],
               color: Colors.secondary
@@ -89,7 +186,9 @@ const AddAppointmentLocation = () => {
           />
           <Button
             title={'Add location'}
-            onPress={() => navigation.navigate('AddLocation')}
+            onPress={() =>
+              navigation.navigate('AddLocation', { locationType: 2 })
+            }
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,
@@ -106,13 +205,16 @@ const AddAppointmentLocation = () => {
             listMode="SCROLLVIEW"
             open={openVideoConference}
             value={valueVideoConference}
-            items={
-              items
-              //               category.map((item) => ({
-              // label: item.categoryTitle,
-              // value: item.id
-              //               }))
-            }
+            items={[
+              {
+                value: 1,
+                label: 'Google Meet'
+              },
+              {
+                value: 2,
+                label: 'Microsoft Teams'
+              }
+            ]}
             arrowIconStyle={{
               height: SIZES[12],
               width: SIZES[14]
@@ -122,7 +224,7 @@ const AddAppointmentLocation = () => {
             }}
             setValue={setValueVideoConference}
             setItems={setItems}
-            placeholder={'Video conference'}
+            placeholder={''}
             placeholderStyle={{
               ...Fonts.PoppinsRegular[12],
               color: Colors.secondary
@@ -156,7 +258,30 @@ const AddAppointmentLocation = () => {
           />
           <Button
             title={'Save'}
-            onPress={() => navigation.navigate('AddMeetingSubjects')}
+            onPress={() => {
+              console.log(valueLocation, platform.platformId);
+              addAppointment({
+                variables: {
+                  appointment: {
+                    appointmentDescription: discription,
+                    appointmentId: 0,
+                    appointmentTitle: title,
+                    attachFileIds: attachFiles,
+                    committeeId: committee,
+                    locationId: valueLocation,
+                    platformId: platform.platformId,
+                    repeat: Repeat,
+                    required: [],
+                    setDate: startDate,
+                    setTime: startTime,
+                    endDate: endDate,
+                    endTime: endTime,
+                    timeZone: TimeZone,
+                    userIds: users
+                  }
+                }
+              });
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styles } from './styles';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
@@ -17,9 +17,45 @@ import { subjectData } from '../../../../Constans/data';
 import SelectSubjectCard from '../../../../component/Cards/selectSubjectcard/SelectSubjectCard';
 import { Button } from '../../../../component/button/Button';
 import { Colors } from '../../../../themes/Colors';
+import { useQuery } from '@apollo/client';
+import { GET_All_SUBJECTS } from '../../../../graphql/query';
 
 const SelectSubjects = () => {
   const navigation = useNavigation();
+  const [searchText, setSearchText] = useState('');
+  const [subjectData, setSubjectData] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  console.log('selectedSubjects', selectedSubjects);
+
+  const {
+    loading: SubjectsLoading,
+    error: SubjectsError,
+    data: SubjectsData
+  } = useQuery(GET_All_SUBJECTS, {
+    variables: {
+      searchValue: searchText,
+      screen: 1
+    },
+
+    onCompleted: (data) => {
+      // setFilterData(data?.subjects.items);
+      console.log(data.subjects.items, 'commiitee by id');
+      setSubjectData(data?.subjects.items);
+    }
+  });
+
+  if (SubjectsError) {
+    console.log('subjects error---', SubjectsError);
+  }
+  useEffect(() => {
+    // const newData = subjectData?.map((subject) => {
+    //   if (subject.subjectId !== selectedSubjects?.subjectId) {
+    //     return [...subject, selectedSubjects];
+    //   }
+    // });
+    // console.log(newData);
+  }, [selectedSubjects]);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -35,7 +71,7 @@ const SelectSubjects = () => {
           <TextInput
             style={styles.textInput}
             placeholder={'Search'}
-            // onChangeText={(text) => searchFilterSubject(text)}
+            onChangeText={(text) => setSearchText(text)}
           />
           <TouchableOpacity>
             <Icon
@@ -66,7 +102,13 @@ const SelectSubjects = () => {
           showsVerticalScrollIndicator={false}
           keyExtractor={(item, index) => `${index}`}
           renderItem={({ item, index }) => (
-            <SelectSubjectCard item={item} index={index} />
+            <SelectSubjectCard
+              item={item}
+              index={index}
+              searchText={searchText}
+              selectedSubjects={selectedSubjects}
+              setSelectedSubjects={setSelectedSubjects}
+            />
           )}
         />
       </View>
@@ -89,7 +131,7 @@ const SelectSubjects = () => {
           />
           <Button
             title={'Add subjects'}
-            onPress={() => navigation.navigate('AddMeetingSubjects')}
+            onPress={() => navigation.goBack()}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

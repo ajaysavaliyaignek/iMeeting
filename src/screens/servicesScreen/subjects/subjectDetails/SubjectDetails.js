@@ -46,6 +46,7 @@ const SubjectDetails = () => {
   const [comments, setComments] = useState([]);
   const [commenttext, setCommentText] = useState('');
   const keyboardVerticalOffset = Platform.OS === 'ios' ? -350 : -600;
+  const profilePicture = comments[0]?.profilePicture;
 
   const checkPermission = async (file) => {
     console.log('check permission');
@@ -216,7 +217,7 @@ const SubjectDetails = () => {
     DELETE_SUBJECTS,
     {
       // export const GET_All_SUBJECTS = gql`
-      refetchQueries: [{ query: GET_All_SUBJECTS }]
+      refetchQueries: [{ query: GET_All_SUBJECTS, variables: { screen: 0 } }]
     }
   );
   if (data) {
@@ -313,96 +314,66 @@ const SubjectDetails = () => {
               showsVerticalScrollIndicator={false}
               keyExtractor={({ item, index }) => `${item?.commentId}`}
               renderItem={({ item, index }) => (
-                <CommentCard item={item} commentThreadId={commentThreadId} />
+                <CommentCard
+                  item={item}
+                  commentThreadId={commentThreadId}
+                  index={index}
+                  setComment={setCommentText}
+                />
               )}
             />
-            {/* <CommentCard /> */}
+          </View>
 
-            {/* <TouchableOpacity
-              onPress={() => setOpenReply(!openReply)}
+          {comments[0]?.childComment.length == 0 && (
+            <View
               style={{
+                paddingVertical: SIZES[14],
+                paddingHorizontal: SIZES[16],
+                borderWidth: SIZES[1],
+                borderColor: Colors.line,
+                borderRadius: SIZES[8],
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginTop: SIZES[16]
+                marginTop: SIZES[32],
+                marginBottom: SIZES[24]
               }}
             >
-              <Icon
-                name={openReply ? IconName.Arrow_Down : IconName.Arrow_Right}
-                height={SIZES[10]}
-                width={SIZES[10]}
-              />
-
-              <Text
+              <TextInput
                 style={{
-                  ...Fonts.PoppinsRegular[14],
-                  color: Colors.primary,
-                  marginLeft: SIZES[8]
+                  flex: 1,
+                  height: SIZES[30],
+                  backgroundColor: Colors.white
+                }}
+                value={commenttext}
+                underlineColor={Colors.white}
+                activeUnderlineColor={Colors.white}
+                placeholder={'Your comment'}
+                onChangeText={(text) => setCommentText(text)}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('commenttext', commenttext);
+                  console.log('parentCommentId', comments[0]?.parentCommentId);
+                  addComment({
+                    variables: {
+                      comment: {
+                        comment: commenttext,
+                        commentId: 0,
+                        parentCommentId: comments[0]?.commentId
+                      }
+                    }
+                  });
+                  setCommentText('');
                 }}
               >
-                Show 2 replies
-              </Text>
-            </TouchableOpacity> */}
-          </View>
-
-          {/* {openReply && (
-              <View style={{ marginLeft: SIZES[24], marginTop: SIZES[24] }}>
-                {comments}
-                <CommentCard />
-                <Text
-                  style={{
-                    ...Fonts.PoppinsRegular[14],
-                    color: '#144B8D',
-                    marginTop: SIZES[16]
-                  }}
-                >
-                  Reply
-                </Text>
-              </View>
-            )} */}
-          <View
-            style={{
-              paddingVertical: SIZES[14],
-              paddingHorizontal: SIZES[16],
-              borderWidth: SIZES[1],
-              borderColor: Colors.line,
-              borderRadius: SIZES[8],
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: SIZES[32],
-              marginBottom: SIZES[24]
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                height: SIZES[30],
-                backgroundColor: Colors.white
-              }}
-              value={commenttext}
-              underlineColor={Colors.white}
-              activeUnderlineColor={Colors.white}
-              placeholder={'Your comment'}
-              onChangeText={(text) => setCommentText(text)}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                console.log('commenttext', commenttext);
-                console.log('parentCommentId', comments[0]?.parentCommentId);
-                addComment({
-                  variables: {
-                    comment: {
-                      comment: commenttext,
-                      commentId: 0,
-                      parentCommentId: comments[0]?.commentId
-                    }
-                  }
-                });
-                setCommentText('');
-              }}
-            >
-              <Icon name={IconName.Send} height={SIZES[22]} width={SIZES[20]} />
-            </TouchableOpacity>
-          </View>
+                <Icon
+                  name={IconName.Send}
+                  height={SIZES[22]}
+                  width={SIZES[20]}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </KeyboardAvoidingView>
       </ScrollView>
 

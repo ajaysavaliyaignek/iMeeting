@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 
 import { SIZES } from '../../../../themes/Sizes';
@@ -20,9 +20,42 @@ import { Button } from '../../../../component/button/Button';
 import { usersData } from '../../../../Constans/data';
 import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { styles } from './styles';
+import { Fonts } from '../../../../themes';
+import { UserContext } from '../../../../context';
+import { canUseLayoutEffect } from '@apollo/client/utilities';
 
 const AddMeetingUser = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const [users, setUsers] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [required, setRequired] = useState(null);
+  // const [selectUser, setRequiredse] = useState(null);
+  const { selectedUsers } = useContext(UserContext);
+  const { attachFiles, committee, title, discription } = route?.params;
+
+  useEffect(() => {
+    console.log('required', required);
+  }, [required]);
+
+  console.log('meeting data from user', {
+    attachFiles,
+    committee,
+    title,
+    discription
+  });
+
+  useEffect(() => {
+    if (selectedUsers?.length > 0) {
+      const userId = selectedUsers?.map((item) => {
+        return item.userId;
+      });
+      setUsers(userId);
+    }
+  }, [selectedUsers]);
+
+  console.log('userId', users);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -45,13 +78,19 @@ const AddMeetingUser = () => {
         <Text style={styles.txtAddSubjectTitle}>Users</Text>
         <View style={styles.searchContainer}>
           <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput style={styles.textInput} placeholder={'Search'} />
+          <TextInput
+            style={styles.textInput}
+            placeholder={'Search'}
+            onChangeText={(text) => {
+              setSearchText(text);
+            }}
+          />
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
         </View>
         <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('Timeline')}
+          onPress={() => navigation.navigate('Timeline', { selectedUsers })}
         >
           <Text style={styles.txtCommittee}>Timeline</Text>
           <View style={styles.btnCommittees}>
@@ -66,11 +105,13 @@ const AddMeetingUser = () => {
         <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('SelectUsers')}
+          onPress={() => navigation.navigate('SelectUsers', { committee })}
         >
           <Text style={styles.txtCommittee}>Users</Text>
           <View style={styles.btnCommittees}>
-            <Text style={styles.txtBtnCommittees}>Select 3</Text>
+            <Text style={styles.txtBtnCommittees}>
+              Select {selectedUsers?.length > 0 ? selectedUsers?.length : ''}
+            </Text>
             <Icon
               name={IconName.Arrow_Right}
               height={SIZES[12]}
@@ -80,14 +121,31 @@ const AddMeetingUser = () => {
         </TouchableOpacity>
         <Divider style={styles.divider} />
 
-        <FlatList
-          data={usersData}
-          keyExtractor={({ item, index }) => `user-${index}`}
-          renderItem={({ item, index }) => (
-            <UserCard item={item} index={index} />
-          )}
-          showsVerticalScrollIndicator={false}
-        />
+        {selectedUsers?.length > 0 ? (
+          <FlatList
+            data={selectedUsers}
+            keyExtractor={(item, index) => `${item.userId}`}
+            renderItem={({ item, index }) => (
+              <UserCard
+                item={item}
+                index={index}
+                text={searchText}
+                isSwitchOnRow={true}
+                required={required}
+                setRequired={setRequired}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+              No selected user
+            </Text>
+          </View>
+        )}
       </View>
 
       <View
@@ -107,7 +165,15 @@ const AddMeetingUser = () => {
           />
           <Button
             title={'Next'}
-            onPress={() => navigation.navigate('AddMeetingDateAndTime')}
+            onPress={() =>
+              navigation.navigate('AddMeetingDateAndTime', {
+                attachFiles,
+                committee,
+                title,
+                discription,
+                users
+              })
+            }
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

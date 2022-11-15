@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   ScrollView
 } from 'react-native';
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { Divider } from 'react-native-paper';
 
@@ -16,9 +16,36 @@ import { Icon, IconName } from '../../../../component';
 import { SIZES } from '../../../../themes/Sizes';
 import { Button } from '../../../../component/button/Button';
 import { Colors } from '../../../../themes/Colors';
+import { GET_ALL_LOCATION_BY_ID } from '../../../../graphql/query';
+import { useQuery } from '@apollo/client';
 
 const LocationDetails = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { locationId, platform } = route?.params;
+  const [location, setLocation] = useState({});
+  const [role, setRole] = useState('Member');
+
+  // get location by id
+  const {
+    loading: LocationLoading,
+    error: LocationError,
+    data: LocationData
+  } = useQuery(GET_ALL_LOCATION_BY_ID, {
+    variables: {
+      locationId: locationId
+    },
+
+    onCompleted: (data) => {
+      console.log('get location by id', data);
+      // setSubjectData(data?.subjects.items);
+      setLocation(data.location);
+    }
+  });
+  if (LocationError) {
+    console.log('LocationError', LocationError);
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -35,11 +62,11 @@ const LocationDetails = () => {
           <Text style={styles.txtTitleGeneral}>General</Text>
 
           <Text style={styles.txtTitle}>Title</Text>
-          <Text style={styles.discription}>Office 2</Text>
+          <Text style={styles.discription}>{location.title}</Text>
           <Divider style={styles.divider} />
 
           <Text style={styles.txtTitle}>People capacity</Text>
-          <Text style={styles.discription}>32</Text>
+          <Text style={styles.discription}>{location.peopleCapacity}</Text>
           <Divider style={styles.divider} />
         </View>
 
@@ -47,15 +74,17 @@ const LocationDetails = () => {
           <Text style={styles.txtTitleGeneral}>Address</Text>
 
           <Text style={styles.txtTitle}>City</Text>
-          <Text style={styles.discription}>Toronto</Text>
+          <Text style={styles.discription}>{location.city}</Text>
           <Divider style={styles.divider} />
 
           <Text style={styles.txtTitle}>Street</Text>
-          <Text style={styles.discription}>8080 Railroad St.</Text>
+          <Text style={styles.discription}>{location.street}</Text>
           <Divider style={styles.divider} />
 
           <Text style={styles.txtTitle}>Building / Floor / Room</Text>
-          <Text style={styles.discription}>2, 5, 4</Text>
+          <Text
+            style={styles.discription}
+          >{`${location.building}, ${location.floor}, ${location.room}`}</Text>
           <Divider style={styles.divider} />
 
           <Text style={styles.txtTitle}>Google Map URL</Text>
@@ -67,11 +96,9 @@ const LocationDetails = () => {
               marginVertical: SIZES[10]
             }}
           >
-            <Text style={styles.txtUrl}>goo.gl/maps/zPNPu7pQnfgRopjc9</Text>
+            <Text style={styles.txtUrl}>{platform?.plateformlink}</Text>
             <TouchableOpacity
-              onPress={() =>
-                Clipboard.setString('goo.gl/maps/zPNPu7pQnfgRopjc9')
-              }
+              onPress={() => Clipboard.setString(location.googleMapURL)}
             >
               <Icon
                 name={IconName.CopyText}
@@ -83,36 +110,62 @@ const LocationDetails = () => {
           <Divider style={styles.divider} />
         </View>
       </ScrollView>
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Divider */}
-        <Divider style={styles.divider} />
+      {role == 'Head' || role == 'Secretory' ? (
         <View
-          style={[styles.buttonContainer, { paddingHorizontal: SIZES[16] }]}
+          style={{
+            backgroundColor: Colors.white,
+            justifyContent: 'flex-end'
+          }}
         >
-          <Button
-            title={'Close'}
-            onPress={() => navigation.goBack()}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Edit'}
-            onPress={() => navigation.navigate('AddMeetingLocation')}
-            layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
-              styles.nextBtnLayout
-            ]}
-            textStyle={styles.txtNextBtn}
-          />
+          {/* Divider */}
+          <Divider style={styles.divider} />
+          <View
+            style={[styles.buttonContainer, { paddingHorizontal: SIZES[16] }]}
+          >
+            <Button
+              title={'Close'}
+              onPress={() => navigation.goBack()}
+              layoutStyle={styles.cancelBtnLayout}
+              textStyle={styles.txtCancelButton}
+            />
+            <Button
+              title={'Edit'}
+              onPress={() =>
+                navigation.navigate('EditLocation', {
+                  meetingLocation: location
+                })
+              }
+              layoutStyle={[
+                // {
+                //     opacity: title === "" || discription === "" ? 0.5 : null,
+                // },
+                styles.nextBtnLayout
+              ]}
+              textStyle={styles.txtNextBtn}
+            />
+          </View>
         </View>
-      </View>
+      ) : (
+        <View
+          style={{
+            backgroundColor: Colors.white,
+            justifyContent: 'flex-end'
+          }}
+        >
+          {/* Divider */}
+          <Divider style={styles.divider} />
+          <View
+            style={[styles.buttonContainer, { paddingHorizontal: SIZES[16] }]}
+          >
+            <Button
+              title={'Close'}
+              onPress={() => navigation.goBack()}
+              layoutStyle={[styles.cancelBtnLayout, { width: '100%' }]}
+              textStyle={styles.txtCancelButton}
+            />
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

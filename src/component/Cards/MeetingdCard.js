@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 
@@ -10,15 +10,27 @@ import IconName from '../Icon/iconName';
 import EditDeleteModal from '../EditDeleteModal';
 import { SIZES } from '../../themes/Sizes';
 import moment from 'moment';
-import { GET_ALL_LOCATION_BY_ID } from '../../graphql/query';
-import { useQuery } from '@apollo/client';
+import { GET_ALL_LOCATION_BY_ID, GET_All_MEETING } from '../../graphql/query';
+import { useMutation, useQuery } from '@apollo/client';
+import { UserContext } from '../../context';
+import { DELETE_MEETING } from '../../graphql/mutation';
+import { getHighlightedText } from '../highlitedText/HighlitedText';
 
 const MeetingsCard = ({ item, text, index }) => {
   const navigation = useNavigation();
-  const [editModal, setEditModal] = useState(false);
+
   const [location, setLocation] = useState('');
+  const { editModal, setEditModal } = useContext(UserContext);
+  const [role, setRole] = useState(item.yourRoleName);
+  console.log('context', editModal);
+  const [showEditModal, setShowEditModal] = useState(editModal);
+  console.log('showEditModal', showEditModal);
 
   // get location
+  useEffect(() => {
+    setShowEditModal(editModal);
+  }, [editModal]);
+
   const {
     loading: loadingLocation,
     error: errorLocation,
@@ -28,54 +40,58 @@ const MeetingsCard = ({ item, text, index }) => {
       locationId: item.locationId
     },
     onCompleted: (data) => {
-      console.log('location', data);
       if (data) {
-        setLocation(data.location);
+        setLocation(data?.location.city);
       }
     }
   });
-
-  if (dataLocation) {
-    console.log('dataLocation', dataLocation.location);
-  }
 
   if (errorLocation) {
     console.log('errorLocation', errorLocation);
   }
 
-  const getHighlightedText = (txt) => {
-    const parts = txt.split(new RegExp(`(${text})`, 'gi'));
-    return (
-      <Text>
-        {parts.map((part) =>
-          part === text ? (
-            <Text
-              style={[
-                styles.txtCommitteeTitle,
-                {
-                  backgroundColor: '#E6C54F'
-                }
-              ]}
-              numberOfLines={1}
-            >
-              {part}
-            </Text>
-          ) : (
-            <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
-              {part}
-            </Text>
-          )
-        )}
-      </Text>
-    );
-  };
+  const [deleteMeeting, { data, loading, error }] = useMutation(
+    DELETE_MEETING,
+    {
+      // export const GET_All_SUBJECTS = gql`
+      refetchQueries: [
+        {
+          query: GET_All_MEETING,
+          variables: {
+            onlyMyMeeting: false,
+            screen: 0
+          }
+        }
+      ],
+      onCompleted: (data) => {
+        console.log('delete meeting', data.deleteMeeting.status);
+      }
+    }
+  );
+  if (data) {
+    console.log('delete meeting', data.deleteMeeting.status);
+  }
+  if (error) {
+    Alert.alert('Delete Subject Error', [
+      {
+        text: error,
+
+        style: 'default'
+      }
+    ]);
+  }
 
   const onDeleteHandler = () => {
     setEditModal(false);
-    Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
+    Alert.alert('Delete meeting', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
-        onPress: () => console.log('delete Pressed'),
+        onPress: () =>
+          deleteMeeting({
+            variables: {
+              meetingId: item.meetingId
+            }
+          }),
         style: 'destructive'
       },
       {
@@ -110,7 +126,7 @@ const MeetingsCard = ({ item, text, index }) => {
         }}
         activeOpacity={0.5}
       >
-        {getHighlightedText(item.meetingTitle)}
+        {getHighlightedText(item.meetingTitle, text)}
         {/* <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
           {item.title}
         </Text> */}
@@ -119,52 +135,53 @@ const MeetingsCard = ({ item, text, index }) => {
           name={'Date & Time'}
           discription={moment(item.setDate).format('D MMMM YYYY,hh:mm A')}
         />
-        <RowData name={'Location'} discription={item.location} />
+        <RowData name={'Location'} discription={location} />
         <RowData
           name={'Status'}
-          discription={item.status}
+          discription={item.meetingStatusTitle}
           style={{
-            color:
-              item.status !== null && item.status === 'Scheduled'
-                ? Colors.bold
-                : Colors.bold,
+            color: Colors.bold,
             ...Fonts.PoppinsSemiBold[14]
           }}
           marginLeft={24}
           btnStyle={{
-            backgroundColor:
-              item.status !== null && item.status === 'Scheduled'
-                ? Colors.white
-                : Colors.white,
-            marginLeft: item.status !== null && SIZES[24],
-            borderColor: item.status !== null && Colors.line,
-            borderWidth: item.status !== null && SIZES[1],
-            borderRadius: item.status !== null && SIZES[8]
+            backgroundColor: Colors.white,
+            marginLeft: SIZES[24],
+            borderColor: Colors.line,
+            borderWidth: SIZES[1],
+            borderRadius: SIZES[8]
           }}
         />
       </View>
 
       {/* dotsView */}
       <TouchableOpacity
-        onPress={() => setEditModal(!editModal)}
+        onPress={() => {
+          // setEditModal(!showEditModal);
+          setShowEditModal(!showEditModal);
+        }}
         style={styles.dotsView}
       >
         <Icon name={IconName.Dots} height={16} width={6} />
       </TouchableOpacity>
-      {editModal && (
+      {showEditModal && (
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDelete={() => {
               onDeleteHandler();
-              setEditModal(false);
+              setShowEditModal(false);
             }}
             onPressView={() => {
-              navigation.navigate('MeetingDetails');
-              setEditModal(false);
+              navigation.navigate('MeetingDetails', { item });
+              setShowEditModal(false);
             }}
             onPressEdit={() => {
-              setEditModal(false);
+              setShowEditModal(false);
+              navigation.navigate('EditMeetingGeneral', { item });
             }}
+            subjectStatus={item.meetingStatusTitle}
+            editable={role == 'Head' || role == 'Secretory' ? true : flase}
+            deleted={role == 'Head' || role == 'Secretory' ? true : flase}
           />
         </View>
       )}

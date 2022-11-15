@@ -9,12 +9,15 @@ import {
 import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { useQuery } from '@apollo/client';
 
 import { styles } from './styles';
 import { Icon, IconName } from '../../../../component';
 import { SIZES } from '../../../../themes/Sizes';
-import { AppointmentsData } from '../../../../Constans/data';
 import AppoinmentCard from '../../../../component/Cards/appointmentCard/AppointmentCard';
+import { GET_All_APPOINTMENT } from '../../../../graphql/query';
+import { Fonts } from '../../../../themes';
+import { Colors } from '../../../../themes/Colors';
 
 const AppointmentsList = () => {
   const navigation = useNavigation();
@@ -22,22 +25,21 @@ const AppointmentsList = () => {
   const [searchText, setSearchText] = useState('');
   const [appointmentsData, setAppointmentsData] = useState([]);
   const [filterAppointmentsData, setFilterAppointmentsData] = useState([]);
+  // get ALL appointment
+  const Appointment = useQuery(GET_All_APPOINTMENT, {
+    variables: {
+      searchValue: searchText
+    },
 
-  const searchFilterAppointment = (text) => {
-    if (text) {
-      const newData = appointmentsData.filter((item) => {
-        const itemData = item.appointmentTitle ? item.appointmentTitle : '';
-        const textData = text;
-        return itemData.indexOf(textData) > -1;
-      });
+    onCompleted: (data) => {
+      console.log('all appointment', data?.appointments.items);
 
-      setSearchText(text);
-      setFilterAppointmentsData(newData);
-    } else {
-      setSearchText(text);
-      setFilterAppointmentsData(appointmentsData);
+      setAppointmentsData(data?.appointments.items);
+    },
+    onError: (data) => {
+      console.log('all appointment error', data);
     }
-  };
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -80,7 +82,7 @@ const AppointmentsList = () => {
               <TextInput
                 style={{ flex: 1, marginLeft: SIZES[6] }}
                 onChangeText={(text) => {
-                  searchFilterAppointment(text);
+                  setSearchText(text);
                 }}
                 value={searchText}
                 placeholder={'Search appointments'}
@@ -116,33 +118,33 @@ const AppointmentsList = () => {
             </TouchableOpacity>
 
             <Divider style={styles.divider} />
-
-            {/* secretory permission */}
-            <TouchableOpacity style={styles.committeeView} activeOpacity={0.5}>
-              <Text style={styles.txtCommittee}>Secretary permission</Text>
-              <View style={styles.btnCommittees}>
-                <Icon
-                  name={IconName.Arrow_Right}
-                  height={SIZES[12]}
-                  width={SIZES[6]}
-                />
-              </View>
-            </TouchableOpacity>
-
-            <Divider style={styles.divider} />
           </View>
         )}
 
-        <FlatList
-          data={AppointmentsData}
-          keyExtractor={(item) => `${item.id}`}
-          renderItem={({ item, index }) => {
-            return (
-              <AppoinmentCard item={item} index={index} text={searchText} />
-            );
-          }}
-          showsVerticalScrollIndicator={false}
-        />
+        {appointmentsData.length > 0 ? (
+          <FlatList
+            data={appointmentsData}
+            keyExtractor={(item) => `${item.id}`}
+            renderItem={({ item, index }) => {
+              return (
+                <AppoinmentCard item={item} index={index} text={searchText} />
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : Appointment.error ? (
+          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+              {Appointment.error.message}
+            </Text>
+          </View>
+        ) : (
+          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+              No appointment found
+            </Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );

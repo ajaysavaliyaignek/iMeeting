@@ -14,7 +14,7 @@ const ServicesScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* header */}
-      <Header name={'Services'} />
+      <Header name={'Services'} leftIconName={null} rightIconName={null} />
 
       <View style={styles.subContainer}>
         {/* general title */}

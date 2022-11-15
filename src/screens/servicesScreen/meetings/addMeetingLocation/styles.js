@@ -29,7 +29,8 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.line
   },
   locationContainer: {
-    marginTop: SIZES[24]
+    marginTop: SIZES[24],
+    zIndex: 20
   },
   buttonContainer: {
     flexDirection: 'row',

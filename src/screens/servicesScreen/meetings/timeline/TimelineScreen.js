@@ -1,81 +1,237 @@
 import {
   View,
   SafeAreaView,
-  StyleSheet,
-  Dimensions,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  useWindowDimensions
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { Agenda } from 'react-native-calendars';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import DeviceInfo from 'react-native-device-info';
+import CalendarStrip from 'react-native-calendar-strip';
+import { Divider } from 'react-native-paper';
+import Timetable from 'react-native-calendar-timetable';
+import moment from 'moment';
 
 import { SIZES } from '../../../../themes/Sizes';
 import { Colors } from '../../../../themes/Colors';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
-import EventCalendar from 'react-native-events-calendar';
-import { Divider } from 'react-native-paper';
-import Calendar from 'react-native-big-calendar';
-
-const NUM_ITEMS = 10;
-function getColor(i) {
-  const multiplier = 255 / (NUM_ITEMS - 1);
-  const colorVal = i * multiplier;
-  return `rgb(${colorVal}, ${Math.abs(128 - colorVal)}, ${255 - colorVal})`;
-}
-
-// const backgroundColor = getColor(index);
+import Avatar from '../../../../component/Avatar/Avatar';
+import { Fonts } from '../../../../themes';
 
 const TimelineScreen = () => {
+  const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
-  // const [events, setEvents] = useState([
-  //   {
-  //     start: '2022-10-14 00:00:00',
-  //     end: '2022-10-14 02:00:00',
-  //     title: 'New Year Party',
-  //     summary: 'xyz Location'
-  //   },
-  //   {
-  //     start: '2022-10-14 00:00:00',
-  //     end: '2022-10-14 02:00:00',
-  //     title: 'New Year Wishes',
-  //     summary: 'Call to every one'
-  //   },
-  //   {
-  //     start: '2022-10-14 00:00:00',
-  //     end: '2022-10-14 02:00:00',
-  //     title: 'New Year Wishes',
-  //     summary: 'Call to every one'
-  //   }
-  // ]);
+  const route = useRoute();
+  const { selectedUsers } = route?.params;
+  console.log(' from timeline', selectedUsers);
+  const [date, setDate] = useState(new Date().toISOString());
+  const [selected, setSelected] = useState(false);
+  const [from] = useState(moment().subtract(3, 'days').toDate());
+  const [till] = useState(moment().add(3, 'days').toISOString());
+  // moment().add(3, 'days').toISOString()
+  const [myEvents, setEvents] = useState([]);
 
   const events = [
     {
-      title: 'Meeting',
-      start: new Date(2022, 10, 28, 11, 0),
-      end: new Date(2022, 10, 28, 11, 30)
+      start: '2022-11-14T08:00:00.000Z',
+      end: '2022-11-17T17:00:00.000Z',
+      title: 'Business of Software Conference',
+      color: '#ff6d42'
     },
     {
-      title: 'Coffee break',
-      start: new Date(2022, 10, 28, 15, 45),
-      end: new Date(2020, 10, 28, 16, 30)
+      start: '2022-11-12T12:00:00.000Z',
+      end: '2022-11-13T20:00:00.000Z',
+      title: 'Friends binge marathon',
+      color: '#7bde83'
     }
   ];
 
-  const eventClicked = (event) => {
-    //On Click of event showing alert from here
-    alert(JSON.stringify(event));
-  };
+  const onEventClick = React.useCallback((event) => {
+    console.log('pressed event', event.event.title);
+    // toast({
+    //   message: event.event.title
+    // });
+  }, []);
 
-  const renderEvent = (event) => {
+  const view = React.useMemo(() => {
+    return {
+      schedule: { type: 'day' }
+    };
+  }, []);
+
+  const range = { from, till };
+  console.log('from', range);
+  console.log(
+    moment(new Date(2022, 11, 11, 20, 20)).subtract(1, 'hour').toDate()
+  );
+  console.log(moment().add(1, 'hour').toDate());
+  const [items] = useState([
+    {
+      title: [
+        { title: 'Some event' },
+        { title: 'ajay' },
+        { title: 'ajay' },
+        { title: 'ajay' },
+        { title: 'ajay' },
+        { title: 'ajay' }
+      ],
+      startDate: moment().subtract(1, 'hour').toDate(),
+      endDate: moment().add(1, 'hour').toDate(),
+      color: '#F7F5F9',
+      borderColor: '#AB9EC8'
+    },
+    {
+      title: [
+        { title: 'Some event' },
+        { title: 'Business of Software Conference' },
+        { title: 'ajay' },
+        { title: 'ajay' },
+        { title: 'ajay' },
+        { title: 'ajay' }
+      ],
+      startDate: moment('2022-11-12T08:00:00.000Z').toDate(),
+      endDate: moment('2022-11-12T12:00:00.000Z').toDate(),
+      color: '#FDF5F1',
+      borderColor: '#E79D73'
+    }
+  ]);
+
+  let datesWhitelist = [
+    {
+      start: moment(),
+      end: moment().add(3, 'days') // total 4 days enabled
+    }
+  ];
+  let datesBlacklist = [moment().add(1, 'days')];
+
+  function MyItemCard({ style, item, dayIndex, daysTotal }) {
     return (
-      <TouchableOpacity style={{ width: 1000 }}>
-        <Text>{`My custom event: ${event.title} `}</Text>
+      <TouchableOpacity
+        style={{
+          ...style,
+          backgroundColor: item.color,
+          borderRadius: SIZES[8],
+          // elevation: 5,
+          width: width - 102,
+          flexDirection: 'row'
+        }}
+        activeOpacity={0.9}
+      >
+        <View
+          style={{
+            backgroundColor: item.borderColor,
+            width: SIZES[4],
+            borderTopLeftRadius: SIZES[10],
+            borderBottomLeftRadius: SIZES[10]
+          }}
+        />
+
+        <FlatList
+          // maxToRenderPerBatch={3}
+          contentContainerStyle={{ paddingVertical: SIZES[8] }}
+          initialNumToRender={3}
+          data={
+            DeviceInfo.isTablet()
+              ? item.title.slice(0, 2)
+              : item.title.slice(0, 3)
+          }
+          renderItem={({ item, index }) => {
+            return (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: SIZES[4],
+                  marginBottom: SIZES[4]
+                }}
+                key={index}
+              >
+                <Avatar
+                  source={'https://picsum.photos/200/300'}
+                  size={SIZES[24]}
+                />
+                <Text
+                  style={{
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.bold,
+                    marginLeft: SIZES[8]
+                  }}
+                >
+                  {item.title}
+                </Text>
+              </View>
+            );
+          }}
+        />
+        {/* {item.title.map((ite, index) => {
+            return (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: SIZES[4],
+                  marginBottom: SIZES[4]
+                }}
+                key={index}
+              >
+                <Avatar
+                  source={'https://picsum.photos/200/300'}
+                  size={SIZES[24]}
+                />
+                <Text
+                  style={{
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.bold,
+                    marginLeft: SIZES[8]
+                  }}
+                >
+                  {ite.title}
+                </Text>
+              </View>
+            );
+          })} */}
+
+        <Text
+          style={{
+            position: 'absolute',
+            bottom: SIZES[8],
+            left: SIZES[12],
+            zIndex: 20,
+            ...Fonts.PoppinsRegular[12],
+            color: Colors.secondary
+          }}
+        >
+          10:00 - 12:10 PM - 12 users
+        </Text>
       </TouchableOpacity>
     );
-  };
+  }
+
+  markedDatesArray = [
+    {
+      date: new Date(),
+      dots: [
+        {
+          color: Colors.primary,
+          selectedColor: Colors.white
+        }
+      ]
+    },
+    {
+      date: new Date(),
+      lines: [
+        {
+          color: Colors.primary
+          // selectedColor: <string> (optional),
+        }
+      ]
+    }
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -90,11 +246,13 @@ const TimelineScreen = () => {
         <TouchableOpacity
           style={styles.usersView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('Committee')}
+          onPress={() => navigation.navigate('SelectUser', { selectedUsers })}
         >
           <Text style={styles.txtUsers}>Users</Text>
           <View style={styles.btnCommittees}>
-            <Text style={styles.txtBtnCommittees}>Selected 7 users</Text>
+            <Text style={styles.txtBtnCommittees}>
+              Selected {selectedUsers.length} users
+            </Text>
             <Icon
               name={IconName.Arrow_Right}
               height={SIZES[12]}
@@ -103,150 +261,91 @@ const TimelineScreen = () => {
           </View>
         </TouchableOpacity>
         <Divider style={styles.divider} />
-        {/* <EventCalendar
-          eventTapped={eventClicked}
-          // Function on event press
-          events={events}
-          // Passing the Array of event
-          width={400}
-          // Container width
-          size={60}
-          // number of date will render before and after initDate
-          // (default is 30 will render 30 day before initDate
-          // and 29 day after initDate)
-          initDate={
-            '2022-10-14'
-            //   `${new Date().getFullYear()}-${
-            //   new Date().getMonth() < 10
-            //     ? '0' + new Date().getMonth()
-            //     : new Date().getMonth()
-            // }-${
-            //   new Date().getDate() < 10
-            //     ? '0' + new Date().getDate()
-            //     : new Date().getDate()
-            //   }`
-          }
-          // Show initial date (default is today)
-          scrollToFirst
-          // Scroll to first event of the day (default true)
-          renderEvent={(event) => (
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={{ backgroundColor: getColor(event.index) }}>
-                {event.title}
-              </Text>
-            </View>
-          )}
-        /> */}
-        <Calendar
-          events={events}
-          height={600}
-          mode="week"
-          swipeEnabled={true}
-          // hourRowHeight={300}
-          showAllDayEventCell={true}
-          renderEvent={(event) => renderEvent(event)}
-          ampm={true}
+
+        <CalendarStrip
+          calendarAnimation={{ type: 'sequence', duration: 30 }}
+          // daySelectionAnimation={{
+          //   type: 'border',
+          //   duration: 200,
+          //   borderWidth: 1,
+          //   borderHighlightColor: 'white'
+          // }}
+          style={{ height: 100 }}
+          calendarHeaderPosition={'above'}
+          // calendarHeaderFormat={moment(date).format('MMMM DD,YYYY')}
+          calendarHeaderStyle={{
+            color: 'white',
+            alignSelf: 'flex-start'
+          }}
+          // iconLeftStyle={{}}
+          dateNumberStyle={{ color: Colors.bold, ...Fonts.PoppinsSemiBold[14] }}
+          dateNameStyle={{ color: '#AEB0B5', ...Fonts.PoppinsRegular[12] }}
+          highlightDateNumberStyle={{
+            color: Colors.white,
+            ...Fonts.PoppinsSemiBold[14]
+          }}
+          highlightDateNameStyle={{
+            color: Colors.white,
+            ...Fonts.PoppinsRegular[12]
+          }}
+          disabledDateNameStyle={{ color: 'grey' }}
+          disabledDateNumberStyle={{ color: 'grey' }}
+          highlightDateContainerStyle={{
+            backgroundColor: Colors.primary,
+            height: 80,
+            borderRadius: 10
+          }}
+          startingDate={new Date()}
+          // datesWhitelist={datesWhitelist}
+          // datesBlacklist={datesBlacklist}
+          markedDates={markedDatesArray}
+          onDateSelected={(date) => {
+            // setDate(date);
+            console.log(date.toISOString());
+          }}
+          scrollable={true}
+          dayComponentHeight={100}
+          dayContainerStyle={{
+            height: 80,
+            borderRadius: 10,
+            alignSelf: 'center',
+
+            zIndex: 20
+          }}
         />
-        {/* <Calendar
-          // The list of items that have to be displayed in agenda. If you want to render item as empty date
-          // the value of date key has to be an empty array []. If there exists no value for date key it is
-          // considered that the date in question is not yet loaded
-          items={{
-            '2012-05-16': [{ name: 'item 1 - any js object' }],
-            '2012-05-23': [{ name: 'item 2 - any js object', height: 80 }],
-            '2012-05-24': [],
-            '2012-05-25': [
-              { name: 'item 3 - any js object' },
-              { name: 'any js object' }
-            ]
+        <Text
+          style={{
+            ...Fonts.PoppinsBold[20],
+            color: Colors.bold,
+            marginBottom: SIZES[4]
           }}
-          // Callback that gets called when items for a certain month should be loaded (month became visible)
-          loadItemsForMonth={(month) => {
-            console.log('trigger items loading');
+        >
+          {moment(date).format('MMMM DD,YYYY')}
+        </Text>
+        <Text
+          style={{
+            ...Fonts.PoppinsRegular[14],
+            color: Colors.secondary,
+            marginBottom: SIZES[24]
           }}
-          // Callback that fires when the calendar is opened or closed
-          onCalendarToggled={(calendarOpened) => {
-            console.log(calendarOpened);
-          }}
-          // Callback that gets called on day press
-          onDayPress={(day) => {
-            console.log('day pressed');
-          }}
-          // Callback that gets called when day changes while scrolling agenda list
-          onDayChange={(day) => {
-            console.log('day changed');
-          }}
-          // Initially selected day
-          selected={'2012-05-16'}
-          // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-          minDate={'2012-05-10'}
-          // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-          maxDate={'2012-05-30'}
-          // Max amount of months allowed to scroll to the past. Default = 50
-          pastScrollRange={50}
-          scrollEnabled={true}
-          // Max amount of months allowed to scroll to the future. Default = 50
-          futureScrollRange={50}
-          // Specify how each item should be rendered in agenda
-          renderItem={(item, firstItemInDay) => {
-            return (
-              <View>
-                <Text>{item.name}</Text>
-              </View>
-            );
-          }}
-          // Specify how each date should be rendered. day can be undefined if the item is not first in that day
-          renderDay={(day, item) => {
-            return <View />;
-          }}
-          // Specify how empty date content with no items should be rendered
-          renderEmptyDate={() => {
-            return <View />;
-          }}
-          // Specify how agenda knob should look like
-          renderKnob={() => {
-            return <View />;
-          }}
-          // Override inner list with a custom implemented component
-          renderList={(listProps) => {
-            return <View />;
-          }}
-          // Specify what should be rendered instead of ActivityIndicator
-          renderEmptyData={() => {
-            return <View />;
-          }}
-          // Specify your item comparison function for increased performance
-          rowHasChanged={(r1, r2) => {
-            return r1.text !== r2.text;
-          }}
-          // Hide knob button. Default = false
-          hideKnob={true}
-          // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false
-          showClosingKnob={false}
-          // By default, agenda dates are marked if they have at least one item, but you can override this if needed
-          markedDates={{
-            '2012-05-16': { selected: true, marked: true },
-            '2012-05-17': { marked: true },
-            '2012-05-18': { disabled: true }
-          }}
-          // If disabledByDefault={true} dates flagged as not disabled will be enabled. Default = false
-          disabledByDefault={true}
-          // If provided, a standard RefreshControl will be added for "Pull to Refresh" functionality. Make sure to also set the refreshing prop correctly
-          onRefresh={() => console.log('refreshing...')}
-          // Set this true while waiting for new data from a refresh
-          refreshing={false}
-          // Add a custom RefreshControl component, used to provide pull-to-refresh functionality for the ScrollView
-          refreshControl={null}
-          // Agenda theme
-          theme={{
-            agendaDayTextColor: 'yellow',
-            agendaDayNumColor: 'green',
-            agendaTodayColor: 'red',
-            agendaKnobColor: 'blue'
-          }}
-          // Agenda container style
-          // style={{ flex: 1 }}
-        /> */}
+        >
+          6 events
+        </Text>
+        <ScrollView style={{ flex: 1 }}>
+          <Timetable
+            items={items}
+            cardComponent={MyItemCard}
+            date={date} // optional
+            range={range} // optional
+            // width={width - 40}
+            hideNowLine={true}
+            linesLeftInset={-5}
+            linesTopOffset={20}
+            timeWidth={50}
+            enableSnapping={false}
+            hourHeight={DeviceInfo.isTablet() ? 200 : 60}
+          />
+        </ScrollView>
       </View>
     </SafeAreaView>
   );

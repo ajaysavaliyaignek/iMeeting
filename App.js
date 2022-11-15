@@ -7,42 +7,60 @@ import { client } from './src/ApolloClient/Client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MainStack from './routes';
+import { AppProvider } from './src/context';
 
 const App = () => {
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState(null);
 
   const getToken = async () => {
-    try {
-      await AsyncStorage.getItem('@user')
-        .then((result) => {
-          if (result !== null) {
-            setToken(JSON.parse(result)?.dataToken);
-            console.log('token', token.toString());
-          } else setToken(null);
-        })
-        .catch((e) => console.log(e));
-    } catch (error) {
-      console.log(error);
-    }
+    const token = await AsyncStorage.getItem('@token')
+      .then((result) => {
+        setToken(result);
+      })
+      .catch((e) => console.log(e));
+
+    // setToken(JSON.parse(user)?.dataToken);
   };
 
   useEffect(() => {
     getToken();
-  });
+    console.log('token from app', token);
+  }, []);
+
+  // const getToken = async () => {
+  //   try {
+  //     await AsyncStorage.getItem('@user')
+  //       .then((result) => {
+  //         if (result !== null) {
+  //           setToken(JSON.parse(result)?.dataToken);
+  //           console.log('token', token.toString());
+  //         } else setToken(null);
+  //       })
+  //       .catch((e) => console.log(e));
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getToken();
+  // });
 
   return (
-    <ApolloProvider client={client}>
-      <PaperProvider>
-        <NavigationContainer>
-          {token !== '' ? (
-            <MainStack initialRouteName="MainBottomTab" />
-          ) : (
-            // <StackAuth />
-            <MainStack initialRouteName="MainBottomTab" />
-          )}
-        </NavigationContainer>
-      </PaperProvider>
-    </ApolloProvider>
+    <AppProvider>
+      <ApolloProvider client={client}>
+        <PaperProvider>
+          <NavigationContainer>
+            {token ? (
+              <MainStack initialRouteName="MainBottomTab" />
+            ) : (
+              // <StackAuth />
+              <MainStack initialRouteName="MainBottomTab" />
+            )}
+          </NavigationContainer>
+        </PaperProvider>
+      </ApolloProvider>
+    </AppProvider>
   );
 };
 

@@ -13,7 +13,10 @@ const EditDeleteModal = ({
   onPressEdit,
   onPressDelete,
   subjectStatus,
-  onPressDownload
+  onPressDownload,
+  download,
+  editable,
+  deleted
 }) => {
   return (
     <View style={styles.container}>
@@ -25,21 +28,29 @@ const EditDeleteModal = ({
           width={SIZES[18]}
         />
       </TouchableOpacity>
-      <Divider style={styles.divider} />
-      <TouchableOpacity style={styles.btnView} onPress={onPressEdit}>
-        <Text style={styles.txtEditBtn}>Edit</Text>
-        <Icon name={IconName.Edit} height={SIZES[18]} width={SIZES[18]} />
-      </TouchableOpacity>
-      <Divider style={styles.divider} />
-      <TouchableOpacity style={styles.btnView} onPress={onPressDownload}>
-        <Text style={styles.txtEditBtn}>Download</Text>
-        <Icon
-          name={IconName.Download_Primary}
-          height={SIZES[18]}
-          width={SIZES[16]}
-        />
-      </TouchableOpacity>
-      {subjectStatus !== 'Deleted' && (
+      {editable && (
+        <View>
+          <Divider style={styles.divider} />
+          <TouchableOpacity style={styles.btnView} onPress={onPressEdit}>
+            <Text style={styles.txtEditBtn}>Edit</Text>
+            <Icon name={IconName.Edit} height={SIZES[18]} width={SIZES[18]} />
+          </TouchableOpacity>
+        </View>
+      )}
+      {download && (
+        <View>
+          <Divider style={styles.divider} />
+          <TouchableOpacity style={styles.btnView} onPress={onPressDownload}>
+            <Text style={styles.txtEditBtn}>Download</Text>
+            <Icon
+              name={IconName.Download_Primary}
+              height={SIZES[18]}
+              width={SIZES[16]}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+      {subjectStatus !== 'Deleted' && deleted && (
         <View>
           <Divider style={styles.divider} />
           <TouchableOpacity style={styles.btnView} onPress={onPressDelete}>

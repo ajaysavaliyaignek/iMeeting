@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Image, TouchableOpacity, Text } from 'react-native';
-import { Colors } from 'react-native-paper';
+import { Colors } from '../../themes/Colors';
 
 import Normalize from '../../themes/mixins';
 import style from './styles';
@@ -24,6 +24,7 @@ const Avatar = (props) => {
   );
 
   const getInitials = (name) => {
+    const userName = name?.substring(0, 1) ?? '';
     return name?.substring(0, 1) ?? '';
   };
 
@@ -41,7 +42,7 @@ const Avatar = (props) => {
     >
       {source ? (
         <Image style={styles.imageStyle} source={{ uri: source }} />
-      ) : (
+      ) : name ? (
         <Text
           style={[
             styles.initialsText,
@@ -51,7 +52,7 @@ const Avatar = (props) => {
         >
           {getInitials(name)}
         </Text>
-      )}
+      ) : null}
     </TouchableOpacity>
   );
 };

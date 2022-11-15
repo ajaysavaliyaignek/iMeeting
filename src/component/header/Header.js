@@ -21,6 +21,7 @@ const Header = ({
   onRightPress,
   style
 }) => {
+  console.log(leftIconName, rightIconName);
   return (
     <View>
       {leftIconName || rightIconName ? (
@@ -48,13 +49,11 @@ const Header = ({
             style={[
               styles.txtHeader,
               {
-                marginLeft: rightIconName
-                  ? 0
-                  : DeviceInfo.isTablet()
-                  ? '45%'
-                  : '35%'
+                marginLeft: rightIconName ? '8%' : '32%',
+                width: '30%'
               }
             ]}
+            numberOfLines={1}
           >
             {name}
           </Text>
@@ -65,10 +64,8 @@ const Header = ({
           </TouchableOpacity>
         </View>
       ) : (
-        <View>
-          <View style={styles.centerView}>
-            <Text style={styles.txtHeader}>{name}</Text>
-          </View>
+        <View style={styles.centerView}>
+          <Text style={styles.txtHeader}>{name}</Text>
         </View>
       )}
     </View>
@@ -86,8 +83,9 @@ const styles = StyleSheet.create({
   },
   txtHeader: {
     ...Fonts.PoppinsSemiBold[14],
-    color: Colors.bold,
-    alignSelf: 'center'
+    color: Colors.bold
+
+    // width: '30%'
   },
   centerView: {
     paddingVertical: SIZES[10],

@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, TextInput, ScrollView } from 'react-native';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
@@ -17,20 +17,127 @@ import Header from '../../../../component/header/Header';
 import { SIZES } from '../../../../themes/Sizes';
 import { styles } from './styles';
 import { GET_All_COMMITTEE, GET_FILE } from '../../../../graphql/query';
+import { BASE_URL } from '../../../../ApolloClient/Client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddMeetingGeneralScreen = () => {
   const navigation = useNavigation();
   const [title, setTitle] = useState('');
   const [discription, setDiscription] = useState('');
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [valueCommitee, setValue] = useState(null);
   const [committee, setCommittee] = useState(null);
   const [items, setItems] = useState([{ label: 'Design', value: 'design' }]);
   const [fileResponse, setFileResponse] = useState([]);
   const [filesId, setFilesId] = useState([]);
+  const [token, setToken] = useState('');
   let fileId = [];
+  let file = [];
+  console.log(filesId);
+
+  const checkPermission = async (file) => {
+    console.log('check permission');
+    if (Platform.OS === 'ios') {
+      downloadFile(file);
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage Permission Required',
+            message: 'Application needs access to your storage to download File'
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // Start downloading
+          downloadFile(file);
+          console.log('Storage Permission Granted.');
+        } else {
+          // If permission denied then show alert
+          Alert.alert('Error', 'Storage Permission Not Granted');
+        }
+      } catch (err) {
+        // To handle permission related exception
+        console.log('++++' + err);
+      }
+    }
+  };
+
+  const downloadFile = (file) => {
+    console.log('downloadfile');
+    // Get today's date to add the time suffix in filename
+    let date = new Date();
+    // File URL which we want to download
+    let FILE_URL = file;
+    // Function to get extention of the file url
+    let file_ext = getFileExtention(FILE_URL);
+
+    file_ext = '.' + file_ext[0];
+
+    // config: To get response by passing the downloading related options
+    // fs: Root directory path to download
+    const { config, fs } = RNFetchBlob;
+    let RootDir = fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        path:
+          RootDir +
+          '/file_' +
+          Math.floor(date.getTime() + date.getSeconds() / 2) +
+          file_ext,
+        description: 'downloading file...',
+        notification: true,
+        // useDownloadManager works with Android only
+        useDownloadManager: true
+      }
+    };
+    config(options)
+      .fetch('GET', FILE_URL)
+      .then((res) => {
+        // Alert after successful downloading
+        console.log('res -> ', res.respInfo.redirects[0]);
+        alert('File Downloaded Successfully.');
+        if (Platform.OS == 'ios') {
+          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
+        }
+      });
+  };
+
+  const getFileExtention = (fileUrl) => {
+    // To get the file extension
+    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
+  };
 
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
+
+  useEffect(() => {
+    if (filesId?.length > 0) {
+      filesId.map((id) =>
+        fetchFile({
+          variables: {
+            fileEntryId: id
+          },
+          onCompleted: (data) => {
+            console.log(data, 'inner file dartas');
+            // fileResponse.push(data.uploadedFile);
+            file.push(data?.uploadedFile);
+            setFileResponse(
+              file
+              // (prev) => {
+              // console.log('prev', prev);
+              // if (
+              //   fileResponse?.map((item) => item.fileEnteryId !== id)
+              // ) {
+              //   return [...prev, data.uploadedFile];
+              // }
+              // }
+            );
+          }
+        })
+      );
+    }
+  }, [filesId]);
 
   // fetch commitees
   const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
@@ -49,11 +156,23 @@ const AddMeetingGeneralScreen = () => {
     console.log('commitee error', CommitteeError);
   }
 
+  useEffect(() => {
+    getToken();
+  }, [token]);
+
+  const getToken = async () => {
+    const user = await AsyncStorage.getItem('@user').catch((e) =>
+      console.log(e)
+    );
+    setToken(JSON.parse(user)?.dataToken);
+  };
+
   const handleDocumentSelection = useCallback(async () => {
     try {
-      const response = await DocumentPicker.pickMultiple({
+      const response = await DocumentPicker.pick({
         presentationStyle: 'fullScreen',
-        type: [DocumentPicker.types.allFiles]
+        type: [DocumentPicker.types.allFiles],
+        allowMultiSelection: true
       });
 
       response.map((res) => {
@@ -62,7 +181,7 @@ const AddMeetingGeneralScreen = () => {
           formData.append('file', res);
           console.log('formdata', formData);
 
-          fetch(`http://128.199.26.43:9080/o/imeeting-rest/v1.0/file-upload`, {
+          fetch(`${BASE_URL}/o/imeeting-rest/v1.0/file-upload`, {
             method: 'POST',
             headers: {
               Authorization: 'Bearer ' + `${token}`,
@@ -76,25 +195,6 @@ const AddMeetingGeneralScreen = () => {
               fileId.push(responseData?.fileEnteryId);
               console.log('fileId', fileId);
               setFilesId(fileId);
-
-              if (fileId) {
-                fileId.map((id) =>
-                  fetchFile({
-                    variables: {
-                      fileEntryId: id
-                    },
-                    onCompleted: (data) => {
-                      console.log(data, 'inner file dartas');
-                      setFileResponse((prev) => {
-                        console.log('prev', prev);
-                        if (prev.fileEnteryId !== id) {
-                          return [...prev, data.uploadedFile];
-                        }
-                      });
-                    }
-                  })
-                );
-              }
             })
             .then(() => {})
             .catch((e) => console.log('file upload error--', e));
@@ -104,6 +204,8 @@ const AddMeetingGeneralScreen = () => {
       console.log(err);
     }
   }, []);
+
+  console.log('file response', fileResponse);
 
   const removeFile = (id) => {
     const filteredData = fileResponse?.filter(
@@ -140,7 +242,7 @@ const AddMeetingGeneralScreen = () => {
             <DropDownPicker
               listMode="SCROLLVIEW"
               open={open}
-              value={value}
+              value={valueCommitee}
               items={
                 committee?.map((item) => ({
                   label: item.committeeTitle,
@@ -150,7 +252,7 @@ const AddMeetingGeneralScreen = () => {
               setOpen={setOpen}
               setValue={setValue}
               setItems={setItems}
-              placeholder={'Subject committee'}
+              placeholder={''}
               placeholderStyle={{
                 ...Fonts.PoppinsRegular[12],
                 color: Colors.secondary
@@ -172,7 +274,7 @@ const AddMeetingGeneralScreen = () => {
             />
           </View>
           <View style={styles.categoryContainer}>
-            <Text style={styles.txtTitle}>DISCRIPTION</Text>
+            <Text style={styles.txtTitle}>DESCRIPTION</Text>
             <TextInput
               style={styles.textInput}
               multiline={true}
@@ -188,13 +290,15 @@ const AddMeetingGeneralScreen = () => {
                   key={index}
                   filePath={file.name}
                   fileSize={file.size}
-                  onDownloadPress={() => navigation.navigate('SubjectDownload')}
+                  onDownloadPress={() => checkPermission(file.downloadUrl)}
                   fileType={file.type}
                   onRemovePress={() => removeFile(file.fileEnteryId)}
                   style={{
                     borderBottomWidth: SIZES[1],
                     borderBottomColor: Colors.Approved
                   }}
+                  download={true}
+                  deleted={true}
                 />
               );
             })}
@@ -222,7 +326,15 @@ const AddMeetingGeneralScreen = () => {
         <View style={styles.buttonContainer}>
           <Button
             title={'Next'}
-            onPress={() => navigation.navigate('AddMeetingUser')}
+            onPress={() => {
+              navigation.navigate('AddMeetingUser', {
+                attachFiles: filesId,
+                committee: valueCommitee,
+                title: title,
+                discription: discription
+              });
+              // navigation.setParams();
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

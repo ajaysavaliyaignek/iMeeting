@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   SafeAreaView
@@ -25,12 +24,8 @@ const LoginScreen = ({ navigation }) => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
-  const [clientId, setClientId] = useState(
-    'id-ddddf11b-f44f-cd72-59c9-40e239822d'
-  );
-  const [clientSecret, setClientSecret] = useState(
-    'secret-d45c341b-b192-645b-fee9-202aa3a4edc'
-  );
+  const [clientId, setClientId] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
 
   const [error, setError] = useState('');
 
@@ -86,7 +81,7 @@ const LoginScreen = ({ navigation }) => {
           console.log('responseData-----', responseData);
           if (responseData.error) {
             setError(responseData.error);
-            console.log(responseData.error);
+            console.log('login error', responseData.error);
           } else {
             const dataToken = responseData.access_token;
             let user = {
@@ -99,11 +94,12 @@ const LoginScreen = ({ navigation }) => {
             console.log(user);
             storeToken(user);
             storeUserToken(dataToken);
+            navigation.navigate('MainBottomTab');
 
             const interval = setInterval(() => {
               refreshToken();
             }, responseData.expires_in);
-            navigation.navigate('MainBottomTab');
+
             return () => clearInterval(interval);
           }
         });
@@ -175,10 +171,10 @@ const LoginScreen = ({ navigation }) => {
           // onPressOut={()=>{
           //   console.log("i am called from press out", url)
           //   getAuth({variables:{domainName:url}})}}
-          // onChange={() => {
-          //   console.log('i am called', url);
-          //   getAuth({ variables: { domainName: url } });
-          // }}
+          onChange={() => {
+            console.log('i am called', url);
+            getAuth({ variables: { domainName: url } });
+          }}
           value={url}
           label={'URL- address company'}
           right={

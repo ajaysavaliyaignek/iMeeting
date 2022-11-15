@@ -6,19 +6,51 @@ import {
   TextInput,
   ScrollView
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { SIZES } from '../../../../themes/Sizes';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { Button } from '../../../../component/button/Button';
 import { styles } from './styles';
 import { Colors } from '../../../../themes/Colors';
+import { useMutation } from '@apollo/client';
+import { UPDATE_LOCATION } from '../../../../graphql/mutation';
+import { GET_ALL_LOCATION } from '../../../../graphql/query';
 
 const AddLocation = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { locationType } = route?.params;
+  const [linkText, setLinkText] = useState('');
+  const [title, setTitle] = useState('');
+  const [capacity, setCapacity] = useState('');
+  const [city, setCity] = useState('');
+  const [building, setBuilding] = useState('');
+  const [floor, setFloor] = useState('');
+  const [street, setStreet] = useState('');
+  const [room, setRoom] = useState('');
+
+  const [addLocation, { data, loading, error: addLocationError }] = useMutation(
+    UPDATE_LOCATION,
+    {
+      refetchQueries: [
+        { query: GET_ALL_LOCATION, variables: { locationType: locationType } }
+      ],
+      onCompleted: (data) => {
+        if (data) {
+          console.log(data.updateLocation.status[0]);
+          if (data.updateLocation.status[0].statusCode == '200') {
+            navigation.goBack();
+          }
+          // navigation.goBack();
+        }
+      }
+    }
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -26,6 +58,11 @@ const AddLocation = () => {
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
+      {addLocationError && (
+        <Text style={{ alignSelf: 'center', color: Colors.Rejected }}>
+          Please enter valid field
+        </Text>
+      )}
       <ScrollView
         style={styles.subContainer}
         showsVerticalScrollIndicator={false}
@@ -35,11 +72,17 @@ const AddLocation = () => {
           <Text style={styles.txtTitleGeneral}>General</Text>
 
           <Text style={styles.txtTitle}>TITLE</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => setTitle(text)}
+          />
           <Divider style={styles.divider} />
 
           <Text style={styles.txtTitle}>PEOPLE CAPACITY</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => setCapacity(text)}
+          />
           <Divider style={styles.divider} />
         </View>
 
@@ -47,27 +90,42 @@ const AddLocation = () => {
           <Text style={styles.txtTitleGeneral}>Address</Text>
 
           <Text style={styles.txtTitle}>CITY</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => setCity(text)}
+          />
           <Divider style={styles.divider} />
 
           <Text style={styles.txtTitle}>STREET</Text>
-          <TextInput style={styles.textInput} />
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(text) => setStreet(text)}
+          />
           <Divider style={styles.divider} />
 
           <View style={styles.buildingContainer}>
             <View style={{ width: '30%' }}>
               <Text style={styles.txtTitle}>BUILDING</Text>
-              <TextInput style={styles.textInput} />
+              <TextInput
+                style={styles.textInput}
+                onChangeText={(text) => setBuilding(text)}
+              />
               <Divider style={styles.divider} />
             </View>
             <View style={{ width: '30%' }}>
               <Text style={styles.txtTitle}>FLOOR</Text>
-              <TextInput style={styles.textInput} />
+              <TextInput
+                style={styles.textInput}
+                onChangeText={(text) => setFloor(text)}
+              />
               <Divider style={styles.divider} />
             </View>
             <View style={{ width: '30%' }}>
               <Text style={styles.txtTitle}>ROOM</Text>
-              <TextInput style={styles.textInput} />
+              <TextInput
+                style={styles.textInput}
+                onChangeText={(text) => setRoom(text)}
+              />
               <Divider style={styles.divider} />
             </View>
           </View>
@@ -81,12 +139,11 @@ const AddLocation = () => {
               marginVertical: SIZES[10]
             }}
           >
-            <Text style={styles.txtUrl}>goo.gl/maps/zPNPu7pQnfgRopjc9</Text>
-            <TouchableOpacity
-              onPress={() =>
-                Clipboard.setString('goo.gl/maps/zPNPu7pQnfgRopjc9')
-              }
-            >
+            <TextInput
+              onChangeText={(text) => setLinkText(text)}
+              style={{ flex: 1 }}
+            />
+            <TouchableOpacity onPress={() => Clipboard.setString(linkText)}>
               <Icon
                 name={IconName.CopyText}
                 height={SIZES[20]}
@@ -116,7 +173,46 @@ const AddLocation = () => {
           />
           <Button
             title={'Save'}
-            onPress={() => navigation.navigate('AddMeetingLocation')}
+            onPress={() => {
+              console.log(
+                'building',
+                parseInt(building),
+                'city',
+                city,
+                'floor',
+                parseInt(floor),
+                'googleMapURL',
+                linkText,
+                'locationId',
+                0,
+                'peopleCapacity',
+                parseInt(capacity),
+                'room',
+                parseInt(room),
+                'street',
+                street,
+                'title',
+                title,
+                'locationType',
+                2
+              );
+              addLocation({
+                variables: {
+                  location: {
+                    building: parseInt(building),
+                    city: city,
+                    floor: parseInt(floor),
+                    googleMapURL: linkText,
+                    locationId: 0,
+                    peopleCapacity: parseInt(capacity),
+                    room: parseInt(room),
+                    street: street,
+                    title: title,
+                    locationType: locationType
+                  }
+                }
+              });
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,
