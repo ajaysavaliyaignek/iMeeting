@@ -1,5 +1,15 @@
 import { gql } from '@apollo/client';
 
+export const GET_USER_PAYLOAD = gql`
+  query {
+    userPayload {
+      userId
+      userName
+      userCommitteesDetail
+    }
+  }
+`;
+
 export const GET_TASK_STATUS = gql`
   query taskStatus {
     taskStatus {
@@ -99,11 +109,11 @@ export const GET_TIMELINE_REVIEW = gql`
 `;
 
 export const GET_ALL_SUBJECTS_STATUS = gql`
-  query subjectStatus {
-    subjectStatus {
+  query subjectStatus($subject: Boolean, $decision: Boolean) {
+    subjectStatus(subject: $subject, decision: $decision) {
       items {
-        subjectStatusId
-        subjectStatus
+        statusId
+        statusTitle
       }
     }
   }
@@ -267,7 +277,7 @@ export const GET_AUTH = gql`
 
 export const GET_All_SUBJECTS = gql`
   query subjects(
-    $committeeId: Long
+    $committeeIds: String
     $page: Int
     $pageSize: Int
     $searchValue: String
@@ -280,7 +290,7 @@ export const GET_All_SUBJECTS = gql`
       pageSize: $pageSize
       searchValue: $searchValue
       sort: $sort
-      committeeId: $committeeId
+      committeeIds: $committeeIds
       deadline: $deadline
       screen: $screen
     ) {
@@ -297,7 +307,7 @@ export const GET_All_SUBJECTS = gql`
         subjectId
         subjectTitle
         userId
-        subjectStatus
+        statusTitle
       }
       pageSize
       pageSize
@@ -358,7 +368,7 @@ export const GET_SUBJECT_BY_ID = gql`
       subjectId
       subjectTitle
       userId
-      subjectStatus
+      statusTitle
       commentThreadId
     }
   }
@@ -502,7 +512,7 @@ export const GET_ZIP_PDF_DOWNLOAD = gql`
 
 export const GET_All_MEETING = gql`
   query meeting(
-    $committeeId: Long
+    $committeeIds: String
     $date: String
     $onlyMyMeeting: Boolean
     $page: Int
@@ -512,7 +522,7 @@ export const GET_All_MEETING = gql`
     $screen: Int
   ) {
     meetings(
-      committeeId: $committeeId
+      committeeIds: $committeeIds
       date: $date
       onlyMyMeeting: $onlyMyMeeting
       page: $page
@@ -534,7 +544,10 @@ export const GET_All_MEETING = gql`
         platformlink
         platformId
         repeat
+        subjectIds
         setDate
+        setTime
+        endTime
         status
         timeZone
         workHours

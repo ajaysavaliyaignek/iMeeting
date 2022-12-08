@@ -4,7 +4,7 @@ import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
 
 export const getHighlightedText = (txt, searchText) => {
-  const parts = txt.split(new RegExp(`(${searchText})`, 'gi'));
+  const parts = txt?.split(new RegExp(`(${searchText})`, 'gi'));
   return (
     <Text style={{ width: '94%' }} numberOfLines={1}>
       {parts.map((part) =>

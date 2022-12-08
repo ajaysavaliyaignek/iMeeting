@@ -1,7 +1,8 @@
 import { View, Text, SafeAreaView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
@@ -19,46 +20,25 @@ import {
   GET_ALL_LOCATION_BY_ID,
   GET_PLATFORMLINK
 } from '../../../../graphql/query';
+import { UserContext } from '../../../../context';
 
 const EditMeetingLocation = () => {
   const navigation = useNavigation();
+  const { meetingsData, setMeetingsData } = useContext(UserContext);
   const route = useRoute();
-  const {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    userRequired,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat,
-    item
-  } = route?.params;
-  console.log('meeting data from Editmeetinglocation', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    userRequired,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat,
-    item
-  });
+  const { item } = route?.params;
+  console.log('meeting data from Editmeetinglocation', meetingsData);
+  console.log('item from Editmeetinglocation', item);
   const [openLocation, setOpenLocation] = useState(false);
-  const [valueLocation, setValueLocation] = useState(item.locationId);
+  const [onFocus, setIsFocus] = useState(false);
+  const [valueLocation, setValueLocation] = useState(
+    meetingsData?.location ? meetingsData?.location : item.locationId
+  );
   const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(
-    item.platformId
+    item?.platformlink?.includes('google') ? 1 : 2
   );
+  console.log('valueVideoConference', valueVideoConference);
   const [platform, setPlatform] = useState(null);
   const [location, setLocation] = useState([]);
   const [locationId, setLocationId] = useState([]);
@@ -129,7 +109,12 @@ const EditMeetingLocation = () => {
       <Header
         name={'Edit meeting'}
         rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
+        onRightPress={() => {
+          navigation.navigate('Details', {
+            title: 'Meetings',
+            active: '0'
+          });
+        }}
       />
       <View style={styles.subContainer}>
         <View style={styles.progressContainer}>
@@ -146,34 +131,40 @@ const EditMeetingLocation = () => {
         <Text style={styles.txtAddSubjectTitle}>Location</Text>
         <View style={styles.locationContainer}>
           <Text style={styles.txtTitle}>LOCATION</Text>
-          <DropDownPicker
-            listMode="SCROLLVIEW"
-            open={openLocation}
-            value={valueLocation}
-            items={location?.map((item) => ({
+          <Dropdown
+            placeholderStyle={{
+              ...Fonts.PoppinsRegular[12],
+              color: Colors.secondary
+            }}
+            data={location?.map((item) => ({
               label: item.title,
               value: item.locationId
             }))}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            setOpen={() => {
-              setOpenLocation(!openLocation);
-            }}
-            setValue={setValueLocation}
-            setItems={setItems}
-            placeholder={locationId?.title}
-            placeholderStyle={{
-              ...Fonts.PoppinsRegular[14]
-            }}
             style={{
               borderWidth: 0,
               paddingRight: SIZES[16],
               paddingLeft: 0
             }}
             textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            // search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={locationId?.title}
+            arrowIconStyle={{
+              height: SIZES[12],
+              width: SIZES[14]
+            }}
+            searchPlaceholder="Search..."
+            value={valueLocation}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setValueLocation(item.value);
+              setIsFocus(false);
+            }}
           />
+
           <Divider style={styles.divider} />
         </View>
 
@@ -183,7 +174,8 @@ const EditMeetingLocation = () => {
             onPress={() =>
               navigation.navigate('LocationDetails', {
                 locationId: valueLocation,
-                platform: platform
+                platform: platform,
+                locationType: 1
               })
             }
             layoutStyle={styles.cancelBtnLayout}
@@ -204,13 +196,14 @@ const EditMeetingLocation = () => {
           />
         </View>
 
-        <View style={styles.locationContainer}>
+        <View style={styles.videoContainer}>
           <Text style={styles.txtTitle}>VIDEO CONFERENCING PLATFORM</Text>
-          <DropDownPicker
-            listMode="SCROLLVIEW"
-            open={openVideoConference}
-            value={valueVideoConference}
-            items={[
+          <Dropdown
+            placeholderStyle={{
+              ...Fonts.PoppinsRegular[12],
+              color: Colors.secondary
+            }}
+            data={[
               {
                 value: 1,
                 label: 'Google Meet'
@@ -220,28 +213,31 @@ const EditMeetingLocation = () => {
                 label: 'Microsoft Teams'
               }
             ]}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            setOpen={() => {
-              setOpenVideoConference(!openVideoConference);
-            }}
-            setValue={setValueVideoConference}
-            setItems={setItems}
-            placeholder={
-              valueVideoConference == 1 ? 'Google Meet' : 'Microsoft Teams'
-            }
-            placeholderStyle={{
-              ...Fonts.PoppinsRegular[14]
-            }}
             style={{
               borderWidth: 0,
               paddingRight: SIZES[16],
               paddingLeft: 0
             }}
             textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            // search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={''}
+            arrowIconStyle={{
+              height: SIZES[12],
+              width: SIZES[14]
+            }}
+            searchPlaceholder="Search..."
+            value={valueVideoConference}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setValueVideoConference(item.value);
+              setIsFocus(false);
+            }}
           />
+
           <Divider style={styles.divider} />
         </View>
       </View>
@@ -258,31 +254,31 @@ const EditMeetingLocation = () => {
         >
           <Button
             title={'Back'}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              navigation.goBack();
+              setMeetingsData({
+                ...meetingsData,
+                platform: platform,
+                location: valueLocation,
+                videoConference: valueVideoConference
+              });
+            }}
             layoutStyle={styles.cancelBtnLayout}
             textStyle={styles.txtCancelButton}
           />
           <Button
             title={'Next'}
-            onPress={() =>
-              navigation.navigate('EditMeetingSubjects', {
-                attachFiles,
-                committee,
-                title,
-                discription,
-                users,
-                userRequired,
-                startDate,
-                endDate,
-                startTime,
-                endTime,
-                TimeZone,
-                Repeat,
+            onPress={() => {
+              setMeetingsData({
+                ...meetingsData,
                 platform: platform,
                 location: valueLocation,
+                videoConference: valueVideoConference
+              });
+              navigation.navigate('EditMeetingSubjects', {
                 item
-              })
-            }
+              });
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

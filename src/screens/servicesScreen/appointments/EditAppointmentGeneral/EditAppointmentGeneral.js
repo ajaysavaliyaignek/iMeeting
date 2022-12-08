@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, TextInput, ScrollView } from 'react-native';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
@@ -23,12 +23,14 @@ import {
   GET_FILE
 } from '../../../../graphql/query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../../../../context';
 
 const EditAppointmentGeneral = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { data } = route?.params;
   console.log('item from general', data);
+  const { appointmentsData, setAppointmentsData } = useContext(UserContext);
   const [token, setToken] = useState('');
   const [appointment, setAppointment] = useState(null);
   const [title, setTitle] = useState(data?.appointmentTitle);
@@ -52,7 +54,7 @@ const EditAppointmentGeneral = () => {
             const pevDaa = prev.filter((ite) => {
               return ite.fileEnteryId !== data.fileEnteryId;
             });
-            return [...pevDaa, data];
+            return [...pevDaa, data.uploadedFile];
           });
         }
       }
@@ -64,7 +66,7 @@ const EditAppointmentGeneral = () => {
 
   const GetAppointmentById = useQuery(GET_APPOINTMENT_BY_ID, {
     variables: {
-      id: data.appointmentId
+      id: data?.appointmentId
     },
     onCompleted: (data) => {
       console.log(
@@ -244,7 +246,7 @@ const EditAppointmentGeneral = () => {
       <Header
         name={'Edit appointment'}
         rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
+        onRightPress={() => navigation.navigate('AppointmentsList')}
       />
 
       <View style={styles.subContainer}>
@@ -309,13 +311,13 @@ const EditAppointmentGeneral = () => {
           <View style={{ marginTop: 24 }}>
             <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
             {fileResponse?.map((file, index) => {
-              console.log('from retuen', file);
+              console.log('from return', file);
               return (
                 <FilesCard
                   key={index}
                   filePath={file.name}
                   fileSize={file.size}
-                  onDownloadPress={() => checkPermission(file.downloadUrl)}
+                  fileUrl={file.downloadUrl}
                   fileType={file.type}
                   onRemovePress={() => removeFile(file)}
                   style={{
@@ -357,15 +359,22 @@ const EditAppointmentGeneral = () => {
           />
           <Button
             title={'Next'}
-            onPress={() =>
+            onPress={() => {
+              setAppointmentsData({
+                ...appointmentsData,
+                attachFiles: filesId,
+                committee: valueCommitee,
+                title: title,
+                discription: discription
+              });
               navigation.navigate('EditAppointmentUsers', {
                 attachFiles: filesId,
                 committee: valueCommitee,
                 title: title,
                 discription: discription,
                 item: data
-              })
-            }
+              });
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

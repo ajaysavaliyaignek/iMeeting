@@ -1,23 +1,29 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import React, { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { useMutation, useQuery } from '@apollo/client';
 import moment from 'moment';
 
-import { Colors } from '../../themes/Colors';
-import { Fonts } from '../../themes';
-import Icon from '../Icon';
-import IconName from '../Icon/iconName';
-import EditDeleteModal from '../EditDeleteModal';
-import { SIZES } from '../../themes/Sizes';
-import { GET_ALL_LOCATION_BY_ID, GET_All_MEETING } from '../../graphql/query';
-import { UserContext } from '../../context';
-import { DELETE_MEETING } from '../../graphql/mutation';
-import { getHighlightedText } from '../highlitedText/HighlitedText';
+import { Colors } from '../../../themes/Colors';
+import { Fonts } from '../../../themes';
+import Icon from '../../Icon';
+import IconName from '../../Icon/iconName';
+import EditDeleteModal from '../../EditDeleteModal';
+import { SIZES } from '../../../themes/Sizes';
+import {
+  GET_ALL_LOCATION_BY_ID,
+  GET_All_MEETING
+} from '../../../graphql/query';
+import { DELETE_MEETING } from '../../../graphql/mutation';
+import { getHighlightedText } from '../../highlitedText/HighlitedText';
+import { styles } from './styles';
+import { UserContext } from '../../../context';
 
 const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
   const navigation = useNavigation();
+  const { setSelectedUsers, setSelectedSubjects, setMeetingsData } =
+    useContext(UserContext);
 
   const [location, setLocation] = useState('');
   const [role, setRole] = useState(item.yourRoleName);
@@ -51,7 +57,11 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
           query: GET_All_MEETING,
           variables: {
             onlyMyMeeting: false,
-            screen: 0
+            committeeIds: '',
+            screen: 0,
+            searchValue: '',
+            page: -1,
+            pageSize: -1
           }
         }
       ],
@@ -103,7 +113,11 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
   };
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={() => setVisibleIndex(-1)}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={() => setVisibleIndex(-1)}
+      key={index}
+    >
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
@@ -115,7 +129,9 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
 
         <RowData
           name={'Date & Time'}
-          discription={moment(item.setDate).format('D MMMM YYYY,hh:mm A')}
+          discription={`${moment(item.setDate).format('D MMM YYYY')}, ${
+            item.setTime
+          }`}
         />
         <RowData name={'Location'} discription={location} />
         <RowData
@@ -139,15 +155,14 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
       {/* dotsView */}
       <TouchableOpacity
         onPress={() => {
+          setVisibleIndex(!showModal ? index : -1);
           setShowModal(!showModal);
-
-          setVisibleIndex(visibleIndex == -1 ? index : -1);
         }}
         style={styles.dotsView}
       >
         <Icon name={IconName.Dots} height={16} width={6} />
       </TouchableOpacity>
-      {visibleIndex === index && (
+      {visibleIndex === index && showModal && (
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDelete={() => {
@@ -159,7 +174,12 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
               setVisibleIndex(-1);
             }}
             onPressEdit={() => {
+              setMeetingsData([]);
+              setSelectedUsers([]);
+              setSelectedSubjects([]);
+
               setVisibleIndex(-1);
+
               navigation.navigate('EditMeetingGeneral', { item });
             }}
             subjectStatus={item.meetingStatusTitle}
@@ -173,52 +193,3 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
 };
 
 export default MeetingsCard;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SIZES[12]
-  },
-  divider: {
-    width: '100%',
-    height: SIZES[1],
-    backgroundColor: Colors.line
-  },
-  txtCommitteeName: {
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.secondary,
-    width: '30%'
-  },
-  discription: {
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.bold
-  },
-  committeeDetailView: {
-    paddingVertical: SIZES[24],
-    paddingHorizontal: SIZES[16],
-    width: '90%'
-  },
-  txtCommitteeTitle: {
-    ...Fonts.PoppinsBold[20],
-    color: Colors.bold
-  },
-  dotsView: {
-    position: 'absolute',
-    right: SIZES[18],
-    top: SIZES[32],
-    width: 16,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  discriptionView: {
-    paddingVertical: SIZES[6],
-    paddingHorizontal: SIZES[24],
-    borderRadius: SIZES[8]
-  },
-  modalView: {
-    position: 'absolute',
-    top: SIZES[60],
-    right: SIZES[8]
-  }
-});

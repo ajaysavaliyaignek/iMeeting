@@ -356,7 +356,6 @@ const AddDraftSubject = () => {
                   key={index}
                   filePath={file.name}
                   fileSize={file.size}
-                  onDownloadPress={() => navigation.navigate('SubjectDownload')}
                   fileType={file.type}
                   fileUrl={file.downloadUrl}
                   onRemovePress={() => removeFile(file.fileEnteryId)}

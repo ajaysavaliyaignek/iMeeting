@@ -6,14 +6,13 @@ import {
   FlatList,
   TextInput
 } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
 
 import SubjectsCard from '../../../component/Cards/subjectCard/SubjectsCard';
 import { SIZES } from '../../../themes/Sizes';
-import MeetingsCard from '../../../component/Cards/MeetingdCard';
 import { Button } from '../../../component/button/Button';
 import { GET_All_MEETING, GET_All_SUBJECTS } from '../../../graphql/query';
 import { Icon, IconName } from '../../../component';
@@ -22,6 +21,7 @@ import Loader from '../../../component/Loader/Loader';
 import { styles } from './styles';
 import { Fonts } from '../../../themes';
 import { UserContext } from '../../../context';
+import MeetingsCard from '../../../component/Cards/meetingCard/MeetingdCard';
 
 const DetailsScreen = () => {
   const route = useRoute();
@@ -37,10 +37,26 @@ const DetailsScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [meetingData, setMeetingData] = useState([]);
   const [filterMeetingData, setFilterMeetingData] = useState([]);
-  const { committee } = useContext(UserContext);
+  // const { committee } = useContext(UserContext);
+  const [committee, setCommittee] = useState([]);
+  const [committeeId, setCommitteeId] = useState('');
+  const [committeeName, setCommitteeName] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [isFetching, setIsFetching] = useState(false);
-  console.log('commitee', committee);
+  const { setSelectedUsers, setMeetingsData, setSelectedSubjects } =
+    useContext(UserContext);
+  console.log('commiteee', committee);
+
+  useEffect(() => {
+    const committeeId = committee?.map((com) => {
+      return com.organizationId;
+    });
+    const committeeName = committee?.map((com) => {
+      return com.committeeTitle;
+    });
+    setCommitteeId(committeeId?.join());
+    setCommitteeName(committeeName?.join());
+  }, [committee]);
 
   // get ALL SUBJECTS
   const {
@@ -49,22 +65,22 @@ const DetailsScreen = () => {
     data: SubjectsData
   } = useQuery(GET_All_SUBJECTS, {
     variables: {
-      committeeId: committee?.organizationId,
+      committeeIds: committeeId,
       searchValue: searchText,
-      screen: 0
+      screen: 0,
+      page: -1,
+      pageSize: -1
     },
 
     onCompleted: (data) => {
-      console.log('subjects', data?.subjects.items);
       setFilterData(data?.subjects.items);
 
       setSubjectData(data?.subjects.items);
+    },
+    onError: (data) => {
+      console.log('subjects error---', data.message);
     }
   });
-
-  if (SubjectsError) {
-    console.log('subjects error---', SubjectsError);
-  }
 
   // get ALL MEETINGS
   const {
@@ -74,25 +90,23 @@ const DetailsScreen = () => {
   } = useQuery(GET_All_MEETING, {
     variables: {
       onlyMyMeeting: onlyMyMeetings,
-      committeeId: committee?.organizationId,
-      screen: 0
+      committeeIds: committeeId,
+      screen: 0,
+      searchValue: searchText,
+      page: -1,
+      pageSize: -1
     },
     onCompleted: (data) => {
       if (data) {
-        console.log('meetings', data?.meetings.items);
         setFilterMeetingData(data?.meetings.items);
 
         setMeetingData(data?.meetings.items);
       }
+    },
+    onError: (data) => {
+      console.log('GetMeetings error---', data.message);
     }
   });
-
-  // if (dataGetMeetings) {
-  //   console.log('dataGetMeetings---', dataGetMeetings.meetings.items);
-  // }
-  if (errorGetMeetings) {
-    console.log('GetMeetings error---', errorGetMeetings.message);
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,6 +139,9 @@ const DetailsScreen = () => {
             <TouchableOpacity
               onPress={() => {
                 if (activeTab === '0') {
+                  setSelectedUsers([]);
+                  setMeetingsData([]);
+                  setSelectedSubjects([]);
                   navigation.navigate('AddMeetingGeneral');
                 } else if (activeTab === '1') {
                   navigation.navigate('AddSubject', { committee: null });
@@ -189,12 +206,16 @@ const DetailsScreen = () => {
                   if (activeTab === '0') {
                     navigation.navigate('Committee', {
                       Data: filterMeetingData,
-                      activeTab: '0'
+                      activeTab: '0',
+                      setCommittee: setCommittee,
+                      committee: committee
                     });
                   } else if (activeTab === '1') {
                     navigation.navigate('Committee', {
                       Data: filterData,
-                      activeTab: '1'
+                      activeTab: '1',
+                      setCommittee: setCommittee,
+                      committee: committee
                     });
                   }
                   // navigation.navigate('Committee');
@@ -202,10 +223,8 @@ const DetailsScreen = () => {
               >
                 <Text style={styles.txtCommittee}>Committee</Text>
                 <View style={styles.btnCommittees}>
-                  <Text style={styles.txtBtnCommittees}>
-                    {committee?.committeeTitle
-                      ? committee?.committeeTitle
-                      : 'All'}
+                  <Text style={styles.txtBtnCommittees} numberOfLines={1}>
+                    {committeeName !== '' ? committeeName : 'All'}
                   </Text>
                   <Icon
                     name={IconName.Arrow_Right}
@@ -303,7 +322,9 @@ const DetailsScreen = () => {
                     // meetingsData
                     filterMeetingData
                   }
-                  keyExtractor={(item, index) => `${item.meetingId}`}
+                  keyExtractor={(item, index) => {
+                    return index.toString();
+                  }}
                   renderItem={({ item, index }) => (
                     <MeetingsCard
                       item={item}
@@ -359,7 +380,9 @@ const DetailsScreen = () => {
               ) : filterData.length > 0 ? (
                 <FlatList
                   data={filterData}
-                  keyExtractor={(item, index) => `$subject-${index}`}
+                  keyExtractor={(item, index) => {
+                    return index.toString();
+                  }}
                   renderItem={({ item, index }) => (
                     <SubjectsCard
                       item={item}
@@ -368,6 +391,7 @@ const DetailsScreen = () => {
                       search={search}
                       visibleIndex={visibleIndex}
                       setVisibleIndex={setVisibleIndex}
+                      subjectStatus={true}
                     />
                   )}
                   showsVerticalScrollIndicator={false}

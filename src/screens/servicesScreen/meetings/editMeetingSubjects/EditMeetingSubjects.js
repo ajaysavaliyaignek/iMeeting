@@ -21,7 +21,11 @@ import { SIZES } from '../../../../themes/Sizes';
 import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_All_MEETING, GET_All_SUBJECTS } from '../../../../graphql/query';
+import {
+  GET_All_MEETING,
+  GET_All_SUBJECTS,
+  GET_SUBJECT_BY_ID
+} from '../../../../graphql/query';
 import { UPDATE_MEETING } from '../../../../graphql/mutation';
 import { UserContext } from '../../../../context';
 import AddSubjectsCard from '../addMeetingSubjects/AddSubjectsCard';
@@ -30,40 +34,17 @@ const EditMeetingSubjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { selectedSubjects } = useContext(UserContext);
   const {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    userRequired,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat,
-    platform,
-    location,
-    item
-  } = route?.params;
+    selectedSubjects,
+    setSelectedUsers,
+    meetingsData,
+    setMeetingsData,
+    setSelectedSubjects
+  } = useContext(UserContext);
+  const { item } = route?.params;
   console.log('meeting data from add meeting subjects', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    userRequired,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat,
-    platform,
-    location,
-    item
+    item,
+    meetingsData
   });
 
   console.log('selected subjects from add meeting subjects', selectedSubjects);
@@ -72,39 +53,72 @@ const EditMeetingSubjects = () => {
   const [filterData, setFilterData] = useState(selectedSubjects);
   const [subjectData, setSubjectData] = useState(selectedSubjects);
   const [subjectsId, setSubjectsId] = useState([]);
-  const [user, setUsers] = useState([]);
+  const [subject, setSubject] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
 
+  item?.subjectIds?.map((id) => {
+    const { loading, error } = useQuery(GET_SUBJECT_BY_ID, {
+      variables: {
+        subjectId: id
+      },
+      onCompleted: (data) => {
+        console.log('subject by id from subjects', data);
+        if (data) {
+          setSubject((prev) => {
+            subject?.filter((ite) => {
+              if (ite.subjectId !== data.subject.subjectId) {
+                return [...ite, data.subject];
+              }
+              // console.log('item id', ite.subjectId);
+              // console.log('data id', data.subject.subjectId);
+            });
+            // return [...subject, data.subject];
+          });
+        }
+      }
+    });
+    if (error) {
+      console.log('file error', error);
+    }
+  });
   useEffect(() => {
-    const user = selectedSubjects?.map((item) => item.user);
-    console.log('userId', user);
-    setUsers(user);
+    setSelectedSubjects(subject);
+    const userId = selectedSubjects?.map((item) => {
+      return item.subjectId;
+    });
+    setSubjectsId(userId);
   }, [selectedSubjects]);
+  console.log('suvjectid', subjectsId);
 
-  // useEffect(() => {
-  //   if (selectedSubjects.length > 0) {
-  //     const subjectId = selectedSubjects?.map((subject) => {
-  //       return subject.subjectId;
-  //     });
-  //     subjectsId.push(subjectId);
-  //   }
-  // }, [selectedSubjects]);
-  // console.log('subjectId', subjectsId);
+  useEffect(() => {
+    Voice.onSpeechStart = onSpeechStartHandler;
+    Voice.onSpeechEnd = onSpeechEndHandler;
+    Voice.onSpeechResults = onSpeechResultsHandler;
 
-  const searchFilterSubject = (text) => {
-    if (text) {
-      const newData = selectedSubjects.filter((item) => {
-        const itemData = item.subjectTitle ? item.subjectTitle : '';
-        const textData = text;
-        return itemData.indexOf(textData) > -1;
-      });
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
 
-      setSearchText(text);
-      setFilterData(newData);
-    } else {
-      setSearchText(text);
-      setFilterData(selectedSubjects);
+  const onSpeechStartHandler = (e) => {
+    console.log('startHandler', e);
+  };
+
+  const onSpeechEndHandler = (e) => {
+    console.log('onSpeechEndHandler', e);
+  };
+
+  const onSpeechResultsHandler = (e) => {
+    console.log('onSpeechResultsHandler', e);
+    let text = e.value[0];
+    setSearchText(text);
+  };
+  const startRecording = async () => {
+    try {
+      await Voice.start('en-US');
+    } catch (error) {
+      console.log('voice error', error);
     }
   };
 
@@ -117,7 +131,7 @@ const EditMeetingSubjects = () => {
     variables: {
       searchValue: searchText,
       screen: 1,
-      committeeId: committee
+      committeeId: meetingsData?.committee
     },
 
     onCompleted: (data) => {
@@ -138,25 +152,31 @@ const EditMeetingSubjects = () => {
         query: GET_All_MEETING,
         variables: {
           onlyMyMeeting: false,
-          screen: 0
+          committeeIds: '',
+          screen: 0,
+          searchValue: '',
+          page: -1,
+          pageSize: -1
         }
       }
     ],
     onCompleted: (data) => {
+      console.log('addmeeting data', data.updateMeeting);
       if (data.updateMeeting.status[0].statusCode == '200') {
+        setSelectedUsers([]);
+        setMeetingsData([]);
+        setSelectedSubjects([]);
+
         navigation.navigate('Details', {
           title: 'Meetings',
           active: '0'
         });
       }
+    },
+    onError: (data) => {
+      console.log('addmeeting data', data.message);
     }
   });
-  if (data) {
-    console.log('addmeeting data', data.updateMeeting);
-  }
-  if (error) {
-    console.log('addmeeting error--', error);
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -168,7 +188,12 @@ const EditMeetingSubjects = () => {
         <Header
           name={'Edit meeting'}
           rightIconName={IconName.Close}
-          onRightPress={() => navigation.goBack()}
+          onRightPress={() => {
+            navigation.navigate('Details', {
+              title: 'Meetings',
+              active: '0'
+            });
+          }}
         />
         <View style={styles.subContainer}>
           <View style={styles.progressContainer}>
@@ -188,9 +213,9 @@ const EditMeetingSubjects = () => {
             <TextInput
               style={styles.textInput}
               placeholder={'Search'}
-              onChangeText={(text) => searchFilterSubject(text)}
+              onChangeText={(text) => setSearchText(text)}
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => startRecording()}>
               <Icon
                 name={IconName.Speaker}
                 height={SIZES[15]}
@@ -204,7 +229,7 @@ const EditMeetingSubjects = () => {
             <FlatList
               data={selectedSubjects}
               keyExtractor={(item, index) => {
-                return `${item.subjectId}`;
+                return index.toString();
               }}
               renderItem={({ item, index }) => {
                 return (
@@ -216,26 +241,21 @@ const EditMeetingSubjects = () => {
                     setVisibleIndex={setVisibleIndex}
                     openIndex={openIndex}
                     setOpenIndex={setOpenIndex}
+                    deleted={true}
                   />
                 );
               }}
             />
-            {/* {selectedSubjects?.map((subject, index) => {
-              return (
-                <AddSubjectsCard
-                  item={subject}
-                  searchText={searchText}
-                  index={index}
-                  visibleIndex={visibleIndex}
-                  setVisibleIndex={setVisibleIndex}
-                />
-              );
-            })} */}
+
             <View style={styles.deadlineContainer}>
               <Text style={styles.txtTitle}>DEADLINE SUGGESTING</Text>
               <TouchableOpacity
                 style={styles.deadlineRowContainer}
-                onPress={() => navigation.navigate('DeadlineSuggestion')}
+                onPress={() =>
+                  navigation.navigate('DeadlineSuggestion', {
+                    setCalendarValue: setCalendarValue
+                  })
+                }
               >
                 <TextInput value={calendarValue} editable={false} />
                 <Icon
@@ -252,7 +272,7 @@ const EditMeetingSubjects = () => {
                 textStyle={styles.txtCancelButton}
                 onPress={() =>
                   navigation.navigate('SelectSubjects', {
-                    committee: committee
+                    committee: meetingsData?.committee
                   })
                 }
               />
@@ -262,7 +282,8 @@ const EditMeetingSubjects = () => {
         <View
           style={{
             backgroundColor: Colors.white,
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
+            zIndex: 0
           }}
         >
           {/* Divider */}
@@ -272,54 +293,48 @@ const EditMeetingSubjects = () => {
           >
             <Button
               title={'Back'}
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                navigation.goBack();
+                setMeetingsData({
+                  ...meetingsData,
+                  subjectid: subjectsId,
+                  deadlineDate: calendarValue
+                });
+              }}
               layoutStyle={styles.cancelBtnLayout}
               textStyle={styles.txtCancelButton}
             />
             <Button
               title={'Submit'}
               onPress={() => {
-                console.log('data on press', {
-                  attachFiles,
-                  committee,
-                  discription,
-                  endDate,
-                  endTime,
-                  location,
-                  title,
-                  platformlink: platform.platformlink,
-                  platformId: platform.platformId,
-                  Repeat,
-                  startDate,
-                  startTime,
-                  subjectid: subjectsId[0],
-                  TimeZone,
-                  users
-                });
                 addMeeting({
                   variables: {
                     meeting: {
-                      attachFileIds: attachFiles,
-                      committeeId: committee,
+                      attachFileIds: meetingsData.attachFiles,
+                      committeeId: meetingsData.committee,
                       creatorName: '',
-                      description: discription,
-                      endDate: endDate,
-                      endTime: endTime,
-                      locationId: location,
+                      description: meetingsData.discription,
+                      endDate: meetingsData.endDate,
+                      endTime: meetingsData.endTime,
+                      locationId: meetingsData.location,
                       meetingId: item.meetingId,
-                      meetingTitle: title,
-                      platformlink: platform.platformlink,
-                      platformId: platform.platformId,
+                      meetingTitle: meetingsData.title,
+                      platformlink: meetingsData.platform.platformlink,
+                      platformId:
+                        meetingsData.videoConference !== null
+                          ? meetingsData.videoConference
+                          : 0,
                       repeat: 0,
-                      repeatName: Repeat,
-                      required: userRequired,
-                      setDate: startDate,
-                      setTime: startTime,
-                      subjectIds: subjectsId[0],
-                      timeZone: TimeZone,
-                      userIds: users,
-                      subjectStatusIds: [],
-                      meetingStatusId: 0
+                      repeatName: meetingsData.Repeat,
+                      required: meetingsData.userRequired,
+                      setDate: meetingsData.startDate,
+                      setTime: meetingsData.startTime,
+                      subjectIds: subjectsId,
+                      timeZone: meetingsData.TimeZone,
+                      userIds: meetingsData.users,
+
+                      meetingStatusId: 0,
+                      deadlineDate: calendarValue
                     }
                   }
                 });

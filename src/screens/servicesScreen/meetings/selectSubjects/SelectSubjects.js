@@ -6,20 +6,22 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import Voice from '@react-native-community/voice';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+import { useQuery } from '@apollo/client';
+
 import { styles } from './styles';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
-import { Divider } from 'react-native-paper';
-import { subjectData } from '../../../../Constans/data';
 import SelectSubjectCard from '../../../../component/Cards/selectSubjectcard/SelectSubjectCard';
 import { Button } from '../../../../component/button/Button';
 import { Colors } from '../../../../themes/Colors';
-import { useQuery } from '@apollo/client';
 import { GET_All_SUBJECTS } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
+import { UserContext } from '../../../../context';
 
 const SelectSubjects = () => {
   const navigation = useNavigation();
@@ -28,9 +30,43 @@ const SelectSubjects = () => {
   console.log('committee from select subjects', committee);
   const [searchText, setSearchText] = useState('');
   const [subjectData, setSubjectData] = useState([]);
-  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  console.log('selectedSubjects', selectedSubjects);
+  const [checked, setChecked] = useState(false);
+  const { selectedSubjects, setSelectedSubjects } = useContext(UserContext);
+  console.log('selectedSubjects', selectedSubject);
+  var subjects = [];
+
+  useEffect(() => {
+    Voice.onSpeechStart = onSpeechStartHandler;
+    Voice.onSpeechEnd = onSpeechEndHandler;
+    Voice.onSpeechResults = onSpeechResultsHandler;
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const onSpeechStartHandler = (e) => {
+    console.log('startHandler', e);
+  };
+
+  const onSpeechEndHandler = (e) => {
+    console.log('onSpeechEndHandler', e);
+  };
+
+  const onSpeechResultsHandler = (e) => {
+    console.log('onSpeechResultsHandler', e);
+    let text = e.value[0];
+    setSearchText(text);
+  };
+  const startRecording = async () => {
+    try {
+      await Voice.start('en-US');
+    } catch (error) {
+      console.log('voice error', error);
+    }
+  };
 
   const {
     loading: SubjectsLoading,
@@ -44,15 +80,27 @@ const SelectSubjects = () => {
     },
 
     onCompleted: (data) => {
-      // setFilterData(data?.subjects.items);
-      console.log(data.subjects.items, 'get all subjects');
-      setSubjectData(data?.subjects.items);
+      console.log(data?.subjects.items, 'get all subjects');
+      subjects = data?.subjects.items.map((item, index) => {
+        let isSelected = checked;
+        return { ...item, isSelected };
+      });
+      if (subjects) {
+        setSubjectData(subjects);
+      }
+      // setSubjectData(data?.subjects.items);
     }
   });
 
   if (SubjectsError) {
     console.log('subjects error---', SubjectsError);
   }
+
+  useEffect(() => {
+    const filterUser = subjectData.filter((user) => user.isSelected == true);
+    console.log('filterUser', filterUser);
+    setSelectedSubjects(filterUser);
+  }, [checked]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,7 +119,7 @@ const SelectSubjects = () => {
             placeholder={'Search'}
             onChangeText={(text) => setSearchText(text)}
           />
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => startRecording()}>
             <Icon
               name={IconName.Speaker}
               height={SIZES[15]}
@@ -105,16 +153,22 @@ const SelectSubjects = () => {
           <FlatList
             data={subjectData}
             showsVerticalScrollIndicator={false}
-            keyExtractor={(item, index) => `${item.subjectId}`}
+            keyExtractor={(item, index) => {
+              return index.toString();
+            }}
             renderItem={({ item, index }) => (
               <SelectSubjectCard
                 item={item}
                 index={index}
                 searchText={searchText}
                 selectedSubjects={selectedSubjects}
-                setSelectedSubjects={setSelectedSubjects}
+                setSelectedSubjects={setSelectedSubject}
                 visibleIndex={visibleIndex}
                 setVisibleIndex={setVisibleIndex}
+                subjectData={subjectData}
+                setChecked={setChecked}
+                checked={checked}
+                key={item.userId}
               />
             )}
           />

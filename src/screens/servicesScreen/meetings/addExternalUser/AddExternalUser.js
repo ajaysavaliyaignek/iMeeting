@@ -97,117 +97,116 @@ const AddExternalUser = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-        <Header
-          name={'Add external user'}
-          rightIconName={IconName.Close}
-          onRightPress={() => navigation.goBack()}
-        />
-        <ScrollView
-          style={styles.subContainer}
-          showsVerticalScrollIndicator={false}
+      <Header
+        name={'Add external user'}
+        rightIconName={IconName.Close}
+        onRightPress={() => navigation.goBack()}
+      />
+      <ScrollView
+        style={styles.subContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* avatar */}
+        <TouchableOpacity
+          style={styles.profilePicContainer}
+          onPress={() => handleDocumentSelection()}
         >
-          {/* avatar */}
-          <TouchableOpacity
-            style={styles.profilePicContainer}
-            onPress={() => handleDocumentSelection()}
-          >
-            <Avatar
-              name={firstName}
-              size={120}
-              backgroundColor={'#E79D73'}
-              source={profileImage}
-            />
-          </TouchableOpacity>
+          <Avatar
+            name={firstName}
+            size={120}
+            backgroundColor={'#E79D73'}
+            source={profileImage}
+          />
+        </TouchableOpacity>
 
-          {/* details */}
-          {/* FIRST NAME */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>FIRST NAME</Text>
-            <TextInput
-              style={styles.textInput}
-              value={firstName}
-              onChangeText={(text) => setFirstName(text)}
-            />
-          </View>
+        {/* details */}
+        {/* FIRST NAME */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.txtTitle}>FIRST NAME</Text>
+          <TextInput
+            style={styles.textInput}
+            value={firstName}
+            onChangeText={(text) => setFirstName(text)}
+          />
+        </View>
 
-          {/* SECOND NAME */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>SECOND NAME</Text>
-            <TextInput
-              style={styles.textInput}
-              value={secondName}
-              onChangeText={(text) => setSecondName(text)}
-            />
-          </View>
+        {/* SECOND NAME */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.txtTitle}>SECOND NAME</Text>
+          <TextInput
+            style={styles.textInput}
+            value={secondName}
+            onChangeText={(text) => setSecondName(text)}
+          />
+        </View>
 
-          {/* LAST NAME */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>LAST NAME</Text>
-            <TextInput
-              style={styles.textInput}
-              value={lastName}
-              onChangeText={(text) => setLastName(text)}
-            />
-          </View>
+        {/* LAST NAME */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.txtTitle}>LAST NAME</Text>
+          <TextInput
+            style={styles.textInput}
+            value={lastName}
+            onChangeText={(text) => setLastName(text)}
+          />
+        </View>
 
-          {/* ORGANIZATION */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>ORGANIZATION</Text>
-            <TextInput
-              style={styles.textInput}
-              value={organization}
-              onChangeText={(text) => setOrganization(text)}
-            />
-          </View>
+        {/* ORGANIZATION */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.txtTitle}>ORGANIZATION</Text>
+          <TextInput
+            style={styles.textInput}
+            value={organization}
+            onChangeText={(text) => setOrganization(text)}
+          />
+        </View>
 
-          {/* EMAIL */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>E-MAIL</Text>
-            <TextInput
-              keyboardType="email-address"
-              style={styles.textInput}
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-            />
-          </View>
+        {/* EMAIL */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.txtTitle}>E-MAIL</Text>
+          <TextInput
+            keyboardType="email-address"
+            style={styles.textInput}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+        </View>
 
-          {/* NUMBER */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>NUMBER</Text>
-            <TextInput
-              keyboardType="name-phone-pad"
-              style={styles.textInput}
-              value={number}
-              onChangeText={(text) => setNumber(text)}
-            />
-          </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.txtLabel}>Send SMS</Text>
-            <Switch
-              value={sensSMS}
-              onValueChange={() => setSendSMS(!sensSMS)}
-              color={Colors.switch}
-            />
-          </View>
-          <View style={styles.rowContainer}>
-            <Text style={styles.txtLabel}>Save to database</Text>
-            <Switch
-              value={savaDatabase}
-              onValueChange={() => setSaveDatabase(!savaDatabase)}
-              color={Colors.switch}
-            />
-          </View>
-          <View style={[styles.rowContainer, { marginBottom: 24 }]}>
-            <Text style={styles.txtLabel}>Private details</Text>
-            <Switch
-              value={privateDetails}
-              onValueChange={() => setPrivateDetails(!privateDetails)}
-              color={Colors.switch}
-            />
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        {/* NUMBER */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.txtTitle}>NUMBER</Text>
+          <TextInput
+            keyboardType="name-phone-pad"
+            style={styles.textInput}
+            value={number}
+            onChangeText={(text) => setNumber(text)}
+          />
+        </View>
+        <View style={styles.rowContainer}>
+          <Text style={styles.txtLabel}>Send SMS</Text>
+          <Switch
+            value={sensSMS}
+            onValueChange={() => setSendSMS(!sensSMS)}
+            color={Colors.switch}
+          />
+        </View>
+        <View style={styles.rowContainer}>
+          <Text style={styles.txtLabel}>Save to database</Text>
+          <Switch
+            value={savaDatabase}
+            onValueChange={() => setSaveDatabase(!savaDatabase)}
+            color={Colors.switch}
+          />
+        </View>
+        <View style={[styles.rowContainer, { marginBottom: 24 }]}>
+          <Text style={styles.txtLabel}>Private details</Text>
+          <Switch
+            value={privateDetails}
+            onValueChange={() => setPrivateDetails(!privateDetails)}
+            color={Colors.switch}
+          />
+        </View>
+      </ScrollView>
+
       <View
         style={{
           backgroundColor: Colors.white,
@@ -226,16 +225,6 @@ const AddExternalUser = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              // console.log('emails', [email]);
-              // console.log('familyName', lastName);
-              // console.log('firstName', firstName);
-              // console.log('phoneNumber', number);
-              // console.log('privateDetails', privateDetails);
-              // console.log('profilePicture', profileImage);
-              // console.log('secondName', secondName);
-              // console.log('sendSMS', sensSMS);
-
-              // console.log('userId', 0);
               addExternalUser({
                 variables: {
                   committeeMember: {

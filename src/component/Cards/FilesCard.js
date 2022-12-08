@@ -27,7 +27,7 @@ const FilesCard = ({
   fileUrl
 }) => {
   const checkPermission = async (file) => {
-    console.log('check permission');
+    console.log('check permission', file);
     if (Platform.OS === 'ios') {
       downloadFile(file);
     } else {
@@ -39,9 +39,12 @@ const FilesCard = ({
             message: 'Application needs access to your storage to download File'
           }
         );
+        console.log('permission', PermissionsAndroid.RESULTS.GRANTED);
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           // Start downloading
+
           downloadFile(file);
+
           console.log('Storage Permission Granted.');
         } else {
           // If permission denied then show alert
@@ -65,18 +68,21 @@ const FilesCard = ({
 
     file_ext = '.' + file_ext[0];
 
+    console.log('file_ext', file_ext);
+
     // config: To get response by passing the downloading related options
     // fs: Root directory path to download
     const { config, fs } = RNFetchBlob;
-    let RootDir = fs.dirs.DocumentDir;
+    const { DownloadDir } = fs.dirs;
     let options = {
       fileCache: true,
       addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          file_ext,
+        useDownloadManager: true, // true will use native manager and be shown on notification bar.
+        notification: true,
+        path: `${DownloadDir}/me_${Math.floor(
+          date.getTime() + date.getSeconds() / 2
+        )}${file_ext}`,
+
         description: 'downloading file...',
         notification: true,
         // useDownloadManager works with Android only

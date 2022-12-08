@@ -1,19 +1,24 @@
 import { View, Text, SafeAreaView, Switch } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { styles } from './styles';
 import Avatar from '../../../../component/Avatar/Avatar';
 import { SIZES } from '../../../../themes/Sizes';
 import CheckBox from '../../../../component/checkBox/CheckBox';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const SelectUser = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { selectedUsers } = route?.params;
+  console.log('selected users from time line select user', selectedUsers);
   const [requiredSwitchOn, setRequiredSwitchOn] = useState(false);
   const [requiredCheckBox, setRequiredCheckBox] = useState(false);
   const [optionalSwitchOn, setOptionalSwitchOn] = useState(false);
   const [optionalCheckbox, setOptionalCheckBox] = useState(false);
+  const [requiredUsers, setRequiredUsers] = useState(selectedUsers);
+  const [optionalUser, setOptionalUser] = useState(selectedUsers);
   const users = [
     {
       profileImage: 'https://picsum.photos/200/300',
@@ -32,6 +37,26 @@ const SelectUser = () => {
       userName: 'Bessie Cooper'
     }
   ];
+
+  useEffect(() => {
+    selectedUsers?.map((user) => {
+      if (user.isRequired == true) {
+        setRequiredUsers([...requiredUsers]);
+      }
+      if (user.isRequired == false) {
+        setOptionalUser([...optionalUser]);
+      }
+    });
+    // setRequiredUsers([...requiredUsers]);
+  }, [selectedUsers]);
+
+  // useEffect(() => {
+  //   optionalUser?.map((user) => {
+  //     user?.isRequired == false;
+  //   });
+  //   setOptionalUser([...optionalUser]);
+  // }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -47,26 +72,27 @@ const SelectUser = () => {
             <View style={styles.switchContainer}>
               <Text style={styles.txtAll}>All</Text>
               <Switch
-                value={requiredSwitchOn}
+                value={true}
                 onValueChange={() => setRequiredSwitchOn(!requiredSwitchOn)}
               />
             </View>
           </View>
-          {users.map((user, index) => {
+          {requiredUsers?.map((user, index) => {
             return (
               <View style={styles.userContainer} key={index}>
                 <View style={styles.switchContainer}>
                   <Avatar
-                    name={user.userName}
+                    name={user.firstName}
                     source={user.profileImage}
                     size={SIZES[34]}
                   />
-                  <Text style={styles.txtUserName}>{user.userName}</Text>
+                  <Text
+                    style={styles.txtUserName}
+                  >{`${user.firstName} ${user.familyName}`}</Text>
                 </View>
                 <CheckBox
-                  value={requiredCheckBox}
-                  onValueChange={() => setRequiredCheckBox(!requiredCheckBox)}
-                  key={index}
+                  value={true}
+                  onValueChange={() => setOptionalCheckBox(!optionalCheckbox)}
                 />
               </View>
             );
@@ -78,24 +104,26 @@ const SelectUser = () => {
             <View style={styles.switchContainer}>
               <Text style={styles.txtAll}>All</Text>
               <Switch
-                value={optionalSwitchOn}
+                value={false}
                 onValueChange={() => setOptionalSwitchOn(!optionalSwitchOn)}
               />
             </View>
           </View>
-          {users.map((user, index) => {
+          {optionalUser?.map((user, index) => {
             return (
               <View style={styles.userContainer} key={index}>
                 <View style={styles.switchContainer}>
                   <Avatar
-                    name={user.userName}
+                    name={user.firstName}
                     source={user.profileImage}
                     size={SIZES[34]}
                   />
-                  <Text style={styles.txtUserName}>{user.userName}</Text>
+                  <Text
+                    style={styles.txtUserName}
+                  >{`${user.firstName} ${user.familyName}`}</Text>
                 </View>
                 <CheckBox
-                  value={optionalCheckbox}
+                  value={false}
                   onValueChange={() => setOptionalCheckBox(!optionalCheckbox)}
                 />
               </View>

@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, Platform } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Platform, Alert } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 import { styles } from './styles';
@@ -12,6 +12,8 @@ import { getHighlightedText } from '../../../../component/highlitedText/Highlite
 import { useMutation, useQuery } from '@apollo/client';
 import { UPDATE_SUBJECT_STATUS } from '../../../../graphql/mutation';
 import { GET_ALL_SUBJECTS_STATUS } from '../../../../graphql/query';
+import { UserContext } from '../../../../context';
+import { useNavigation } from '@react-navigation/native';
 
 const AddSubjectsCard = ({
   item,
@@ -20,16 +22,33 @@ const AddSubjectsCard = ({
   visibleIndex,
   setVisibleIndex,
   openIndex,
-  setOpenIndex
+  setOpenIndex,
+  deleted
 }) => {
-  console.log(item);
-  const [editModal, setEditModal] = useState(false);
-  const [valueStatus, setValueStatus] = useState('Created');
-  const [openStatus, setOpenStatus] = useState(false);
+  console.log('item from add subject card', item);
+
+  const navigation = useNavigation();
+  const [valueStatus, setValueStatus] = useState(
+    item.statusTitle == 'Approved'
+      ? 317
+      : item.statusTitle == 'Deleted'
+      ? 322
+      : item.statusTitle == 'Pre-Proposed'
+      ? 319
+      : item.statusTitle == 'Proposed'
+      ? 320
+      : item.statusTitle == 'Tentative'
+      ? 316
+      : item.statusTitle == 'Transferred'
+      ? 321
+      : 318
+  );
   const [subjectStatus, setSubectStatus] = useState([]);
   const [items, setItems] = useState([{ label: 'Design', value: 'design' }]);
+  const { selectedSubjects, setSelectedSubjects } = useContext(UserContext);
 
   const getSubjectStatus = useQuery(GET_ALL_SUBJECTS_STATUS, {
+    variables: { subject: true, decision: false },
     onCompleted: (data) => {
       console.log('subject status', data.subjectStatus.items);
       if (data) {
@@ -43,25 +62,36 @@ const AddSubjectsCard = ({
 
   useEffect(() => {
     subjectStatus?.map((status) => {
-      console.log('subjectStatusId', status.subjectStatusId);
-      console.log('subjectStatus', status.subjectStatus);
+      console.log('subjectStatusId', status.statusId);
+      console.log('subjectStatus', status.statusTitle);
       setItems([
         {
-          label: status.subjectStatus,
-          value: status.subjectStatusId
+          label: status.statusTitle,
+          value: status.statusId
         }
       ]);
     });
   }, [subjectStatus]);
 
-  // const getSubjectStatus = useQuery(GET_ALL_SUBJECTS_STATUS, {
-  //   onCompleted: (data) => {
-  //     console.log('subject status', data.subjectStatus.items);
-  //   },
-  //   onError: (data) => {
-  //     console.log('get subject status error', data);
-  //   }
-  // });
+  const onDeleteHandler = () => {
+    Alert.alert('Remove subject', 'Are you sure you want to remove this?', [
+      {
+        text: 'Delete',
+        onPress: () => {
+          const filterData = selectedSubjects.filter(
+            (user) => user.subjectId !== item.subjectId
+          );
+          setSelectedSubjects(filterData);
+        },
+        style: 'destructive'
+      },
+      {
+        text: 'Cancel',
+        // onPress: () => navigation.navigate("Login"),
+        style: 'cancel'
+      }
+    ]);
+  };
 
   const [updateSubjectStatus] = useMutation(UPDATE_SUBJECT_STATUS, {
     onCompleted: (data) => {
@@ -76,7 +106,7 @@ const AddSubjectsCard = ({
       key={index}
       style={[
         Platform.OS === 'ios'
-          ? { zIndex: -2 * index }
+          ? { zIndex: -2 * index, flex: 1 }
           : { elevation: -2 * index, zIndex: -2 * index }
       ]}
       onPress={() => {
@@ -121,14 +151,12 @@ const AddSubjectsCard = ({
           <DropDownPicker
             listMode="MODAL"
             open={openIndex == index}
-            dropDownDirection="TOP"
-            zIndex={2}
             value={valueStatus}
             listChildContainerStyle={{ height: 500 }}
-            items={subjectStatus.map((status) => {
+            items={subjectStatus?.map((status) => {
               return {
-                label: status.subjectStatus,
-                value: status.subjectStatusId
+                label: status.statusTitle,
+                value: status.statusId
               };
             })}
             arrowIconStyle={{
@@ -142,13 +170,25 @@ const AddSubjectsCard = ({
             onClose={() => {
               setOpenIndex(-1);
             }}
+            onSelectItem={(value) => {
+              console.log('value status', value);
+              updateSubjectStatus({
+                variables: {
+                  subject: {
+                    statusId: value.value,
+                    subjectId: item.subjectId
+                  }
+                }
+              });
+            }}
             setValue={setValueStatus}
             setItems={setItems}
-            placeholder={item.subjectStatus}
-            placeholderStyle={styles.txtDiscription}
+            // placeholder={item.subjectStatus}
+            // placeholderStyle={styles.txtDiscription}
             style={{
               borderWidth: 0,
               paddingHorizontal: SIZES[24],
+              flex: 1,
 
               backgroundColor:
                 valueStatus === 'Approved'
@@ -200,9 +240,9 @@ const AddSubjectsCard = ({
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDownload={() => navigation.navigate('SubjectDownload')}
-            subjectStatus={item.subjectStatus}
+            subjectStatus={item.statusTitle}
             onPressDelete={() => {
-              onDeleteHandler(item.subjectId);
+              onDeleteHandler();
               setVisibleIndex(-1);
             }}
             onPressEdit={() => {
@@ -213,6 +253,7 @@ const AddSubjectsCard = ({
               navigation.navigate('SubjectDetails', { item });
               setVisibleIndex(-1);
             }}
+            deleted={deleted}
           />
         </View>
       )}

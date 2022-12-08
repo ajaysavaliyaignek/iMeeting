@@ -49,3 +49,21 @@ export { default as Delete } from './Delete.svg';
 // meetings
 export { default as Speaker } from './Speaker.svg';
 export { default as CopyText } from './CopyText.svg';
+
+// livemeetings
+export { default as LMChat } from './LiveMeetingIcon/LMChat';
+export { default as LMChatWhite } from './LiveMeetingIcon/LMChatWhite';
+export { default as LMDecisions } from './LiveMeetingIcon/LMDecisions';
+export { default as LMDecisionsWhite } from './LiveMeetingIcon/LMDecisionsWhite';
+export { default as LMDetails } from './LiveMeetingIcon/LMDetails';
+export { default as LMDetailsWhite } from './LiveMeetingIcon/LMDetailsWhite';
+export { default as LMOnline } from './LiveMeetingIcon/LMOnline';
+export { default as LMOnlineWhite } from './LiveMeetingIcon/LMOnlineWhite';
+export { default as LMSubjects } from './LiveMeetingIcon/LMSubjects';
+export { default as LMSubjectsWhite } from './LiveMeetingIcon/LMSubjectsWhite';
+export { default as LMTasks } from './LiveMeetingIcon/LMTasks';
+export { default as LMTasksWhite } from './LiveMeetingIcon/LMTasksWhite';
+export { default as LMUsers } from './LiveMeetingIcon/LMUsers';
+export { default as LMUsersWhite } from './LiveMeetingIcon/LMUsersWhite';
+export { default as LMVotings } from './LiveMeetingIcon/LMVotings';
+export { default as LMVotingsWhite } from './LiveMeetingIcon/LMVotingsWhite';

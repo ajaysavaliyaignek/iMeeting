@@ -3,7 +3,10 @@ import {
   Text,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  ToastAndroid,
+  Platform,
+  Alert
 } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -22,11 +25,12 @@ import { useQuery } from '@apollo/client';
 const LocationDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { locationId, platform } = route?.params;
+  const { locationId, platform, locationType } = route?.params;
   const [location, setLocation] = useState({});
   const [role, setRole] = useState('Head');
 
   // get location by id
+
   const {
     loading: LocationLoading,
     error: LocationError,
@@ -45,6 +49,8 @@ const LocationDetails = () => {
   if (LocationError) {
     console.log('LocationError', LocationError);
   }
+
+  console.log('GET_ALL_LOCATION_BY_ID', GET_ALL_LOCATION_BY_ID);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -98,7 +104,22 @@ const LocationDetails = () => {
           >
             <Text style={styles.txtUrl}>{location.googleMapURL}</Text>
             <TouchableOpacity
-              onPress={() => Clipboard.setString(location.googleMapURL)}
+              onPress={() => {
+                Clipboard.setString(location.googleMapURL);
+                if (
+                  location.googleMapURL !== '' ||
+                  location.googleMapURL !== null
+                ) {
+                  if (Platform.OS == 'android') {
+                    ToastAndroid.show(
+                      `Copied Text :-  ${location.googleMapURL}`,
+                      ToastAndroid.SHORT
+                    );
+                  } else {
+                    Alert.alert(`Copied Text :-  ${location.googleMapURL}`);
+                  }
+                }
+              }}
             >
               <Icon
                 name={IconName.CopyText}
@@ -132,7 +153,8 @@ const LocationDetails = () => {
               title={'Edit'}
               onPress={() =>
                 navigation.navigate('EditLocation', {
-                  meetingLocation: location
+                  meetingLocation: location,
+                  locationType: locationType
                 })
               }
               layoutStyle={[

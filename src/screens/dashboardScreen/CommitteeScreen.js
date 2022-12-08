@@ -3,22 +3,21 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  ScrollView,
-  FlatList
+  FlatList,
+  TouchableOpacity
 } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Checkbox from 'expo-checkbox';
+import { useQuery } from '@apollo/client';
+import { Divider } from 'react-native-paper';
 
 import Header from '../../component/header/Header';
 import { IconName } from '../../component';
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
 import { SIZES } from '../../themes/Sizes';
-import { useQuery } from '@apollo/client';
 import { GET_All_COMMITTEE } from '../../graphql/query';
 import Loader from '../../component/Loader/Loader';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../component/button/Button';
 import CommitteeCard from '../../component/Cards/committeeCard/CommitteeCard';
 import CheckBox from '../../component/checkBox/CheckBox';
@@ -27,12 +26,23 @@ import { UserContext } from '../../context';
 const CommitteeScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { Data, activeTab } = route?.params;
-  const ref = useRef();
-  const { setCommittee } = useContext(UserContext);
+  const { Data, activeTab, setCommittee, committee } = route?.params;
+  // const { setCommittee } = useContext(UserContext);
   const [committees, setCommittees] = useState([]);
   const [selectCommittee, setSelectCommittee] = useState(null);
   const [isChecked, setChecked] = useState(false);
+  // const [checked, setIsChecked] = useState(false);
+  let filterCommittee = [];
+
+  const checkToggle = (ite, value) => {
+    committees?.map((com) => {
+      if (com.organizationId == ite.organizationId) {
+        ite.isSelected = !ite.isSelected;
+      }
+    });
+    setCommittees([...committees]);
+  };
+
   console.log('COMMITTE FROM COMMITTE SCRREN', selectCommittee);
 
   const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
@@ -42,7 +52,21 @@ const CommitteeScreen = () => {
       onCompleted: (data) => {
         if (data) {
           console.log('committees', data?.committees.items);
-          setCommittees(data.committees.items);
+
+          filterCommittee = data?.committees?.items.map((item, index) => {
+            let previousUserIndex = committees?.findIndex(
+              (user) => user.organizationId === item.organizationId
+            );
+            let isSelected = false;
+            if (previousUserIndex >= 0) {
+              isSelected = true;
+            }
+            return { ...item, isSelected };
+          });
+          console.log('filter commitee', filterCommittee);
+          if (filterCommittee) {
+            setCommittees(filterCommittee);
+          }
         }
       }
     }
@@ -51,11 +75,28 @@ const CommitteeScreen = () => {
     console.log('commitee error', CommitteeError);
   }
 
-  useEffect(() => {
-    if (isChecked) {
-      setCommittee(Data);
-    }
-  }, [isChecked]);
+  const setSelectedCommitee = () => {
+    console.log('committes==>', committees);
+    const selectedUserList = [];
+    committees.map((committee) => {
+      console.log('user', committee.isSelected);
+      if (committee.isSelected) {
+        selectedUserList.push(committee);
+        // console.log('selectCommittee', selectCommittee);
+      }
+    });
+    console.log('selectCommittee', selectedUserList);
+    setCommittee(selectedUserList);
+    navigation.goBack();
+  };
+
+  const setAllCommittee = () => {
+    committees?.map((committee) => {
+      console.log('all committee=======>', committee);
+      committee.isSelected == true;
+    });
+    setCommittees([...committees]);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -86,34 +127,41 @@ const CommitteeScreen = () => {
           </View>
         ) : (
           <View>
-            <View style={styles.rowDataContainer}>
+            <TouchableOpacity
+              style={styles.rowDataContainer}
+              onPress={() => {
+                setAllCommittee();
+              }}
+            >
               <CheckBox
                 color={Colors.primary}
                 value={isChecked}
                 onValueChange={() => {
-                  setChecked(!isChecked);
+                  setAllCommittee();
                 }}
               />
               <Text style={styles.txtCheckboxTitle}>All</Text>
-            </View>
+            </TouchableOpacity>
             <FlatList
               data={committees}
-              keyExtractor={(item, index) => `${index}`}
+              keyExtractor={(item, index) => {
+                return index.toString();
+              }}
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
-                return <CommitteeCard item={item} index={index} />;
+                return (
+                  <CommitteeCard
+                    item={item}
+                    index={index}
+                    setCommittee={setCommittee}
+                    committee={committees}
+                    checkToggle={checkToggle}
+                  />
+                );
               }}
             />
           </View>
         )}
-        {/* 
-        {rowData({ title: 'Advisory Committee on Financial Management' })}
-        {rowData({ title: 'Assessment Accommodations Review Panel' })}
-        {rowData({ title: 'English Learner Stakeholder Input Group (ELSIG)' })}
-        {rowData({ title: 'Indigenous Education Action Team' })}
-        {rowData({ title: 'Local Assessment Advisory Committee (LAAC)' })}
-        {rowData({ title: 'Nonpublic Education Council' })}
-        {rowData({ title: 'Special Education Advisory Panel (SEAP)' })} */}
       </View>
       <View
         style={{
@@ -133,7 +181,7 @@ const CommitteeScreen = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              navigation.goBack();
+              setSelectedCommitee();
             }}
             layoutStyle={styles.nextBtnLayout}
             textStyle={styles.txtNextBtn}

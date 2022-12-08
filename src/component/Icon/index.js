@@ -137,6 +137,77 @@ const Icon = ({ name, height = SIZES[24], width = SIZES[24], fill }) => {
             fill={fill}
           />
         );
+      case IconName.LMChat:
+        return <SVGImage.LMChat height={height} width={width} fill={fill} />;
+
+      case IconName.LMChatWhite:
+        return (
+          <SVGImage.LMChatWhite height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMDecisions:
+        return (
+          <SVGImage.LMDecisions height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMDecisionsWhite:
+        return (
+          <SVGImage.LMDecisionsWhite
+            height={height}
+            width={width}
+            fill={fill}
+          />
+        );
+
+      case IconName.LMDetails:
+        return <SVGImage.LMDetails height={height} width={width} fill={fill} />;
+
+      case IconName.LMDetailsWhite:
+        return (
+          <SVGImage.LMDetailsWhite height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMOnline:
+        return <SVGImage.LMOnline height={height} width={width} fill={fill} />;
+
+      case IconName.LMOnlineWhite:
+        return (
+          <SVGImage.LMOnlineWhite height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMSubjects:
+        return (
+          <SVGImage.LMSubjects height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMSubjectsWhite:
+        return (
+          <SVGImage.LMSubjectsWhite height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMTasks:
+        return <SVGImage.LMTasks height={height} width={width} fill={fill} />;
+
+      case IconName.LMTasksWhite:
+        return (
+          <SVGImage.LMTasksWhite height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMUsers:
+        return <SVGImage.LMUsers height={height} width={width} fill={fill} />;
+
+      case IconName.LMUsersWhite:
+        return (
+          <SVGImage.LMUsersWhite height={height} width={width} fill={fill} />
+        );
+
+      case IconName.LMVotings:
+        return <SVGImage.LMVotings height={height} width={width} fill={fill} />;
+
+      case IconName.LMVotingsWhite:
+        return (
+          <SVGImage.LMVotingsWhite height={height} width={width} fill={fill} />
+        );
 
       default:
         return null;

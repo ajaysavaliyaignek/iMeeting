@@ -36,7 +36,15 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Location service used to fetch location</string>
+  <key>UIFileSharingEnabled</key>
+  <true/>
+  <key>LSSupportsOpeningDocumentsInPlace</key>
+  <true/>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>Description of why you require the use of the microphone</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Description of why you require the use of the speech recognition</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

@@ -5,13 +5,15 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
-  useWindowDimensions
+  useWindowDimensions,
+  Modal,
+  Pressable
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import CalendarStrip from 'react-native-calendar-strip';
-import { Divider } from 'react-native-paper';
+import { Divider, useTheme } from 'react-native-paper';
 import Timetable from 'react-native-calendar-timetable';
 import moment from 'moment';
 
@@ -26,22 +28,23 @@ import { useQuery } from '@apollo/client';
 import { GET_TIMELINE_REVIEW } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
 import EventCalendar from 'react-native-events-calendar';
+import { Data } from 'victory-core';
 
 const TimelineScreen = () => {
   const { width, height } = useWindowDimensions();
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const { selectedUsers } = route?.params;
   // console.log(' from timeline', selectedUsers);
-  const userId = selectedUsers.map((user) => user.userId.toString()).join(',');
+  const userId = selectedUsers?.map((user) => user.userId.toString()).join(',');
   console.log('userId', userId);
 
   const [date, setDate] = useState(new Date());
   const [selected, setSelected] = useState(false);
   const [event, setEvents] = useState(null);
-  const [from] = useState(moment(event?.startTime).toDate());
-
-  const [till] = useState(moment(event?.endTime).toISOString());
+  const [items, setItems] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
 
   const { data, error, loading } = useQuery(GET_TIMELINE_REVIEW, {
     variables: {
@@ -74,29 +77,26 @@ const TimelineScreen = () => {
     // });
   }, []);
 
-  // console.log('events', event);
+  console.log('events', event);
+  console.log('startTime', event?.startTime);
+  console.log('endTime', event?.endTime);
 
-  const range = { from, till };
-  console.log('from', range);
-  console.log('date value', moment(event?.endDate).toDate());
-  console.log(moment().add(1, 'hour').toDate());
-  const [items] = useState([
-    {
-      title: [
-        { title: 'Some event' },
-        { title: 'Business of Software Conference' },
-        { title: 'ajay' },
-        { title: 'ajay' },
-        { title: 'ajay' },
-        { title: 'ajay' }
-      ],
-      startDate: moment(event?.startTime).toDate(),
-      // moment(event?.startTime, 'YYYY-MM-DD hh:mm a'),
-      endDate: moment(event?.endTime).toDate(),
-      color: '#FDF5F1',
-      borderColor: '#E79D73'
+  useEffect(() => {
+    if (event !== null) {
+      setItems([
+        {
+          title: event,
+          startDate: moment(event?.startTime, 'YYYY-MM-DD hh:mm A'),
+          endDate: moment(event?.endTime, 'YYYY-MM-DD hh:mm A'),
+          //2022-12-02 07:58 AM
+          // startDate: moment('2022-12-01 03:54 PM', 'YYYY-MM-DD hh:mm a'),
+          // endDate: moment('2022-12-02 07:58 AM', 'YYYY-MM-DD hh:mm a'),
+          color: '#FDF5F1',
+          borderColor: '#E79D73'
+        }
+      ]);
     }
-  ]);
+  }, [event]);
 
   let datesWhitelist = [
     {
@@ -106,94 +106,8 @@ const TimelineScreen = () => {
   ];
   let datesBlacklist = [moment().add(1, 'days')];
 
-  const events = [
-    {
-      start: '2022-11-26 00:30:00',
-      end: '2022-11-26 01:30:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-07 01:30:00',
-      end: '2017-09-07 02:20:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-07 04:10:00',
-      end: '2017-09-07 04:40:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-07 01:05:00',
-      end: '2017-09-07 01:45:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-07 14:30:00',
-      end: '2017-09-07 16:30:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-08 01:20:00',
-      end: '2017-09-08 02:20:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-08 04:10:00',
-      end: '2017-09-08 04:40:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-08 00:45:00',
-      end: '2017-09-08 01:45:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-08 11:30:00',
-      end: '2017-09-08 12:30:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-09 01:30:00',
-      end: '2017-09-09 02:00:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-09 03:10:00',
-      end: '2017-09-09 03:40:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    },
-    {
-      start: '2017-09-09 00:10:00',
-      end: '2017-09-09 01:45:00',
-      title: 'Dr. Mariana Joseph',
-      summary: '3412 Piedmont Rd NE, GA 3032',
-      color: 'red'
-    }
-  ];
-
   function MyItemCard({ style, item, dayIndex, daysTotal }) {
+    console.log('item from timeline', item);
     return (
       <TouchableOpacity
         style={{
@@ -202,29 +116,19 @@ const TimelineScreen = () => {
           borderRadius: SIZES[8],
           // elevation: 5,
           width: width - 102,
-          flexDirection: 'row'
+          borderLeftWidth: SIZES[4],
+          borderLeftColor: item.borderColor
         }}
-        activeOpacity={0.9}
+        activeOpacity={0.5}
+        onPress={() => setOpenModal(true)}
       >
-        <View
-          style={{
-            backgroundColor: item.borderColor,
-            width: SIZES[4],
-            borderTopLeftRadius: SIZES[10],
-            borderBottomLeftRadius: SIZES[10]
-          }}
-        />
-
         <FlatList
           // maxToRenderPerBatch={3}
           contentContainerStyle={{ paddingVertical: SIZES[8] }}
           initialNumToRender={3}
-          data={
-            DeviceInfo.isTablet()
-              ? item.title.slice(0, 2)
-              : item.title.slice(0, 3)
-          }
+          data={item.title.events}
           renderItem={({ item, index }) => {
+            console.log('item ', item);
             return (
               <View
                 style={{
@@ -235,10 +139,7 @@ const TimelineScreen = () => {
                 }}
                 key={index}
               >
-                <Avatar
-                  source={'https://picsum.photos/200/300'}
-                  size={SIZES[24]}
-                />
+                <Avatar source={item.portraitURL} size={SIZES[24]} />
                 <Text
                   style={{
                     ...Fonts.PoppinsSemiBold[14],
@@ -246,7 +147,7 @@ const TimelineScreen = () => {
                     marginLeft: SIZES[8]
                   }}
                 >
-                  {item.title}
+                  {item.userName}
                 </Text>
               </View>
             );
@@ -283,14 +184,17 @@ const TimelineScreen = () => {
         <Text
           style={{
             position: 'absolute',
-            bottom: SIZES[8],
-            left: SIZES[12],
-            zIndex: 20,
+            bottom: 0,
+            left: SIZES[10],
+            zIndex: 40,
             ...Fonts.PoppinsRegular[12],
             color: Colors.secondary
           }}
         >
-          10:00 - 12:10 PM - 12 users
+          {moment(event?.startTime, 'YYYY-MM-DD hh:mm A').format('hh:mm A')} -
+          {moment(event?.endTime, 'YYYY-MM-DD hh:mm A').format('hh:mm A')} -{' '}
+          {event?.events.length} {''}
+          {event?.events.length > 1 ? 'Users' : 'User'}
         </Text>
       </TouchableOpacity>
     );
@@ -421,7 +325,7 @@ const TimelineScreen = () => {
             items={items}
             cardComponent={MyItemCard}
             date={date} // optional
-            range={range} // optional
+            // range={range} // optional
             // width={width - 40}
             hideNowLine={true}
             linesLeftInset={-5}
@@ -432,6 +336,91 @@ const TimelineScreen = () => {
           />
         </ScrollView>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={openModal}
+        onRequestClose={() => {
+          setOpenModal(!openModal);
+        }}
+      >
+        <View style={styles.modal}>
+          <View style={styles.mainBoxView}>
+            <View style={styles.rowHeader}>
+              <Text style={styles.txtModalHeader}>
+                {moment(event?.startTime, 'YYYY-MM-DD hh:mm A').format(
+                  'hh:mm A'
+                )}{' '}
+                -
+                {moment(event?.endTime, 'YYYY-MM-DD hh:mm A').format('hh:mm A')}
+              </Text>
+              <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={() => setOpenModal(false)}
+              >
+                <Icon
+                  name={IconName.Close}
+                  height={SIZES[16]}
+                  width={SIZES[16]}
+                />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.txtUserCount}>
+              {event?.events.length} users
+            </Text>
+            <ScrollView>
+              {event?.events.map((item, index) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setOpenModal(!openModal);
+                    }}
+                    style={[
+                      styles.userContainer,
+                      {
+                        backgroundColor:
+                          event?.events.length == 1 ? event?.color : item.color,
+                        borderLeftColor:
+                          event?.events.length == 1
+                            ? event?.borderColor
+                            : item.borderColor
+                      }
+                    ]}
+                    key={index}
+                  >
+                    <View style={styles.userDataContainer}>
+                      <View style={styles.userInfoContainer}>
+                        <Avatar
+                          name={item.userName}
+                          source={item.portraitURL}
+                          size={SIZES[24]}
+                        />
+                        <Text style={styles.txtUserName}>{item.userName}</Text>
+                      </View>
+                      <Text style={styles.txtTime}>
+                        {moment(item?.startTime, 'YYYY-MM-DD hh:mm A').format(
+                          'hh:mm A'
+                        )}{' '}
+                        -
+                        {moment(item?.endTime, 'YYYY-MM-DD hh:mm A').format(
+                          'hh:mm A'
+                        )}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          <TouchableOpacity
+            style={styles.closeContainer}
+            onPress={() => setOpenModal(false)}
+          >
+            <Text style={styles.txtClostBtn}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

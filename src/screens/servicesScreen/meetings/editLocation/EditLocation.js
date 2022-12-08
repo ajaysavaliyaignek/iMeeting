@@ -4,7 +4,10 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  ScrollView
+  ScrollView,
+  ToastAndroid,
+  Platform,
+  Alert
 } from 'react-native';
 import React, { useState } from 'react';
 import Header from '../../../../component/header/Header';
@@ -18,26 +21,38 @@ import { styles } from './styles';
 import { Colors } from '../../../../themes/Colors';
 import { useMutation } from '@apollo/client';
 import { UPDATE_LOCATION } from '../../../../graphql/mutation';
-import { GET_ALL_LOCATION } from '../../../../graphql/query';
+import {
+  GET_ALL_LOCATION,
+  GET_ALL_LOCATION_BY_ID
+} from '../../../../graphql/query';
 
 const EditLocation = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { meetingLocation } = route?.params;
+  const { meetingLocation, locationType } = route?.params;
   console.log('location from edit location', meetingLocation);
-  const [linkText, setLinkText] = useState('');
-  const [title, setTitle] = useState('');
-  const [capacity, setCapacity] = useState('');
-  const [city, setCity] = useState('');
-  const [building, setBuilding] = useState('');
-  const [floor, setFloor] = useState('');
-  const [street, setStreet] = useState('');
-  const [room, setRoom] = useState('');
+  console.log('location type', locationType);
+  const [linkText, setLinkText] = useState(meetingLocation?.googleMapURL);
+  const [title, setTitle] = useState(meetingLocation?.title);
+  const [capacity, setCapacity] = useState(
+    meetingLocation?.peopleCapacity.toString()
+  );
+  const [city, setCity] = useState(meetingLocation?.city);
+  const [building, setBuilding] = useState(
+    meetingLocation?.building.toString()
+  );
+  const [floor, setFloor] = useState(meetingLocation?.floor.toString());
+  const [street, setStreet] = useState(meetingLocation?.street);
+  const [room, setRoom] = useState(meetingLocation?.room.toString());
 
   const [editLocation, { data, loading, error: editLocationError }] =
     useMutation(UPDATE_LOCATION, {
       refetchQueries: [
-        { query: GET_ALL_LOCATION, variables: { locationType: 1 } }
+        { query: GET_ALL_LOCATION, variables: { locationType: locationType } },
+        {
+          query: GET_ALL_LOCATION_BY_ID,
+          variables: { locationId: meetingLocation.locationId }
+        }
       ],
       onCompleted: (data) => {
         if (data) {
@@ -74,7 +89,7 @@ const EditLocation = () => {
           <TextInput
             style={styles.textInput}
             onChangeText={(text) => setTitle(text)}
-            value={meetingLocation?.title}
+            value={title}
           />
           <Divider style={styles.divider} />
 
@@ -82,7 +97,8 @@ const EditLocation = () => {
           <TextInput
             style={styles.textInput}
             onChangeText={(text) => setCapacity(text)}
-            value={meetingLocation?.peopleCapacity.toString()}
+            value={capacity}
+            keyboardType="numeric"
           />
           <Divider style={styles.divider} />
         </View>
@@ -94,7 +110,7 @@ const EditLocation = () => {
           <TextInput
             style={styles.textInput}
             onChangeText={(text) => setCity(text)}
-            value={meetingLocation?.city}
+            value={city}
           />
           <Divider style={styles.divider} />
 
@@ -102,7 +118,7 @@ const EditLocation = () => {
           <TextInput
             style={styles.textInput}
             onChangeText={(text) => setStreet(text)}
-            value={meetingLocation?.street}
+            value={street}
           />
           <Divider style={styles.divider} />
 
@@ -112,7 +128,8 @@ const EditLocation = () => {
               <TextInput
                 style={styles.textInput}
                 onChangeText={(text) => setBuilding(text)}
-                value={meetingLocation?.building.toString()}
+                value={building}
+                keyboardType="numeric"
               />
               <Divider style={styles.divider} />
             </View>
@@ -121,7 +138,8 @@ const EditLocation = () => {
               <TextInput
                 style={styles.textInput}
                 onChangeText={(text) => setFloor(text)}
-                value={meetingLocation?.floor.toString()}
+                value={floor}
+                keyboardType="numeric"
               />
               <Divider style={styles.divider} />
             </View>
@@ -130,7 +148,8 @@ const EditLocation = () => {
               <TextInput
                 style={styles.textInput}
                 onChangeText={(text) => setRoom(text)}
-                value={meetingLocation?.room.toString()}
+                value={room}
+                keyboardType="numeric"
               />
               <Divider style={styles.divider} />
             </View>
@@ -148,9 +167,23 @@ const EditLocation = () => {
             <TextInput
               onChangeText={(text) => setLinkText(text)}
               style={{ flex: 1 }}
-              value={meetingLocation?.googleMapURL}
+              value={linkText}
             />
-            <TouchableOpacity onPress={() => Clipboard.setString(linkText)}>
+            <TouchableOpacity
+              onPress={() => {
+                Clipboard.setString(linkText);
+                if (linkText !== '' || linkText !== null) {
+                  if (Platform.OS == 'android') {
+                    ToastAndroid.show(
+                      `Copied Text :-  ${linkText}`,
+                      ToastAndroid.SHORT
+                    );
+                  } else {
+                    Alert.alert(`Copied Text :-  ${linkText}`);
+                  }
+                }
+              }}
+            >
               <Icon
                 name={IconName.CopyText}
                 height={SIZES[20]}
@@ -210,12 +243,12 @@ const EditLocation = () => {
                     city: city,
                     floor: parseInt(floor),
                     googleMapURL: linkText,
-                    locationId: 0,
+                    locationId: meetingLocation.locationId,
                     peopleCapacity: parseInt(capacity),
                     room: parseInt(room),
                     street: street,
                     title: title,
-                    locationType: 1
+                    locationType: locationType
                   }
                 }
               });

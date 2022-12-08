@@ -1,25 +1,29 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { useMutation } from '@apollo/client';
+import { Divider } from 'react-native-paper';
 
 import { Colors } from '../../../themes/Colors';
-import { Fonts } from '../../../themes';
 import Icon from '../../Icon';
 import IconName from '../../Icon/iconName';
-import { Divider } from 'react-native-paper';
 import EditDeleteModal from '../../EditDeleteModal';
-import { SIZES } from '../../../themes/Sizes';
-import { useMutation } from '@apollo/client';
 import { GET_All_SUBJECTS } from '../../../graphql/query';
 import { DELETE_SUBJECTS } from '../../../graphql/mutation';
 import { styles } from './styles';
-import { ModalContext } from '../../../context';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
 
-const SubjectCard = ({ item, index, searchText, search, role }) => {
-  console.log('index', index);
+const SubjectCard = ({
+  item,
+  index,
+  searchText,
+
+  role,
+  valueIndex,
+  setValueIndex,
+  showdots
+}) => {
   const navigation = useNavigation();
-  const [editModal, setEditModal] = useState(false);
 
   const [deleteSubject, { data, loading, error }] = useMutation(
     DELETE_SUBJECTS,
@@ -50,7 +54,7 @@ const SubjectCard = ({ item, index, searchText, search, role }) => {
 
   const onDeleteHandler = (id) => {
     console.log(id);
-    setEditModal(false);
+
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
@@ -99,18 +103,11 @@ const SubjectCard = ({ item, index, searchText, search, role }) => {
   };
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={() => setEditModal(false)}>
+    <TouchableOpacity activeOpacity={1} onPress={() => setValueIndex(-1)}>
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
-      <View
-        style={[styles.committeeDetailView, { paddingHorizontal: 0 }]}
-        onPress={() => {
-          // navigation.navigate("SubjectDetails");
-          setEditModal(false);
-        }}
-        activeOpacity={0.5}
-      >
+      <View style={[styles.committeeDetailView, { paddingHorizontal: 0 }]}>
         {getHighlightedText(item.subjectTitle, searchText)}
         {/* {getHighlightedText(item.subjectTitle)} */}
 
@@ -120,31 +117,31 @@ const SubjectCard = ({ item, index, searchText, search, role }) => {
         {role == 'Head' || role == 'Secretory' ? (
           <RowData
             name={'Status'}
-            discription={item.subjectStatus}
+            discription={item.statusTitle}
             backgroundColor={
-              item.subjectStatus === 'Approved'
+              item.statusTitle === 'Approved'
                 ? Colors.BG_Approved
-                : item.subjectStatus === 'Verified'
+                : item.statusTitle === 'Verified'
                 ? Colors.BG_Verified
-                : item.subjectStatus === 'Rejected'
+                : item.statusTitle === 'Rejected'
                 ? Colors.BG_Rejected
-                : item.subjectStatus === 'Deleted'
+                : item.statusTitle === 'Deleted'
                 ? Colors.BG_Rejected
-                : item.subjectStatus === 'Pending'
+                : item.statusTitle === 'Pending'
                 ? Colors.BG_Pending
                 : Colors.BG_Transferred
             }
             style={{
               color:
-                item.subjectStatus === 'Approved'
+                item.statusTitle === 'Approved'
                   ? Colors.Approved
-                  : item.subjectStatus === 'Verified'
+                  : item.statusTitle === 'Verified'
                   ? Colors.Verified
-                  : item.subjectStatus === 'Rejected'
+                  : item.statusTitle === 'Rejected'
                   ? Colors.Rejected
-                  : item.subjectStatus === 'Deleted'
+                  : item.statusTitle === 'Deleted'
                   ? Colors.Rejected
-                  : item.subjectStatus === 'Pending'
+                  : item.statusTitle === 'Pending'
                   ? Colors.Pending
                   : Colors.Transfered
             }}
@@ -154,37 +151,39 @@ const SubjectCard = ({ item, index, searchText, search, role }) => {
       </View>
 
       {/* dotsView */}
-      <TouchableOpacity
-        onPress={() => setEditModal(!editModal)}
-        style={styles.dotsView}
-      >
-        <Icon name={IconName.Dots} height={16} width={6} />
-      </TouchableOpacity>
-      {editModal && (
+      {showdots && (
+        <TouchableOpacity
+          onPress={() => setValueIndex(valueIndex == -1 ? index : -1)}
+          style={styles.dotsView}
+        >
+          <Icon name={IconName.Dots} height={16} width={6} />
+        </TouchableOpacity>
+      )}
+      {valueIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDownload={() => {
               navigation.navigate('SubjectDownload', { item });
-              setEditModal(false);
+              setValueIndex(-1);
             }}
-            subjectStatus={item.subjectStatus}
+            subjectStatus={item.statusTitle}
             onPressDelete={() => {
               onDeleteHandler(item.subjectId);
-              setEditModal(false);
+              setValueIndex(-1);
             }}
             onPressEdit={() => {
               navigation.navigate('EditSubject', { item });
-              setEditModal(false);
+              setValueIndex(-1);
             }}
             onPressView={() => {
               navigation.navigate('SubjectDetails', { item });
-              setEditModal(false);
+              setValueIndex(-1);
             }}
             download={true}
             editable={
               role == 'Head' || role == 'Secretory'
                 ? true
-                : false || (item.subjectStatus == 'Deleted' && false)
+                : false || (item.statusTitle == 'Deleted' && false)
             }
             deleted={role == 'Head' || role == 'Secretory' ? true : false}
           />

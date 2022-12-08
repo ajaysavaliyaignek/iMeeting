@@ -1,7 +1,8 @@
 import { View, Text, SafeAreaView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
@@ -20,6 +21,7 @@ import {
   GET_PLATFORMLINK
 } from '../../../../graphql/query';
 import { UPDATE_APPOINTMENT } from '../../../../graphql/mutation';
+import { UserContext } from '../../../../context';
 
 const EditAppointmentLocation = () => {
   const navigation = useNavigation();
@@ -56,12 +58,15 @@ const EditAppointmentLocation = () => {
   });
   const [openLocation, setOpenLocation] = useState(false);
   const [valueLocation, setValueLocation] = useState(item.locationId);
+  const [onFocus, setIsFocus] = useState(false);
   const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(
     item.platformName == 'Google Meet' ? 1 : 2
   );
+  const { setSelectedUsers } = useContext(UserContext);
   const [platform, setPlatform] = useState(null);
   const [location, setLocation] = useState([]);
+  const [error, setError] = useState('');
   const [items, setItems] = useState([
     { label: 'Office 2', value: 'Office 2' }
   ]);
@@ -113,7 +118,7 @@ const EditAppointmentLocation = () => {
     refetchQueries: [
       {
         query: GET_All_APPOINTMENT,
-        variables: { searchValue: '' }
+        variables: { searchValue: '', page: -1, pageSize: -1 }
       }
     ],
     onCompleted: (data) => {
@@ -127,12 +132,20 @@ const EditAppointmentLocation = () => {
     }
   });
 
+  const handleViewDetails = () => {
+    navigation.navigate('LocationDetails', {
+      locationId: valueLocation,
+      platform: platform,
+      locationType: 2
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
         name={'Edit appointment'}
         rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
+        onRightPress={() => navigation.navigate('AppointmentsList')}
       />
       <View style={styles.subContainer}>
         <View style={styles.progressContainer}>
@@ -147,35 +160,44 @@ const EditAppointmentLocation = () => {
         </View>
 
         <Text style={styles.txtAddSubjectTitle}>Location</Text>
+        {error && (
+          <Text style={{ alignSelf: 'center', color: Colors.Rejected }}>
+            {error}
+          </Text>
+        )}
         <View style={styles.locationContainer}>
           <Text style={styles.txtTitle}>LOCATION</Text>
-          <DropDownPicker
-            listMode="SCROLLVIEW"
-            open={openLocation}
-            value={valueLocation}
-            items={location?.map((item) => ({
-              label: item.title,
-              value: item.locationId
-            }))}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            setOpen={() => {
-              setOpenLocation(!openLocation);
-            }}
-            setValue={setValueLocation}
-            setItems={setItems}
-            placeholder={item.locationName}
+          <Dropdown
             placeholderStyle={{
               ...Fonts.PoppinsRegular[14]
             }}
+            data={location?.map((item) => ({
+              label: item.title,
+              value: item.locationId
+            }))}
             style={{
               borderWidth: 0,
               paddingRight: SIZES[16],
               paddingLeft: 0
             }}
             textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            // search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={item.locationName}
+            arrowIconStyle={{
+              height: SIZES[12],
+              width: SIZES[14]
+            }}
+            searchPlaceholder="Search..."
+            value={valueLocation}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setValueLocation(item.value);
+              setIsFocus(false);
+            }}
           />
           <Divider style={styles.divider} />
         </View>
@@ -183,7 +205,11 @@ const EditAppointmentLocation = () => {
         <View style={styles.buttonContainer}>
           <Button
             title={'View details'}
-            onPress={() => navigation.navigate('LocationDetails')}
+            onPress={() =>
+              valueLocation == null
+                ? setError('Please select location')
+                : handleViewDetails()
+            }
             layoutStyle={styles.cancelBtnLayout}
             textStyle={styles.txtCancelButton}
           />
@@ -202,9 +228,48 @@ const EditAppointmentLocation = () => {
           />
         </View>
 
-        <View style={styles.locationContainer}>
+        <View style={styles.videoContainer}>
           <Text style={styles.txtTitle}>VIDEO CONFERENCING PLATFORM</Text>
-          <DropDownPicker
+          <Dropdown
+            placeholderStyle={{
+              ...Fonts.PoppinsRegular[12],
+              color: Colors.secondary
+            }}
+            data={[
+              {
+                value: 1,
+                label: 'Google Meet'
+              },
+              {
+                value: 2,
+                label: 'Microsoft Teams'
+              }
+            ]}
+            style={{
+              borderWidth: 0,
+              paddingRight: SIZES[16],
+              paddingLeft: 0
+            }}
+            textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            // search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={''}
+            arrowIconStyle={{
+              height: SIZES[12],
+              width: SIZES[14]
+            }}
+            searchPlaceholder="Search..."
+            value={valueVideoConference}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setValueVideoConference(item.value);
+              setIsFocus(false);
+            }}
+          />
+          {/* <DropDownPicker
             listMode="SCROLLVIEW"
             open={openVideoConference}
             value={valueVideoConference}
@@ -237,7 +302,7 @@ const EditAppointmentLocation = () => {
               paddingLeft: 0
             }}
             textStyle={{ ...Fonts.PoppinsRegular[14] }}
-          />
+          /> */}
           <Divider style={styles.divider} />
         </View>
       </View>
@@ -261,6 +326,7 @@ const EditAppointmentLocation = () => {
           <Button
             title={'Save'}
             onPress={() => {
+              setSelectedUsers([]);
               console.log(valueLocation, platform.platformId);
               addAppointment({
                 variables: {
@@ -271,7 +337,8 @@ const EditAppointmentLocation = () => {
                     attachFileIds: attachFiles,
                     committeeId: committee,
                     locationId: valueLocation,
-                    platformId: platform.platformId,
+                    platformId:
+                      valueVideoConference !== null ? valueVideoConference : 0,
                     repeat: Repeat,
                     required: userRequired,
                     setDate: startDate,

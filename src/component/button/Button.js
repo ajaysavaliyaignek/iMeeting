@@ -5,17 +5,9 @@ import { Fonts } from '../../themes';
 import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
 
-const _Button = ({
-  onPress,
-  title,
-  textStyle,
-  layoutStyle,
-  icon,
-  disable = false
-}) => {
+const _Button = ({ onPress, title, textStyle, layoutStyle, icon, disable }) => {
   return (
     <TouchableOpacity
-      // activeOpacity={0.7}
       onPress={onPress}
       disabled={disable}
       style={[style.layout, { backgroundColor: Colors.primary }, layoutStyle]}

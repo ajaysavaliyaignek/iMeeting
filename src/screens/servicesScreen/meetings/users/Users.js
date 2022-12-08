@@ -1,13 +1,20 @@
-import { View, SafeAreaView, TextInput, FlatList } from 'react-native';
-import React, { useContext, useState } from 'react';
+import {
+  View,
+  SafeAreaView,
+  TextInput,
+  FlatList,
+  TouchableOpacity
+} from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import Voice from '@react-native-community/voice';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+
 import { styles } from './styles';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
-import { usersData } from '../../../../Constans/data';
 import UserCard from '../../../../component/Cards/userCard/UserCard';
-import { Divider } from 'react-native-paper';
 import { UserContext } from '../../../../context';
 
 const Users = () => {
@@ -16,7 +23,54 @@ const Users = () => {
   const { userDetails } = route?.params;
   console.log('userdetails from users', userDetails);
   const [searchText, setSearchText] = useState('');
+  const [filterData, setFilterData] = useState(userDetails);
   const { required, setRequired } = useContext(UserContext);
+
+  const searchFilterUsers = (text) => {
+    if (text) {
+      const newData = userDetails?.filter((item) => {
+        const itemData = item.userName ? item.userName : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+      setSearchText(text);
+      setFilterData(newData);
+    } else {
+      setSearchText(text);
+      setFilterData(userDetails);
+    }
+  };
+
+  useEffect(() => {
+    Voice.onSpeechStart = onSpeechStartHandler;
+    Voice.onSpeechEnd = onSpeechEndHandler;
+    Voice.onSpeechResults = onSpeechResultsHandler;
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const onSpeechStartHandler = (e) => {
+    console.log('startHandler', e);
+  };
+
+  const onSpeechEndHandler = (e) => {
+    console.log('onSpeechEndHandler', e);
+  };
+
+  const onSpeechResultsHandler = (e) => {
+    console.log('onSpeechResultsHandler', e);
+    let text = e.value[0];
+    setSearchText(text);
+  };
+  const startRecording = async () => {
+    try {
+      await Voice.start('en-US');
+    } catch (error) {
+      console.log('voice error', error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,15 +85,23 @@ const Users = () => {
           <TextInput
             style={styles.textInput}
             placeholder={'Search'}
-            onChangeText={(text) => setSearchText(text)}
+            onChangeText={(text) => searchFilterUsers(text)}
           />
-          <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
+          <TouchableOpacity onPress={() => startRecording()}>
+            <Icon
+              name={IconName.Speaker}
+              height={SIZES[15]}
+              width={SIZES[10]}
+            />
+          </TouchableOpacity>
         </View>
         <Divider style={styles.divider} />
 
         <FlatList
-          data={userDetails}
-          keyExtractor={({ item, index }) => `user-${index}`}
+          data={filterData}
+          keyExtractor={(item, index) => {
+            return index.toString();
+          }}
           renderItem={({ item, index }) => (
             <UserCard
               item={item}

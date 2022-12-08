@@ -51,15 +51,15 @@ export const styles = StyleSheet.create({
     borderBottomWidth: SIZES[1],
     borderBottomColor: Colors.line
   },
-  textInput: {
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.bold,
-    backgroundColor: 'transparent',
-    flex: 1,
-    marginHorizontal: SIZES[6],
-    // height: SIZES[36],
-    paddingVertical: 8
-  },
+  // textInput: {
+  //   ...Fonts.PoppinsRegular[14],
+  //   color: Colors.bold,
+  //   backgroundColor: 'transparent',
+  //   flex: 1,
+  //   marginHorizontal: SIZES[6],
+  //   // height: SIZES[36],
+  //   paddingVertical: 8
+  // },
   categoryContainer: {
     marginTop: SIZES[24],
     borderBottomWidth: SIZES[1],
@@ -81,15 +81,30 @@ export const styles = StyleSheet.create({
     ...Fonts.PoppinsRegular[14],
     color: Colors.secondary
   },
+  // searchContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   paddingHorizontal: SIZES[10],
+  //   backgroundColor: Colors.gray,
+  //   borderRadius: SIZES[10],
+  //   marginVertical: SIZES[22],
+  //   justifyContent: 'center'
+  //   // height: SIZES[36]
+  // },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SIZES[10],
+
+    height: Platform.OS == 'ios' ? SIZES[36] : null,
     backgroundColor: Colors.gray,
+    paddingHorizontal: SIZES[16],
     borderRadius: SIZES[10],
-    marginVertical: SIZES[22],
-    justifyContent: 'center'
-    // height: SIZES[36]
+    marginVertical: SIZES[22]
+  },
+  textInput: {
+    ...Fonts.PoppinsRegular[14],
+    flex: 1,
+    marginLeft: SIZES[6]
   },
   txtBtnCommittees: {
     ...Fonts.PoppinsRegular[14],

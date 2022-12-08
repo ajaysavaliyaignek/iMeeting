@@ -21,9 +21,9 @@ const SubjectsCard = ({
   index,
   searchText,
   visibleIndex,
-  setVisibleIndex
+  setVisibleIndex,
+  subjectStatus
 }) => {
-  console.log('index', index);
   const navigation = useNavigation();
 
   const [deleteSubject, { data, loading, error }] = useMutation(
@@ -34,7 +34,10 @@ const SubjectsCard = ({
         {
           query: GET_All_SUBJECTS,
           variables: {
-            screen: 0
+            searchValue: '',
+            screen: 0,
+            page: -1,
+            pageSize: -1
           }
         }
       ]
@@ -55,7 +58,7 @@ const SubjectsCard = ({
 
   const onDeleteHandler = (id) => {
     console.log(id);
-    setEditModal(false);
+
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
@@ -104,7 +107,12 @@ const SubjectsCard = ({
   };
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={() => setVisibleIndex(-1)}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={() => setVisibleIndex(-1)}
+      style={{ flex: 1, overflow: 'visible' }}
+      key={index}
+    >
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
@@ -123,38 +131,40 @@ const SubjectsCard = ({
         <RowData name={'ID'} discription={item.subjectId} />
         <RowData name={'Category'} discription={item.subjectCategoryName} />
         <RowData name={'Creator'} discription={item.createrName} />
-        <RowData
-          name={'Status'}
-          discription={item.subjectStatus}
-          backgroundColor={
-            item.subjectStatus === 'Approved'
-              ? Colors.BG_Approved
-              : item.subjectStatus === 'Verified'
-              ? Colors.BG_Verified
-              : item.subjectStatus === 'Rejected'
-              ? Colors.BG_Rejected
-              : item.subjectStatus === 'Deleted'
-              ? Colors.BG_Rejected
-              : item.subjectStatus === 'Pending'
-              ? Colors.BG_Pending
-              : Colors.BG_Transferred
-          }
-          style={{
-            color:
-              item.subjectStatus === 'Approved'
-                ? Colors.Approved
-                : item.subjectStatus === 'Verified'
-                ? Colors.Verified
-                : item.subjectStatus === 'Rejected'
-                ? Colors.Rejected
-                : item.subjectStatus === 'Deleted'
-                ? Colors.Rejected
-                : item.subjectStatus === 'Pending'
-                ? Colors.Pending
-                : Colors.Transfered
-          }}
-          marginLeft={24}
-        />
+        {subjectStatus && (
+          <RowData
+            name={'Status'}
+            discription={item.statusTitle}
+            backgroundColor={
+              item.statusTitle === 'Approved'
+                ? Colors.BG_Approved
+                : item.statusTitle === 'Verified'
+                ? Colors.BG_Verified
+                : item.statusTitle === 'Rejected'
+                ? Colors.BG_Rejected
+                : item.statusTitle === 'Deleted'
+                ? Colors.BG_Rejected
+                : item.statusTitle === 'Pending'
+                ? Colors.BG_Pending
+                : Colors.BG_Transferred
+            }
+            style={{
+              color:
+                item.statusTitle === 'Approved'
+                  ? Colors.Approved
+                  : item.statusTitle === 'Verified'
+                  ? Colors.Verified
+                  : item.statusTitle === 'Rejected'
+                  ? Colors.Rejected
+                  : item.statusTitle === 'Deleted'
+                  ? Colors.Rejected
+                  : item.statusTitle === 'Pending'
+                  ? Colors.Pending
+                  : Colors.Transfered
+            }}
+            marginLeft={24}
+          />
+        )}
       </View>
 
       {/* dotsView */}
@@ -171,7 +181,7 @@ const SubjectsCard = ({
               navigation.navigate('SubjectDownload', { item });
               setVisibleIndex(-1);
             }}
-            subjectStatus={item.subjectStatus}
+            subjectStatus={item.statusTitle}
             onPressDelete={() => {
               onDeleteHandler(item.subjectId);
               setVisibleIndex(-1);
@@ -185,7 +195,7 @@ const SubjectsCard = ({
               setVisibleIndex(-1);
             }}
             download={true}
-            editable={item.subjectStatus === 'Deleted' ? false : true}
+            editable={item.statusTitle === 'Deleted' ? false : true}
             deleted={true}
           />
         </View>

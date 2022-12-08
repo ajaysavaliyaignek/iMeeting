@@ -7,7 +7,7 @@ import {
   PermissionsAndroid,
   Platform
 } from 'react-native';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
@@ -16,6 +16,7 @@ import { Divider } from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNFetchBlob from 'rn-fetch-blob';
 
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
@@ -32,16 +33,15 @@ import {
   GET_FILE,
   GET_MEETING_BY_ID
 } from '../../../../graphql/query';
-import RNFetchBlob from 'rn-fetch-blob';
+import { UserContext } from '../../../../context';
 
 const EditMeetingGeneralScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { item } = route?.params;
-  console.log('item', item);
+  const { meetingsData, setMeetingsData } = useContext(UserContext);
 
   const [open, setOpen] = useState(false);
-
   const [committee, setCommittee] = useState(null);
   const [committeeData, setCommitteeData] = useState(null);
   const [items, setItems] = useState([{ label: 'Design', value: 'design' }]);
@@ -49,88 +49,11 @@ const EditMeetingGeneralScreen = () => {
   const [filesId, setFilesId] = useState([]);
   const [token, setToken] = useState('');
   const [meeting, setMeeting] = useState(null);
-  console.log('committeeData', committeeData);
   const [valueCommitee, setValue] = useState(item?.committeeId);
   const [title, setTitle] = useState(item?.meetingTitle);
   const [discription, setDiscription] = useState(item.description);
   const [error, setError] = useState('');
   let fileId = [];
-
-  const checkPermission = async (file) => {
-    console.log('check permissions', file);
-    if (Platform.OS === 'ios') {
-      downloadFile(file);
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download File'
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-          downloadFile(file);
-          console.log('Storage Permission Granted.');
-        } else {
-          // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
-        }
-      } catch (err) {
-        // To handle permission related exception
-        console.log('++++' + err);
-      }
-    }
-  };
-
-  const downloadFile = (file) => {
-    console.log('downloadfile', file);
-
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(FILE_URL);
-
-    // file_ext = '.' + file_ext[0];
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    let RootDir =
-      Platform.OS === 'ios' ? fs.dirs.DocumentDir : fs.dirs.PictureDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2),
-
-        description: 'downloading file...',
-        notification: true,
-        // useDownloadManager works with Android only
-        useDownloadManager: true
-      }
-    };
-    config(options)
-      .fetch('GET', file)
-      .then((res) => {
-        // Alert after successful downloading
-        console.log('res -> ', res.respInfo.redirects[0]);
-        alert('File Downloaded Successfully.');
-        if (Platform.OS == 'ios') {
-          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
-        }
-      });
-  };
-
-  const getFileExtention = (fileUrl) => {
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
 
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
@@ -354,9 +277,7 @@ const EditMeetingGeneralScreen = () => {
                   key={index}
                   filePath={file.name}
                   fileSize={file.size}
-                  onDownloadPress={() => {
-                    checkPermission(file.downloadUrl);
-                  }}
+                  fileUrl={file.downloadUrl}
                   fileType={file.type}
                   onRemovePress={() => removeFile(file)}
                   style={{
@@ -404,11 +325,14 @@ const EditMeetingGeneralScreen = () => {
           <Button
             title={'Next'}
             onPress={() => {
-              navigation.navigate('EditMeetingUser', {
+              setMeetingsData({
+                ...meetingsData,
                 attachFiles: filesId,
                 committee: valueCommitee,
                 title: title,
-                discription: discription,
+                discription: discription
+              });
+              navigation.navigate('EditMeetingUser', {
                 item: item
               });
               // navigation.setParams();

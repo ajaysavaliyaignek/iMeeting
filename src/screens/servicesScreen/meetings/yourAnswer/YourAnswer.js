@@ -1,5 +1,13 @@
-import { View, Text, SafeAreaView, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
 import React, { useState } from 'react';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { styles } from './styles';
@@ -12,6 +20,11 @@ import { Divider } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useMutation } from '@apollo/client';
 import { UPDATE_ANSWER } from '../../../../graphql/mutation';
+import moment from 'moment';
+import {
+  GET_All_APPOINTMENT,
+  GET_All_MEETING
+} from '../../../../graphql/query';
 
 const YourAnswer = () => {
   const navigation = useNavigation();
@@ -21,6 +34,7 @@ const YourAnswer = () => {
   const [open, setOpen] = useState(false);
   const [valueAnswer, setValue] = useState(null);
   const [suggestedTime, setSuggestedTime] = useState('');
+  const [openTimePicker, setOpenTimePicker] = useState(false);
   const [items, setItems] = useState([
     { label: 'Yes', value: 'Yes' },
     { label: 'No', value: 'No' },
@@ -29,13 +43,47 @@ const YourAnswer = () => {
   ]);
 
   const [updateAnswer] = useMutation(UPDATE_ANSWER, {
+    refetchQueries: [
+      {
+        query: GET_All_MEETING,
+        variables: {
+          onlyMyMeeting: false,
+          committeeIds: '',
+          screen: 0,
+          searchValue: '',
+          page: -1,
+          pageSize: -1
+        }
+      },
+      {
+        query: GET_All_APPOINTMENT,
+        variables: {
+          searchValue: '',
+          page: -1,
+          pageSize: -1
+        }
+      }
+    ],
     onCompleted: (data) => {
-      console.log('answer', data.updateAnswer);
+      console.log('add answer status', data.updateAnswer);
+      if (data.updateAnswer.status[0].statusCode == 200) {
+        navigation.goBack();
+      }
     },
     onError: (data) => {
       console.log('update answer error', data);
     }
   });
+
+  const handleConfirmClock = (date) => {
+    console.log('A date has been picked: ', date);
+
+    const time = moment(date).format('LT');
+    setSuggestedTime(time);
+    console.log('time', time);
+    setOpenTimePicker(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -69,12 +117,26 @@ const YourAnswer = () => {
           {/* <TextInput style={styles.textInput} /> */}
         </View>
         {valueAnswer == 'Suggest time' ? (
-          <View style={styles.inputContainer}>
-            <Text style={styles.txtTitle}>YOUR SUGGESTION TIME</Text>
-            <TextInput
-              onChangeText={(text) => setSuggestedTime(text)}
-              style={styles.input}
-              // editable={suggestedTime == 'Suggest time' ? true : false}
+          <View>
+            <TouchableOpacity
+              style={styles.inputContainer}
+              onPress={() => setOpenTimePicker(!openTimePicker)}
+            >
+              <Text style={styles.txtTitle}>YOUR SUGGESTION TIME</Text>
+              <TextInput
+                onChangeText={(text) => setSuggestedTime(text)}
+                style={styles.input}
+                editable={false}
+                value={suggestedTime}
+              />
+            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={openTimePicker}
+              mode="time"
+              onConfirm={handleConfirmClock}
+              onCancel={() => setOpenTimePicker(false)}
+              minimumDate={new Date()}
+              date={new Date()}
             />
           </View>
         ) : null}
@@ -99,14 +161,27 @@ const YourAnswer = () => {
             layoutStyle={[styles.nextBtnLayout]}
             textStyle={styles.txtNextBtn}
             onPress={() => {
+              console.log('add answer data', {
+                answer: valueAnswer,
+                appointmentId:
+                  item?.appointmentId == undefined ? 0 : item?.appointmentId,
+                suggestionTime:
+                  valueAnswer == 'Suggest time' ? suggestedTime : '',
+                meetingId: item?.meetingId == undefined ? 0 : item?.meetingId,
+                videoConferenceId: 0
+              });
               updateAnswer({
                 variables: {
                   answer: {
-                    answer: suggestedTime,
-                    appointmentId: 901,
+                    answer: valueAnswer,
+                    appointmentId:
+                      item?.appointmentId == undefined
+                        ? 0
+                        : item?.appointmentId,
                     suggestionTime:
-                      valueAnswer == 'Suggest time' ? suggestedTime : null,
-                    meetingId: item.meetingId,
+                      valueAnswer == 'Suggest time' ? suggestedTime : '',
+                    meetingId:
+                      item?.meetingId == undefined ? 0 : item?.meetingId,
                     videoConferenceId: 0
                   }
                 }

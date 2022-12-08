@@ -6,7 +6,7 @@ import {
   TextInput,
   FlatList
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
@@ -19,24 +19,28 @@ import { GET_All_APPOINTMENT } from '../../../../graphql/query';
 import { Fonts } from '../../../../themes';
 import { Colors } from '../../../../themes/Colors';
 import Loader from '../../../../component/Loader/Loader';
+import { UserContext } from '../../../../context';
 
 const AppointmentsList = () => {
   const navigation = useNavigation();
   const [search, setSearch] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [appointmentsData, setAppointmentsData] = useState([]);
+  const [appointmentsData, setAppointmentData] = useState([]);
+  const { setSelectedUsers, setAppointmentsData } = useContext(UserContext);
   const [filterAppointmentsData, setFilterAppointmentsData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   // get ALL appointment
   const Appointment = useQuery(GET_All_APPOINTMENT, {
     variables: {
-      searchValue: searchText
+      searchValue: searchText,
+      page: -1,
+      pageSize: -1
     },
 
     onCompleted: (data) => {
       console.log('all appointment', data?.appointments.items);
 
-      setAppointmentsData(data?.appointments.items);
+      setAppointmentData(data?.appointments.items);
     },
     onError: (data) => {
       console.log('all appointment error', data);
@@ -64,8 +68,17 @@ const AppointmentsList = () => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              setSelectedUsers([]);
+
               navigation.navigate('AddAppointmentGeneral');
             }}
+            style={{
+              height: 20,
+              width: 20,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            activeOpacity={0.8}
           >
             <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />
           </TouchableOpacity>
@@ -126,7 +139,10 @@ const AppointmentsList = () => {
         {appointmentsData.length > 0 ? (
           <FlatList
             data={appointmentsData}
-            keyExtractor={(item) => `${item.id}`}
+            keyExtractor={(item, index) => {
+              return index.toString();
+            }}
+            key={(item, index) => `${item.appointmentId}`}
             renderItem={({ item, index }) => {
               return (
                 <AppoinmentCard

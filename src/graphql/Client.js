@@ -31,7 +31,7 @@ export const Client = () => {
   };
 
   console.log('url from client', url);
-  const BASE_URL = 'finance2.imeetingpro.com';
+
   const httpLink = createUploadLink({
     uri: `https://${url}//o/graphql`
   });

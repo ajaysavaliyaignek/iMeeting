@@ -7,6 +7,7 @@ import {
   Platform
 } from 'react-native';
 import React, { useState } from 'react';
+import FileViewer from 'react-native-file-viewer';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, Switch } from 'react-native-paper';
@@ -20,6 +21,7 @@ import { Button } from '../../../../component/button/Button';
 import Header from '../../../../component/header/Header';
 import { styles } from './styles';
 import { GET_ZIP_PDF_DOWNLOAD } from '../../../../graphql/query';
+import moment from 'moment';
 
 const SubjectDownload = () => {
   const route = useRoute();
@@ -29,18 +31,26 @@ const SubjectDownload = () => {
   const [open, setOpen] = useState(false);
   const [valueType, setValueType] = useState(null);
   const [items, setItems] = useState([
-    { label: 'PDF', value: '.PDF' },
-    { label: 'ZIP', value: '.ZIP' }
+    { label: 'PDF', value: 'pdf' },
+    { label: 'ZIP', value: 'zip' }
   ]);
   const [isAttachFileSwitchOn, setIsAttachFileSwitchOn] = useState(false);
   const [isCommentsSwitchOn, setIsCommentsSwitchOn] = useState(false);
   const [base64, setBese64] = useState(null);
   const [fileName, setFileName] = useState(null);
 
-  const checkPermission = async (file) => {
+  const checkPermission = async () => {
     console.log('check permission');
     if (Platform.OS === 'ios') {
-      downloadFile(file);
+      downloadFiles({
+        variables: {
+          attachFile: isAttachFileSwitchOn,
+          comments: isCommentsSwitchOn,
+          format: valueType,
+          id: item?.subjectId,
+          type: 2
+        }
+      });
     } else {
       try {
         const granted = await PermissionsAndroid.request(
@@ -50,10 +60,25 @@ const SubjectDownload = () => {
             message: 'Application needs access to your storage to download File'
           }
         );
+
+        const readGranted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            title: 'Storage Permission Required',
+            message: 'Application needs access to your storage to download File'
+          }
+        );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-          downloadFile(file);
           console.log('Storage Permission Granted.');
+          downloadFiles({
+            variables: {
+              attachFile: isAttachFileSwitchOn,
+              comments: isCommentsSwitchOn,
+              format: valueType,
+              id: item?.subjectId,
+              type: 2
+            }
+          });
         } else {
           // If permission denied then show alert
           Alert.alert('Error', 'Storage Permission Not Granted');
@@ -65,81 +90,53 @@ const SubjectDownload = () => {
     }
   };
 
-  const downloadFile = (file) => {
-    console.log('downloadfile');
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(fileName);
-
-    file_ext = '.' + file_ext[0];
-    console.log('file_ext', file_ext);
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    let RootDir = fs.dirs.DCIMDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          file_ext,
-        description: 'downloading file...',
-        notification: true,
-        // useDownloadManager works with Android only
-        useDownloadManager: true
-      }
-    };
-    RNFetchBlob.config(options)
-      .fetch('GET', FILE_URL)
-      .then((res) => {
-        // Alert after successful downloading
-        console.log('res -> ', `${res.data}.pdf`);
-        alert('File Downloaded Successfully.');
-        if (Platform.OS == 'ios') {
-          RNFetchBlob.ios.openDocument(`${res.data}.pdf`);
-        }
-      });
-  };
-
-  const getFileExtention = (fileUrl) => {
-    console.log('fileUrl', fileUrl);
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
-
   const [downloadFiles, { loading, data }] = useLazyQuery(
     GET_ZIP_PDF_DOWNLOAD,
     {
-      onCompleted: (data, error) => {
-        // console.log(
-        //   'data filedowload',
-        //   data.report,
-        //   'error filedowload',
-        //   error
-        // );
-        // const sampleArr = base64ToArrayBuffer(data.report.fileData.base64);
-        // saveByteArray(data.report.fileData.fileName, sampleArr);
-        // readFile(
-        //   data.report.fileData.base64.toString(),
-        //   data.report.fileData.fileName.toString()
-        // );
-        // checkPermission(data.report.fileData);
-        setBese64(data?.report?.fileData.base64);
-        setFileName(data?.report?.fileData.fileName);
-        if (base64) {
-          checkPermission(`data:application/pdf;base64,${base64}`);
+      onCompleted: async (data, error) => {
+        let base64Str = data?.report?.fileData.base64;
+
+        let fPath = Platform.select({
+          ios: RNFetchBlob.fs.dirs.DocumentDir,
+          android: RNFetchBlob.fs.dirs.DownloadDir
+        });
+
+        fPath = `${fPath}/${Date.now()}.${valueType}`;
+
+        console.log('file path', fPath);
+
+        if (Platform.OS == 'ios') {
+          await RNFetchBlob.fs.createFile(fPath, base64Str, 'base64');
+        } else {
+          await RNFetchBlob.config({
+            addAndroidDownloads: {
+              title: 'Downloading',
+              useDownloadManager: true,
+              mediaScannable: true,
+              notification: true,
+              description: 'File downloaded by download manager.',
+              path: fPath
+            }
+          });
+          await RNFetchBlob.fs.writeFile(fPath, base64Str, 'base64');
+        }
+
+        if (Platform.OS == 'ios') {
+          RNFetchBlob.ios.openDocument(fPath);
+        } else {
+          console.log('file path2', fPath);
+
+          RNFetchBlob.android.actionViewIntent(fPath);
+          await FileViewer.open(fPath, { showOpenWithDialog: true });
         }
       },
 
       fetchPolicy: 'cache-and-network'
     }
   );
+  // if (base64) {
+  //   checkPermission(`data:application/${valueType};base64,${base64}`);
+  // }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -198,25 +195,14 @@ const SubjectDownload = () => {
           <Button
             title={'Cancel'}
             // onPress={onCancelHandler}
+            onPress={() => navigation.goBack()}
             layoutStyle={styles.cancelBtnLayout}
             textStyle={styles.txtCancelButton}
           />
           <Button
             title={'Save'}
             onPress={() => {
-              console.log('isAttachFileSwitchOn', isAttachFileSwitchOn);
-              console.log('comments', isCommentsSwitchOn);
-              console.log('format', valueType);
-              console.log('id', item?.subjectId);
-              downloadFiles({
-                variables: {
-                  attachFile: isAttachFileSwitchOn,
-                  comments: isCommentsSwitchOn,
-                  format: valueType,
-                  id: item?.subjectId,
-                  type: 2
-                }
-              });
+              checkPermission();
             }}
             layoutStyle={[styles.nextBtnLayout]}
             textStyle={styles.txtNextBtn}

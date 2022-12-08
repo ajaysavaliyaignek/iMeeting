@@ -140,7 +140,9 @@ const TasksList = () => {
         {tasksData.length > 0 ? (
           <FlatList
             data={tasksData}
-            keyExtractor={(item) => `${item.taskId}`}
+            keyExtractor={(item, index) => {
+              return index.toString();
+            }}
             renderItem={({ item, index }) => {
               return (
                 <TasksDetailsCard

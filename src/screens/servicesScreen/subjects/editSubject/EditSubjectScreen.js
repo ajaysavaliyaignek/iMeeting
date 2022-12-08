@@ -64,7 +64,7 @@ const EditSubjectScreen = () => {
             const pevDaa = prev.filter((ite) => {
               return ite.fileEnteryId !== data.fileEnteryId;
             });
-            return [...pevDaa, data];
+            return [...pevDaa, data.uploadedFile];
           });
         }
       }
@@ -261,7 +261,18 @@ const EditSubjectScreen = () => {
 
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
     // export const GET_All_SUBJECTS = gql`
-    refetchQueries: [{ query: GET_All_SUBJECTS, variables: { screen: 0 } }]
+    refetchQueries: [
+      {
+        query: GET_All_SUBJECTS,
+        variables: {
+          committeeIds: '',
+          searchValue: searchText,
+          screen: 0,
+          page: -1,
+          pageSize: -1
+        }
+      }
+    ]
   });
   if (data) {
     console.log(data);
@@ -436,7 +447,7 @@ const EditSubjectScreen = () => {
                       key={index}
                       filePath={file.name}
                       fileSize={file.size}
-                      onDownloadPress={() => checkPermission(file.downloadUrl)}
+                      fileUrl={file.downloadUrl}
                       fileType={file.type}
                       onRemovePress={() => removeFile(file)}
                       download={true}
@@ -497,7 +508,8 @@ const EditSubjectScreen = () => {
                         description: discription,
                         subjectCategoryId: valueCategory,
                         draft: false,
-                        attachFileIds: filesId
+                        attachFileIds: filesId,
+                        id: 0
                       }
                     },
                     onCompleted: () => {

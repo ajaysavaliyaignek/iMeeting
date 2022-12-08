@@ -1,7 +1,8 @@
 import { View, Text, SafeAreaView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
@@ -15,42 +16,22 @@ import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
+import { UserContext } from '../../../../context';
 
 const AddMeetingLocation = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat,
-    userRequired
-  } = route?.params;
-  console.log('meeting data from addmeetinglocation', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat,
-    userRequired
-  });
+  const { meetingsData, setMeetingsData } = useContext(UserContext);
+
+  console.log('meeting data from addmeetinglocation', meetingsData);
   const [openLocation, setOpenLocation] = useState(false);
-  const [valueLocation, setValueLocation] = useState(null);
+  const [onFocus, setIsFocus] = useState(false);
+  const [valueLocation, setValueLocation] = useState(
+    meetingsData?.location ? meetingsData?.location : null
+  );
   const [openVideoConference, setOpenVideoConference] = useState(false);
-  const [valueVideoConference, setValueVideoConference] = useState(null);
+  const [valueVideoConference, setValueVideoConference] = useState(
+    meetingsData?.videoConference ? meetingsData?.videoConference : null
+  );
   const [platform, setPlatform] = useState(null);
   const [location, setLocation] = useState([]);
   const [error, setError] = useState(null);
@@ -104,7 +85,8 @@ const AddMeetingLocation = () => {
   const handleViewDetails = () => {
     navigation.navigate('LocationDetails', {
       locationId: valueLocation,
-      platform: platform
+      platform: platform,
+      locationType: 1
     });
   };
 
@@ -135,37 +117,38 @@ const AddMeetingLocation = () => {
         )}
         <View style={styles.locationContainer}>
           <Text style={styles.txtTitle}>LOCATION</Text>
-          <DropDownPicker
-            listMode="SCROLLVIEW"
-            open={openLocation}
-            value={valueLocation}
-            items={location?.map((item) => ({
-              label: item.title,
-              value: item.locationId
-            }))}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            setOpen={() => {
-              setOpenLocation(!openLocation);
-            }}
-            setValue={(value) => {
-              setValueLocation(value);
-              setError(null);
-            }}
-            setItems={setItems}
-            placeholder={''}
+          <Dropdown
             placeholderStyle={{
               ...Fonts.PoppinsRegular[12],
               color: Colors.secondary
             }}
+            data={location?.map((item) => ({
+              label: item.title,
+              value: item.locationId
+            }))}
             style={{
               borderWidth: 0,
               paddingRight: SIZES[16],
               paddingLeft: 0
             }}
             textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            // search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={''}
+            arrowIconStyle={{
+              height: SIZES[12],
+              width: SIZES[14]
+            }}
+            searchPlaceholder="Search..."
+            value={valueLocation}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setValueLocation(item.value);
+              setIsFocus(false);
+            }}
           />
           <Divider style={styles.divider} />
         </View>
@@ -197,13 +180,14 @@ const AddMeetingLocation = () => {
           />
         </View>
 
-        <View style={styles.locationContainer}>
+        <View style={styles.videoContainer}>
           <Text style={styles.txtTitle}>VIDEO CONFERENCING PLATFORM</Text>
-          <DropDownPicker
-            listMode="SCROLLVIEW"
-            open={openVideoConference}
-            value={valueVideoConference}
-            items={[
+          <Dropdown
+            placeholderStyle={{
+              ...Fonts.PoppinsRegular[12],
+              color: Colors.secondary
+            }}
+            data={[
               {
                 value: 1,
                 label: 'Google Meet'
@@ -213,26 +197,29 @@ const AddMeetingLocation = () => {
                 label: 'Microsoft Teams'
               }
             ]}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            setOpen={() => {
-              setOpenVideoConference(!openVideoConference);
-            }}
-            setValue={setValueVideoConference}
-            setItems={setItems}
-            placeholder={''}
-            placeholderStyle={{
-              ...Fonts.PoppinsRegular[12],
-              color: Colors.secondary
-            }}
             style={{
               borderWidth: 0,
               paddingRight: SIZES[16],
               paddingLeft: 0
             }}
             textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            // search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={''}
+            arrowIconStyle={{
+              height: SIZES[12],
+              width: SIZES[14]
+            }}
+            searchPlaceholder="Search..."
+            value={valueVideoConference}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setValueVideoConference(item.value);
+              setIsFocus(false);
+            }}
           />
           <Divider style={styles.divider} />
         </View>
@@ -250,37 +237,44 @@ const AddMeetingLocation = () => {
         >
           <Button
             title={'Back'}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              navigation.goBack();
+              setMeetingsData({
+                ...meetingsData,
+                platform: platform,
+                location: valueLocation,
+                videoConference: valueVideoConference
+              });
+            }}
             layoutStyle={styles.cancelBtnLayout}
             textStyle={styles.txtCancelButton}
           />
           <Button
             title={'Next'}
-            onPress={() =>
-              navigation.navigate('AddMeetingSubjects', {
-                attachFiles,
-                committee,
-                title,
-                discription,
-                users,
-                startDate,
-                endDate,
-                startTime,
-                endTime,
-                TimeZone,
-                Repeat,
-                userRequired,
+            onPress={() => {
+              setMeetingsData({
+                ...meetingsData,
                 platform: platform,
-                location: valueLocation
-              })
-            }
+                location: valueLocation,
+                videoConference: valueVideoConference
+              });
+              navigation.navigate('AddMeetingSubjects');
+            }}
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity:
+                  valueLocation == null || valueVideoConference == null
+                    ? 0.5
+                    : null
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}
+            disable={
+              valueLocation == null || valueVideoConference == null
+                ? true
+                : false
+            }
           />
         </View>
       </View>

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 import { Colors } from '../../../themes/Colors';
@@ -18,6 +18,7 @@ import { DELETE_APPOINTMENT, DELETE_SUBJECTS } from '../../../graphql/mutation';
 import { styles } from './styles';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
 import moment from 'moment';
+import { UserContext } from '../../../context';
 
 const AppoinmentCard = ({
   item,
@@ -27,6 +28,11 @@ const AppoinmentCard = ({
   setVisibleIndex
 }) => {
   const navigation = useNavigation();
+  const {
+    setSelectedUsers,
+
+    setAppointmentsData
+  } = useContext(UserContext);
   const [data, setData] = useState('');
 
   const LocationById = useQuery(GET_APPOINTMENT_BY_ID, {
@@ -42,11 +48,10 @@ const AppoinmentCard = ({
   });
 
   const [deleteAppointment] = useMutation(DELETE_APPOINTMENT, {
-    // export const GET_All_SUBJECTS = gql`
     refetchQueries: [
       {
         query: GET_All_APPOINTMENT,
-        variables: { searchValue: '' }
+        variables: { searchValue: '', page: -1, pageSize: -1 }
       }
     ],
     onCompleted: (data) => {
@@ -58,7 +63,7 @@ const AppoinmentCard = ({
 
   const onDeleteHandler = (id) => {
     console.log(id);
-    setEditModal(false);
+
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
@@ -110,7 +115,8 @@ const AppoinmentCard = ({
     <TouchableOpacity
       activeOpacity={1}
       onPress={() => setVisibleIndex(-1)}
-      key={index}
+      key={item.appointmentId}
+      style={{ opacity: item.isDisable && 0.5 }}
     >
       {index !== 0 && <Divider style={styles.divider} />}
 
@@ -154,11 +160,17 @@ const AppoinmentCard = ({
               setVisibleIndex(-1);
             }}
             onPressEdit={() => {
+              setSelectedUsers([]);
+
+              setAppointmentsData([]);
               navigation.navigate('EditAppointmentGeneral', { data });
               setVisibleIndex(-1);
             }}
             onPressView={() => {
-              navigation.navigate('AppointmentDetails', { item });
+              navigation.navigate('AppointmentDetails', {
+                item: data,
+                isDisable: item.isDisable
+              });
               setVisibleIndex(-1);
             }}
             editable={

@@ -3,51 +3,66 @@ import {
   Text,
   SafeAreaView,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { Divider } from 'react-native-paper';
+import moment from 'moment';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { useQuery } from '@apollo/client';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
 import { Colors } from '../../../../themes/Colors';
 import { SIZES } from '../../../../themes/Sizes';
-import { Divider } from 'react-native-paper';
-import moment from 'moment';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { Fonts } from '../../../../themes';
 import { Button } from '../../../../component/button/Button';
-import { useQuery } from '@apollo/client';
 import { GET_TIMEZONE } from '../../../../graphql/query';
+import { UserContext } from '../../../../context';
 
 const AddAppointmentDateAndTime = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const { attachFiles, committee, title, discription, users } = route?.params;
-  console.log('meeting data from date and time', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users
-  });
+  const { appointmentsData, setAppointmentsData } = useContext(UserContext);
+  console.log(
+    'appointment data from add appointment date and time',
+    appointmentsData
+  );
+
   const [startDate, setStartdate] = useState(
-    moment(new Date()).format('DD MMM,YYYY')
+    appointmentsData?.startDate
+      ? appointmentsData?.startDate
+      : moment(new Date()).format('DD MMM,YYYY')
   );
   const [startNewDate, setStartNewDate] = useState(
-    moment(new Date()).format('YYYY-MM-DD')
+    appointmentsData?.startDate
+      ? appointmentsData?.startDate
+      : moment(new Date()).format('YYYY-MM-DD')
   );
   const [endNewDate, setEndNewdate] = useState(
-    moment(new Date()).format('YYYY-MM-DD')
+    appointmentsData?.endDate
+      ? appointmentsData?.startDate
+      : moment(new Date()).format('YYYY-MM-DD')
   );
-  const [startTime, setStartTime] = useState(moment(new Date()).format('LT'));
-  const [endDate, setEnddate] = useState(startDate);
-  const [endTime, setEndTime] = useState(moment(new Date()).format('LT'));
+  const [startTime, setStartTime] = useState(
+    appointmentsData?.startTime
+      ? appointmentsData?.startTime
+      : moment(new Date()).format('LT')
+  );
+  const [endDate, setEnddate] = useState(
+    appointmentsData?.endDate ? appointmentsData?.endDate : startDate
+  );
+  const [endTime, setEndTime] = useState(
+    appointmentsData?.endTime
+      ? appointmentsData?.endTime
+      : moment(new Date()).format('LT')
+  );
   const [date, setDate] = useState(new Date());
   const [dates, setDates] = useState(new Date());
   const [time, setTime] = useState(new Date());
@@ -57,32 +72,98 @@ const AddAppointmentDateAndTime = () => {
   const [value, setValue] = useState('');
   const [openTimeZone, setOpenTimeZone] = useState(false);
   const [openRepeat, setOpenRepeat] = useState(false);
-  const [valueRepeat, setValueRepeat] = useState(null);
-  const [valueTimeZone, setValueTimeZone] = useState(null);
+  const [valueRepeat, setValueRepeat] = useState(appointmentsData?.Repeat);
+  const [valueTimeZone, setValueTimeZone] = useState(
+    appointmentsData?.TimeZone ? appointmentsData?.TimeZone : null
+  );
   const [items, setItems] = useState([
     { label: 'GMT_8 (USA)', value: 'GMT_8 (USA)' }
   ]);
+  const [isFocus, setIsFocus] = useState(false);
+
+  const data = [
+    { label: 'Item 1', value: '1' },
+    { label: 'Item 2', value: '2' },
+    { label: 'Item 3', value: '3' },
+    { label: 'Item 4', value: '4' },
+    { label: 'Item 5', value: '5' },
+    { label: 'Item 6', value: '6' },
+    { label: 'Item 7', value: '7' },
+    { label: 'Item 8', value: '8' }
+  ];
 
   const handleConfirmClock = (date) => {
-    console.log('A date has been picked: ', date);
+    console.log('A time has been picked: ', date);
 
     const time = moment(date).format('LT');
     console.log('time', time);
-    if (value == 'startTime') {
-      setStartTime(time);
-      setEndTime(time);
-      setTime(date);
+
+    var d = dates.toLocaleDateString();
+    let currentDate = moment().format('DD/MM/YYYY');
+
+    if (d == currentDate) {
+      console.log(
+        moment(time, 'hh:mm A').isSameOrAfter(moment()),
+        "moment(time, 'hh:mm A').isSameOrAfter(moment())"
+      );
+      if (moment(time, 'hh:mm A').isAfter(moment())) {
+        if (value == 'startTime') {
+          setStartTime(time);
+          setEndTime(time);
+          setTime(date);
+        }
+        if (value == 'endTime') {
+          setEndTime(time);
+        }
+        setOpenClock(false);
+      } else {
+        Alert.alert('Please select future time');
+      }
+    } else {
+      if (value == 'startTime') {
+        setStartTime(time);
+        setEndTime(time);
+        setTime(date);
+      }
+      // if (value == 'endTime') {
+      //   setEndTime(time);
+      // }
+      setOpenClock(false);
     }
+    console.log(
+      moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A')),
+      'time compare'
+    );
+    console.log(startTime, 'startTime');
     if (value == 'endTime') {
-      setEndTime(time);
+      if (startDate == endDate) {
+        if (moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A'))) {
+          if (value == 'startTime') {
+            setStartTime(time);
+            setEndTime(time);
+            setTime(date);
+          }
+          if (value == 'endTime') {
+            setEndTime(time);
+          }
+          setOpenClock(false);
+        } else {
+          Alert.alert('Please select future time');
+        }
+      } else {
+        if (value == 'endTime') {
+          setEndTime(date);
+        }
+      }
     }
-    setOpenClock(false);
   };
   const handleConfirmCalendar = (date) => {
     console.log('A date has been picked: ', date);
-    setOpenCalendar(false);
+
     const Date = moment(date).format('DD MMM,YYYY');
     const newDate = moment(date).format('YYYY-MM-DD');
+    const time = moment(date).format('LT');
+    console.log('time', time);
     console.log('new date', newDate);
     console.log('time', Date);
     if (value == 'startDate') {
@@ -91,12 +172,17 @@ const AddAppointmentDateAndTime = () => {
       setDates(date);
       setEnddate(Date);
       setDate(date);
+      setStartTime(time);
+      setEndTime(time);
+      setTime(date);
     }
     if (value == 'endDate') {
       setEnddate(Date);
       setEndNewdate(newDate);
       setDate(date);
+      setEndTime(time);
     }
+    setOpenCalendar(false);
   };
 
   const TimeZone = useQuery(GET_TIMEZONE, {
@@ -110,6 +196,17 @@ const AddAppointmentDateAndTime = () => {
       console.log('timezone error', data);
     }
   });
+
+  const renderLabel = () => {
+    if (value || isFocus) {
+      return (
+        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+          Dropdown label
+        </Text>
+      );
+    }
+    return null;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -221,28 +318,48 @@ const AddAppointmentDateAndTime = () => {
               />
             </TouchableOpacity>
           </View>
+
           <View style={styles.timezoneContainer}>
             <Text style={styles.txtTitle}>TIMEZONE</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              dropDownDirection="TOP"
-              open={openTimeZone}
-              value={valueTimeZone}
-              items={timeZone?.map((item) => ({
+            <Dropdown
+              placeholderStyle={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary
+              }}
+              data={timeZone?.map((item) => ({
                 label: item.timeZone,
                 value: item.timeZoneId
               }))}
+              style={{
+                borderWidth: 0,
+                paddingRight: SIZES[16],
+                paddingLeft: 0
+              }}
+              textStyle={{ ...Fonts.PoppinsRegular[14] }}
+              // search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={''}
               arrowIconStyle={{
                 height: SIZES[12],
                 width: SIZES[14]
               }}
-              setOpen={() => {
-                setOpenRepeat(false);
-                setOpenTimeZone(!openTimeZone);
+              searchPlaceholder="Search..."
+              value={valueTimeZone}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={(item) => {
+                setValueTimeZone(item.value);
+                setIsFocus(false);
               }}
-              setValue={setValueTimeZone}
-              setItems={setItems}
-              placeholder={''}
+            />
+
+            <Divider style={styles.divider} />
+          </View>
+          <View style={styles.repeatContainer}>
+            <Text style={styles.txtTitle}>REPEAT</Text>
+            <Dropdown
               placeholderStyle={{
                 ...Fonts.PoppinsRegular[12],
                 color: Colors.secondary
@@ -253,17 +370,12 @@ const AddAppointmentDateAndTime = () => {
                 paddingLeft: 0
               }}
               textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            />
-            <Divider style={styles.divider} />
-          </View>
-          <View style={styles.repeatContainer}>
-            <Text style={styles.txtTitle}>REPEAT</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              dropDownDirection="TOP"
-              open={openRepeat}
-              value={valueRepeat}
-              items={[
+              arrowIconStyle={{
+                height: SIZES[12],
+                width: SIZES[14]
+              }}
+              // search
+              data={[
                 {
                   label: "Dosen't repeat",
                   value: 0
@@ -285,28 +397,21 @@ const AddAppointmentDateAndTime = () => {
                   label: 'Repeat yearly'
                 }
               ]}
-              arrowIconStyle={{
-                height: SIZES[12],
-                width: SIZES[14]
-              }}
-              setOpen={() => {
-                setOpenTimeZone(false);
-                setOpenRepeat(!openRepeat);
-              }}
-              setValue={setValueRepeat}
-              setItems={setItems}
+              // search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
               placeholder={''}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
+              searchPlaceholder="Search..."
+              value={valueRepeat}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={(item) => {
+                setValueRepeat(item.value);
+                setIsFocus(false);
               }}
-              style={{
-                borderWidth: 0,
-                paddingRight: SIZES[16],
-                paddingLeft: 0
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
             />
+
             <Divider style={styles.divider} />
           </View>
         </View>
@@ -340,27 +445,35 @@ const AddAppointmentDateAndTime = () => {
         <View style={styles.buttonContainer}>
           <Button
             title={'Back'}
-            onPress={() => navigation.goBack()}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Next'}
-            onPress={() =>
-              navigation.navigate('AddAppointmentLocation', {
-                attachFiles,
-                committee,
-                title,
-                discription,
-                users,
+            onPress={() => {
+              navigation.goBack();
+              setAppointmentsData({
+                ...appointmentsData,
                 startDate: startNewDate,
                 endDate: endNewDate,
                 startTime: startTime,
                 endTime: endTime,
                 TimeZone: valueTimeZone,
                 Repeat: valueRepeat
-              })
-            }
+              });
+            }}
+            layoutStyle={styles.cancelBtnLayout}
+            textStyle={styles.txtCancelButton}
+          />
+          <Button
+            title={'Next'}
+            onPress={() => {
+              setAppointmentsData({
+                ...appointmentsData,
+                startDate: startNewDate,
+                endDate: endNewDate,
+                startTime: startTime,
+                endTime: endTime,
+                TimeZone: valueTimeZone,
+                Repeat: valueRepeat
+              });
+              navigation.navigate('AddAppointmentLocation');
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

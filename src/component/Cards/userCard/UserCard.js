@@ -19,75 +19,15 @@ const UserCard = ({
   index,
   text,
   isSwitchOnRow,
-  required,
-  setRequired,
   userSelect,
   editable,
   deleted,
-  userDetails
+  committee,
+  onChangeUser,
+  onDeleteHandler,
+  valueIndex,
+  setValueIndex
 }) => {
-  const navigation = useNavigation();
-  const [editModal, setEditModal] = useState(false);
-  // const { required, setRequired } = useContext(UserContext);
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
-  const { selectedUsers } = useContext(UserContext);
-
-  useEffect(() => {
-    if (isSwitchOn) {
-      setRequired((prev) => {
-        const pevDaa = prev.filter((ite) => {
-          return ite.user !== item.userId;
-        });
-        return [
-          ...pevDaa,
-          {
-            user: item.userId,
-            isRequired: isSwitchOn
-          }
-        ];
-      });
-    } else {
-      setRequired((prev) => {
-        const pevDaa = prev.filter((ite) => {
-          return ite.user !== item.userId;
-        });
-        return [
-          ...pevDaa,
-          {
-            user: item.userId,
-            isRequired: isSwitchOn
-          }
-        ];
-      });
-    }
-  }, [isSwitchOn]);
-
-  const onDeleteHandler = () => {
-    setEditModal(false);
-    Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
-      {
-        text: 'Delete',
-        onPress: () => console.log('delete Pressed'),
-        style: 'destructive'
-      },
-      {
-        text: 'Cancel',
-        // onPress: () => navigation.navigate("Login"),
-        style: 'cancel'
-      }
-    ]);
-  };
-
-  // useEffect(() => {
-  //   let newRequired;
-  //   if (isSwitchOn) {
-  //     newRequired = required.push(true);
-  //   } else {
-  //     newRequired = required.pop(true);
-  //   }
-  //   setRequired(newRequired);
-  // }, [isSwitchOn]);
-
   const RowData = ({
     name,
     discription,
@@ -102,8 +42,12 @@ const UserCard = ({
         {switchView && (
           <Switch
             color={Colors.switch}
-            value={value}
-            onValueChange={() => setIsSwitchOn(!isSwitchOn)}
+            value={value.isRequired}
+            onValueChange={(isRequired) => {
+              console.log('new changed value ', isRequired);
+
+              onChangeUser(value, isRequired);
+            }}
           />
         )}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -117,8 +61,10 @@ const UserCard = ({
   return (
     <TouchableOpacity
       activeOpacity={1}
-      onPress={() => setEditModal(false)}
-      key={index}
+      onPress={() => {
+        setValueIndex(-1);
+      }}
+      key={item.userId}
     >
       {index == 0 ? null : <Divider style={styles.divider} />}
       {/* committee details */}
@@ -153,7 +99,7 @@ const UserCard = ({
           name={'Role'}
           discription={
             item.roles
-              ? item.roles.join(', ')
+              ? item.roles[item?.organizationIds?.indexOf(committee)]
               : item.yourRoleName
               ? item.yourRoleName
               : item.roleName
@@ -165,11 +111,12 @@ const UserCard = ({
           style={{
             height: SIZES[8],
             width: SIZES[8],
-            backgroundColor: item?.isAvailable
-              ? '#81AB96'
-              : 'Unknown'
-              ? '#E6C54F'
-              : '#DD7878',
+            backgroundColor:
+              item?.isAvailable == 'Unknown'
+                ? '#E6C54F'
+                : item?.isAvailable == 'conflict'
+                ? '#DD7878'
+                : '#81AB96',
             borderRadius: SIZES[4],
             marginRight: SIZES[8]
           }}
@@ -183,23 +130,25 @@ const UserCard = ({
           name={'Required'}
           discription={item.isRequired}
           switchView={isSwitchOnRow}
-          value={item.isRequired || isSwitchOn}
+          value={item}
         />
       </View>
 
       {/* dotsView */}
       {userSelect && (
         <TouchableOpacity
-          onPress={() => setEditModal(!editModal)}
+          onPress={() => {
+            setValueIndex(!valueIndex ? -1 : index);
+          }}
           style={styles.dotsView}
         >
           <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[4]} />
         </TouchableOpacity>
       )}
-      {editModal && (
+      {valueIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
-            onPressDelete={onDeleteHandler}
+            onPressDelete={onDeleteHandler(item)}
             subjectStatus={'NoDeleted'}
             deleted={deleted}
             editable={editable}

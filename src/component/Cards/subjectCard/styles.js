@@ -36,7 +36,11 @@ export const styles = StyleSheet.create({
   dotsView: {
     position: 'absolute',
     right: SIZES[16],
-    top: SIZES[32]
+    top: SIZES[32],
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   discriptionView: {
     paddingVertical: SIZES[6],

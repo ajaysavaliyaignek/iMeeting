@@ -5774,6 +5774,11 @@
   dependencies:
     "minimist" "^1.2.6"
 
+"moment-duration-format@^2.3.2":
+  "integrity" "sha512-cBMXjSW+fjOb4tyaVHuaVE/A5TqkukDWiOfxxAjY+PEqmmBQlLwn+8OzwPiG3brouXKY5Un4pBjAeB6UToXHaQ=="
+  "resolved" "https://registry.npmjs.org/moment-duration-format/-/moment-duration-format-2.3.2.tgz"
+  "version" "2.3.2"
+
 "moment@^2.18.1", "moment@^2.22.2", "moment@^2.24.0", "moment@^2.29.4", "moment@>=2.0.0":
   "integrity" "sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w=="
   "resolved" "https://registry.npmjs.org/moment/-/moment-2.29.4.tgz"
@@ -6562,6 +6567,11 @@
   "resolved" "https://registry.npmjs.org/react-native-dropdown-picker/-/react-native-dropdown-picker-5.4.2.tgz"
   "version" "5.4.2"
 
+"react-native-element-dropdown@^2.4.0":
+  "integrity" "sha512-xdwOWMsPnlICe/dvgE8aYySBF9DJE+dJqqoVFd6+vAtP+IbCDhkEZdbrgwn72c9ukFNzE4Tg8+gGCGqrN5XwrA=="
+  "resolved" "https://registry.npmjs.org/react-native-element-dropdown/-/react-native-element-dropdown-2.4.0.tgz"
+  "version" "2.4.0"
+
 "react-native-events-calendar@^1.0.8":
   "integrity" "sha512-2jMFWaNLA45+6qe230WpxZ1+DtrvlvW8XWCIhUzJ3rejiulKTNrc55QPM+Xm+cpZH2gRGfSykyJwY1XzDZgj/A=="
   "resolved" "https://registry.npmjs.org/react-native-events-calendar/-/react-native-events-calendar-1.0.8.tgz"
@@ -6569,6 +6579,11 @@
   dependencies:
     "lodash" "^4.17.4"
     "moment" "^2.18.1"
+
+"react-native-file-viewer@^2.1.5":
+  "integrity" "sha512-MGC6sx9jsqHdefhVQ6o0akdsPGpkXgiIbpygb2Sg4g4bh7v6K1cardLV1NwGB9A6u1yICOSDT/MOC//9Ez6EUg=="
+  "resolved" "https://registry.npmjs.org/react-native-file-viewer/-/react-native-file-viewer-2.1.5.tgz"
+  "version" "2.1.5"
 
 "react-native-gesture-handler@^2.6.0":
   "integrity" "sha512-IwdYdt5FKjjbRSrSqh8hoNctlYZl5DFnqSJ6buKtrl4A4gyzkrtW6WcmOFl5LnCa6Bcw+znSD77O6UiZ8qda7g=="

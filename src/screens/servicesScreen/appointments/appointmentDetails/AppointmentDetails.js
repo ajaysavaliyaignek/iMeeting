@@ -5,13 +5,16 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  FlatList
+  FlatList,
+  ToastAndroid,
+  Platform
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { useMutation, useQuery } from '@apollo/client';
 import { Divider } from 'react-native-paper';
+import momentDurationFormatSetup from 'moment-duration-format';
 
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
@@ -24,7 +27,9 @@ import { Fonts } from '../../../../themes';
 
 import {
   GET_All_APPOINTMENT,
-  GET_APPOINTMENT_BY_ID
+  GET_APPOINTMENT_BY_ID,
+  GET_FILE,
+  GET_USER_PAYLOAD
 } from '../../../../graphql/query';
 
 import { DELETE_APPOINTMENT } from '../../../../graphql/mutation';
@@ -33,91 +38,18 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 const AppointmentsDetails = () => {
   const navigation = useNavigation();
+  momentDurationFormatSetup(moment);
   const route = useRoute();
-  const { item } = route?.params;
+  const { item, isDisable } = route?.params;
   console.log(item);
-  const [fileResponse, setFileResponse] = useState(null);
+  console.log(isDisable);
+  const [fileResponse, setFileResponse] = useState([]);
   const [appointment, setAppointment] = useState(null);
-  const [location, setLocation] = useState(null);
-  const [committe, setCommittee] = useState(null);
-  const [platform, setPlatform] = useState(null);
   const [role, setRole] = useState(item.yourRoleName);
+  const [user, setUser] = useState(null);
+  let fileId = item?.attachFileIds;
 
-  const checkPermission = async (file) => {
-    console.log('check permission');
-    if (Platform.OS === 'ios') {
-      downloadFile(file);
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download File'
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-          downloadFile(file);
-          console.log('Storage Permission Granted.');
-        } else {
-          // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
-        }
-      } catch (err) {
-        // To handle permission related exception
-        console.log('++++' + err);
-      }
-    }
-  };
-
-  const downloadFile = (file) => {
-    console.log('downloadfile');
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(FILE_URL);
-
-    file_ext = '.' + file_ext[0];
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    let RootDir = fs.dirs.PictureDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          file_ext,
-        description: 'downloading file...',
-        notification: true,
-        // useDownloadManager works with Android only
-        useDownloadManager: true
-      }
-    };
-    config(options)
-      .fetch('GET', FILE_URL)
-      .then((res) => {
-        // Alert after successful downloading
-        console.log('res -> ', res.respInfo.redirects[0]);
-        alert('File Downloaded Successfully.');
-        if (Platform.OS == 'ios') {
-          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
-        }
-      });
-  };
-
-  const getFileExtention = (fileUrl) => {
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
-
-  // get meeting
+  // get mappointment by id
   const { data, error, loading } = useQuery(GET_APPOINTMENT_BY_ID, {
     variables: {
       id: item.appointmentId
@@ -134,64 +66,63 @@ const AppointmentsDetails = () => {
     }
   });
 
-  const start = moment(
-    `${appointment?.setDate},${appointment?.setTime}`,
-    'YYYY-MM-DD,hh:mm A'
+  const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    onCompleted: (data) => {
+      console.log('user data', data.userPayload.userCommitteesDetail);
+      const userId = item?.userDetails?.filter((user) => {
+        if (user.userId == data.userPayload.userId) {
+          return user;
+        }
+      });
+      console.log('user Id', userId);
+      setUser(userId[0]);
+    }
+  });
+
+  fileId?.map((id) => {
+    const { loading, error } = useQuery(GET_FILE, {
+      variables: {
+        fileEntryId: id
+      },
+      onCompleted: (data) => {
+        if (data) {
+          setFileResponse((prev) => {
+            const pevDaa = prev?.filter((ite) => {
+              return ite.fileEnteryId !== data.fileEnteryId;
+            });
+            return [...pevDaa, data.uploadedFile];
+          });
+        }
+      }
+    });
+    if (error) {
+      console.log('file error', error);
+    }
+  });
+
+  const DurationTime = moment(
+    `${appointment?.endDate} ${appointment?.endTime}`,
+    ['YYYY-MM-DD hh:mm A']
+  ).diff(
+    moment(`${appointment?.setDate} ${appointment?.setTime}`, [
+      'YYYY-MM-DD hh:mm A'
+    ]),
+    'minutes'
   );
-  const end = moment(
-    `${appointment?.endDate},${appointment?.endTime}`,
-    'YYYY-MM-DD,hh:mm A'
-  );
-
-  // Calculate the duration
-  // Keep in mind you can get the duration in seconds, days, etc.
-  const duration = moment.duration(end.diff(start));
-
-  const hours = parseInt(duration.asHours());
-
-  // meeting?.attachFileIds.map((id) => {
-  //   const getFile = useQuery(GET_FILE, {
-  //     variables: {
-  //       fileEntryId: id
-  //     },
-  //     onCompleted: (data) => {
-  //       console.log(data);
-  //       // setFileResponse((prev) => {
-  //       //   console.log('prev', prev);
-  //       //   if (prev.fileEnteryId !== id) {
-  //       //     return [...prev, data.uploadedFile];
-  //       //   }
-  //       // });
-  //     }
-  //   });
-  //   if (getFile.data) {
-  //     console.log('File', getFile.data);
-  //   }
-  //   if (getFile.error) {
-  //     console.log('File error', getFile.error);
-  //   }
-  // });
-
-  // get location
-  // const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
-  //   variables: {
-  //     locationId: item.locationId
-  //   },
-  //   onCompleted: (data) => {
-  //     if (data) {
-  //       setLocation(data.location);
-  //     }
-  //   },
-  //   onError: (data) => {
-  //     console.log('error in get location by id', data);
-  //   }
-  // });
+  const durationHourMin = moment
+    .duration(DurationTime, 'minutes')
+    .format('h [hrs], m [min]');
 
   // delete appointment
   const [deleteAppointment] = useMutation(DELETE_APPOINTMENT, {
     refetchQueries: [
       {
-        query: GET_All_APPOINTMENT
+        query: GET_All_APPOINTMENT,
+        variables: {
+          searchValue: '',
+          page: -1,
+          pageSize: -1
+        }
       }
     ],
     onCompleted: (data) => {
@@ -257,10 +188,12 @@ const AppointmentsDetails = () => {
           <View>
             {details(
               'Start date',
-              moment(appointment?.setDate).format('DD MMM,YYYY')
+              `${moment(appointment?.setDate).format('DD MMM,YYYY')},${
+                appointment?.setTime
+              }`
             )}
             <View>
-              <Text style={styles.txtDuration}>(Duration {hours} hours)</Text>
+              <Text style={styles.txtDuration}>{durationHourMin}</Text>
             </View>
           </View>
           {details('Timezone', appointment?.timeZone)}
@@ -302,7 +235,12 @@ const AppointmentsDetails = () => {
                   </View>
                 </View>
               ) : (
-                details('Your answer', item.answers)
+                details(
+                  'Your answer',
+                  user?.suggestedTime == ''
+                    ? user?.answer
+                    : `Your suggestion time - ${user?.suggestedTime}`
+                )
               )}
               <TouchableOpacity
                 style={{
@@ -340,7 +278,8 @@ const AppointmentsDetails = () => {
                 onPress={() =>
                   navigation.navigate('LocationDetails', {
                     locationId: appointment?.locationId,
-                    platform: appointment?.platformName
+                    platform: appointment?.platformName,
+                    locationType: 2
                   })
                 }
               >
@@ -359,13 +298,33 @@ const AppointmentsDetails = () => {
                   borderBottomWidth: 1,
                   borderBottomColor: Colors.primary,
                   flexDirection: 'row',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  width: '70%'
                 }}
               >
-                <Text style={styles.txtLink}>{appointment?.platformlink}</Text>
+                <Text style={[styles.txtLink, { width: '80%' }]}>
+                  {appointment?.platformlink}
+                </Text>
                 <TouchableOpacity
                   style={{ marginTop: 32, marginLeft: 14 }}
-                  onPress={() => Clipboard.setString(appointment?.platformlink)}
+                  onPress={() => {
+                    Clipboard.setString(appointment?.platformlink);
+                    if (
+                      appointment?.platformlink !== '' ||
+                      appointment?.platformlink !== null
+                    ) {
+                      if (Platform.OS == 'android') {
+                        ToastAndroid.show(
+                          `Copied Text :-  ${appointment?.platformlink}`,
+                          ToastAndroid.SHORT
+                        );
+                      } else {
+                        Alert.alert(
+                          `Copied Text :-  ${appointment?.platformlink}`
+                        );
+                      }
+                    }
+                  }}
                 >
                   <Icon
                     name={IconName.CopyText}
@@ -387,7 +346,7 @@ const AppointmentsDetails = () => {
                     download={true}
                     filePath={file.name}
                     fileSize={file.size}
-                    onDownloadPress={() => checkPermission(file.downloadUrl)}
+                    fileUrl={file.downloadUrl}
                     fileType={file.type}
                     style={{
                       borderBottomWidth: SIZES[1],
@@ -407,17 +366,20 @@ const AppointmentsDetails = () => {
             {appointment?.userDetails?.length > 0 ? (
               <FlatList
                 data={appointment?.userDetails}
-                keyExtractor={(item) => `${item.userId}
-            `}
+                keyExtractor={(item, index) => {
+                  return index.toString();
+                }}
                 renderItem={({ item, index }) => {
                   return (
                     <UserCard
                       item={item}
                       index={index}
                       isSwitchOnRow={true}
-                      userSelect={true}
+                      userSelect={false}
                       text={''}
                       setRequired={() => {}}
+                      deleted={false}
+                      editable={false}
                     />
                   );
                 }}
@@ -443,25 +405,29 @@ const AppointmentsDetails = () => {
       {role == 'Head' || role == 'Secretory' ? (
         <View style={styles.bottomContainer}>
           <Divider style={styles.divider} />
-          <View style={styles.btnContainer}>
-            <Button
-              title={'Edit'}
-              layoutStyle={[styles.btnLayout, { backgroundColor: '#F3F6F9' }]}
-              textStyle={{
-                ...Fonts.PoppinsSemiBold[14],
-                color: Colors.primary
-              }}
-              onPress={() =>
-                navigation.navigate('EditAppointmentGeneral', { item: item })
-              }
-            />
-            <Button
-              title={'Delete'}
-              layoutStyle={[styles.btnLayout, { backgroundColor: '#DD7878' }]}
-              onPress={onDeleteHandler}
-            />
-            <Button title={'Start'} layoutStyle={[styles.btnLayout]} />
-          </View>
+          {!isDisable && (
+            <View style={styles.btnContainer}>
+              <Button
+                title={'Edit'}
+                layoutStyle={[styles.btnLayout, { backgroundColor: '#F3F6F9' }]}
+                textStyle={{
+                  ...Fonts.PoppinsSemiBold[14],
+                  color: Colors.primary
+                }}
+                onPress={() =>
+                  navigation.navigate('EditAppointmentGeneral', {
+                    data: appointment
+                  })
+                }
+              />
+              <Button
+                title={'Delete'}
+                layoutStyle={[styles.btnLayout, { backgroundColor: '#DD7878' }]}
+                onPress={onDeleteHandler}
+              />
+              <Button title={'Start'} layoutStyle={[styles.btnLayout]} />
+            </View>
+          )}
         </View>
       ) : null}
     </SafeAreaView>

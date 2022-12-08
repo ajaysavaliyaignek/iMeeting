@@ -77,7 +77,10 @@ export const styles = StyleSheet.create({
   txtBtnCommittees: {
     ...Fonts.PoppinsRegular[14],
     color: Colors.secondary,
-    marginRight: SIZES[21]
+    marginRight: SIZES[21],
+    // width: '80%',
+
+    marginLeft: 8
   },
   subjectCard: { ...Fonts.PoppinsSemiBold[14] },
   switchContainer: {

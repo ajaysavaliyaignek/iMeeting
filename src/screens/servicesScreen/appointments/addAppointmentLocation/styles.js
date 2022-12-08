@@ -30,12 +30,17 @@ export const styles = StyleSheet.create({
   },
   locationContainer: {
     marginTop: SIZES[24],
+    zIndex: 40
+  },
+  videoContainer: {
+    marginTop: SIZES[24],
     zIndex: 20
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: SIZES[16]
+    marginVertical: SIZES[16],
+    zIndex: 20
   },
   cancelBtnLayout: {
     backgroundColor: '#F3F6F9',

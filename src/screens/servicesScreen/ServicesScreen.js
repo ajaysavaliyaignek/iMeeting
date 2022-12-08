@@ -1,4 +1,10 @@
-import { View, Text, useWindowDimensions, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  useWindowDimensions,
+  SafeAreaView,
+  ScrollView
+} from 'react-native';
 import React from 'react';
 
 import Header from '../../component/header/Header';
@@ -16,7 +22,10 @@ const ServicesScreen = ({ navigation }) => {
       {/* header */}
       <Header name={'Services'} leftIconName={null} rightIconName={null} />
 
-      <View style={styles.subContainer}>
+      <ScrollView
+        style={styles.subContainer}
+        showsVerticalScrollIndicator={false}
+      >
         {/* general title */}
         <Text style={styles.txtHeading}>GENERAL</Text>
 
@@ -110,7 +119,7 @@ const ServicesScreen = ({ navigation }) => {
             title={'Statistics'}
           />
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

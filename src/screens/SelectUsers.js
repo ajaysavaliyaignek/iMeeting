@@ -1,9 +1,16 @@
-import { View, SafeAreaView, StyleSheet, TextInput } from 'react-native';
+import {
+  View,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FlatList } from 'react-native-gesture-handler';
 import { Divider } from 'react-native-paper';
 import { useQuery } from '@apollo/client';
+import Voice from '@react-native-community/voice';
 
 import Header from '../component/header/Header';
 import { Icon, IconName } from '../component';
@@ -14,25 +21,102 @@ import { Button } from '../component/button/Button';
 import UsersCard from '../component/Cards/UsersCard';
 import { GET_All_USERS } from '../graphql/query';
 import { UserContext } from '../context';
+import Loader from '../component/Loader/Loader';
 
 const SelectUsers = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { committee } = route?.params;
+  const { committee, previousUser, onUpdateSelection } = route?.params;
+  //set all user to the list
+  const [allUsers, setAllUsers] = useState();
+  const [externalUser, setExternalUser] = useState();
+  //set status of active tabs
   const [activeTab, setActiveTab] = useState('0');
-  const [selectUser, setSelectUser] = useState([]);
-  const [selectExternal, setSelectExternal] = useState(false);
-  const [externalUser, setExternalUser] = useState(false);
-  const [selectAll, setSelectAll] = useState(false);
-  const [user, setUser] = useState([]);
-  const [allUserButton, setAllUserButton] = useState(false);
-  const [selectedUser, setSelectedUser] = useState([]);
-  const [filterData, setFilterData] = useState(user);
+  //used to search text
   const [searchText, setSearchText] = useState('');
-  const { selectedUsers, setSelectedUsers } = useContext(UserContext);
-  console.log('selected user from select user', selectUser);
+  var usersData = [];
+  var externalUserData = [];
+  useEffect(() => {
+    Voice.onSpeechStart = onSpeechStartHandler;
+    Voice.onSpeechEnd = onSpeechEndHandler;
+    Voice.onSpeechResults = onSpeechResultsHandler;
 
-  // get user
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const onSpeechStartHandler = (e) => {
+    console.log('startHandler', e);
+  };
+
+  const onSpeechEndHandler = (e) => {
+    console.log('onSpeechEndHandler', e);
+  };
+
+  const onSpeechResultsHandler = (e) => {
+    console.log('onSpeechResultsHandler', e);
+    let text = e.value[0];
+    setSearchText(text);
+  };
+  const startRecording = async () => {
+    try {
+      await Voice.start('en-US');
+    } catch (error) {
+      console.log('voice error', error);
+    }
+  };
+
+  const setOnAllUserClick = (item) => {
+    allUsers.map((user) => {
+      if (user.userId === item.userId) {
+        user.isSelected = !user.isSelected;
+      }
+    });
+    setAllUsers([...allUsers]);
+  };
+
+  const setOnExternalUserClick = (item) => {
+    externalUser.map((user) => {
+      if (user.userId === item.userId) {
+        user.isSelected = !user.isSelected;
+      }
+    });
+    setExternalUser([...externalUser]);
+  };
+
+  const setAllUserSelected = () => {
+    allUsers.map((user) => {
+      user.isSelected = true;
+    });
+    setAllUsers([...allUsers]);
+
+    externalUser.map((user) => {
+      user.isSelected = true;
+    });
+    setExternalUser([...externalUser]);
+  };
+
+  const setSelectedUserInSelectedList = () => {
+    const selectedUserList = [];
+    allUsers.map((user) => {
+      if (user.isSelected) {
+        selectedUserList.push(user);
+      }
+    });
+
+    externalUser.map((user) => {
+      if (user.isSelected) {
+        selectedUserList.push(user);
+      }
+    });
+    onUpdateSelection(selectedUserList);
+    // setSelectedUsers(selectedUserList);
+
+    navigation.goBack();
+  };
+
+  // get users data from the server
   const { loading: UsersLoading, error: UsersError } = useQuery(GET_All_USERS, {
     variables: {
       isDeleted: true,
@@ -41,10 +125,20 @@ const SelectUsers = () => {
       organizationId: committee
     },
     onCompleted: (data) => {
-      console.log('userdata', data.committeeMembersList);
-      if (data) {
-        setUser(data?.committeeMembersList.items);
-        setFilterData(data?.committeeMembersList.items);
+      usersData = data?.committeeMembersList.items.map((item, index) => {
+        let previousUserIndex = previousUser?.findIndex(
+          (user) => user.userId === item.userId
+        );
+        let isSelected = false;
+
+        if (previousUserIndex >= 0) {
+          isSelected = true;
+        }
+        return { ...item, isSelected };
+      });
+      if (usersData) {
+        //set all user to the user list
+        setAllUsers(usersData);
       }
     }
   });
@@ -60,9 +154,26 @@ const SelectUsers = () => {
       },
       onCompleted: (data) => {
         console.log('externaluserdata', data.committeeMembersList.items);
-        if (data) {
-          setExternalUser(data?.committeeMembersList.items);
+        externalUserData = data?.committeeMembersList.items.map(
+          (item, index) => {
+            let previousUserIndex = previousUser?.findIndex(
+              (user) => user.userId === item.userId
+            );
+            let isSelected = false;
+
+            if (previousUserIndex >= 0) {
+              isSelected = true;
+            }
+
+            return { ...item, isSelected };
+          }
+        );
+        if (externalUserData) {
+          setExternalUser(externalUserData);
         }
+        // if (data) {
+        //   setExternalUser(data?.committeeMembersList.items);
+        // }
       }
     }
   );
@@ -70,31 +181,6 @@ const SelectUsers = () => {
   if (externalUsersError) {
     console.log('externalUsersError error', externalUsersError);
   }
-
-  useEffect(() => {
-    if (selectAll) {
-      console.log('user', user);
-      console.log('external user', externalUser);
-      if (activeTab == '0') {
-        setSelectedUser(user);
-        setSelectedUsers(user);
-        // const userId = user?.map((item) => {
-        //   return item.id;
-        // });
-        // selectedUsers.push(userId);
-      }
-      if (activeTab == '1') {
-        setSelectedUser(externalUser);
-        setSelectedUsers(externalUser);
-        // const userId = externalUser?.map((item) => {
-        //   return item.id;
-        // });
-        // selectedUsers.push(userId);
-      }
-    } else {
-      setSelectedUsers(selectUser);
-    }
-  }, [selectAll, user, externalUser, selectUser]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -121,7 +207,13 @@ const SelectUsers = () => {
               // searchFilterUsers(text, user, setSearchText, setFilterData)
             }
           />
-          <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
+          <TouchableOpacity onPress={() => startRecording()}>
+            <Icon
+              name={IconName.Speaker}
+              height={SIZES[15]}
+              width={SIZES[10]}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.btnContainer}>
           <Button
@@ -156,57 +248,28 @@ const SelectUsers = () => {
         {activeTab === '0' && (
           <View style={{ flex: 1 }}>
             <Divider style={styles.divider} />
-            <FlatList
-              data={filterData}
-              keyExtractor={(item, index) => `${item.userId}`}
-              renderItem={({ item, index }) => (
-                <UsersCard
-                  item={item}
-                  index={index}
-                  setSelectAll={setSelectAll}
-                  selectAll={selectAll}
-                  allUserButton={allUserButton}
-                  searchText={searchText}
-                  activeTab={activeTab}
-                  selectUser={selectUser}
-                  setSelectUser={setSelectUser}
-                />
-              )}
-              showsVerticalScrollIndicator={false}
-            />
-            <View
-              style={{
-                backgroundColor: Colors.white,
-                justifyContent: 'flex-end'
-              }}
-            >
-              {/* Divider */}
-              <Divider style={styles.divider} />
-              <View style={styles.buttonContainer}>
-                <Button
-                  title={'Select all users'}
-                  onPress={() => {
-                    if (activeTab == '0') {
-                      setSelectAll(!selectAll);
-                      setAllUserButton(!allUserButton);
-                    }
-                  }}
-                  layoutStyle={styles.cancelBtnLayout}
-                  textStyle={styles.txtCancelButton}
-                />
-                <Button
-                  title={'Add user'}
-                  onPress={() => navigation.goBack()}
-                  layoutStyle={[
-                    // {
-                    //     opacity: title === "" || discription === "" ? 0.5 : null,
-                    // },
-                    styles.nextBtnLayout
-                  ]}
-                  textStyle={styles.txtNextBtn}
-                />
-              </View>
-            </View>
+            {UsersLoading ? (
+              <Loader />
+            ) : (
+              <FlatList
+                data={allUsers}
+                keyExtractor={(item, index) => {
+                  return index.toString();
+                }}
+                key={(item) => `${item.userId}`}
+                renderItem={({ item, index }) => (
+                  <UsersCard
+                    item={item}
+                    index={index}
+                    searchText={searchText}
+                    onChecked={setOnAllUserClick}
+                    committee={committee}
+                    openPopup={false}
+                  />
+                )}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
           </View>
         )}
 
@@ -222,60 +285,53 @@ const SelectUsers = () => {
             <Divider style={styles.divider} />
             <FlatList
               data={externalUser}
-              keyExtractor={(item, index) => `${index}`}
+              keyExtractor={(item, index) => {
+                return index.toString();
+              }}
               renderItem={({ item, index }) => (
                 <UsersCard
                   item={item}
                   index={index}
                   external={true}
-                  selectAllExternal={selectExternal}
-                  allUserButton={allUserButton}
+                  onChecked={setOnExternalUserClick}
                   searchText={searchText}
-                  setSelectAll={setSelectAll}
-                  selectAll={selectAll}
-                  activeTab={activeTab}
-                  setSelectUser={setSelectUser}
+                  committee={committee}
+                  openPopup={false}
                 />
               )}
               showsVerticalScrollIndicator={false}
               ListFooterComponent={<View style={{ height: 20 }} />}
             />
-            <View
-              style={{
-                backgroundColor: Colors.white,
-                justifyContent: 'flex-end'
-              }}
-            >
-              {/* Divider */}
-              <Divider style={styles.divider} />
-              <View style={styles.buttonContainer}>
-                <Button
-                  title={'Select all users'}
-                  onPress={() => {
-                    if (activeTab == '1') {
-                      setSelectAll(!selectAll);
-                      setSelectExternal(!selectExternal);
-                      setAllUserButton(!allUserButton);
-                    }
-                  }}
-                  layoutStyle={styles.cancelBtnLayout}
-                  textStyle={styles.txtCancelButton}
-                />
-                <Button
-                  title={'Add user'}
-                  onPress={() => navigation.goBack()}
-                  layoutStyle={[
-                    // {
-                    //     opacity: title === "" || discription === "" ? 0.5 : null,
-                    // },
-                    styles.nextBtnLayout
-                  ]}
-                  textStyle={styles.txtNextBtn}
-                />
-              </View>
-            </View>
           </View>
         )}
+      </View>
+      <View
+        style={{
+          backgroundColor: Colors.white,
+          justifyContent: 'flex-end'
+        }}
+      >
+        {/* Divider */}
+        <Divider style={styles.divider} />
+        <View style={styles.buttonContainer}>
+          <Button
+            title={'Select all users'}
+            onPress={() => setAllUserSelected()}
+            layoutStyle={styles.cancelBtnLayout}
+            textStyle={styles.txtCancelButton}
+          />
+          <Button
+            title={'Add user'}
+            onPress={() => setSelectedUserInSelectedList()}
+            layoutStyle={[
+              // {
+              //     opacity: title === "" || discription === "" ? 0.5 : null,
+              // },
+              styles.nextBtnLayout
+            ]}
+            textStyle={styles.txtNextBtn}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

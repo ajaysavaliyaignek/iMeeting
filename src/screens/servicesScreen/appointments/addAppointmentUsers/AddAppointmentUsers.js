@@ -4,7 +4,8 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import * as Progress from 'react-native-progress';
@@ -24,196 +25,268 @@ import { UserContext } from '../../../../context';
 
 const AddAppointmentUsers = () => {
   const navigation = useNavigation();
-  const route = useRoute();
   const [searchText, setSearchText] = useState('');
-  const [users, setUsers] = useState([]);
-  const [required, setRequired] = useState([]);
-  const [pitch, setPitch] = useState('');
-  const [error, setError] = useState('');
-  const [end, setEnd] = useState('');
-  const [started, setStarted] = useState('');
-  const [results, setResults] = useState([]);
-  const [partialResults, setPartialResults] = useState([]);
-  const { attachFiles, committee, title, discription } = route?.params;
-  const { selectedUsers } = useContext(UserContext);
+  const {
+    selectedUsers,
+    appointmentsData,
+    setAppointmentsData,
+    setSelectedUsers
+  } = useContext(UserContext);
+  const [filterData, setFilterData] = useState([]);
+  console.log('selected user from add appointment user', selectedUsers);
+  const [previousUser, setPreviousUser] = useState([]);
+  const [valueIndex, setValueIndex] = useState(-1);
+  let users = [];
+  let requiredUsers = [];
 
-  const onSpeechStart = (e) => {
-    setStarted('True');
-  };
-  const onSpeechEnd = () => {
-    setStarted(null);
-    setEnd('True');
-  };
-  const onSpeechError = (e) => {
-    setError(JSON.stringify(e.error));
-  };
-  const onSpeechResults = (e) => {
-    setResults(e.value);
-  };
-  const onSpeechPartialResults = (e) => {
-    setPartialResults(e.value);
-  };
-  const onSpeechVolumeChanged = (e) => {
-    setPitch(e.value);
-  };
+  let backUpUser = [];
 
   useEffect(() => {
-    Voice.onSpeechStart = onSpeechStart;
-    Voice.onSpeechEnd = onSpeechEnd;
-    Voice.onSpeechError = onSpeechError;
-    Voice.onSpeechResults = onSpeechResults;
-    Voice.onSpeechPartialResults = onSpeechPartialResults;
-    Voice.onSpeechVolumeChanged = onSpeechVolumeChanged;
-  }, []);
+    users = previousUser?.map((item) => item.userId);
+    console.log('userId', users);
+    requiredUsers = previousUser?.map((item) => item.isRequired);
+    console.log('userRequired', requiredUsers);
+  }, [previousUser]);
 
-  const startSpeechRecognizing = async () => {
-    setPitch('');
-    setError('');
-    setStarted('');
-    setResults([]);
-    setPartialResults([]);
-    setEnd('');
-    try {
-      await Voice.start('en-US', {
-        EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS: 10000
+  const onUpdateSelection = (items) => {
+    let newUsers = [];
+    console.log('Selected user from add appointment', items);
+
+    items?.map((user) => {
+      let indexPreviousUser =
+        previousUser?.length > 0
+          ? previousUser?.findIndex((obj) => obj.userId === user?.userId)
+          : -1;
+      if (indexPreviousUser === -1) {
+        let index =
+          backUpUser?.length > 0
+            ? backUpUser?.findIndex((obj) => obj.userId === user.userId)
+            : -1;
+        if (index == -1) {
+          newUsers.push(JSON.parse(JSON.stringify(user)));
+        } else {
+          newUsers.push(JSON.parse(JSON.stringify(backUpUser[index])));
+        }
+      } else {
+        newUsers.push(
+          JSON.parse(JSON.stringify(previousUser[indexPreviousUser]))
+        );
+
+        // newUsers.push(previousUser[indexPreviousUser]);
+      }
+    });
+
+    setPreviousUser(newUsers);
+    setFilterData(newUsers);
+  };
+
+  const onChangeUserState = (item, isRequired) => {
+    console.log('required item NAme', item.userName);
+    console.log('required item', isRequired);
+
+    previousUser.map((user) => {
+      if (user.userId === item.userId) {
+        console.log('required item NAme', user.userName);
+        console.log('required item', user.isRequired);
+        user.isRequired = isRequired;
+        console.log('required item', user.isRequired);
+      }
+    });
+    setPreviousUser([...previousUser]);
+    users = previousUser?.map((item) => item.userId);
+    console.log('userId', users);
+    requiredUsers = previousUser?.map((item) => item.isRequired);
+    console.log('userRequired', requiredUsers);
+  };
+
+  const searchFilterUsers = (text) => {
+    if (text) {
+      const newData = filterData?.filter((item) => {
+        const itemData = item.firstName ? item.firstName : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
       });
-    } catch (e) {
-      console.error(e);
+      setSearchText(text);
+      setPreviousUser(newData);
+    } else {
+      setSearchText(text);
+      setPreviousUser(filterData);
     }
   };
 
-  useEffect(() => {
-    if (selectedUsers?.length > 0) {
-      const userId = selectedUsers?.map((item) => {
-        return item.userId;
-      });
-      setUsers(userId);
-    }
-  }, [selectedUsers]);
+  const onDeleteHandler = (item) => {
+    setValueIndex(-1);
+    Alert.alert('Remove User', 'Are you sure you want to remove this?', [
+      {
+        text: 'Delete',
+        onPress: () => {
+          const filterData = previousUser.filter(
+            (user) => user.userId !== item.userId
+          );
+          setPreviousUser(filterData);
+        },
+        style: 'destructive'
+      },
+      {
+        text: 'Cancel',
+        // onPress: () => navigation.navigate("Login"),
+        style: 'cancel'
+      }
+    ]);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        name={'Add appointment'}
-        rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
-      />
-
-      <View style={styles.subContainer}>
-        <View style={styles.progressContainer}>
-          <Progress.Bar
-            color={Colors.switch}
-            progress={0.5}
-            borderColor={Colors.white}
-            unfilledColor={'#e6e7e9'}
-            width={DeviceInfo.isTablet() ? 800 : 264}
-          />
-          <Text style={styles.txtProgress}>Step 2/4</Text>
-        </View>
-        <Text style={styles.txtAddSubjectTitle}>Users</Text>
-        <View style={styles.searchContainer}>
-          <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={'Search'}
-            onChangeText={(text) => setSearchText(text)}
-          />
-          {/* <TouchableOpacity onPress={startSpeechRecognizing}>
-            <Icon
-              name={IconName.Speaker}
-              height={SIZES[15]}
-              width={SIZES[10]}
-            />
-          </TouchableOpacity> */}
-        </View>
-        <TouchableOpacity
-          style={styles.committeeView}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Timeline', { selectedUsers })}
-        >
-          <Text style={styles.txtCommittee}>Timeline</Text>
-          <View style={styles.btnCommittees}>
-            <Icon
-              name={IconName.Arrow_Right}
-              height={SIZES[12]}
-              width={SIZES[6]}
-            />
-          </View>
-        </TouchableOpacity>
-        <Divider style={styles.divider} />
-        <TouchableOpacity
-          style={styles.committeeView}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('SelectUsers', { committee })}
-        >
-          <Text style={styles.txtCommittee}>Users</Text>
-          <View style={styles.btnCommittees}>
-            <Text style={styles.txtBtnCommittees}>
-              Select {selectedUsers?.length > 0 ? selectedUsers?.length : ''}
-            </Text>
-            <Icon
-              name={IconName.Arrow_Right}
-              height={SIZES[12]}
-              width={SIZES[6]}
-            />
-          </View>
-        </TouchableOpacity>
-        <Divider style={styles.divider} />
-
-        <FlatList
-          data={selectedUsers}
-          keyExtractor={({ item, index }) => `user-${index}`}
-          renderItem={({ item, index }) => (
-            <UserCard
-              item={item}
-              index={index}
-              text={searchText}
-              required={required}
-              setRequired={setRequired}
-              isSwitchOnRow={true}
-              userSelect={false}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          justifyContent: 'flex-end'
-        }}
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        onPress={() => setValueIndex(-1)}
+        activeOpacity={1}
       >
-        {/* Divider */}
-        <Divider style={styles.divider} />
-        <View style={styles.buttonContainer}>
-          <Button
-            title={'Back'}
-            onPress={() => navigation.goBack()}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Next'}
+        <Header
+          name={'Add appointment'}
+          rightIconName={IconName.Close}
+          onRightPress={() => navigation.navigate('AppointmentsList')}
+        />
+
+        <View style={styles.subContainer}>
+          <View style={styles.progressContainer}>
+            <Progress.Bar
+              color={Colors.switch}
+              progress={0.5}
+              borderColor={Colors.white}
+              unfilledColor={'#e6e7e9'}
+              width={DeviceInfo.isTablet() ? 800 : 264}
+            />
+            <Text style={styles.txtProgress}>Step 2/4</Text>
+          </View>
+          <Text style={styles.txtAddSubjectTitle}>Users</Text>
+          <View style={styles.searchContainer}>
+            <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
+            <TextInput
+              style={styles.textInput}
+              placeholder={'Search'}
+              onChangeText={(text) => searchFilterUsers(text)}
+            />
+            <TouchableOpacity
+            // onPress={startRecording()}
+            >
+              <Icon
+                name={IconName.Speaker}
+                height={SIZES[15]}
+                width={SIZES[10]}
+              />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.committeeView}
+            activeOpacity={0.5}
             onPress={() =>
-              navigation.navigate('AddAppointmentDateAndTime', {
-                attachFiles,
-                committee,
-                title,
-                discription,
-                users
+              navigation.navigate('Timeline', { selectedUsers: previousUser })
+            }
+          >
+            <Text style={styles.txtCommittee}>Timeline</Text>
+            <View style={styles.btnCommittees}>
+              <Icon
+                name={IconName.Arrow_Right}
+                height={SIZES[12]}
+                width={SIZES[6]}
+              />
+            </View>
+          </TouchableOpacity>
+          <Divider style={styles.divider} />
+          <TouchableOpacity
+            style={styles.committeeView}
+            activeOpacity={0.5}
+            onPress={() =>
+              navigation.navigate('SelectUsers', {
+                committee: appointmentsData?.committee,
+                previousUser: previousUser,
+                onUpdateSelection: onUpdateSelection
               })
             }
-            layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
-              styles.nextBtnLayout
-            ]}
-            textStyle={styles.txtNextBtn}
+          >
+            <Text style={styles.txtCommittee}>Users</Text>
+            <View style={styles.btnCommittees}>
+              <Text style={styles.txtBtnCommittees}>
+                Select {previousUser?.length > 0 ? previousUser?.length : ''}
+              </Text>
+              <Icon
+                name={IconName.Arrow_Right}
+                height={SIZES[12]}
+                width={SIZES[6]}
+              />
+            </View>
+          </TouchableOpacity>
+          <Divider style={styles.divider} />
+
+          <FlatList
+            data={previousUser}
+            keyExtractor={(item, index) => {
+              return index.toString();
+            }}
+            renderItem={({ item, index }) => (
+              <UserCard
+                item={item}
+                index={index}
+                text={searchText}
+                isSwitchOnRow={true}
+                userSelect={true}
+                deleted={true}
+                committee={appointmentsData.committee}
+                onChangeUser={onChangeUserState}
+                setPreviousUser={setSelectedUsers}
+                onDeleteHandler={onDeleteHandler}
+                valueIndex={valueIndex}
+                setValueIndex={setValueIndex}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
           />
         </View>
-      </View>
+
+        <View
+          style={{
+            backgroundColor: Colors.white,
+            justifyContent: 'flex-end'
+          }}
+        >
+          {/* Divider */}
+          <Divider style={styles.divider} />
+          <View style={styles.buttonContainer}>
+            <Button
+              title={'Back'}
+              onPress={() => {
+                navigation.goBack();
+                setAppointmentsData({
+                  ...appointmentsData,
+                  users,
+                  userRequired: requiredUsers
+                });
+              }}
+              layoutStyle={styles.cancelBtnLayout}
+              textStyle={styles.txtCancelButton}
+            />
+            <Button
+              title={'Next'}
+              onPress={() => {
+                setAppointmentsData({
+                  ...appointmentsData,
+                  users,
+                  userRequired: requiredUsers
+                });
+                navigation.navigate('AddAppointmentDateAndTime');
+              }}
+              layoutStyle={[
+                // {
+                //     opacity: title === "" || discription === "" ? 0.5 : null,
+                // },
+                styles.nextBtnLayout
+              ]}
+              textStyle={styles.txtNextBtn}
+            />
+          </View>
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

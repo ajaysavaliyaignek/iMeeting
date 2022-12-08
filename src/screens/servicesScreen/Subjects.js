@@ -7,170 +7,201 @@ import {
   FlatList,
   TouchableOpacity
 } from 'react-native';
-import React, { useState } from 'react';
-import Header from '../../component/header/Header';
-import { Icon, IconName } from '../../component';
+import React, { useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useQuery } from '@apollo/client';
+import Voice from '@react-native-community/voice';
+
+import Header from '../../component/header/Header';
+import { Icon, IconName } from '../../component';
 import { SIZES } from '../../themes/Sizes';
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
-import { subjectData, usersData } from '../../Constans/data';
 import SubjectCard from '../../component/Cards/subjectCard/SubjectCard';
 import { Button } from '../../component/button/Button';
-import { useRef } from 'react/cjs/react.development';
-import { useQuery } from '@apollo/client';
 import { GET_SUBJECT_BY_ID } from '../../graphql/query';
-
-const subjectsData = [
-  {
-    subjectTitle: 'Advisory Committee on Fina...',
-
-    id: 0,
-    subjectCategoryName: 'finance',
-    createrName: 'Marvin McKinney',
-    subjectStatus: 'Approved'
-  },
-  {
-    subjectTitle: 'Advisory Committee on Fina...',
-    id: 1,
-    subjectCategoryName: 'finance',
-    createrName: 'Marvin McKinney',
-    subjectStatus: 'Verified'
-  },
-  {
-    subjectTitle: 'Advisory Committee on Fina...',
-    id: 2,
-    subjectCategoryName: 'finance',
-    createrName: 'Marvin McKinney',
-    subjectStatus: 'Rejected'
-  },
-  {
-    subjectTitle: 'Advisory Committee on Fina...',
-    id: 3,
-    subjectCategoryName: 'finance',
-    createrName: 'Marvin McKinney',
-    subjectStatus: 'Pending'
-  },
-  {
-    subjectTitle: 'Advisory Committee on Fina...',
-    id: 4,
-    subjectCategoryName: 'finance',
-    createrName: 'Marvin McKinney',
-    subjectStatus: 'Transferred'
-  }
-];
 
 const Subjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { subjectId, role } = route?.params;
-  console.log('subject id', subjectId);
   const [searchText, setSearchText] = useState('');
-  const [subject, setSubject] = useState(null);
+  const [subject, setSubject] = useState([]);
+  const [valueIndex, setValueIndex] = useState(-1);
   let subjects = [];
 
+  console.log('subject id', subjectId);
+
+  useEffect(() => {
+    Voice.onSpeechStart = onSpeechStartHandler;
+    Voice.onSpeechEnd = onSpeechEndHandler;
+    Voice.onSpeechResults = onSpeechResultsHandler;
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const onSpeechStartHandler = (e) => {
+    console.log('startHandler', e);
+  };
+
+  const onSpeechEndHandler = (e) => {
+    console.log('onSpeechEndHandler', e);
+  };
+
+  const onSpeechResultsHandler = (e) => {
+    console.log('onSpeechResultsHandler', e);
+    let text = e.value[0];
+    setSearchText(text);
+  };
+  const startRecording = async () => {
+    try {
+      await Voice.start('en-US');
+    } catch (error) {
+      console.log('voice error', error);
+    }
+  };
+
   subjectId?.map((id) => {
-    const getSubjectsById = useQuery(GET_SUBJECT_BY_ID, {
+    const { loading, error } = useQuery(GET_SUBJECT_BY_ID, {
       variables: {
         subjectId: id
       },
       onCompleted: (data) => {
-        console.log('subject from meeting details', data.subject);
-        setSubject((prev) => {
-          const id = subjects.map((item) => {
-            return item.subjectId;
+        console.log('subject by id from subjects', data);
+        if (data) {
+          setSubject((prev) => {
+            subject?.filter((ite) => {
+              console.log('item id', ite.subjectId);
+              console.log('data id', data.subject.subjectId);
+            });
+            return [...subject, data.subject];
           });
-
-          if (id != data.subject.subjectId) {
-            subjects.push(data.subject);
-            setSubject(subjects);
-          }
-        });
+        }
       }
     });
-    // if (getSubjectsById.data) {
-    //   console.log('getSubjectsById', getSubjectsById.data);
-    // }
-    if (getSubjectsById.error) {
-      console.log('getSubjectsById error', getSubjectsById.error);
+    if (error) {
+      console.log('file error', error);
     }
   });
+  // subjectId?.map((id) => {
+  //   const getSubjectsById = useQuery(GET_SUBJECT_BY_ID, {
+  //     variables: {
+  //       subjectId: id
+  //     },
+  //     onCompleted: (data) => {
+  //       console.log('subject from meeting details', data.subject);
+  //       setSubject((prev) => {
+  //         const id = subjects?.map((item) => {
+  //           return [...item];
+  //         });
+
+  //         // if (id != data.subject.subjectId) {
+  //         //   setSubject([...item]);
+  //         //   // setSubject(subjects);
+  //         // }
+  //       });
+  //     }
+  //   });
+
+  //   if (getSubjectsById.error) {
+  //     console.log('getSubjectsById error', getSubjectsById.error);
+  //   }
+  // });
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        name={'Subjects'}
-        leftIconName={IconName.Arrow_Left}
-        onLeftPress={() => navigation.goBack()}
-      />
-      <View style={styles.subContainer}>
-        <View style={styles.searchContainer}>
-          <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={'Search'}
-            onChangeText={(text) => setSearchText(text)}
-          />
-          <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
-        </View>
-        <View style={styles.deadlineContainer}>
-          <Text style={styles.txtDeadlineTitle}>Deadline suggesting</Text>
-          {role == 'Head' || role == 'Secretory' ? (
-            <TouchableOpacity
-              style={styles.chooseDateContainer}
-              onPress={() => navigation.navigate('DeadlineSuggestion')}
-            >
-              <View
-                style={{
-                  borderBottomWidth: SIZES[1],
-                  borderBottomColor: Colors.primary,
-                  marginRight: SIZES[14]
-                }}
-              >
-                <Text style={styles.txtChooseDate}>Choose date</Text>
-              </View>
-
+      <TouchableOpacity
+        style={styles.container}
+        activeOpacity={1}
+        onPress={() => setValueIndex(-1)}
+      >
+        <Header
+          name={'Subjects'}
+          leftIconName={IconName.Arrow_Left}
+          onLeftPress={() => navigation.goBack()}
+        />
+        <View style={styles.subContainer}>
+          <View style={styles.searchContainer}>
+            <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
+            <TextInput
+              style={styles.textInput}
+              placeholder={'Search'}
+              onChangeText={(text) => setSearchText(text)}
+            />
+            <TouchableOpacity onPress={() => startRecording()}>
               <Icon
-                name={IconName.Calendar_Focused}
-                height={SIZES[20]}
-                width={SIZES[18]}
+                name={IconName.Speaker}
+                height={SIZES[15]}
+                width={SIZES[10]}
               />
             </TouchableOpacity>
-          ) : (
-            <Text
-              style={{
-                ...Fonts.PoppinsSemiBold[14],
-                color: Colors.bold,
-                marginLeft: SIZES[8]
-              }}
-            >
-              5-11 September
-            </Text>
-          )}
-        </View>
-        {role == 'Head' || role == 'Secretory' ? null : (
-          <Button
-            title="Add draft subject"
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-            onPress={() => navigation.navigate('AddDraftSubject')}
-          />
-        )}
-        <Divider style={styles.divider} />
-        <FlatList
-          data={subject}
-          keyExtractor={(item, index) => `subjects-${item.id}`}
-          renderItem={({ item, index }) => (
-            <SubjectCard
-              item={item}
-              index={index}
-              searchText={searchText}
-              role={role}
+          </View>
+          <View style={styles.deadlineContainer}>
+            <Text style={styles.txtDeadlineTitle}>Deadline suggesting</Text>
+            {role == 'Head' || role == 'Secretory' ? (
+              <TouchableOpacity
+                style={styles.chooseDateContainer}
+                onPress={() => navigation.navigate('DeadlineSuggestion')}
+              >
+                <View
+                  style={{
+                    borderBottomWidth: SIZES[1],
+                    borderBottomColor: Colors.primary,
+                    marginRight: SIZES[14]
+                  }}
+                >
+                  <Text style={styles.txtChooseDate}>Choose date</Text>
+                </View>
+
+                <Icon
+                  name={IconName.Calendar_Focused}
+                  height={SIZES[20]}
+                  width={SIZES[18]}
+                />
+              </TouchableOpacity>
+            ) : (
+              <Text
+                style={{
+                  ...Fonts.PoppinsSemiBold[14],
+                  color: Colors.bold,
+                  marginLeft: SIZES[8]
+                }}
+              >
+                5-11 September
+              </Text>
+            )}
+          </View>
+          {role == 'Head' || role == 'Secretory' ? null : (
+            <Button
+              title="Add draft subject"
+              layoutStyle={styles.cancelBtnLayout}
+              textStyle={styles.txtCancelButton}
+              onPress={() => navigation.navigate('AddDraftSubject')}
             />
           )}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+          <Divider style={styles.divider} />
+          <FlatList
+            data={subject}
+            keyExtractor={(item, index) => {
+              return index.toString();
+            }}
+            renderItem={({ item, index }) => (
+              <SubjectCard
+                item={item}
+                index={index}
+                searchText={searchText}
+                role={role}
+                valueIndex={valueIndex}
+                setValueIndex={setValueIndex}
+                showdots={false}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

@@ -34,6 +34,22 @@ const IconName = {
   Speaker: 'Speaker',
   Download_Primary: 'Download_Primary',
   CopyText: 'CopyText',
+  LMChat: 'LMChat',
+  LMChatWhite: 'LMChatWhite',
+  LMDecisions: 'LMDecisions',
+  LMDecisionsWhite: 'LMDecisionsWhite',
+  LMDetails: 'LMDetails',
+  LMDetailsWhite: 'LMDetailsWhite',
+  LMOnline: 'LMOnline',
+  LMOnlineWhite: 'LMOnlineWhite',
+  LMSubjects: 'LMSubjects',
+  LMSubjectsWhite: 'LMSubjectsWhite',
+  LMTasks: 'LMTasks',
+  LMTasksWhite: 'LMTasksWhite',
+  LMUsers: 'LMUsers',
+  LMUsersWhite: 'LMUsersWhite',
+  LMVotings: 'LMVotings',
+  LMVotingsWhite: 'LMVotingsWhite',
   Arrow_Right_Black: 'Arrow_Right_Black'
 };
 

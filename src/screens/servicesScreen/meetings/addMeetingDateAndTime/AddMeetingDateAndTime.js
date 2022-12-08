@@ -4,53 +4,62 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { Divider } from 'react-native-paper';
+import moment from 'moment';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { useQuery } from '@apollo/client';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
 import { Colors } from '../../../../themes/Colors';
 import { SIZES } from '../../../../themes/Sizes';
-import { Divider } from 'react-native-paper';
-import moment from 'moment';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { Fonts } from '../../../../themes';
 import { Button } from '../../../../component/button/Button';
-import { useQuery } from '@apollo/client';
 import { GET_TIMEZONE } from '../../../../graphql/query';
+import { UserContext } from '../../../../context';
 
 const AddMeetingDateAndTime = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const { attachFiles, committee, title, discription, users, userRequired } =
-    route?.params;
-  console.log('meeting data from date and time', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    userRequired
-  });
+  const { meetingsData, setMeetingsData } = useContext(UserContext);
+  console.log('meeting data from date and time', meetingsData);
   const [startDate, setStartdate] = useState(
-    moment(new Date()).format('DD MMM,YYYY')
+    meetingsData?.startDate
+      ? meetingsData?.startDate
+      : moment(new Date()).format('DD MMM,YYYY')
   );
   const [startNewDate, setStartNewDate] = useState(
-    moment(new Date()).format('YYYY-MM-DD')
+    meetingsData?.startDate
+      ? meetingsData?.startDate
+      : moment(new Date()).format('YYYY-MM-DD')
   );
-  const [startTime, setStartTime] = useState(moment(new Date()).format('LT'));
-  const [endDate, setEnddate] = useState(startDate);
+  const [startTime, setStartTime] = useState(
+    meetingsData?.startTime
+      ? meetingsData?.startTime
+      : moment(new Date()).format('LT')
+  );
+  const [endDate, setEnddate] = useState(
+    meetingsData?.endDate ? meetingsData?.endDate : startDate
+  );
   const [endNewDate, setEndNewdate] = useState(
-    moment(new Date()).format('YYYY-MM-DD')
+    meetingsData?.endDate
+      ? meetingsData?.startDate
+      : moment(new Date()).format('YYYY-MM-DD')
   );
-  const [endTime, setEndTime] = useState(moment(new Date()).format('LT'));
+  const [endTime, setEndTime] = useState(
+    meetingsData?.endTime
+      ? meetingsData?.endTime
+      : moment(new Date()).format('LT')
+  );
   const [date, setDate] = useState(new Date());
   const [dates, setDates] = useState(new Date());
   const [time, setTime] = useState(new Date());
@@ -61,8 +70,13 @@ const AddMeetingDateAndTime = () => {
   const [value, setValue] = useState('');
   const [openTimeZone, setOpenTimeZone] = useState(false);
   const [openRepeat, setOpenRepeat] = useState(false);
-  const [valueRepeat, setValueRepeat] = useState(null);
-  const [valueTimeZone, setValueTimeZone] = useState(null);
+  const [onFocus, setIsFocus] = useState(false);
+  const [valueRepeat, setValueRepeat] = useState(
+    meetingsData?.Repeat ? meetingsData?.Repeat : null
+  );
+  const [valueTimeZone, setValueTimeZone] = useState(
+    meetingsData?.TimeZone ? meetingsData?.TimeZone : null
+  );
   const [items, setItems] = useState([
     { label: 'GMT_8 (USA)', value: 'GMT_8 (USA)' }
   ]);
@@ -72,35 +86,91 @@ const AddMeetingDateAndTime = () => {
 
     const time = moment(date).format('LT');
     console.log('time', time);
-    if (value == 'startTime') {
-      setStartTime(time);
-      setTime(date);
-      setEndTime(time);
-      setTimes(date);
+
+    var d = dates.toLocaleDateString();
+    let currentDate = moment().format('DD/MM/YYYY');
+
+    if (d == currentDate) {
+      console.log(
+        moment(time, 'hh:mm A').isAfter(moment()),
+        "moment(time, 'hh:mm A').isSameOrAfter(moment())"
+      );
+      if (moment(time, 'hh:mm A').isAfter(moment())) {
+        if (value == 'startTime') {
+          setStartTime(time);
+          setEndTime(time);
+          setTime(date);
+        }
+        if (value == 'endTime') {
+          setEndTime(time);
+        }
+        setOpenClock(false);
+      } else {
+        Alert.alert('Please select future time');
+      }
+    } else {
+      if (value == 'startTime') {
+        setStartTime(time);
+        setEndTime(time);
+        setTime(date);
+      }
+      // if (value == 'endTime') {
+      //   setEndTime(time);
+      // }
+      setOpenClock(false);
     }
-    if (value == 'endTime') {
-      setEndTime(time);
-      setTime(date);
+    console.log('startDate', startDate);
+    console.log('endDate', endDate);
+    console.log(startTime, 'startTime');
+    console.log('value', value);
+
+    if (startDate === endDate) {
+      console.log('-----');
+      if (moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A'))) {
+        if (value == 'endTime') {
+          setEndTime(time);
+        }
+        setOpenClock(false);
+      } else {
+        Alert.alert('Please select future time');
+      }
+    } else {
+      if (value == 'endTime') {
+        console.log('+++++++++');
+        setEndTime(time);
+      }
+      // if (value == 'endTime') {
+      //   setEndTime(time);
+      // }
+      setOpenClock(false);
     }
-    setOpenClock(false);
   };
   const handleConfirmCalendar = (date) => {
-    setOpenCalendar(false);
+    console.log('A date has been picked: ', date);
+
     const Date = moment(date).format('DD MMM,YYYY');
     const newDate = moment(date).format('YYYY-MM-DD');
-
+    const time = moment(date).format('LT');
+    console.log('time', time);
+    console.log('new date', newDate);
+    console.log('time', Date);
     if (value == 'startDate') {
       setStartdate(Date);
       setStartNewDate(newDate);
       setDates(date);
       setEnddate(Date);
       setDate(date);
+      setStartTime(time);
+      setEndTime(time);
+      setTime(date);
     }
     if (value == 'endDate') {
       setEnddate(Date);
       setEndNewdate(newDate);
       setDate(date);
+      setEndTime(time);
     }
+    setOpenCalendar(false);
   };
 
   const TimeZone = useQuery(GET_TIMEZONE, {
@@ -232,26 +302,45 @@ const AddMeetingDateAndTime = () => {
           </View>
           <View style={styles.timezoneContainer}>
             <Text style={styles.txtTitle}>TIMEZONE</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              dropDownDirection="TOP"
-              open={openTimeZone}
-              value={valueTimeZone}
-              items={timeZone?.map((item) => ({
+            <Dropdown
+              placeholderStyle={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary
+              }}
+              data={timeZone?.map((item) => ({
                 label: item.timeZone,
                 value: item.timeZoneId
               }))}
+              style={{
+                borderWidth: 0,
+                paddingRight: SIZES[16],
+                paddingLeft: 0
+              }}
+              textStyle={{ ...Fonts.PoppinsRegular[14] }}
+              // search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={''}
               arrowIconStyle={{
                 height: SIZES[12],
                 width: SIZES[14]
               }}
-              setOpen={() => {
-                setOpenRepeat(false);
-                setOpenTimeZone(!openTimeZone);
+              searchPlaceholder="Search..."
+              value={valueTimeZone}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={(item) => {
+                setValueTimeZone(item.value);
+                setIsFocus(false);
               }}
-              setValue={setValueTimeZone}
-              setItems={setItems}
-              placeholder={''}
+            />
+
+            <Divider style={styles.divider} />
+          </View>
+          <View style={styles.repeatContainer}>
+            <Text style={styles.txtTitle}>REPEAT</Text>
+            <Dropdown
               placeholderStyle={{
                 ...Fonts.PoppinsRegular[12],
                 color: Colors.secondary
@@ -259,21 +348,15 @@ const AddMeetingDateAndTime = () => {
               style={{
                 borderWidth: 0,
                 paddingRight: SIZES[16],
-                paddingLeft: 0,
-                flex: 1
+                paddingLeft: 0
               }}
               textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            />
-            <Divider style={styles.divider} />
-          </View>
-          <View style={styles.repeatContainer}>
-            <Text style={styles.txtTitle}>REPEAT</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              dropDownDirection="TOP"
-              open={openRepeat}
-              value={valueRepeat}
-              items={[
+              arrowIconStyle={{
+                height: SIZES[12],
+                width: SIZES[14]
+              }}
+              // search
+              data={[
                 {
                   label: "Dosen't repeat",
                   value: 0
@@ -295,27 +378,19 @@ const AddMeetingDateAndTime = () => {
                   label: 'Repeat yearly'
                 }
               ]}
-              arrowIconStyle={{
-                height: SIZES[12],
-                width: SIZES[14]
-              }}
-              setOpen={() => {
-                setOpenTimeZone(false);
-                setOpenRepeat(!openRepeat);
-              }}
-              setValue={setValueRepeat}
-              setItems={setItems}
+              // search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
               placeholder={''}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
+              searchPlaceholder="Search..."
+              value={valueRepeat}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={(item) => {
+                setValueRepeat(item.value);
+                setIsFocus(false);
               }}
-              style={{
-                borderWidth: 0,
-                paddingRight: SIZES[16],
-                paddingLeft: 0
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
             />
             <Divider style={styles.divider} />
           </View>
@@ -337,7 +412,6 @@ const AddMeetingDateAndTime = () => {
           onCancel={() => setOpenClock(false)}
           minimumDate={value == 'startTime' ? new Date() : times}
           date={value == 'startTime' ? times : time}
-          is24Hour={true}
         />
       </ScrollView>
       <View
@@ -351,35 +425,60 @@ const AddMeetingDateAndTime = () => {
         <View style={styles.buttonContainer}>
           <Button
             title={'Back'}
-            onPress={() => navigation.goBack()}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Next'}
-            onPress={() =>
-              navigation.navigate('AddMeetingLocation', {
-                attachFiles,
-                committee,
-                title,
-                discription,
-                users,
-                userRequired,
+            onPress={() => {
+              navigation.goBack();
+              setMeetingsData({
+                ...meetingsData,
                 startDate: startNewDate,
                 endDate: endNewDate,
                 startTime: startTime,
                 endTime: endTime,
                 TimeZone: valueTimeZone,
                 Repeat: valueRepeat
-              })
-            }
+              });
+            }}
+            layoutStyle={styles.cancelBtnLayout}
+            textStyle={styles.txtCancelButton}
+          />
+          <Button
+            title={'Next'}
+            onPress={() => {
+              setMeetingsData({
+                ...meetingsData,
+                startDate: startNewDate,
+                endDate: endNewDate,
+                startTime: startTime,
+                endTime: endTime,
+                TimeZone: valueTimeZone,
+                Repeat: valueRepeat
+              });
+              navigation.navigate('AddMeetingLocation');
+            }}
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity:
+                  startNewDate == '' ||
+                  endDate == '' ||
+                  startTime == '' ||
+                  endTime == '' ||
+                  valueTimeZone == '' ||
+                  valueRepeat == null
+                    ? 0.5
+                    : null
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}
+            disable={
+              startNewDate == '' ||
+              endDate == '' ||
+              startTime == '' ||
+              endTime == '' ||
+              valueTimeZone == '' ||
+              valueRepeat == null
+                ? true
+                : false
+            }
           />
         </View>
       </View>

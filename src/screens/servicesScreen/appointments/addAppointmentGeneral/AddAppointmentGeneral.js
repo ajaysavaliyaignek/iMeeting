@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, TextInput, ScrollView } from 'react-native';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
@@ -22,9 +22,11 @@ import {
   GET_FILE
 } from '../../../../graphql/query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserContext } from '../../../../context';
 
 const AddAppointmentGeneral = () => {
   const navigation = useNavigation();
+  const { appointmentsData, setAppointmentsData } = useContext(UserContext);
   const [token, setToken] = useState('');
   const [title, setTitle] = useState('');
   const [discription, setDiscription] = useState('');
@@ -204,7 +206,9 @@ const AddAppointmentGeneral = () => {
       <Header
         name={'Add appointment'}
         rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
+        onRightPress={() => {
+          navigation.navigate('AppointmentsList');
+        }}
       />
 
       <View style={styles.subContainer}>
@@ -274,7 +278,7 @@ const AddAppointmentGeneral = () => {
                   key={index}
                   filePath={file.name}
                   fileSize={file.size}
-                  onDownloadPress={() => checkPermission(file.downloadUrl)}
+                  fileUrl={file.downloadUrl}
                   fileType={file.type}
                   onRemovePress={() => removeFile(file)}
                   style={{
@@ -316,14 +320,16 @@ const AddAppointmentGeneral = () => {
           />
           <Button
             title={'Next'}
-            onPress={() =>
-              navigation.navigate('AddAppointmentUsers', {
+            onPress={() => {
+              setAppointmentsData({
+                ...appointmentsData,
                 attachFiles: filesId,
                 committee: valueCommitee,
                 title: title,
                 discription: discription
-              })
-            }
+              });
+              navigation.navigate('AddAppointmentUsers');
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

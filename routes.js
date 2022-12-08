@@ -63,6 +63,7 @@ import SelectUser from './src/screens/servicesScreen/meetings/selectUser/SelectU
 import AppointmentsDetails from './src/screens/servicesScreen/appointments/appointmentDetails/AppointmentDetails';
 import TasksList from './src/screens/servicesScreen/tasks/tasksList/TasksList';
 import FilterTask from './src/screens/servicesScreen/tasks/filterTask/FilterTask';
+import LiveMeetingMenu from './src/screens/liveMetting/liveMeetingMenu/LiveMeetingMenu';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -343,6 +344,7 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="Users" component={Users} />
       <Stack.Screen name="TasksList" component={TasksList} />
       <Stack.Screen name="FilterTask" component={FilterTask} />
+      <Stack.Screen name="LiveMeetingMenu" component={LiveMeetingMenu} />
     </Stack.Navigator>
   );
 };

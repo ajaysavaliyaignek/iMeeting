@@ -220,7 +220,15 @@ const LoginScreen = ({ navigation }) => {
             url !== '' ? (
               <TextInput.Icon
                 name={() => (
-                  <TouchableOpacity onPress={() => setUrl('')}>
+                  <TouchableOpacity
+                    onPress={() => setUrl('')}
+                    style={{
+                      height: 24,
+                      width: 24,
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
                     <Icon
                       name={IconName.Close}
                       height={SIZES[12]}

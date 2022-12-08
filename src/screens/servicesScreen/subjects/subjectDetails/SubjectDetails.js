@@ -39,88 +39,14 @@ const SubjectDetails = () => {
   const { item } = route?.params;
   console.log('item-----', item);
 
-  const [openReply, setOpenReply] = useState(false);
   const [fileId, setFileId] = useState(item?.attachFileIds);
   const [commentThreadId, setCommentThreadId] = useState(null);
   const [fileResponse, setFileResponse] = useState([]);
   const [comments, setComments] = useState([]);
   const [commenttext, setCommentText] = useState('');
+  const [commentId, setCommentId] = useState(null);
   const keyboardVerticalOffset = Platform.OS === 'ios' ? -350 : -600;
-  const profilePicture = comments[0]?.profilePicture;
-
-  const checkPermission = async (file) => {
-    console.log('check permission');
-    if (Platform.OS === 'ios') {
-      downloadFile(file);
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download File'
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-          downloadFile(file);
-          console.log('Storage Permission Granted.');
-        } else {
-          // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
-        }
-      } catch (err) {
-        // To handle permission related exception
-        console.log('++++' + err);
-      }
-    }
-  };
-
-  const downloadFile = (file) => {
-    console.log('downloadfile');
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(FILE_URL);
-
-    file_ext = '.' + file_ext[0];
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    let RootDir = fs.dirs.PictureDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          file_ext,
-        description: 'downloading file...',
-        notification: true,
-        // useDownloadManager works with Android only
-        useDownloadManager: true
-      }
-    };
-    config(options)
-      .fetch('GET', FILE_URL)
-      .then((res) => {
-        // Alert after successful downloading
-        console.log('res -> ', res.respInfo.redirects[0]);
-        alert('File Downloaded Successfully.');
-        if (Platform.OS == 'ios') {
-          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
-        }
-      });
-  };
-
-  const getFileExtention = (fileUrl) => {
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
+  const profilePicture = comments?.profilePicture;
 
   fileId?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
@@ -175,17 +101,17 @@ const SubjectDetails = () => {
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
-        console.log('comments data', data.comments.items);
-        setComments(data.comments.items);
+        // console.log('comments data', data.comments);
+        console.log('items data', data.comments.items[0].childComment[0]);
+
+        // console.log('commentsChild data', data.comments.items[0].childComment);
+
+        setComments(data.comments.items[0]);
       } else {
         console.log('no comments');
       }
     }
   });
-
-  if (CommentsData) {
-    console.log('CommentsData', CommentsData.comments.items);
-  }
 
   if (CommentsError) {
     console.log('CommentsError error', CommentsError);
@@ -203,12 +129,15 @@ const SubjectDetails = () => {
 
         variables: { commentCategoryId: commentThreadId }
       }
-    ]
+    ],
+    onCompleted: (data) => {
+      console.log('add comment data', data.addComment.status[0].statusCode);
+      if (data.addComment.status[0].statusCode == 200) {
+        setCommentId(null);
+      }
+    }
   });
 
-  if (AddCommentData) {
-    console.log('addComment', AddCommentData);
-  }
   if (AddCommentError) {
     console.log('addCommentError', AddCommentError);
   }
@@ -217,7 +146,12 @@ const SubjectDetails = () => {
     DELETE_SUBJECTS,
     {
       // export const GET_All_SUBJECTS = gql`
-      refetchQueries: [{ query: GET_All_SUBJECTS, variables: { screen: 0 } }]
+      refetchQueries: [
+        {
+          query: GET_All_SUBJECTS,
+          variables: { searchValue: '', screen: 0, page: -1, pageSize: -1 }
+        }
+      ]
     }
   );
   if (data) {
@@ -277,104 +211,112 @@ const SubjectDetails = () => {
         style={styles.subContainer}
         showsVerticalScrollIndicator={false}
       >
-        <KeyboardAvoidingView
-          behavior="position"
-          keyboardVerticalOffset={keyboardVerticalOffset}
-        >
-          <Text style={styles.txtTitle}>General</Text>
-          {generalDetails('Title', item.subjectTitle)}
-          {generalDetails('Discription', item.description)}
-          {generalDetails('Subject category', item.subjectCategoryName)}
-          {generalDetails('Committeee ', item.committeeName)}
-          {generalDetails('Creator', item.createrName)}
-          {generalDetails('Date of creation', item.dateOfCreation)}
+        <Text style={styles.txtTitle}>General</Text>
+        {generalDetails('Title', item.subjectTitle)}
+        {generalDetails('Discription', item.description)}
+        {generalDetails('Subject category', item.subjectCategoryName)}
+        {generalDetails('Committeee ', item.committeeName)}
+        {generalDetails('Creator', item.createrName)}
+        {generalDetails('Date of creation', item.dateOfCreation)}
 
-          {/* attach file */}
-          <Text style={styles.txtAttachedTitle}>ATTACHED FILES</Text>
-          {fileResponse?.map((file, index) => {
-            return (
-              <FilesCard
-                download={true}
-                deleted={false}
-                key={index}
-                filePath={file.name}
-                fileSize={file.size}
-                onDownloadPress={() => checkPermission(file.downloadUrl)}
-                fileType={file.type}
-              />
-            );
-          })}
-
-          {/* comments     */}
-          <Text style={styles.txtcommentsTitle}>Comments</Text>
-
-          <View>
-            <FlatList
-              data={comments[0]?.childComment}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={({ item, index }) => `${item?.commentId}`}
-              renderItem={({ item, index }) => (
-                <CommentCard
-                  item={item}
-                  commentThreadId={commentThreadId}
-                  index={index}
-                  setComment={setCommentText}
-                />
-              )}
+        {/* attach file */}
+        <Text style={styles.txtAttachedTitle}>ATTACHED FILES</Text>
+        {fileResponse?.map((file, index) => {
+          return (
+            <FilesCard
+              download={true}
+              deleted={false}
+              key={index}
+              filePath={file.name}
+              fileSize={file.size}
+              fileUrl={file.downloadUrl}
+              fileType={file.type}
             />
-          </View>
+          );
+        })}
 
-          {comments[0]?.childComment.length == 0 && (
-            <View
-              style={{
-                paddingVertical: SIZES[14],
-                paddingHorizontal: SIZES[16],
-                borderWidth: SIZES[1],
-                borderColor: Colors.line,
-                borderRadius: SIZES[8],
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: SIZES[32],
-                marginBottom: SIZES[24]
-              }}
-            >
-              <TextInput
-                style={{
-                  flex: 1,
-                  height: SIZES[30],
-                  backgroundColor: Colors.white
-                }}
-                value={commenttext}
-                underlineColor={Colors.white}
-                activeUnderlineColor={Colors.white}
-                placeholder={'Your comment'}
-                onChangeText={(text) => setCommentText(text)}
+        {/* comments     */}
+        <Text style={styles.txtcommentsTitle}>Comments</Text>
+
+        <View>
+          <FlatList
+            data={comments?.childComment}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item, index) => {
+              return index.toString();
+            }}
+            renderItem={({ item, index }) => (
+              <CommentCard
+                item={item}
+                commentThreadId={commentThreadId}
+                index={index}
+                setComment={setCommentText}
+                setCommentId={setCommentId}
+                commenttext={commenttext}
               />
-              <TouchableOpacity
-                onPress={() => {
-                  console.log('commenttext', commenttext);
-                  console.log('parentCommentId', comments[0]?.parentCommentId);
+            )}
+          />
+        </View>
+
+        {
+          <View
+            style={{
+              paddingVertical: SIZES[14],
+              paddingHorizontal: SIZES[16],
+              borderWidth: SIZES[1],
+              borderColor: Colors.line,
+              borderRadius: SIZES[8],
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: SIZES[32],
+              marginBottom: SIZES[24]
+            }}
+          >
+            <TextInput
+              style={{
+                flex: 1,
+                height: SIZES[30],
+                backgroundColor: Colors.white
+              }}
+              value={commenttext}
+              underlineColor={Colors.white}
+              activeUnderlineColor={Colors.white}
+              placeholder={'Your comment'}
+              onChangeText={(text) => setCommentText(text)}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                console.log('commenttext', commenttext);
+                console.log('parentCommentId', commentThreadId);
+                console.log('commentId', commentId);
+                if (commentId == null) {
                   addComment({
                     variables: {
                       comment: {
                         comment: commenttext,
                         commentId: 0,
-                        parentCommentId: comments[0]?.commentId
+                        parentCommentId: comments.commentId
                       }
                     }
                   });
-                  setCommentText('');
-                }}
-              >
-                <Icon
-                  name={IconName.Send}
-                  height={SIZES[22]}
-                  width={SIZES[20]}
-                />
-              </TouchableOpacity>
-            </View>
-          )}
-        </KeyboardAvoidingView>
+                } else {
+                  addComment({
+                    variables: {
+                      comment: {
+                        comment: commenttext,
+                        commentId: commentId
+                      }
+                    }
+                  });
+                }
+
+                setCommentText('');
+              }}
+            >
+              <Icon name={IconName.Send} height={SIZES[22]} width={SIZES[20]} />
+            </TouchableOpacity>
+          </View>
+        }
       </ScrollView>
 
       <View

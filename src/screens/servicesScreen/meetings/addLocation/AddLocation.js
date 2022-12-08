@@ -4,7 +4,10 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  ScrollView
+  ScrollView,
+  ToastAndroid,
+  Platform,
+  Alert
 } from 'react-native';
 import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
@@ -19,7 +22,10 @@ import { Button } from '../../../../component/button/Button';
 import { styles } from './styles';
 import { Colors } from '../../../../themes/Colors';
 import { UPDATE_LOCATION } from '../../../../graphql/mutation';
-import { GET_ALL_LOCATION } from '../../../../graphql/query';
+import {
+  GET_ALL_LOCATION,
+  GET_ALL_LOCATION_BY_ID
+} from '../../../../graphql/query';
 
 const AddLocation = () => {
   const navigation = useNavigation();
@@ -38,7 +44,11 @@ const AddLocation = () => {
     UPDATE_LOCATION,
     {
       refetchQueries: [
-        { query: GET_ALL_LOCATION, variables: { locationType: locationType } }
+        { query: GET_ALL_LOCATION, variables: { locationType: locationType } },
+        {
+          query: GET_ALL_LOCATION_BY_ID,
+          variables: { locationType: locationType }
+        }
       ],
       onCompleted: (data) => {
         if (data) {
@@ -148,7 +158,21 @@ const AddLocation = () => {
               onChangeText={(text) => setLinkText(text)}
               style={{ flex: 1 }}
             />
-            <TouchableOpacity onPress={() => Clipboard.setString(linkText)}>
+            <TouchableOpacity
+              onPress={() => {
+                Clipboard.setString(linkText);
+                if (linkText !== '' || linkText !== null) {
+                  if (Platform.OS == 'android') {
+                    ToastAndroid.show(
+                      `Copied Text :-  ${linkText}`,
+                      ToastAndroid.SHORT
+                    );
+                  } else {
+                    Alert.alert(`Copied Text :-  ${linkText}`);
+                  }
+                }
+              }}
+            >
               <Icon
                 name={IconName.CopyText}
                 height={SIZES[20]}

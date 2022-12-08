@@ -7,12 +7,7 @@ import {
   PermissionsAndroid,
   Platform
 } from 'react-native';
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useLayoutEffect
-} from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
@@ -32,7 +27,8 @@ import { SIZES } from '../../../../themes/Sizes';
 import { styles } from './styles';
 import { GET_COMMITTEES_BY_ROLE, GET_FILE } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
-import RNFetchBlob from 'rn-fetch-blob';
+
+import { UserContext } from '../../../../context';
 
 const AddMeetingGeneralScreen = () => {
   const navigation = useNavigation();
@@ -45,6 +41,7 @@ const AddMeetingGeneralScreen = () => {
   const [fileResponse, setFileResponse] = useState([]);
   const [filesId, setFilesId] = useState(null);
   const [token, setToken] = useState('');
+  const { meetingsData, setMeetingsData } = useContext(UserContext);
 
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
@@ -131,81 +128,6 @@ const AddMeetingGeneralScreen = () => {
 
     setFilesId(fileId);
   }, [fileResponse]);
-  console.log('file id', filesId);
-
-  const checkPermission = async (file) => {
-    console.log('file', file);
-    console.log('check permission');
-    if (Platform.OS === 'ios') {
-      downloadFile(file);
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download File'
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-          downloadFile(file);
-          console.log('Storage Permission Granted.');
-        } else {
-          // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
-        }
-      } catch (err) {
-        // To handle permission related exception
-        console.log('++++' + err);
-      }
-    }
-  };
-
-  const downloadFile = (file) => {
-    console.log('downloadfile');
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(FILE_URL);
-
-    // file_ext = '.' + file_ext[0];
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    let RootDir = fs.dirs.PictureDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2),
-        description: 'downloading file...',
-        notification: true,
-        // useDownloadManager works with Android only
-        useDownloadManager: true
-      }
-    };
-    config(options)
-      .fetch('GET', FILE_URL)
-      .then((res) => {
-        // Alert after successful downloading
-        console.log('res -> ', res.respInfo.redirects[0]);
-        alert('File Downloaded Successfully.');
-        if (Platform.OS == 'ios') {
-          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
-        }
-      });
-  };
-
-  const getFileExtention = (fileUrl) => {
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
 
   const removeFile = (file) => {
     setFileResponse((prev) => {
@@ -251,7 +173,7 @@ const AddMeetingGeneralScreen = () => {
               open={open}
               value={valueCommitee}
               items={
-                CommitteeData
+                committee
                   ? committee?.map((comm) => ({
                       label: comm.committeeTitle,
                       value: comm.organizationId
@@ -279,7 +201,9 @@ const AddMeetingGeneralScreen = () => {
             <Text style={styles.txtTitle}>TITLE</Text>
             <TextInput
               style={styles.textInput}
-              onChangeText={(text) => setTitle(text)}
+              onChangeText={(text) => {
+                setTitle(text);
+              }}
             />
           </View>
           <View style={styles.categoryContainer}>
@@ -287,20 +211,20 @@ const AddMeetingGeneralScreen = () => {
             <TextInput
               style={styles.textInput}
               multiline={true}
-              onChangeText={(text) => setDiscription(text)}
+              onChangeText={(text) => {
+                setDiscription(text);
+              }}
             />
           </View>
           <View style={{ marginTop: 24 }}>
             <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
             {fileResponse?.map((file, index) => {
-              console.log('file from return', file);
-
               return (
                 <FilesCard
                   key={index}
                   filePath={file.name}
                   fileSize={file.size}
-                  onDownloadPress={() => downloadFile(file.downloadUrl)}
+                  // onDownloadPress={() => checkPermission(file.downloadUrl)}
                   fileType={file.type}
                   onRemovePress={() => removeFile(file)}
                   style={{
@@ -309,6 +233,7 @@ const AddMeetingGeneralScreen = () => {
                   }}
                   download={true}
                   deleted={true}
+                  fileUrl={file.downloadUrl}
                 />
               );
             })}
@@ -342,13 +267,14 @@ const AddMeetingGeneralScreen = () => {
             }
             title={'Next'}
             onPress={() => {
-              navigation.navigate('AddMeetingUser', {
+              setMeetingsData({
+                ...meetingsData,
                 attachFiles: filesId,
                 committee: valueCommitee,
                 title: title,
                 discription: discription
               });
-              // navigation.setParams();
+              navigation.navigate('AddMeetingUser');
             }}
             layoutStyle={[
               {

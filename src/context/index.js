@@ -19,6 +19,8 @@ export const AppProvider = ({ children }) => {
   const [committee, setCommittee] = useState(null);
   const [required, setRequired] = useState([]);
   const [companyUrl, setCompanyUrl] = useState(null);
+  const [meetingsData, setMeetingsData] = useState(null);
+  const [appointmentsData, setAppointmentsData] = useState(null);
   return (
     <UserContext.Provider
       value={{
@@ -33,7 +35,11 @@ export const AppProvider = ({ children }) => {
         required,
         setRequired,
         companyUrl,
-        setCompanyUrl
+        setCompanyUrl,
+        meetingsData,
+        setMeetingsData,
+        appointmentsData,
+        setAppointmentsData
       }}
     >
       {children}

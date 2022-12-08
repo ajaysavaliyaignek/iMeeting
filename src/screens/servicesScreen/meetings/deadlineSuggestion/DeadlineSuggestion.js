@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView } from 'react-native';
 import React, { useState } from 'react';
 import { Calendar } from 'react-native-calendars';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
 
 import Header from '../../../../component/header/Header';
@@ -15,6 +15,8 @@ import { SIZES } from '../../../../themes/Sizes';
 let CalanderDate = moment();
 const DeadlineSuggestion = () => {
   const calendarRef = React.useRef();
+  const route = useRoute();
+  const { setCalendarValue } = route?.params;
   const navigation = useNavigation();
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
@@ -54,6 +56,11 @@ const DeadlineSuggestion = () => {
           markingType="custom"
           hideArrows={true}
           current={calendarDate}
+          onDayPress={(date) => {
+            console.log('date', date.dateString);
+            setCalendarValue(date.dateString);
+            navigation.goBack();
+          }}
           monthFormat={'yyyy MM'}
           enableSwipeMonths={true}
           theme={{
@@ -88,12 +95,12 @@ const DeadlineSuggestion = () => {
           //     paddingRight: 0
           //   }}
 
-          markedDates={{
-            '2022-10-19': { soldOut: false, blocked: false, inventory: 2 },
-            '2019-02-24': { soldOut: false, blocked: false, inventory: 2 },
-            '2019-02-25': { soldOut: false, blocked: true, inventory: 0 },
-            '2019-02-26': { soldOut: true, blocked: true, inventory: 2 }
-          }}
+          // markedDates={{
+          //   '2022-10-19': { soldOut: false, blocked: false, inventory: 2 },
+          //   '2019-02-24': { soldOut: false, blocked: false, inventory: 2 },
+          //   '2019-02-25': { soldOut: false, blocked: true, inventory: 0 },
+          //   '2019-02-26': { soldOut: true, blocked: true, inventory: 2 }
+          // }}
           //   horizontal={this.state.horizontal}
           //   onDayPress={this.onDayPress}
         />

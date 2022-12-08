@@ -14,7 +14,6 @@ import EditDeleteModal from '../../EditDeleteModal';
 import { SIZES } from '../../../themes/Sizes';
 import CheckBox from '../../checkBox/CheckBox';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
-import { confirmButtonStyles } from 'react-native-modal-datetime-picker';
 import { UserContext } from '../../../context';
 
 const SelectSubjectCard = ({
@@ -22,34 +21,31 @@ const SelectSubjectCard = ({
   index,
   searchText,
   visibleIndex,
-  setVisibleIndex
-  // selectedSubjects,
-  // setSelectedSubjects
+  setVisibleIndex,
+  selectedSubjects,
+  setSelectedSubjects,
+  subjectData,
+  setChecked,
+  checked
 }) => {
   const [editModal, setEditModal] = useState(false);
   const [selectSubject, setSelectSubject] = useState([]);
   const [isCheck, setIsCheck] = useState(false);
-  const { selectedSubjects, setSelectedSubjects } = useContext(UserContext);
 
-  console.log('selectedSubjects from select card', selectedSubjects);
-
+  const checkToggle = (id) => {
+    subjectData?.map((subject) => {
+      if (subject.subjectId == item.subjectId) {
+        item.isSelected = !item.isSelected;
+      }
+    });
+  };
   useEffect(() => {
-    if (isCheck) {
-      setSelectedSubjects((prev) => {
-        const pevDaa = prev.filter((ite) => {
-          return ite.subjectId !== item.subjectId;
-        });
-        return [...pevDaa, item];
-      });
-    } else {
-      setSelectedSubjects((prev) => {
-        const pevDaa = prev.filter((ite) => {
-          return ite.subjectId !== item.subjectId;
-        });
-        return [...pevDaa, item];
-      });
-    }
-  }, [isCheck]);
+    selectedSubjects?.map((subject) => {
+      if (subject.subjectId == item.subjectId) {
+        item.isSelected = true;
+      }
+    });
+  }, []);
 
   // console.log('selected subject from select subject', selectSubject);
 
@@ -67,7 +63,11 @@ const SelectSubjectCard = ({
     <TouchableOpacity
       key={index}
       activeOpacity={1}
-      onPress={() => setVisibleIndex(-1)}
+      onPress={() => {
+        setVisibleIndex(-1);
+        checkToggle(item.userId);
+        setChecked(!checked);
+      }}
     >
       {/* committee details */}
       <Text style={{ marginLeft: SIZES[12], marginTop: SIZES[24] }}>
@@ -81,9 +81,12 @@ const SelectSubjectCard = ({
           <RowData name={'Creator'} discription={item.createrName} />
         </View>
         <CheckBox
-          value={isCheck}
-          onValueChange={() => setIsCheck(!isCheck)}
-          disabled={item.subjectStatus == 'Deleted' ? true : false}
+          value={item.isSelected}
+          onValueChange={() => {
+            checkToggle(item.subjectId);
+            setChecked(!checked);
+          }}
+          // disabled={item.isSelected}
         />
       </View>
       <Divider style={styles.divider} />

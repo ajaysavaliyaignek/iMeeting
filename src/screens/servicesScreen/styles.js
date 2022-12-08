@@ -24,6 +24,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: SIZES[24]
+    marginBottom: SIZES[24],
+    justifyContent: 'space-between'
   }
 });

@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
   subContainer: {
     backgroundColor: Colors.white,
 
-    paddingHorizontal: SIZES[16]
+    paddingHorizontal: SIZES[16],
+    flex: 1
   },
   txtTitle: {
     ...Fonts.PoppinsBold[20],

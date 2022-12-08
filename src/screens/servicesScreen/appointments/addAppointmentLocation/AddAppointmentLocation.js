@@ -1,61 +1,44 @@
 import { View, Text, SafeAreaView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
+import { useMutation, useQuery } from '@apollo/client';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
 import { Fonts } from '../../../../themes';
 import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
-import { useMutation, useQuery } from '@apollo/client';
+
 import {
   GET_All_APPOINTMENT,
   GET_ALL_LOCATION,
   GET_PLATFORMLINK
 } from '../../../../graphql/query';
 import { UPDATE_APPOINTMENT } from '../../../../graphql/mutation';
+import { UserContext } from '../../../../context';
 
 const AddAppointmentLocation = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat
-  } = route?.params;
-  console.log('meeting data from addmeetinglocation', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat
-  });
+  const { setSelectedUsers, appointmentsData, setAppointmentsData } =
+    useContext(UserContext);
+
+  console.log('meeting data from addmeetinglocation', appointmentsData);
   const [openLocation, setOpenLocation] = useState(false);
   const [valueLocation, setValueLocation] = useState(null);
   const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(null);
+  const [onFocus, setIsFocus] = useState(false);
+
   const [platform, setPlatform] = useState(null);
   const [location, setLocation] = useState([]);
+  const [error, setError] = useState([]);
   const [items, setItems] = useState([
     { label: 'Office 2', value: 'Office 2' }
   ]);
@@ -108,7 +91,9 @@ const AddAppointmentLocation = () => {
       {
         query: GET_All_APPOINTMENT,
         variables: {
-          searchValue: ''
+          searchValue: '',
+          page: -1,
+          pageSize: -1
         }
       }
     ],
@@ -116,6 +101,8 @@ const AddAppointmentLocation = () => {
       console.log('add appointment', data.updateAppointment);
       if (data.updateAppointment.status[0].statusCode == '200') {
         navigation.navigate('AppointmentsList');
+        setSelectedUsers([]);
+        setAppointmentsData([]);
       }
     },
     onError: (data) => {
@@ -123,12 +110,20 @@ const AddAppointmentLocation = () => {
     }
   });
 
+  const handleViewDetails = () => {
+    navigation.navigate('LocationDetails', {
+      locationId: valueLocation,
+      platform: platform,
+      locationType: 2
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
         name={'Add appointment'}
         rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
+        onRightPress={() => navigation.navigate('AppointmentsList')}
       />
       <View style={styles.subContainer}>
         <View style={styles.progressContainer}>
@@ -145,34 +140,38 @@ const AddAppointmentLocation = () => {
         <Text style={styles.txtAddSubjectTitle}>Location</Text>
         <View style={styles.locationContainer}>
           <Text style={styles.txtTitle}>LOCATION</Text>
-          <DropDownPicker
-            listMode="SCROLLVIEW"
-            open={openLocation}
-            value={valueLocation}
-            items={location?.map((item) => ({
-              label: item.title,
-              value: item.locationId
-            }))}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            setOpen={() => {
-              setOpenLocation(!openLocation);
-            }}
-            setValue={setValueLocation}
-            setItems={setItems}
-            placeholder={''}
+          <Dropdown
             placeholderStyle={{
               ...Fonts.PoppinsRegular[12],
               color: Colors.secondary
             }}
+            data={location?.map((item) => ({
+              label: item.title,
+              value: item.locationId
+            }))}
             style={{
               borderWidth: 0,
               paddingRight: SIZES[16],
               paddingLeft: 0
             }}
             textStyle={{ ...Fonts.PoppinsRegular[14] }}
+            // search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={''}
+            arrowIconStyle={{
+              height: SIZES[12],
+              width: SIZES[14]
+            }}
+            searchPlaceholder="Search..."
+            value={valueLocation}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={(item) => {
+              setValueLocation(item.value);
+              setIsFocus(false);
+            }}
           />
           <Divider style={styles.divider} />
         </View>
@@ -180,7 +179,11 @@ const AddAppointmentLocation = () => {
         <View style={styles.buttonContainer}>
           <Button
             title={'View details'}
-            onPress={() => navigation.navigate('LocationDetails')}
+            onPress={() =>
+              valueLocation == null
+                ? setError('Please select location')
+                : handleViewDetails()
+            }
             layoutStyle={styles.cancelBtnLayout}
             textStyle={styles.txtCancelButton}
           />
@@ -199,7 +202,7 @@ const AddAppointmentLocation = () => {
           />
         </View>
 
-        <View style={styles.locationContainer}>
+        <View style={styles.videoContainer}>
           <Text style={styles.txtTitle}>VIDEO CONFERENCING PLATFORM</Text>
           <DropDownPicker
             listMode="SCROLLVIEW"
@@ -252,32 +255,56 @@ const AddAppointmentLocation = () => {
         >
           <Button
             title={'Back'}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              navigation.goBack();
+              setAppointmentsData({
+                ...appointmentsData,
+                locationId: valueLocation,
+                platformId: platform.platformId,
+                videoConference: valueVideoConference
+              });
+            }}
             layoutStyle={styles.cancelBtnLayout}
             textStyle={styles.txtCancelButton}
           />
           <Button
             title={'Save'}
             onPress={() => {
-              console.log(valueLocation, platform.platformId);
+              console.log({
+                appointmentDescription: appointmentsData?.discription,
+                appointmentId: 0,
+                appointmentTitle: appointmentsData?.title,
+                attachFileIds: appointmentsData?.attachFiles,
+                committeeId: appointmentsData?.committee,
+                locationId: valueLocation,
+                platformId: valueVideoConference,
+                repeat: appointmentsData?.Repeat,
+                required: appointmentsData?.userRequired,
+                setDate: appointmentsData?.startDate,
+                setTime: appointmentsData?.startTime,
+                endDate: appointmentsData?.endDate,
+                endTime: appointmentsData?.endTime,
+                timeZone: appointmentsData?.TimeZone,
+                userIds: appointmentsData?.users
+              });
               addAppointment({
                 variables: {
                   appointment: {
-                    appointmentDescription: discription,
+                    appointmentDescription: appointmentsData?.discription,
                     appointmentId: 0,
-                    appointmentTitle: title,
-                    attachFileIds: attachFiles,
-                    committeeId: committee,
+                    appointmentTitle: appointmentsData?.title,
+                    attachFileIds: appointmentsData?.attachFiles,
+                    committeeId: appointmentsData?.committee,
                     locationId: valueLocation,
-                    platformId: platform.platformId,
-                    repeat: Repeat,
-                    required: [],
-                    setDate: startDate,
-                    setTime: startTime,
-                    endDate: endDate,
-                    endTime: endTime,
-                    timeZone: TimeZone,
-                    userIds: users
+                    platformId: valueVideoConference,
+                    repeat: appointmentsData?.Repeat,
+                    required: appointmentsData?.userRequired,
+                    setDate: appointmentsData?.startDate,
+                    setTime: appointmentsData?.startTime,
+                    endDate: appointmentsData?.endDate,
+                    endTime: appointmentsData?.endTime,
+                    timeZone: appointmentsData?.TimeZone,
+                    userIds: appointmentsData?.users
                   }
                 }
               });

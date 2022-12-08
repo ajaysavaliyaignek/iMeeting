@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
-import { PreventRemoveContext, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
@@ -13,46 +13,21 @@ import EditDeleteModal from '../EditDeleteModal';
 import CheckBox from '../checkBox/CheckBox';
 import { getHighlightedText } from '../highlitedText/HighlitedText';
 import { UserContext } from '../../context';
+import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 
 const UsersCard = ({
   item,
   index,
   external,
-  setSelectAll,
-  selectAll,
-  allUserButton,
   searchText,
-  selectUser,
-  setSelectUser
+  committee,
+  openPopup,
+  // usersData,
+  onChecked
+  // previousUser
 }) => {
-  const navigation = useNavigation();
   const [editModal, setEditModal] = useState(false);
-  // const [selectUser, setSelectUser] = useState(false);
   const [isSwitchOn, setIsSwitchOn] = useState(false);
-  const [isCheckAll, setIsCheckAll] = useState(false);
-  const [user, setUser] = useState([]);
-  const { selectedUsers } = useContext(UserContext);
-  let user_list = [];
-
-  useEffect(() => {
-    if (isCheckAll) {
-      setSelectUser((pre) => {
-        return [...pre, item];
-      });
-    } else {
-      selectUser?.filter((ite) => {
-        ite.userId != item.userId;
-      });
-    }
-  }, [isCheckAll]);
-
-  useEffect(() => {
-    selectedUsers.map((user) => {
-      if (user.userId == item.userId) {
-        setIsCheckAll(isCheckAll ? false : true);
-      }
-    });
-  }, [isCheckAll]);
 
   const onDeleteHandler = () => {
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
@@ -90,15 +65,21 @@ const UsersCard = ({
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={() => setEditModal(false)}
-      key={item.id}
+    <Pressable
+      // activeOpacity={0.8}
+
+      onPress={() => {
+        console.log('user pressed');
+        setEditModal(false);
+        onChecked(item);
+        // checkToggle(item.userId);
+      }}
+      key={item.userId}
     >
       {index == 0 ? null : <Divider style={styles.divider} />}
 
       {/* committee details */}
-      <TouchableOpacity style={styles.committeeDetailView} activeOpacity={0.5}>
+      <View style={styles.committeeDetailView} activeOpacity={0.5}>
         <View style={styles.userDetails}>
           <Avatar name={item.firstName} size={SIZES[32]} />
           <Text style={{ marginLeft: SIZES[12] }}>
@@ -115,7 +96,13 @@ const UsersCard = ({
           <View>
             <RowData name={'ID'} discription={item.userId} />
             <RowData name={'E-mail'} discription={item.emails} />
-            <RowData name={'Role'} discription={item.roles} />
+            <RowData
+              name={'Role'}
+              discription={
+                item.roles !== null &&
+                item.roles[item?.organizationIds?.indexOf(committee)]
+              }
+            />
             {external ? (
               <RowData name={'Private'} switchView={true} />
             ) : (
@@ -125,31 +112,35 @@ const UsersCard = ({
           <CheckBox
             // value={selectUser || selectAllExternal ? true : selectUser}
             onValueChange={() => {
-              allUserButton
-                ? setSelectAll(!selectAll)
-                : setIsCheckAll(!isCheckAll);
+              onChecked(item);
+
+              // allUserButton
+              //   ? setSelectAll(!selectAll)
+              //   : setIsCheckAll(!isCheckAll);
               // if (isCheckAll) {
               //   user.push(item);
               // } else user.pop(item);
             }}
-            value={allUserButton ? true : isCheckAll}
+            value={item.isSelected}
           />
         </View>
-      </TouchableOpacity>
+      </View>
 
       {/* dotsView */}
-      <TouchableOpacity
-        onPress={() => setEditModal(!editModal)}
-        style={styles.dotsView}
-      >
-        <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[4]} />
-      </TouchableOpacity>
+      {openPopup && (
+        <TouchableOpacity
+          onPress={() => setEditModal(!editModal)}
+          style={styles.dotsView}
+        >
+          <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[4]} />
+        </TouchableOpacity>
+      )}
       {editModal && (
         <View style={styles.modalView}>
           <EditDeleteModal onPressDelete={onDeleteHandler} download />
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -189,7 +180,11 @@ const styles = StyleSheet.create({
   dotsView: {
     position: 'absolute',
     right: SIZES[16],
-    top: SIZES[32]
+    top: SIZES[32],
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   userDetails: {
     flexDirection: 'row',
