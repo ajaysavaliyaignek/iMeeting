@@ -222,7 +222,12 @@ const DetailsScreen = () => {
                 }}
               >
                 <Text style={styles.txtCommittee}>Committee</Text>
-                <View style={styles.btnCommittees}>
+                <View
+                  style={[
+                    styles.btnCommittees,
+                    { width: committeeName !== '' ? '78%' : null }
+                  ]}
+                >
                   <Text style={styles.txtBtnCommittees} numberOfLines={1}>
                     {committeeName !== '' ? committeeName : 'All'}
                   </Text>

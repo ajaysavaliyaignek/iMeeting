@@ -26,7 +26,8 @@ const UserCard = ({
   onChangeUser,
   onDeleteHandler,
   valueIndex,
-  setValueIndex
+  setValueIndex,
+  disableSwitch
 }) => {
   const RowData = ({
     name,
@@ -48,6 +49,7 @@ const UserCard = ({
 
               onChangeUser(value, isRequired);
             }}
+            disabled={disableSwitch}
           />
         )}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>

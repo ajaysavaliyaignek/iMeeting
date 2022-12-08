@@ -34,13 +34,7 @@ const EditAppointmentUsers = () => {
   const [required, setRequired] = useState([]);
   const [valueIndex, setValueIndex] = useState(-1);
   const { attachFiles, committee, title, discription, item } = route?.params;
-  console.log('items  from edit appo us', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    item
-  });
+  console.log({ attachFiles, committee, title, discription, item });
   const { selectedUsers, appointmentsData, setAppointmentsData } =
     useContext(UserContext);
   const [previousUser, setPreviousUser] = useState([]);
@@ -51,22 +45,13 @@ const EditAppointmentUsers = () => {
 
   useEffect(() => {
     let userData = [];
-    item?.userDetails.map((user) => {
+    item?.userDetails?.map((user) => {
       backUpUser.push(JSON.parse(JSON.stringify(user)));
       userData.push(JSON.parse(JSON.stringify(user)));
     });
     setPreviousUser(userData);
     setPreviousUser(userData);
   }, []);
-
-  useEffect(() => {
-    console.log('pre data', previousUser);
-
-    users = previousUser?.map((item) => item.userId);
-    console.log('userId', users);
-    requiredUsers = previousUser?.map((item) => item.isRequired);
-    console.log('userRequired', requiredUsers);
-  }, [previousUser]);
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStartHandler;
@@ -192,6 +177,15 @@ const EditAppointmentUsers = () => {
     ]);
   };
 
+  useEffect(() => {
+    console.log('pre data', previousUser);
+
+    users = previousUser?.map((item) => item.userId);
+    console.log('userId', users);
+    requiredUsers = previousUser?.map((item) => item.isRequired);
+    console.log('userRequired', requiredUsers);
+  }, [previousUser]);
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
@@ -297,6 +291,7 @@ const EditAppointmentUsers = () => {
                   onDeleteHandler={onDeleteHandler}
                   valueIndex={valueIndex}
                   setValueIndex={setValueIndex}
+                  disableSwitch={false}
                 />
               )}
               showsVerticalScrollIndicator={false}

@@ -18,6 +18,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import {
   GET_All_APPOINTMENT,
   GET_ALL_LOCATION,
+  GET_APPOINTMENT_BY_ID,
   GET_PLATFORMLINK
 } from '../../../../graphql/query';
 import { UPDATE_APPOINTMENT } from '../../../../graphql/mutation';
@@ -41,25 +42,24 @@ const EditAppointmentLocation = () => {
     item,
     userRequired
   } = route?.params;
-  console.log('appointment data from addmeetinglocation', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    startDate,
-    endDate,
-    startTime,
-    endTime,
-    TimeZone,
-    Repeat,
-    item,
-    userRequired
-  });
-  const [openLocation, setOpenLocation] = useState(false);
+  // console.log('appointment data from addmeetinglocation', {
+  //   attachFiles,
+  //   committee,
+  //   title,
+  //   discription,
+  //   users,
+  //   startDate,
+  //   endDate,
+  //   startTime,
+  //   endTime,
+  //   TimeZone,
+  //   Repeat,
+  //   item,
+  //   userRequired
+  // });
+  console.log('appointment id', item.appointmentId);
   const [valueLocation, setValueLocation] = useState(item.locationId);
   const [onFocus, setIsFocus] = useState(false);
-  const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(
     item.platformName == 'Google Meet' ? 1 : 2
   );
@@ -81,15 +81,12 @@ const EditAppointmentLocation = () => {
     },
 
     onCompleted: (data) => {
-      console.log('get location', data?.locations);
-      // setSubjectData(data?.subjects.items);
-
       setLocation(data?.locations.items);
+    },
+    onError: (data) => {
+      console.log('LocationError', data);
     }
   });
-  if (LocationError) {
-    console.log('LocationError', LocationError);
-  }
 
   // get platform link
   const {
@@ -102,16 +99,14 @@ const EditAppointmentLocation = () => {
     },
 
     onCompleted: (data) => {
-      console.log('get platform link', data.videoConferencePlatformLink);
-      // setSubjectData(data?.subjects.items);
       if (data) {
         setPlatform(data?.videoConferencePlatformLink);
       }
+    },
+    onError: (data) => {
+      console.log('platformError', data);
     }
   });
-  if (platformError) {
-    console.log('platformError', platformError);
-  }
 
   const [addAppointment] = useMutation(UPDATE_APPOINTMENT, {
     // export const GET_All_SUBJECTS = gql`
@@ -119,10 +114,13 @@ const EditAppointmentLocation = () => {
       {
         query: GET_All_APPOINTMENT,
         variables: { searchValue: '', page: -1, pageSize: -1 }
+      },
+      {
+        query: GET_APPOINTMENT_BY_ID,
+        variables: { id: item?.appointmentId }
       }
     ],
     onCompleted: (data) => {
-      console.log('add appointment', data.updateAppointment);
       if (data.updateAppointment.status[0].statusCode == '200') {
         navigation.navigate('AppointmentsList');
       }
@@ -326,8 +324,24 @@ const EditAppointmentLocation = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              setSelectedUsers([]);
-              console.log(valueLocation, platform.platformId);
+              console.log({
+                appointmentDescription: discription,
+                appointmentId: item.appointmentId,
+                appointmentTitle: title,
+                attachFileIds: attachFiles,
+                committeeId: committee,
+                locationId: valueLocation,
+                platformId:
+                  valueVideoConference !== null ? valueVideoConference : 0,
+                repeat: Repeat,
+                required: userRequired,
+                setDate: startDate,
+                setTime: startTime,
+                endDate: endDate,
+                endTime: endTime,
+                timeZone: TimeZone,
+                userIds: users
+              });
               addAppointment({
                 variables: {
                   appointment: {

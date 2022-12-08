@@ -244,6 +244,7 @@ const AddMeetingUser = () => {
                   valueIndex={valueIndex}
                   setValueIndex={setValueIndex}
                   onDeleteHandler={onDeleteHandler}
+                  disableSwitch={false}
                 />
               )}
               showsVerticalScrollIndicator={false}

@@ -90,11 +90,7 @@ const AddAppointmentLocation = () => {
     refetchQueries: [
       {
         query: GET_All_APPOINTMENT,
-        variables: {
-          searchValue: '',
-          page: -1,
-          pageSize: -1
-        }
+        variables: { searchValue: '', page: -1, pageSize: -1 }
       }
     ],
     onCompleted: (data) => {

@@ -78,7 +78,6 @@ export const styles = StyleSheet.create({
     ...Fonts.PoppinsRegular[14],
     color: Colors.secondary,
     marginRight: SIZES[21],
-    // width: '80%',
 
     marginLeft: 8
   },

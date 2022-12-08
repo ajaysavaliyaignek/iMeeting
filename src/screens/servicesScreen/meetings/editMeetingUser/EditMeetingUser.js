@@ -42,7 +42,7 @@ const EditMeetingUser = () => {
 
   useEffect(() => {
     let userData = [];
-    item?.userDetails.map((user) => {
+    item?.userDetails?.map((user) => {
       backUpUser.push(JSON.parse(JSON.stringify(user)));
       userData.push(JSON.parse(JSON.stringify(user)));
     });
@@ -284,6 +284,7 @@ const EditMeetingUser = () => {
                   onDeleteHandler={onDeleteHandler}
                   valueIndex={valueIndex}
                   setValueIndex={setValueIndex}
+                  disableSwitch={false}
                 />
               )}
               showsVerticalScrollIndicator={false}

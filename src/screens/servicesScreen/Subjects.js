@@ -25,7 +25,7 @@ import { GET_SUBJECT_BY_ID } from '../../graphql/query';
 const Subjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { subjectId, role } = route?.params;
+  const { subjectId, role, deadlinedDate } = route?.params;
   const [searchText, setSearchText] = useState('');
   const [subject, setSubject] = useState([]);
   const [valueIndex, setValueIndex] = useState(-1);
@@ -86,30 +86,7 @@ const Subjects = () => {
       console.log('file error', error);
     }
   });
-  // subjectId?.map((id) => {
-  //   const getSubjectsById = useQuery(GET_SUBJECT_BY_ID, {
-  //     variables: {
-  //       subjectId: id
-  //     },
-  //     onCompleted: (data) => {
-  //       console.log('subject from meeting details', data.subject);
-  //       setSubject((prev) => {
-  //         const id = subjects?.map((item) => {
-  //           return [...item];
-  //         });
 
-  //         // if (id != data.subject.subjectId) {
-  //         //   setSubject([...item]);
-  //         //   // setSubject(subjects);
-  //         // }
-  //       });
-  //     }
-  //   });
-
-  //   if (getSubjectsById.error) {
-  //     console.log('getSubjectsById error', getSubjectsById.error);
-  //   }
-  // });
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
@@ -144,6 +121,7 @@ const Subjects = () => {
               <TouchableOpacity
                 style={styles.chooseDateContainer}
                 onPress={() => navigation.navigate('DeadlineSuggestion')}
+                disabled={true}
               >
                 <View
                   style={{
@@ -152,7 +130,7 @@ const Subjects = () => {
                     marginRight: SIZES[14]
                   }}
                 >
-                  <Text style={styles.txtChooseDate}>Choose date</Text>
+                  <Text style={styles.txtChooseDate}>{deadlinedDate}</Text>
                 </View>
 
                 <Icon

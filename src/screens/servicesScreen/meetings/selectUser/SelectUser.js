@@ -17,8 +17,8 @@ const SelectUser = () => {
   const [requiredCheckBox, setRequiredCheckBox] = useState(false);
   const [optionalSwitchOn, setOptionalSwitchOn] = useState(false);
   const [optionalCheckbox, setOptionalCheckBox] = useState(false);
-  const [requiredUsers, setRequiredUsers] = useState(selectedUsers);
-  const [optionalUser, setOptionalUser] = useState(selectedUsers);
+  const [requiredUsers, setRequiredUsers] = useState([]);
+  const [optionalUser, setOptionalUser] = useState([]);
   const users = [
     {
       profileImage: 'https://picsum.photos/200/300',
@@ -41,15 +41,21 @@ const SelectUser = () => {
   useEffect(() => {
     selectedUsers?.map((user) => {
       if (user.isRequired == true) {
-        setRequiredUsers([...requiredUsers]);
+        console.log('1');
+        setRequiredUsers((prev) => {
+          return [...prev, user];
+        });
       }
       if (user.isRequired == false) {
-        setOptionalUser([...optionalUser]);
+        console.log('2');
+        setOptionalUser((prev) => {
+          return [...prev, user];
+        });
       }
     });
     // setRequiredUsers([...requiredUsers]);
   }, [selectedUsers]);
-
+  console.log('======required=======', requiredUsers);
   // useEffect(() => {
   //   optionalUser?.map((user) => {
   //     user?.isRequired == false;

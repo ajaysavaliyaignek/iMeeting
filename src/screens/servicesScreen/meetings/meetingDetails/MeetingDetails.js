@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import momentDurationFormatSetup from 'moment-duration-format';
 
@@ -28,6 +28,7 @@ import { Fonts } from '../../../../themes';
 import {
   GET_ALL_LOCATION_BY_ID,
   GET_All_MEETING,
+  GET_ANSWER,
   GET_COMMITTEE_BY_ID,
   GET_FILE,
   GET_MEETING_BY_ID,
@@ -42,6 +43,7 @@ const MeetingDetails = () => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item } = route?.params;
+  console.log('item', item);
 
   const [fileResponse, setFileResponse] = useState(null);
   const [meeting, setMeeting] = useState(null);
@@ -50,6 +52,7 @@ const MeetingDetails = () => {
   const [platform, setPlatform] = useState(null);
   const [role, setRole] = useState('');
   const [user, setUser] = useState(null);
+  const [answer, setAnswer] = useState(null);
   let file = [];
 
   item?.attachFileIds.map((id) => {
@@ -97,17 +100,26 @@ const MeetingDetails = () => {
       console.log('error in get meeting by id', data);
     }
   });
+  console.log('user', user);
+
+  const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
+    onCompleted: (data) => {
+      console.log('answer data', data.answer);
+      setAnswer(data.answer);
+    }
+  });
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
     onCompleted: (data) => {
-      console.log('user data', data.userPayload.userCommitteesDetail);
-      const userId = item?.userDetails?.filter((user) => {
-        if (user.userId == data.userPayload.userId) {
-          return user;
+      console.log('user data', data.userPayload.userId);
+      setUser(data.userPayload.userId);
+      getAnswer({
+        variables: {
+          id: +item?.meetingId,
+          userId: +data.userPayload.userId,
+          type: 1
         }
       });
-      console.log('user Id', userId);
-      setUser(userId[0]);
     }
   });
 
@@ -300,9 +312,9 @@ const MeetingDetails = () => {
               ) : (
                 details(
                   'Your answer',
-                  user?.suggestedTime == ''
-                    ? user?.answer
-                    : `Your suggestion time - ${user?.suggestedTime}`
+                  answer?.suggestionTime == ''
+                    ? answer?.answer
+                    : `Your suggestion time - ${answer?.suggestionTime}`
                 )
               )}
               <TouchableOpacity
@@ -451,7 +463,8 @@ const MeetingDetails = () => {
             onPress={() =>
               navigation.navigate('subjects', {
                 subjectId: meeting?.subjectIds,
-                role
+                role,
+                deadlinedDate: meeting?.deadlineDate
               })
             }
           >

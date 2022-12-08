@@ -226,6 +226,7 @@ const EditMeetingGeneralScreen = () => {
           <View style={styles.titleContainer}>
             <Text style={styles.txtTitle}>CHOOSE COMMITTEE</Text>
             <DropDownPicker
+              disabled={true}
               listMode="SCROLLVIEW"
               open={open}
               value={valueCommitee}

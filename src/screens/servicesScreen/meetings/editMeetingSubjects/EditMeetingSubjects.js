@@ -24,6 +24,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import {
   GET_All_MEETING,
   GET_All_SUBJECTS,
+  GET_MEETING_BY_ID,
   GET_SUBJECT_BY_ID
 } from '../../../../graphql/query';
 import { UPDATE_MEETING } from '../../../../graphql/mutation';
@@ -38,8 +39,8 @@ const EditMeetingSubjects = () => {
     selectedSubjects,
     setSelectedUsers,
     meetingsData,
-    setMeetingsData,
-    setSelectedSubjects
+    setMeetingsData
+    // setSelectedSubjects
   } = useContext(UserContext);
   const { item } = route?.params;
   console.log('meeting data from add meeting subjects', {
@@ -51,11 +52,14 @@ const EditMeetingSubjects = () => {
   const [calendarValue, setCalendarValue] = useState('5-11 September');
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState(selectedSubjects);
-  const [subjectData, setSubjectData] = useState(selectedSubjects);
   const [subjectsId, setSubjectsId] = useState([]);
   const [subject, setSubject] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
+  const [selectSubjects, setSelectedSubjects] = useState([]);
+  const [previosSubjects, setPreviosSubjects] = useState([]);
+  const [backUpUser, setBackupUser] = useState([]);
+  let subjects = [];
 
   item?.subjectIds?.map((id) => {
     const { loading, error } = useQuery(GET_SUBJECT_BY_ID, {
@@ -66,14 +70,22 @@ const EditMeetingSubjects = () => {
         console.log('subject by id from subjects', data);
         if (data) {
           setSubject((prev) => {
-            subject?.filter((ite) => {
-              if (ite.subjectId !== data.subject.subjectId) {
-                return [...ite, data.subject];
-              }
-              // console.log('item id', ite.subjectId);
-              // console.log('data id', data.subject.subjectId);
+            const pevDaa = prev.filter((ite) => {
+              return ite.subjectId !== data.subject.subjectId;
             });
-            // return [...subject, data.subject];
+            return [...pevDaa, data.subject];
+          });
+          setPreviosSubjects((prev) => {
+            const pevDaa = prev.filter((ite) => {
+              return ite.subjectId !== data.subject.subjectId;
+            });
+            return [...pevDaa, data.subject];
+          });
+          setBackupUser((prev) => {
+            const pevDaa = prev.filter((ite) => {
+              return ite.subjectId !== data.subject.subjectId;
+            });
+            return [...pevDaa, data.subject];
           });
         }
       }
@@ -82,14 +94,41 @@ const EditMeetingSubjects = () => {
       console.log('file error', error);
     }
   });
-  useEffect(() => {
-    setSelectedSubjects(subject);
-    const userId = selectedSubjects?.map((item) => {
-      return item.subjectId;
+
+  const onUpdateSelection = (items) => {
+    let newUsers = [];
+
+    items?.map((subject) => {
+      let indexPreviousUser =
+        previosSubjects?.length > 0
+          ? previosSubjects?.findIndex(
+              (obj) => obj.subjectId === subject?.subjectId
+            )
+          : -1;
+      if (indexPreviousUser === -1) {
+        let index =
+          backUpUser?.length > 0
+            ? backUpUser?.findIndex(
+                (obj) => obj.subjectId === subject.subjectId
+              )
+            : -1;
+        if (index == -1) {
+          newUsers.push(JSON.parse(JSON.stringify(subject)));
+        } else {
+          newUsers.push(JSON.parse(JSON.stringify(backUpUser[index])));
+        }
+      } else {
+        newUsers.push(
+          JSON.parse(JSON.stringify(previosSubjects[indexPreviousUser]))
+        );
+
+        // newUsers.push(previousUser[indexPreviousUser]);
+      }
     });
-    setSubjectsId(userId);
-  }, [selectedSubjects]);
-  console.log('suvjectid', subjectsId);
+
+    setPreviosSubjects(newUsers);
+    setFilterData(newUsers);
+  };
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStartHandler;
@@ -158,6 +197,12 @@ const EditMeetingSubjects = () => {
           page: -1,
           pageSize: -1
         }
+      },
+      {
+        query: GET_MEETING_BY_ID,
+        variables: {
+          meetingId: item?.meetingId
+        }
       }
     ],
     onCompleted: (data) => {
@@ -177,6 +222,13 @@ const EditMeetingSubjects = () => {
       console.log('addmeeting data', data.message);
     }
   });
+
+  useEffect(() => {
+    console.log('pre data', previosSubjects);
+
+    subjects = previosSubjects?.map((item) => item.subjectId);
+    console.log('userId', subjects);
+  }, [previosSubjects]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -227,7 +279,7 @@ const EditMeetingSubjects = () => {
 
           <ScrollView showsVerticalScrollIndicator={false}>
             <FlatList
-              data={selectedSubjects}
+              data={previosSubjects}
               keyExtractor={(item, index) => {
                 return index.toString();
               }}
@@ -272,7 +324,10 @@ const EditMeetingSubjects = () => {
                 textStyle={styles.txtCancelButton}
                 onPress={() =>
                   navigation.navigate('SelectSubjects', {
-                    committee: meetingsData?.committee
+                    committee: meetingsData?.committee,
+                    setSelectedSubjects: setSelectedSubjects,
+                    onUpdateSelection: onUpdateSelection,
+                    previosSubjects: previosSubjects
                   })
                 }
               />
@@ -329,7 +384,7 @@ const EditMeetingSubjects = () => {
                       required: meetingsData.userRequired,
                       setDate: meetingsData.startDate,
                       setTime: meetingsData.startTime,
-                      subjectIds: subjectsId,
+                      subjectIds: subjects,
                       timeZone: meetingsData.TimeZone,
                       userIds: meetingsData.users,
 

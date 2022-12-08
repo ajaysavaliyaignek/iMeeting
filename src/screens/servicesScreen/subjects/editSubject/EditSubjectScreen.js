@@ -44,7 +44,7 @@ const EditSubjectScreen = () => {
   const [openMeeting, setOpenMeeting] = useState(false);
   const [valueCategory, setValueCategory] = useState(item.subjectCategoryId);
   const [valueCommittee, setValueCommittee] = useState(item.committeeId);
-  const [valueMeeting, setValueMeeting] = useState(item.committeeId);
+  const [valueMeeting, setValueMeeting] = useState(item?.meetingId);
   const [fileResponse, setFileResponse] = useState([]);
   const [filesId, setFilesId] = useState([]);
   const [token, setToken] = useState('');
@@ -80,75 +80,6 @@ const EditSubjectScreen = () => {
     setFilesId(fileId);
   }, [fileResponse]);
   console.log('file id', filesId);
-
-  const checkPermission = async (file) => {
-    console.log('check permission');
-    if (Platform.OS === 'ios') {
-      downloadFile(file);
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download File'
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-          downloadFile(file);
-          console.log('Storage Permission Granted.');
-        } else {
-          // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
-        }
-      } catch (err) {
-        // To handle permission related exception
-        console.log('++++' + err);
-      }
-    }
-  };
-
-  const downloadFile = (file) => {
-    console.log('downloadfile');
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(FILE_URL);
-
-    file_ext = '.' + file_ext[0];
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    let RootDir = fs.dirs.PictureDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          file_ext,
-        description: 'downloading file...',
-        notification: true,
-        // useDownloadManager works with Android only
-        useDownloadManager: true
-      }
-    };
-    config(options)
-      .fetch('GET', FILE_URL)
-      .then((res) => {
-        // Alert after successful downloading
-        console.log('res -> ', res.respInfo.redirects[0]);
-        alert('File Downloaded Successfully.');
-        if (Platform.OS == 'ios') {
-          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
-        }
-      });
-  };
 
   const getFileExtention = (fileUrl) => {
     // To get the file extension
@@ -266,17 +197,18 @@ const EditSubjectScreen = () => {
         query: GET_All_SUBJECTS,
         variables: {
           committeeIds: '',
-          searchValue: searchText,
+          searchValue: '',
           screen: 0,
           page: -1,
           pageSize: -1
         }
       }
-    ]
+    ],
+    onCompleted: (data) => {
+      console.log(data.updateSubject.status);
+    }
   });
-  if (data) {
-    console.log(data);
-  }
+
   if (error) {
     console.log('addsubject error--', error);
   }
@@ -499,6 +431,7 @@ const EditSubjectScreen = () => {
                   console.log('attachFileIds', filesId);
                   console.log('valueCommittee', valueCommittee);
                   console.log('valueCategory', valueCategory);
+                  console.log('valueMeeting', valueMeeting);
                   addSubject({
                     variables: {
                       subject: {
@@ -509,14 +442,17 @@ const EditSubjectScreen = () => {
                         subjectCategoryId: valueCategory,
                         draft: false,
                         attachFileIds: filesId,
+                        meetingId: valueMeeting !== null ? valueMeeting : 0,
                         id: 0
                       }
                     },
-                    onCompleted: () => {
-                      navigation.navigate('Details', {
-                        title: 'Subjects',
-                        active: '1'
-                      });
+                    onCompleted: (data) => {
+                      if (data.updateSubject.status[0].statusCode == '200') {
+                        navigation.navigate('Details', {
+                          title: 'Subjects',
+                          active: '1'
+                        });
+                      }
                     }
                   });
 

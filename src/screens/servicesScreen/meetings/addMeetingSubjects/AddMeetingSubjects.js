@@ -42,10 +42,14 @@ const AddMeetingSubjects = () => {
       : moment(new Date()).format('YYYY-MM-DD')
   );
   const [searchText, setSearchText] = useState('');
-  const [filterData, setFilterData] = useState(selectedSubjects);
+  const [filterData, setFilterData] = useState([]);
   const [subjectsId, setSubjectsId] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
+  const [previousSubject, setPreviousSubject] = useState([]);
+  let subjects = [];
+
+  let backUpUser = [];
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStartHandler;
@@ -79,27 +83,59 @@ const AddMeetingSubjects = () => {
   };
 
   useEffect(() => {
-    const userId = selectedSubjects?.map((item) => {
-      return item.subjectId;
+    console.log('pre data', previousSubject);
+
+    subjects = previousSubject?.map((item) => item.subjectId);
+    console.log('userId', subjects);
+  }, [previousSubject]);
+
+  const onUpdateSelection = (items) => {
+    let newUsers = [];
+    console.log('Selected user from add appointment', items);
+
+    items?.map((subject) => {
+      let indexPreviousUser =
+        previousSubject?.length > 0
+          ? previousSubject?.findIndex(
+              (obj) => obj.subjectId === subject?.subjectId
+            )
+          : -1;
+      if (indexPreviousUser === -1) {
+        let index =
+          backUpUser?.length > 0
+            ? backUpUser?.findIndex((obj) => obj.userId === subject.userId)
+            : -1;
+        if (index == -1) {
+          newUsers.push(JSON.parse(JSON.stringify(subject)));
+        } else {
+          newUsers.push(JSON.parse(JSON.stringify(backUpUser[index])));
+        }
+      } else {
+        newUsers.push(
+          JSON.parse(JSON.stringify(previousSubject[indexPreviousUser]))
+        );
+
+        // newUsers.push(previousUser[indexPreviousUser]);
+      }
     });
-    setSubjectsId(userId);
-    setFilterData(selectedSubjects);
-  }, [selectedSubjects]);
-  console.log('suvjectid', subjectsId);
+
+    setPreviousSubject(newUsers);
+    setFilterData(newUsers);
+  };
 
   const searchFilterSubject = (text) => {
     if (text) {
-      const newData = selectedSubjects?.filter((item) => {
+      const newData = filterData?.filter((item) => {
         const itemData = item.subjectTitle ? item.subjectTitle : '';
         const textData = text;
         return itemData.indexOf(textData) > -1;
       });
 
       setSearchText(text);
-      setFilterData(newData);
+      setPreviousSubject(newData);
     } else {
       setSearchText(text);
-      setFilterData(selectedSubjects);
+      setPreviousSubject(selectedSubjects);
     }
   };
 
@@ -181,8 +217,8 @@ const AddMeetingSubjects = () => {
         <Divider style={styles.divider} />
 
         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-          {filterData.length > 0 ? (
-            filterData?.map((subjects, index) => {
+          {previousSubject.length > 0 ? (
+            previousSubject?.map((subjects, index) => {
               return (
                 <AddSubjectsCard
                   item={subjects}
@@ -228,7 +264,9 @@ const AddMeetingSubjects = () => {
               textStyle={styles.txtCancelButton}
               onPress={() =>
                 navigation.navigate('SelectSubjects', {
-                  committee: meetingsData.committee
+                  committee: meetingsData.committee,
+                  onUpdateSelection: onUpdateSelection,
+                  previousSubject: previousSubject
                 })
               }
             />
@@ -308,7 +346,7 @@ const AddMeetingSubjects = () => {
                       required: meetingsData.userRequired,
                       setDate: meetingsData.startDate,
                       setTime: meetingsData.startTime,
-                      subjectIds: subjectsId,
+                      subjectIds: subjects,
                       timeZone: meetingsData.TimeZone,
                       userIds: meetingsData.users,
                       subjectStatusIds: [],

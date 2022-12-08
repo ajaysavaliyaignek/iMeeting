@@ -69,6 +69,7 @@ const AppointmentsList = () => {
           <TouchableOpacity
             onPress={() => {
               setSelectedUsers([]);
+              setAppointmentsData([]);
 
               navigation.navigate('AddAppointmentGeneral');
             }}
@@ -119,21 +120,7 @@ const AppointmentsList = () => {
             <Divider style={styles.divider} />
           </View>
         ) : (
-          <View>
-            {/* filter */}
-            <TouchableOpacity style={styles.committeeView} activeOpacity={0.5}>
-              <Text style={styles.txtCommittee}>Filter</Text>
-              <View style={styles.btnCommittees}>
-                <Icon
-                  name={IconName.Arrow_Right}
-                  height={SIZES[12]}
-                  width={SIZES[6]}
-                />
-              </View>
-            </TouchableOpacity>
-
-            <Divider style={styles.divider} />
-          </View>
+          <View></View>
         )}
 
         {appointmentsData.length > 0 ? (

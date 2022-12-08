@@ -12,7 +12,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { Divider } from 'react-native-paper';
 import momentDurationFormatSetup from 'moment-duration-format';
 
@@ -27,6 +27,7 @@ import { Fonts } from '../../../../themes';
 
 import {
   GET_All_APPOINTMENT,
+  GET_ANSWER,
   GET_APPOINTMENT_BY_ID,
   GET_FILE,
   GET_USER_PAYLOAD
@@ -47,6 +48,8 @@ const AppointmentsDetails = () => {
   const [appointment, setAppointment] = useState(null);
   const [role, setRole] = useState(item.yourRoleName);
   const [user, setUser] = useState(null);
+  const [answer, setAnswer] = useState(null);
+  const [valueIndex, setValueIndex] = useState(null);
   let fileId = item?.attachFileIds;
 
   // get mappointment by id
@@ -66,16 +69,24 @@ const AppointmentsDetails = () => {
     }
   });
 
+  const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
+    onCompleted: (data) => {
+      console.log('answer data', data.answer);
+      setAnswer(data.answer);
+    }
+  });
+
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
     onCompleted: (data) => {
-      console.log('user data', data.userPayload.userCommitteesDetail);
-      const userId = item?.userDetails?.filter((user) => {
-        if (user.userId == data.userPayload.userId) {
-          return user;
+      console.log('user data', data.userPayload.userId);
+      setUser(data.userPayload.userId);
+      getAnswer({
+        variables: {
+          id: +item?.appointmentId,
+          userId: +data.userPayload.userId,
+          type: 2
         }
       });
-      console.log('user Id', userId);
-      setUser(userId[0]);
     }
   });
 
@@ -237,9 +248,9 @@ const AppointmentsDetails = () => {
               ) : (
                 details(
                   'Your answer',
-                  user?.suggestedTime == ''
-                    ? user?.answer
-                    : `Your suggestion time - ${user?.suggestedTime}`
+                  answer?.suggestionTime == ''
+                    ? answer?.answer
+                    : `Your suggestion time - ${user?.suggestionTime}`
                 )
               )}
               <TouchableOpacity
@@ -380,6 +391,9 @@ const AppointmentsDetails = () => {
                       setRequired={() => {}}
                       deleted={false}
                       editable={false}
+                      valueIndex={valueIndex}
+                      setValueIndex={setValueIndex}
+                      disableSwitch={true}
                     />
                   );
                 }}
@@ -389,16 +403,6 @@ const AppointmentsDetails = () => {
                 <Text>No selected user</Text>
               </View>
             )}
-            {/* <View style={styles.btnCommittees}>
-              <Text style={styles.txtBtnCommittees}>
-                {appo?.userIds?.length > 0 ? meeting?.userIds?.length : 0}
-              </Text>
-              <Icon
-                name={IconName.Arrow_Right}
-                height={SIZES[12]}
-                width={SIZES[6]}
-              />
-            </View> */}
           </View>
         </View>
       </ScrollView>

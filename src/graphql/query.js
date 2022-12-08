@@ -1,5 +1,14 @@
 import { gql } from '@apollo/client';
 
+export const GET_ANSWER = gql`
+  query answer($id: Long, $userId: Long, $type: Int) {
+    answer(id: $id, userId: $userId, type: $type) {
+      userId
+      suggestionTime
+      answer
+    }
+  }
+`;
 export const GET_USER_PAYLOAD = gql`
   query {
     userPayload {
@@ -308,6 +317,7 @@ export const GET_All_SUBJECTS = gql`
         subjectTitle
         userId
         statusTitle
+        meetingId
       }
       pageSize
       pageSize
@@ -602,6 +612,7 @@ export const GET_MEETING_BY_ID = gql`
       endTime
       workHours
       yourRoleName
+      deadlineDate
       userDetails {
         answer
         email

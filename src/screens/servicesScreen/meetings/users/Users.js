@@ -24,6 +24,7 @@ const Users = () => {
   console.log('userdetails from users', userDetails);
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState(userDetails);
+  const [valueIndex, setValueIndex] = useState(-1);
   const { required, setRequired } = useContext(UserContext);
 
   const searchFilterUsers = (text) => {
@@ -110,6 +111,9 @@ const Users = () => {
               text={searchText}
               required={required}
               setRequired={setRequired}
+              setValueIndex={setValueIndex}
+              valueIndex={valueIndex}
+              disableSwitch={true}
             />
           )}
           showsVerticalScrollIndicator={false}

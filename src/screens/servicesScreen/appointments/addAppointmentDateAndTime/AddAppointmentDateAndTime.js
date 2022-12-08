@@ -59,9 +59,7 @@ const AddAppointmentDateAndTime = () => {
     appointmentsData?.endDate ? appointmentsData?.endDate : startDate
   );
   const [endTime, setEndTime] = useState(
-    appointmentsData?.endTime
-      ? appointmentsData?.endTime
-      : moment(new Date()).format('LT')
+    appointmentsData?.endTime ? appointmentsData?.endTime : startTime
   );
   const [date, setDate] = useState(new Date());
   const [dates, setDates] = useState(new Date());

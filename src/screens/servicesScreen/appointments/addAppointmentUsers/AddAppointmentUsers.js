@@ -238,6 +238,7 @@ const AddAppointmentUsers = () => {
                 onDeleteHandler={onDeleteHandler}
                 valueIndex={valueIndex}
                 setValueIndex={setValueIndex}
+                disableSwitch={false}
               />
             )}
             showsVerticalScrollIndicator={false}

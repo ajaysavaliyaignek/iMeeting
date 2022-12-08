@@ -268,6 +268,7 @@ const EditAppointmentGeneral = () => {
             <DropDownPicker
               listMode="SCROLLVIEW"
               open={open}
+              disabled={true}
               value={valueCommitee}
               items={
                 committee?.map((item) => ({

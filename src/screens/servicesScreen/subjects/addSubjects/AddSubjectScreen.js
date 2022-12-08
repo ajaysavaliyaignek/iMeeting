@@ -179,7 +179,7 @@ const AddSubjectScreen = () => {
         variables: {
           searchValue: '',
           screen: committee ? 1 : 0,
-          committeeIds: committee,
+          committeeIds: '',
           page: -1,
           pageSize: -1
         }
@@ -187,6 +187,9 @@ const AddSubjectScreen = () => {
     ],
     onCompleted: (data) => {
       console.log(data);
+      // if (data.update.status[0].statusCode == '200') {
+      //   navigation.navigate('AppointmentsList');
+      // }
     }
   });
 

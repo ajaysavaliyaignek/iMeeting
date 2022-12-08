@@ -72,11 +72,11 @@ const EditAppointmentDateAndTime = () => {
       : moment(item.endDate).format('YYYY-MM-DD')
   );
   const [startTime, setStartTime] = useState(
-    item.setTime == null
-      ? moment(new Date()).format('LT')
+    item?.setTime
+      ? item.setTime
       : appointmentsData?.startTime
       ? appointmentsData?.startTime
-      : item.endTime
+      : moment(new Date()).format('LT')
   );
   const [endDate, setEnddate] = useState(
     item.endDate == null
@@ -205,7 +205,6 @@ const EditAppointmentDateAndTime = () => {
 
   const TimeZone = useQuery(GET_TIMEZONE, {
     onCompleted: (data) => {
-      console.log(data.timeZone.items);
       if (data) {
         setTimeZone(data.timeZone.items);
       }

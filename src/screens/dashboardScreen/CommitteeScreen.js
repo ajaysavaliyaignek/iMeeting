@@ -54,7 +54,7 @@ const CommitteeScreen = () => {
           console.log('committees', data?.committees.items);
 
           filterCommittee = data?.committees?.items.map((item, index) => {
-            let previousUserIndex = committees?.findIndex(
+            let previousUserIndex = committee?.findIndex(
               (user) => user.organizationId === item.organizationId
             );
             let isSelected = false;
@@ -91,11 +91,23 @@ const CommitteeScreen = () => {
   };
 
   const setAllCommittee = () => {
+    // setCommittees((previous) => {
+    //   let selectedBoxes = previous.selectedBoxes;
+    //   let index = selectedBoxes.indexOf(id);
+    //   if (index === -1) {
+    //     selectedBoxes.push(id);
+    //   } else {
+    //     selectedBoxes.splice(index, 1);
+    //   }
+    //   return { selectedBoxes };
+    // }),
     committees?.map((committee) => {
       console.log('all committee=======>', committee);
-      committee.isSelected == true;
+
+      committee.isSelected = !committee.isSelected;
     });
     setCommittees([...committees]);
+    setChecked(!isChecked);
   };
 
   return (

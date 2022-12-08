@@ -26,7 +26,8 @@ import { UserContext } from '../../../../context';
 const SelectSubjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { committee } = route?.params;
+
+  const { committee, onUpdateSelection, previosSubjects } = route?.params;
   console.log('committee from select subjects', committee);
   const [searchText, setSearchText] = useState('');
   const [subjectData, setSubjectData] = useState([]);
@@ -36,38 +37,6 @@ const SelectSubjects = () => {
   const { selectedSubjects, setSelectedSubjects } = useContext(UserContext);
   console.log('selectedSubjects', selectedSubject);
   var subjects = [];
-
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStartHandler = (e) => {
-    console.log('startHandler', e);
-  };
-
-  const onSpeechEndHandler = (e) => {
-    console.log('onSpeechEndHandler', e);
-  };
-
-  const onSpeechResultsHandler = (e) => {
-    console.log('onSpeechResultsHandler', e);
-    let text = e.value[0];
-    setSearchText(text);
-  };
-  const startRecording = async () => {
-    try {
-      await Voice.start('en-US');
-    } catch (error) {
-      console.log('voice error', error);
-    }
-  };
-
   const {
     loading: SubjectsLoading,
     error: SubjectsError,
@@ -82,19 +51,39 @@ const SelectSubjects = () => {
     onCompleted: (data) => {
       console.log(data?.subjects.items, 'get all subjects');
       subjects = data?.subjects.items.map((item, index) => {
-        let isSelected = checked;
+        let previousUserIndex = previosSubjects?.findIndex(
+          (user) => user.subjectId === item.subjectId
+        );
+        let isSelected = false;
+
+        if (previousUserIndex >= 0) {
+          isSelected = true;
+        }
         return { ...item, isSelected };
       });
       if (subjects) {
         setSubjectData(subjects);
       }
       // setSubjectData(data?.subjects.items);
+    },
+    onError: (data) => {
+      console.log('subjects error---', data);
     }
   });
 
-  if (SubjectsError) {
-    console.log('subjects error---', SubjectsError);
-  }
+  const setSelectedUserInSelectedList = () => {
+    const selectedUserList = [];
+    subjectData.map((user) => {
+      if (user.isSelected) {
+        selectedUserList.push(user);
+      }
+    });
+
+    onUpdateSelection(selectedUserList);
+    // setSelectedUsers(selectedUserList);
+
+    navigation.goBack();
+  };
 
   useEffect(() => {
     const filterUser = subjectData.filter((user) => user.isSelected == true);
@@ -197,7 +186,9 @@ const SelectSubjects = () => {
           />
           <Button
             title={'Add subjects'}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              setSelectedUserInSelectedList();
+            }}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,
