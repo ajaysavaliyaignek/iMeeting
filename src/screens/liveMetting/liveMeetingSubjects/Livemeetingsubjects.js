@@ -20,45 +20,13 @@ import { GET_SUBJECT_BY_ID } from '../../../graphql/query';
 import Loader from '../../../component/Loader/Loader';
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
+import SubjectListComponent from '../../../component/detailsComponent/subjectsListComponent/SubjectListComponent';
 
-const Livemeetingsubjects = ({ item, meeting }) => {
-  console.log('item from LM Subjects', item);
+const Livemeetingsubjects = ({ item }) => {
+  // console.log('item from LM Subjects', item);
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
-  const [filterData, setFilterData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  const [subjectsLoading, setSubjectsLoading] = useState(false);
-  const [subjects, setSubjects] = useState([]);
-
-  meeting?.subjectIds?.map((id) => {
-    console.log('id', id);
-    const { loading: getSubjectLoading, error: getSubjectError } = useQuery(
-      GET_SUBJECT_BY_ID,
-      {
-        variables: {
-          subjectId: id
-        },
-        onCompleted: (data) => {
-          console.log('get subject by id', data.subject);
-          if (data) {
-            setSubjects((prev) => {
-              const pevDaa = prev.filter((ite) => {
-                return ite.subjectId !== data.subjectId;
-              });
-              return [...pevDaa, data.subject];
-            });
-            setSubjectsLoading(false);
-          }
-        }
-      }
-    );
-    if (getSubjectError) {
-      console.log('file error', getSubjectError);
-    }
-    if (getSubjectLoading) {
-      setSubjectsLoading(true);
-    }
-  });
 
   const searchFilterSubject = (text) => {
     // if (text) {
@@ -119,7 +87,7 @@ const Livemeetingsubjects = ({ item, meeting }) => {
         <TextInput
           style={styles.textInput}
           placeholder={'Search subjects'}
-          onChangeText={(text) => searchFilterSubject(text)}
+          onChangeText={(text) => setSearchText(text)}
         />
         <TouchableOpacity onPress={() => startRecording()}>
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
@@ -132,37 +100,12 @@ const Livemeetingsubjects = ({ item, meeting }) => {
         textStyle={styles.txtCancelButton}
       />
       <Divider style={styles.divider} />
-
-      {subjectsLoading ? (
-        <Loader />
-      ) : subjects.length > 0 ? (
-        <FlatList
-          data={subjects}
-          keyExtractor={(item, index) => {
-            return index.toString();
-          }}
-          renderItem={({ item, index }) => {
-            return (
-              <SubjectsCard
-                item={item}
-                index={index}
-                searchText={searchText}
-                visibleIndex={visibleIndex}
-                setVisibleIndex={setVisibleIndex}
-                subjectStatus={item.statusTitle}
-              />
-            );
-          }}
-        />
-      ) : subjects.length == 0 ? (
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
-          <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-            No subjects
-          </Text>
-        </View>
-      ) : null}
+      <SubjectListComponent
+        committeeIds={''}
+        meetingId={item.meetingId}
+        searchText={searchText}
+        isSubjectStatus={false}
+      />
     </TouchableOpacity>
   );
 };

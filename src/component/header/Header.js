@@ -48,7 +48,7 @@ const Header = ({
             style={[
               styles.txtHeader,
               {
-                marginLeft: rightIconName ? '8%' : '38%',
+                marginLeft: rightIconName ? '8%' : '30%',
                 width: '30%',
 
                 alignSelf: 'center'

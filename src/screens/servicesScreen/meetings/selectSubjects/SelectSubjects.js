@@ -7,7 +7,6 @@ import {
   FlatList
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import Voice from '@react-native-community/voice';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { useQuery } from '@apollo/client';
@@ -51,6 +50,8 @@ const SelectSubjects = () => {
     onCompleted: (data) => {
       console.log(data?.subjects.items, 'get all subjects');
       subjects = data?.subjects.items.map((item, index) => {
+        console.log('data subjects', item);
+        console.log('previous subject', previosSubjects);
         let previousUserIndex = previosSubjects?.findIndex(
           (user) => user.subjectId === item.subjectId
         );

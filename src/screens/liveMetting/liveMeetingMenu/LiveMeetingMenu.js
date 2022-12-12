@@ -26,6 +26,7 @@ import LiveMeetingDecisions from '../liveMeetingDecisions/LiveMeetingDecisions';
 import LiveMeetingChats from '../liveMeetingChats/LiveMeetingChats';
 import { useQuery } from '@apollo/client';
 import { GET_MEETING_BY_ID } from '../../../graphql/query';
+import DetailsComponent from '../../../component/detailsComponent/MeetingDetailsComponent';
 
 const LiveMeetingMenu = () => {
   const navigation = useNavigation();
@@ -33,6 +34,7 @@ const LiveMeetingMenu = () => {
   const { item } = route?.params;
   const [activeTab, setActivetab] = useState('Details');
   const [meeting, setMeeting] = useState(null);
+  const [count, setCount] = useState(null);
 
   // get meeting by iod
   const GetMeetingById = useQuery(GET_MEETING_BY_ID, {
@@ -56,37 +58,43 @@ const LiveMeetingMenu = () => {
       id: 0,
       name: 'Details',
       iconName: IconName.LMDetails,
-      iconNameWhite: IconName.LMDetailsWhite
+      iconNameWhite: IconName.LMDetailsWhite,
+      count: 0
     },
     {
       id: 1,
       name: 'Subjects',
       iconName: IconName.LMSubjects,
-      iconNameWhite: IconName.LMSubjectsWhite
+      iconNameWhite: IconName.LMSubjectsWhite,
+      count: meeting?.subjectIds?.length
     },
     {
       id: 2,
       name: 'Users',
       iconName: IconName.LMUsers,
-      iconNameWhite: IconName.LMUsersWhite
+      iconNameWhite: IconName.LMUsersWhite,
+      count: meeting?.userDetails?.length
     },
     {
       id: 3,
       name: 'Votings',
       iconName: IconName.LMVotings,
-      iconNameWhite: IconName.LMVotingsWhite
+      iconNameWhite: IconName.LMVotingsWhite,
+      count: 0
     },
     {
       id: 4,
       name: 'Tasks',
       iconName: IconName.LMTasks,
-      iconNameWhite: IconName.LMTasksWhite
+      iconNameWhite: IconName.LMTasksWhite,
+      count: 0
     },
     {
       id: 5,
       name: 'Decisions',
       iconName: IconName.LMDecisions,
-      iconNameWhite: IconName.LMDecisionsWhite
+      iconNameWhite: IconName.LMDecisionsWhite,
+      count: 0
     },
     {
       id: 6,
@@ -110,10 +118,10 @@ const LiveMeetingMenu = () => {
       />
       <View style={styles.subContainer}>
         {activeTab == 'Details' && (
-          <LiveMeetingDetails item={item} meeting={meeting} />
+          <DetailsComponent item={item} isLiveMeetingDetails={false} />
         )}
         {activeTab == 'Subjects' && (
-          <Livemeetingsubjects item={item} meeting={meeting} />
+          <Livemeetingsubjects item={item} setCount={setCount} />
         )}
         {activeTab == 'Users' && (
           <LiveMeetingUsers item={item} meeting={meeting} />
@@ -164,7 +172,7 @@ const LiveMeetingMenu = () => {
                   />
                 </View>
                 <Text style={styles.txtMenu}>{menu.name}</Text>
-                {menu.name !== 'Details' && menu.name !== 'Online' && (
+                {menu.count > 0 && (
                   <View
                     style={[
                       styles.badgeView,
@@ -175,13 +183,7 @@ const LiveMeetingMenu = () => {
                       }
                     ]}
                   >
-                    <Text style={styles.txtBadge}>
-                      {menu.name == 'Subjects'
-                        ? meeting?.subjectIds?.length > 0
-                          ? meeting?.subjectIds?.length
-                          : 0
-                        : 1}
-                    </Text>
+                    <Text style={styles.txtBadge}>{menu.count}</Text>
                   </View>
                 )}
               </TouchableOpacity>

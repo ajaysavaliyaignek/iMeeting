@@ -141,7 +141,6 @@ const AppointmentsList = () => {
                 />
               );
             }}
-            showsVerticalScrollIndicator={false}
           />
         ) : Appointment.error ? (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>

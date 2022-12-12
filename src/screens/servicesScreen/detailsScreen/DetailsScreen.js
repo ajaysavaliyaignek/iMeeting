@@ -22,6 +22,7 @@ import { styles } from './styles';
 import { Fonts } from '../../../themes';
 import { UserContext } from '../../../context';
 import MeetingsCard from '../../../component/Cards/meetingCard/MeetingdCard';
+import SubjectListComponent from '../../../component/detailsComponent/subjectsListComponent/SubjectListComponent';
 
 const DetailsScreen = () => {
   const route = useRoute();
@@ -37,12 +38,10 @@ const DetailsScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [meetingData, setMeetingData] = useState([]);
   const [filterMeetingData, setFilterMeetingData] = useState([]);
-  // const { committee } = useContext(UserContext);
   const [committee, setCommittee] = useState([]);
   const [committeeId, setCommitteeId] = useState('');
   const [committeeName, setCommitteeName] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  const [isFetching, setIsFetching] = useState(false);
   const { setSelectedUsers, setMeetingsData, setSelectedSubjects } =
     useContext(UserContext);
   console.log('commiteee', committee);
@@ -57,30 +56,6 @@ const DetailsScreen = () => {
     setCommitteeId(committeeId?.join());
     setCommitteeName(committeeName?.join());
   }, [committee]);
-
-  // get ALL SUBJECTS
-  const {
-    loading: SubjectsLoading,
-    error: SubjectsError,
-    data: SubjectsData
-  } = useQuery(GET_All_SUBJECTS, {
-    variables: {
-      committeeIds: committeeId,
-      searchValue: searchText,
-      screen: 0,
-      page: -1,
-      pageSize: -1
-    },
-
-    onCompleted: (data) => {
-      setFilterData(data?.subjects.items);
-
-      setSubjectData(data?.subjects.items);
-    },
-    onError: (data) => {
-      console.log('subjects error---', data.message);
-    }
-  });
 
   // get ALL MEETINGS
   const {
@@ -225,7 +200,14 @@ const DetailsScreen = () => {
                 <View
                   style={[
                     styles.btnCommittees,
-                    { width: committeeName !== '' ? '78%' : null }
+                    {
+                      width:
+                        committee.length == 1
+                          ? null
+                          : committee.length > 2
+                          ? '77%'
+                          : null
+                    }
                   ]}
                 >
                   <Text style={styles.txtBtnCommittees} numberOfLines={1}>
@@ -339,7 +321,6 @@ const DetailsScreen = () => {
                       setVisibleIndex={setVisibleIndex}
                     />
                   )}
-                  showsVerticalScrollIndicator={false}
                 />
               ) : (
                 <View
@@ -362,61 +343,14 @@ const DetailsScreen = () => {
           {/* subjects list */}
 
           {activeTab === '1' && (
-            <TouchableOpacity
-              style={{ flex: 1 }}
-              // onPress={() => setEditModal(false)}
-            >
-              {SubjectsLoading ? (
-                <Loader />
-              ) : SubjectsError ? (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <Text
-                    style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}
-                  >
-                    {SubjectsError.message}
-                  </Text>
-                </View>
-              ) : filterData.length > 0 ? (
-                <FlatList
-                  data={filterData}
-                  keyExtractor={(item, index) => {
-                    return index.toString();
-                  }}
-                  renderItem={({ item, index }) => (
-                    <SubjectsCard
-                      item={item}
-                      index={index}
-                      searchText={searchText}
-                      search={search}
-                      visibleIndex={visibleIndex}
-                      setVisibleIndex={setVisibleIndex}
-                      subjectStatus={true}
-                    />
-                  )}
-                  showsVerticalScrollIndicator={false}
-                />
-              ) : (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <Text
-                    style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}
-                  >
-                    No subjects found
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
+            <SubjectListComponent
+              meetingId={null}
+              committeeIds={committeeId}
+              searchText={searchText}
+              isSubjectStatus={true}
+              deleted={true}
+              download={true}
+            />
           )}
         </View>
       </TouchableOpacity>

@@ -9,15 +9,8 @@ import { Fonts } from '../../themes';
 import Icon from '../Icon';
 import IconName from '../Icon/iconName';
 
-const CommitteesCard = ({
-  committeesTitle,
-  committeeIdNumber,
-  committeeCategoryName,
-  committeeRoleName,
-  committeeDate
-}) => {
+const CommitteesCard = ({ item, index }) => {
   const navigation = useNavigation();
-  const [editModal, setEditModal] = useState(false);
 
   // committee row view
   const RowData = ({ name, discription }) => {
@@ -30,7 +23,11 @@ const CommitteesCard = ({
   };
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={() => setEditModal(false)}>
+    <TouchableOpacity
+      activeOpacity={1}
+      // onPress={() => setEditModal(false)}
+      key={index}
+    >
       <Divider style={styles.divider} />
 
       {/* committee details */}
@@ -39,16 +36,16 @@ const CommitteesCard = ({
         onPress={() => navigation.navigate('CommitteeDetails')}
         activeOpacity={0.5}
       >
-        <Text style={styles.txtCommitteeTitle}>{committeesTitle}</Text>
+        <Text style={styles.txtCommitteeTitle}>{item?.committeeTitle}</Text>
 
-        <RowData name={'ID'} discription={committeeIdNumber} />
-        <RowData name={'Category'} discription={committeeCategoryName} />
-        <RowData name={'Your role'} discription={committeeRoleName} />
-        <RowData name={'Date'} discription={committeeDate} />
+        <RowData name={'ID'} discription={item?.organizationId} />
+        <RowData name={'Category'} discription={item.categoryTitle} />
+        <RowData name={'Your role'} discription={item.yourRoleName} />
+        <RowData name={'Date'} discription={item.setUpDate} />
       </TouchableOpacity>
 
       {/* dotsView */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => setEditModal(!editModal)}
         style={styles.dotsView}
       >
@@ -57,8 +54,8 @@ const CommitteesCard = ({
           height={Normalize(16)}
           width={Normalize(6)}
         />
-      </TouchableOpacity>
-      {editModal && (
+      </TouchableOpacity> */}
+      {/* {editModal && (
         <View
           style={{
             backgroundColor: '#f8f8f8',
@@ -75,7 +72,7 @@ const CommitteesCard = ({
             <Text>Delete</Text>
           </TouchableOpacity>
         </View>
-      )}
+      )} */}
     </TouchableOpacity>
   );
 };

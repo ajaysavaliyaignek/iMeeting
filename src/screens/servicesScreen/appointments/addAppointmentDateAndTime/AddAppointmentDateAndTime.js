@@ -6,14 +6,13 @@ import {
   TouchableOpacity,
   Alert
 } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Divider } from 'react-native-paper';
 import moment from 'moment';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useQuery } from '@apollo/client';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -26,6 +25,7 @@ import { Fonts } from '../../../../themes';
 import { Button } from '../../../../component/button/Button';
 import { GET_TIMEZONE } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
 const AddAppointmentDateAndTime = () => {
   const navigation = useNavigation();
@@ -150,7 +150,7 @@ const AddAppointmentDateAndTime = () => {
         }
       } else {
         if (value == 'endTime') {
-          setEndTime(date);
+          setEndTime(time);
         }
       }
     }
@@ -317,101 +317,49 @@ const AddAppointmentDateAndTime = () => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.timezoneContainer}>
-            <Text style={styles.txtTitle}>TIMEZONE</Text>
-            <Dropdown
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              data={timeZone?.map((item) => ({
-                label: item.timeZone,
-                value: item.timeZoneId
-              }))}
-              style={{
-                borderWidth: 0,
-                paddingRight: SIZES[16],
-                paddingLeft: 0
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={''}
-              arrowIconStyle={{
-                height: SIZES[12],
-                width: SIZES[14]
-              }}
-              searchPlaceholder="Search..."
-              value={valueTimeZone}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={(item) => {
-                setValueTimeZone(item.value);
-                setIsFocus(false);
-              }}
-            />
+          {/* dropdown timezone */}
+          <DropDownPicker
+            data={timeZone?.map((item) => ({
+              label: item.timeZone,
+              value: item.timeZoneId
+            }))}
+            disable={false}
+            placeholder={''}
+            setData={setValueTimeZone}
+            title={'TIMEZONE'}
+            value={valueTimeZone}
+          />
 
-            <Divider style={styles.divider} />
-          </View>
-          <View style={styles.repeatContainer}>
-            <Text style={styles.txtTitle}>REPEAT</Text>
-            <Dropdown
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              style={{
-                borderWidth: 0,
-                paddingRight: SIZES[16],
-                paddingLeft: 0
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              arrowIconStyle={{
-                height: SIZES[12],
-                width: SIZES[14]
-              }}
-              // search
-              data={[
-                {
-                  label: "Dosen't repeat",
-                  value: 0
-                },
-                {
-                  label: 'Repeat daily',
-                  value: 1
-                },
-                {
-                  value: 2,
-                  label: 'Repeat weekly'
-                },
-                {
-                  value: 3,
-                  label: 'Repeat monthly'
-                },
-                {
-                  value: 4,
-                  label: 'Repeat yearly'
-                }
-              ]}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={''}
-              searchPlaceholder="Search..."
-              value={valueRepeat}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={(item) => {
-                setValueRepeat(item.value);
-                setIsFocus(false);
-              }}
-            />
-
-            <Divider style={styles.divider} />
-          </View>
+          {/* dropdown repeat */}
+          <DropDownPicker
+            data={[
+              {
+                label: "Dosen't repeat",
+                value: 0
+              },
+              {
+                label: 'Repeat daily',
+                value: 1
+              },
+              {
+                value: 2,
+                label: 'Repeat weekly'
+              },
+              {
+                value: 3,
+                label: 'Repeat monthly'
+              },
+              {
+                value: 4,
+                label: 'Repeat yearly'
+              }
+            ]}
+            disable={false}
+            placeholder={''}
+            setData={setValueRepeat}
+            title={'REPEAT'}
+            value={valueRepeat}
+          />
         </View>
         <DateTimePickerModal
           isVisible={openCalendar}

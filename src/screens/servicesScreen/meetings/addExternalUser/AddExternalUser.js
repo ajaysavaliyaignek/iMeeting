@@ -5,8 +5,7 @@ import {
   TextInput,
   Switch,
   ScrollView,
-  TouchableOpacity,
-  KeyboardAvoidingView
+  TouchableOpacity
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import DocumentPicker from 'react-native-document-picker';
@@ -23,6 +22,7 @@ import { useMutation } from '@apollo/client';
 import { UPDATE_COMMITTEE_USER } from '../../../../graphql/mutation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GET_All_USERS } from '../../../../graphql/query';
+import RNFetchBlob from 'rn-fetch-blob';
 
 const AddExternalUser = () => {
   const navigation = useNavigation();
@@ -86,10 +86,22 @@ const AddExternalUser = () => {
     try {
       const response = await DocumentPicker.pickSingle({
         presentationStyle: 'fullScreen',
-        type: [DocumentPicker.types.images]
+        type: [DocumentPicker.types.images],
+        bas
       });
-      console.log('file response', response.uri);
+      console.log('file response', response.uri.ba);
+
+      const result = await RNFetchBlob.fs.readFile(
+        // file path
+        response.uri,
+        // encoding, should be one of `base64`, `utf8`, `ascii`
+        'base64'
+        // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
+        // when reading file in BASE64 encoding, buffer size must be multiples of 3.
+      );
       setprofileImage(response?.uri);
+
+      console.log('base64', result);
     } catch (err) {
       console.log(err);
     }
@@ -181,6 +193,7 @@ const AddExternalUser = () => {
             onChangeText={(text) => setNumber(text)}
           />
         </View>
+
         <View style={styles.rowContainer}>
           <Text style={styles.txtLabel}>Send SMS</Text>
           <Switch

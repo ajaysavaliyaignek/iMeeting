@@ -8,7 +8,6 @@ import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
 import { Fonts } from '../../../../themes';
@@ -17,6 +16,7 @@ import { Button } from '../../../../component/button/Button';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
 const AddMeetingLocation = () => {
   const navigation = useNavigation();
@@ -115,43 +115,18 @@ const AddMeetingLocation = () => {
             {error}
           </Text>
         )}
-        <View style={styles.locationContainer}>
-          <Text style={styles.txtTitle}>LOCATION</Text>
-          <Dropdown
-            placeholderStyle={{
-              ...Fonts.PoppinsRegular[12],
-              color: Colors.secondary
-            }}
-            data={location?.map((item) => ({
-              label: item.title,
-              value: item.locationId
-            }))}
-            style={{
-              borderWidth: 0,
-              paddingRight: SIZES[16],
-              paddingLeft: 0
-            }}
-            textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            // search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={''}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            searchPlaceholder="Search..."
-            value={valueLocation}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={(item) => {
-              setValueLocation(item.value);
-              setIsFocus(false);
-            }}
-          />
-          <Divider style={styles.divider} />
-        </View>
+        {/* dropdown location */}
+        <DropDownPicker
+          data={location?.map((item) => ({
+            label: item.title,
+            value: item.locationId
+          }))}
+          disable={false}
+          placeholder={''}
+          setData={setValueLocation}
+          title={'LOCATION'}
+          value={valueLocation}
+        />
 
         <View style={styles.buttonContainer}>
           <Button
@@ -180,49 +155,24 @@ const AddMeetingLocation = () => {
           />
         </View>
 
-        <View style={styles.videoContainer}>
-          <Text style={styles.txtTitle}>VIDEO CONFERENCING PLATFORM</Text>
-          <Dropdown
-            placeholderStyle={{
-              ...Fonts.PoppinsRegular[12],
-              color: Colors.secondary
-            }}
-            data={[
-              {
-                value: 1,
-                label: 'Google Meet'
-              },
-              {
-                value: 2,
-                label: 'Microsoft Teams'
-              }
-            ]}
-            style={{
-              borderWidth: 0,
-              paddingRight: SIZES[16],
-              paddingLeft: 0
-            }}
-            textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            // search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={''}
-            arrowIconStyle={{
-              height: SIZES[12],
-              width: SIZES[14]
-            }}
-            searchPlaceholder="Search..."
-            value={valueVideoConference}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={(item) => {
-              setValueVideoConference(item.value);
-              setIsFocus(false);
-            }}
-          />
-          <Divider style={styles.divider} />
-        </View>
+        {/* dropdown video conference */}
+        <DropDownPicker
+          data={[
+            {
+              value: 1,
+              label: 'Google Meet'
+            },
+            {
+              value: 2,
+              label: 'Microsoft Teams'
+            }
+          ]}
+          disable={false}
+          placeholder={''}
+          setData={setValueVideoConference}
+          title={'VIDEO CONFERENCING PLATFORM'}
+          value={valueVideoConference}
+        />
       </View>
       <View
         style={{

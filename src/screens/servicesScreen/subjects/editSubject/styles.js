@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
   },
   txtTitle: { ...Fonts.PoppinsRegular[12], color: Colors.secondary },
   discriptionContainer: {
-    marginTop: SIZES[24],
+    marginTop: SIZES[20],
     borderBottomWidth: SIZES[1],
     borderBottomColor: Colors.line
   },

@@ -22,7 +22,9 @@ const SubjectsCard = ({
   searchText,
   visibleIndex,
   setVisibleIndex,
-  subjectStatus
+  isSubjectStatus,
+  download,
+  deleted
 }) => {
   const navigation = useNavigation();
 
@@ -131,7 +133,7 @@ const SubjectsCard = ({
         <RowData name={'ID'} discription={item.subjectId} />
         <RowData name={'Category'} discription={item.subjectCategoryName} />
         <RowData name={'Creator'} discription={item.createrName} />
-        {subjectStatus && (
+        {isSubjectStatus && (
           <RowData
             name={'Status'}
             discription={item.statusTitle}
@@ -194,9 +196,9 @@ const SubjectsCard = ({
               navigation.navigate('SubjectDetails', { item });
               setVisibleIndex(-1);
             }}
-            download={true}
+            download={download}
             editable={item.statusTitle === 'Deleted' ? false : true}
-            deleted={true}
+            deleted={deleted}
           />
         </View>
       )}

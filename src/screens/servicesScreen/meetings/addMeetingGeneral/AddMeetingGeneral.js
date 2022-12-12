@@ -1,17 +1,8 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TextInput,
-  ScrollView,
-  PermissionsAndroid,
-  Platform
-} from 'react-native';
+import { View, Text, SafeAreaView, TextInput, ScrollView } from 'react-native';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { Divider } from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 import { useLazyQuery, useQuery } from '@apollo/client';
@@ -19,16 +10,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
-import { Fonts } from '../../../../themes';
-import FilesCard from '../../../../component/Cards/FilesCard';
 import { Button } from '../../../../component/button/Button';
 import Header from '../../../../component/header/Header';
 import { SIZES } from '../../../../themes/Sizes';
 import { styles } from './styles';
 import { GET_COMMITTEES_BY_ROLE, GET_FILE } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
-
 import { UserContext } from '../../../../context';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
+import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 
 const AddMeetingGeneralScreen = () => {
   const navigation = useNavigation();
@@ -164,39 +154,21 @@ const AddMeetingGeneralScreen = () => {
         </View>
         <Text style={styles.txtAddSubjectTitle}>General</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* title */}
-          <View style={styles.titleContainer}>
-            {CommitteeLoading && <Loader />}
-            <Text style={styles.txtTitle}>CHOOSE COMMITTEE</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              open={open}
-              value={valueCommitee}
-              items={
-                committee
-                  ? committee?.map((comm) => ({
-                      label: comm.committeeTitle,
-                      value: comm.organizationId
-                    }))
-                  : items
-              }
-              setOpen={setOpen}
-              setValue={setValue}
-              setItems={setItems}
-              placeholder={''}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              style={{
-                borderWidth: 0,
-                paddingLeft: 0,
-                paddingRight: SIZES[16]
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            />
-            {/* <TextInput style={styles.textInput} /> */}
-          </View>
+          {CommitteeLoading && <Loader />}
+
+          {/* choose committe */}
+          <DropDownPicker
+            data={committee?.map((comm) => ({
+              label: comm.committeeTitle,
+              value: comm.organizationId
+            }))}
+            disable={false}
+            placeholder={''}
+            setData={setValue}
+            title={'CHOOSE COMMITTEE'}
+            value={valueCommitee}
+          />
+
           <View style={styles.discriptionContainer}>
             <Text style={styles.txtTitle}>TITLE</Text>
             <TextInput
@@ -216,37 +188,19 @@ const AddMeetingGeneralScreen = () => {
               }}
             />
           </View>
-          <View style={{ marginTop: 24 }}>
-            <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
-            {fileResponse?.map((file, index) => {
-              return (
-                <FilesCard
-                  key={index}
-                  filePath={file.name}
-                  fileSize={file.size}
-                  // onDownloadPress={() => checkPermission(file.downloadUrl)}
-                  fileType={file.type}
-                  onRemovePress={() => removeFile(file)}
-                  style={{
-                    borderBottomWidth: SIZES[1],
-                    borderBottomColor: Colors.Approved
-                  }}
-                  download={true}
-                  deleted={true}
-                  fileUrl={file.downloadUrl}
-                />
-              );
-            })}
-            <Button
-              title={'Attach file'}
-              layoutStyle={{ backgroundColor: 'rgba(243, 246, 249,1)' }}
-              textStyle={{
-                ...Fonts.PoppinsSemiBold[14],
-                color: Colors.primary
-              }}
-              onPress={() => handleDocumentSelection()}
-            />
-          </View>
+
+          {/* attach files */}
+          <AttachFiles
+            fileResponse={fileResponse}
+            setFileResponse={setFileResponse}
+            showAttachButton={true}
+            styleFileCard={{
+              borderBottomWidth: SIZES[1],
+              borderBottomColor: Colors.Approved
+            }}
+            deleted={true}
+            download={true}
+          />
         </ScrollView>
       </View>
 

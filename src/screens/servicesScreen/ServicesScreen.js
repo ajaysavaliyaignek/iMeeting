@@ -3,9 +3,11 @@ import {
   Text,
   useWindowDimensions,
   SafeAreaView,
-  ScrollView
+  ScrollView,
+  Alert,
+  BackHandler
 } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Header from '../../component/header/Header';
 import { Colors } from '../../themes/Colors';
@@ -16,6 +18,27 @@ import { styles } from './styles';
 
 const ServicesScreen = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Hold on!', 'Are you sure you want to exit app?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel'
+        },
+        { text: 'YES', onPress: () => BackHandler.exitApp() }
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

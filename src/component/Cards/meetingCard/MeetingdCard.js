@@ -39,7 +39,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
     },
     onCompleted: (data) => {
       if (data) {
-        setLocation(data?.location.city);
+        setLocation(data?.location.title);
       }
     }
   });

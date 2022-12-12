@@ -33,7 +33,7 @@ const AddAppointmentUsers = () => {
     setSelectedUsers
   } = useContext(UserContext);
   const [filterData, setFilterData] = useState([]);
-  console.log('selected user from add appointment user', selectedUsers);
+  console.log('selected user from add appointment user', appointmentsData);
   const [previousUser, setPreviousUser] = useState([]);
   const [valueIndex, setValueIndex] = useState(-1);
   let users = [];
@@ -42,6 +42,7 @@ const AddAppointmentUsers = () => {
   let backUpUser = [];
 
   useEffect(() => {
+    console.log('previos user', previousUser);
     users = previousUser?.map((item) => item.userId);
     console.log('userId', users);
     requiredUsers = previousUser?.map((item) => item.isRequired);

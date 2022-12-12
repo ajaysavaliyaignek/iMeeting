@@ -22,16 +22,10 @@ const SelectSubjectCard = ({
   searchText,
   visibleIndex,
   setVisibleIndex,
-  selectedSubjects,
-  setSelectedSubjects,
   subjectData,
   setChecked,
   checked
 }) => {
-  const [editModal, setEditModal] = useState(false);
-  const [selectSubject, setSelectSubject] = useState([]);
-  const [isCheck, setIsCheck] = useState(false);
-
   const checkToggle = (id) => {
     subjectData?.map((subject) => {
       if (subject.subjectId == item.subjectId) {
@@ -39,15 +33,6 @@ const SelectSubjectCard = ({
       }
     });
   };
-  useEffect(() => {
-    selectedSubjects?.map((subject) => {
-      if (subject.subjectId == item.subjectId) {
-        item.isSelected = true;
-      }
-    });
-  }, []);
-
-  // console.log('selected subject from select subject', selectSubject);
 
   const RowData = ({ name, discription }) => {
     return (

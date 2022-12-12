@@ -5,7 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import * as Progress from 'react-native-progress';
@@ -43,12 +44,7 @@ const EditMeetingSubjects = () => {
     // setSelectedSubjects
   } = useContext(UserContext);
   const { item } = route?.params;
-  console.log('meeting data from add meeting subjects', {
-    item,
-    meetingsData
-  });
 
-  console.log('selected subjects from add meeting subjects', selectedSubjects);
   const [calendarValue, setCalendarValue] = useState('5-11 September');
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState(selectedSubjects);
@@ -67,7 +63,6 @@ const EditMeetingSubjects = () => {
         subjectId: id
       },
       onCompleted: (data) => {
-        console.log('subject by id from subjects', data);
         if (data) {
           setSubject((prev) => {
             const pevDaa = prev.filter((ite) => {
@@ -97,21 +92,26 @@ const EditMeetingSubjects = () => {
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
+    console.log('new added subjects', items);
+    console.log('previous subject', previosSubjects);
+    console.log('backup subject', backUpUser);
 
     items?.map((subject) => {
       let indexPreviousUser =
         previosSubjects?.length > 0
           ? previosSubjects?.findIndex(
-              (obj) => obj.subjectId === subject?.subjectId
+              (obj) => obj?.subjectId === subject?.subjectId
             )
           : -1;
+
       if (indexPreviousUser === -1) {
         let index =
           backUpUser?.length > 0
             ? backUpUser?.findIndex(
-                (obj) => obj.subjectId === subject.subjectId
+                (obj) => obj?.subjectId === subject?.subjectId
               )
             : -1;
+
         if (index == -1) {
           newUsers.push(JSON.parse(JSON.stringify(subject)));
         } else {
@@ -175,8 +175,7 @@ const EditMeetingSubjects = () => {
 
     onCompleted: (data) => {
       setFilterData(data?.subjects.items);
-      console.log(data.subjects.items, 'commiitee by id');
-      setSubjectData(data?.subjects.items);
+      // setSubjectData(data?.subjects.items);
     }
   });
 
@@ -184,6 +183,7 @@ const EditMeetingSubjects = () => {
     console.log('subjects error---', SubjectsError);
   }
 
+  // edit meeting mutation
   const [addMeeting, { data, loading, error }] = useMutation(UPDATE_MEETING, {
     // export const GET_All_SUBJECTS = gql`
     refetchQueries: [
@@ -206,7 +206,6 @@ const EditMeetingSubjects = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('addmeeting data', data.updateMeeting);
       if (data.updateMeeting.status[0].statusCode == '200') {
         setSelectedUsers([]);
         setMeetingsData([]);
@@ -224,11 +223,30 @@ const EditMeetingSubjects = () => {
   });
 
   useEffect(() => {
-    console.log('pre data', previosSubjects);
-
     subjects = previosSubjects?.map((item) => item.subjectId);
     console.log('userId', subjects);
   }, [previosSubjects]);
+
+  // delete subject from selected subject
+  const onDeletehandler = (item) => {
+    Alert.alert('Remove subject', 'Are you sure you want to remove this?', [
+      {
+        text: 'Delete',
+        onPress: () => {
+          const filterData = previosSubjects.filter(
+            (subject) => subject?.subjectId !== item.subjectId
+          );
+          setPreviosSubjects(filterData);
+        },
+        style: 'destructive'
+      },
+      {
+        text: 'Cancel',
+        // onPress: () => navigation.navigate("Login"),
+        style: 'cancel'
+      }
+    ]);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -294,6 +312,7 @@ const EditMeetingSubjects = () => {
                     openIndex={openIndex}
                     setOpenIndex={setOpenIndex}
                     deleted={true}
+                    onDeletehandler={onDeletehandler}
                   />
                 );
               }}

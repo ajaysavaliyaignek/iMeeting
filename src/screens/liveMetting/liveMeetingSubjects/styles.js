@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
   },
   cancelBtnLayout: {
     backgroundColor: '#F3F6F9',
-    marginTop: SIZES[16],
+
     marginHorizontal: SIZES[16],
     marginBottom: SIZES[24]
   },

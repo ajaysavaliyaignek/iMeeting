@@ -136,7 +136,7 @@ const AppoinmentCard = ({
         <RowData name={'Your role'} discription={item.yourRoleName} />
         <RowData
           name={'Date & Time'}
-          discription={`${moment(item.setTime).format('DD MMM YYYY')},${
+          discription={`${moment(item.setDate).format('DD MMM YYYY')},${
             data.setTime
           }`}
         />

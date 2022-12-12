@@ -3,10 +3,10 @@ import React, { useState, useCallback, useEffect, useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { Divider } from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 import { useLazyQuery, useQuery } from '@apollo/client';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
@@ -23,6 +23,8 @@ import {
 } from '../../../../graphql/query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../../../../context';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
+import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 
 const AddAppointmentGeneral = () => {
   const navigation = useNavigation();
@@ -36,81 +38,8 @@ const AddAppointmentGeneral = () => {
   const [items, setItems] = useState([{ label: 'Design', value: 'design' }]);
   const [fileResponse, setFileResponse] = useState([]);
   const [filesId, setFilesId] = useState([]);
+  const [isFocus, setIsFocus] = useState(false);
   let fileId = [];
-
-  const checkPermission = async (file) => {
-    console.log('check permission');
-    if (Platform.OS === 'ios') {
-      downloadFile(file);
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download File'
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-          downloadFile(file);
-          console.log('Storage Permission Granted.');
-        } else {
-          // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
-        }
-      } catch (err) {
-        // To handle permission related exception
-        console.log('++++' + err);
-      }
-    }
-  };
-
-  const downloadFile = (file) => {
-    console.log('downloadfile');
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(FILE_URL);
-
-    file_ext = '.' + file_ext[0];
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    let RootDir = fs.dirs.PictureDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        path:
-          RootDir +
-          '/file_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          file_ext,
-        description: 'downloading file...',
-        notification: true,
-        // useDownloadManager works with Android only
-        useDownloadManager: true
-      }
-    };
-    config(options)
-      .fetch('GET', FILE_URL)
-      .then((res) => {
-        // Alert after successful downloading
-        console.log('res -> ', res.respInfo.redirects[0]);
-        alert('File Downloaded Successfully.');
-        if (Platform.OS == 'ios') {
-          RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
-        }
-      });
-  };
-
-  const getFileExtention = (fileUrl) => {
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
 
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
@@ -142,64 +71,12 @@ const AddAppointmentGeneral = () => {
     console.log('commitee error', CommitteeError);
   }
 
-  const handleDocumentSelection = useCallback(async () => {
-    try {
-      const response = await DocumentPicker.pickMultiple({
-        presentationStyle: 'fullScreen',
-        type: [DocumentPicker.types.allFiles]
-      });
-      const url = await AsyncStorage.getItem('@url');
-      response.map((res) => {
-        if (res !== null) {
-          const formData = new FormData();
-          formData.append('file', res);
-          console.log('formdata', formData);
-
-          fetch(`https://${url}//o/imeeting-rest/v1.0/file-upload`, {
-            method: 'POST',
-            headers: {
-              Authorization: 'Bearer ' + `${token}`,
-              'Content-Type': 'multipart/form-data'
-            },
-            body: formData
-          })
-            .then((response) => response.json())
-            .then((responseData) => {
-              // setFileId(responseData?.fileEnteryId);
-              console.log('response data', responseData);
-              if (responseData) {
-                setFileResponse((prev) => {
-                  const pevDaa = prev.filter((ite) => {
-                    return ite.fileEnteryId !== responseData.fileEnteryId;
-                  });
-                  return [...pevDaa, responseData];
-                });
-              }
-            })
-
-            .catch((e) => console.log('file upload error--', e));
-        }
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
   useEffect(() => {
     const fileId = fileResponse.map((file) => file.fileEnteryId);
 
     setFilesId(fileId);
   }, [fileResponse]);
   console.log('file id', filesId);
-
-  const removeFile = (file) => {
-    setFileResponse((prev) => {
-      const pevDaa = prev.filter((ite) => {
-        return ite.fileEnteryId !== file.fileEnteryId;
-      });
-      return [...pevDaa];
-    });
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -225,35 +102,19 @@ const AddAppointmentGeneral = () => {
         <Text style={styles.txtAddSubjectTitle}>General</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* title */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>CHOOSE COMMITTEE</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              open={open}
-              value={valueCommitee}
-              items={
-                committee?.map((item) => ({
-                  label: item.committeeTitle,
-                  value: item.organizationId
-                })) || items
-              }
-              setOpen={setOpen}
-              setValue={setValue}
-              setItems={setItems}
-              placeholder={''}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              style={{
-                borderWidth: 0,
-                paddingLeft: 0,
-                paddingRight: SIZES[16]
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            />
-            {/* <TextInput style={styles.textInput} /> */}
-          </View>
+
+          <DropDownPicker
+            data={committee?.map((item) => ({
+              label: item.committeeTitle,
+              value: item.organizationId
+            }))}
+            setData={setValue}
+            value={valueCommitee}
+            title={'CHOOSE COMMITTEE'}
+            placeholder={''}
+            disable={false}
+          />
+
           <View style={styles.discriptionContainer}>
             <Text style={styles.txtTitle}>TITLE</Text>
             <TextInput
@@ -269,37 +130,18 @@ const AddAppointmentGeneral = () => {
               onChangeText={(text) => setDiscription(text)}
             />
           </View>
-          <View style={{ marginTop: 24 }}>
-            <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
-            {fileResponse?.map((file, index) => {
-              console.log('from retuen', file);
-              return (
-                <FilesCard
-                  key={index}
-                  filePath={file.name}
-                  fileSize={file.size}
-                  fileUrl={file.downloadUrl}
-                  fileType={file.type}
-                  onRemovePress={() => removeFile(file)}
-                  style={{
-                    borderBottomWidth: SIZES[1],
-                    borderBottomColor: Colors.Approved
-                  }}
-                  download={true}
-                  deleted={true}
-                />
-              );
-            })}
-            <Button
-              title={'Attach file'}
-              layoutStyle={{ backgroundColor: 'rgba(243, 246, 249,1)' }}
-              textStyle={{
-                ...Fonts.PoppinsSemiBold[14],
-                color: Colors.primary
-              }}
-              onPress={() => handleDocumentSelection()}
-            />
-          </View>
+          {/* attach files */}
+          <AttachFiles
+            fileResponse={fileResponse}
+            setFileResponse={setFileResponse}
+            showAttachButton={true}
+            styleFileCard={{
+              borderBottomWidth: SIZES[1],
+              borderBottomColor: Colors.Approved
+            }}
+            deleted={true}
+            download={true}
+          />
         </ScrollView>
       </View>
 

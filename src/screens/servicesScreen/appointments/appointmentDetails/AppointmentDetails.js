@@ -10,7 +10,7 @@ import {
   Platform
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { Divider } from 'react-native-paper';
@@ -21,7 +21,6 @@ import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
 import { SIZES } from '../../../../themes/Sizes';
 import { Colors } from '../../../../themes/Colors';
-import FilesCard from '../../../../component/Cards/FilesCard';
 import { Button } from '../../../../component/button/Button';
 import { Fonts } from '../../../../themes';
 
@@ -36,6 +35,7 @@ import {
 import { DELETE_APPOINTMENT } from '../../../../graphql/mutation';
 import UserCard from '../../../../component/Cards/userCard/UserCard';
 import Clipboard from '@react-native-clipboard/clipboard';
+import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 
 const AppointmentsDetails = () => {
   const navigation = useNavigation();
@@ -310,7 +310,8 @@ const AppointmentsDetails = () => {
                   borderBottomColor: Colors.primary,
                   flexDirection: 'row',
                   alignItems: 'center',
-                  width: '70%'
+                  width: '70%',
+                  marginBottom: fileResponse?.length > 0 ? 0 : SIZES[24]
                 }}
               >
                 <Text style={[styles.txtLink, { width: '80%' }]}>
@@ -346,30 +347,16 @@ const AppointmentsDetails = () => {
               </View>
             )}
           </View>
-          <View style={{ marginTop: SIZES[24], marginBottom: SIZES[24] }}>
-            <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
-            {fileResponse?.length > 0 ? (
-              fileResponse?.map((file, index) => {
-                console.log('from retuen', file);
-                return (
-                  <FilesCard
-                    key={index}
-                    download={true}
-                    filePath={file.name}
-                    fileSize={file.size}
-                    fileUrl={file.downloadUrl}
-                    fileType={file.type}
-                    style={{
-                      borderBottomWidth: SIZES[1],
-                      borderBottomColor: Colors.Approved
-                    }}
-                  />
-                );
-              })
-            ) : (
-              <Text>There is no any file</Text>
-            )}
-          </View>
+
+          {fileResponse?.length > 0 && (
+            <AttachFiles
+              fileResponse={fileResponse}
+              setFileResponse={setFileResponse}
+              showAttachButton={false}
+              deleted={false}
+              download={true}
+            />
+          )}
           <Divider style={styles.divider} />
           <View style={{ marginTop: SIZES[40] }}>
             <Text style={styles.txtTitle}>Users</Text>

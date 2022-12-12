@@ -43,6 +43,7 @@ const LoginScreen = ({ navigation }) => {
         data.oAuth2Application.clientId == ''
       ) {
         setError('Please enter valid company url');
+        setLoading(false);
       }
     },
     onError: (data) => {

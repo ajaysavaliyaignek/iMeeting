@@ -1,3 +1,5 @@
+export const dateTimeFormate = 'YYYY-MM-DD hh:mm A';
+
 export const subjectData = [
   {
     subjectTitle: 'Advisory Committee on Fi....',

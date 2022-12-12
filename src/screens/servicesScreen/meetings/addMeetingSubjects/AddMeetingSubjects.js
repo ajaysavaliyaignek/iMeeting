@@ -5,7 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import * as Progress from 'react-native-progress';
@@ -50,37 +51,6 @@ const AddMeetingSubjects = () => {
   let subjects = [];
 
   let backUpUser = [];
-
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStartHandler = (e) => {
-    console.log('startHandler', e);
-  };
-
-  const onSpeechEndHandler = (e) => {
-    console.log('onSpeechEndHandler', e);
-  };
-
-  const onSpeechResultsHandler = (e) => {
-    console.log('onSpeechResultsHandler', e);
-    let text = e.value[0];
-    setSearchText(text);
-  };
-  const startRecording = async () => {
-    try {
-      await Voice.start('en-US');
-    } catch (error) {
-      console.log('voice error', error);
-    }
-  };
 
   useEffect(() => {
     console.log('pre data', previousSubject);
@@ -137,6 +107,26 @@ const AddMeetingSubjects = () => {
       setSearchText(text);
       setPreviousSubject(selectedSubjects);
     }
+  };
+
+  const onDeletehandler = (item) => {
+    Alert.alert('Remove subject', 'Are you sure you want to remove this?', [
+      {
+        text: 'Delete',
+        onPress: () => {
+          const filterData = previousSubject.filter(
+            (subject) => subject?.subjectId !== item.subjectId
+          );
+          setPreviousSubject(filterData);
+        },
+        style: 'destructive'
+      },
+      {
+        text: 'Cancel',
+        // onPress: () => navigation.navigate("Login"),
+        style: 'cancel'
+      }
+    ]);
   };
 
   const [addMeeting, { data, loading: addMeetingLoading, error }] = useMutation(
@@ -230,6 +220,7 @@ const AddMeetingSubjects = () => {
                   setOpenIndex={setOpenIndex}
                   subjectsId={subjectsId}
                   deleted={true}
+                  onDeletehandler={onDeletehandler}
                 />
               );
             })
@@ -266,7 +257,7 @@ const AddMeetingSubjects = () => {
                 navigation.navigate('SelectSubjects', {
                   committee: meetingsData.committee,
                   onUpdateSelection: onUpdateSelection,
-                  previousSubject: previousSubject
+                  previosSubjects: previousSubject
                 })
               }
             />
@@ -320,7 +311,7 @@ const AddMeetingSubjects = () => {
                   required: meetingsData.userRequired,
                   setDate: meetingsData.startDate,
                   setTime: meetingsData.startTime,
-                  subjectIds: subjectsId,
+                  subjectIds: subjects,
                   timeZone: meetingsData.TimeZone,
                   userIds: meetingsData.users,
                   subjectStatusIds: [],

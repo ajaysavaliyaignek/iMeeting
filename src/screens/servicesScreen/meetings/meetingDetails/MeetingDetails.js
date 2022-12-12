@@ -20,7 +20,6 @@ import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
 import { SIZES } from '../../../../themes/Sizes';
 import { Colors } from '../../../../themes/Colors';
-import FilesCard from '../../../../component/Cards/FilesCard';
 import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 import { Fonts } from '../../../../themes';
@@ -37,6 +36,8 @@ import {
 } from '../../../../graphql/query';
 
 import { DELETE_MEETING } from '../../../../graphql/mutation';
+import AttachFiles from '../../../../component/attachFiles/AttachFiles';
+import DetailsComponent from '../../../../component/detailsComponent/MeetingDetailsComponent';
 
 const MeetingDetails = () => {
   const navigation = useNavigation();
@@ -242,249 +243,12 @@ const MeetingDetails = () => {
     <SafeAreaView style={styles.container}>
       <Header
         name={'Meeting details'}
-        rightIconName={IconName.Search}
         leftIconName={IconName.Arrow_Left}
         onLeftPress={() => navigation.goBack()}
       />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.subContainer}
-      >
-        <View style={styles.detailsContainer}>
-          <Text style={styles.txtTitle}>General</Text>
-          {details('Committee', committe?.committeeTitle)}
-          {details('Your role', meeting?.yourRoleName)}
-          {details('Title', meeting?.meetingTitle)}
-          {details('Description', meeting?.description)}
-          {details('Creator', meeting?.creatorName)}
-        </View>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.txtTitle}>Date & Time</Text>
-          <View>
-            {details(
-              'Start date',
-              `${moment(meeting?.setDate).format('DD MMM,YYYY')},${
-                meeting?.setTime
-              }`
-            )}
-            <View>
-              <Text style={styles.txtDuration}> {durationHourMin}</Text>
-            </View>
-          </View>
-          {details('Timezone', meeting?.timeZone)}
 
-          {details(
-            'Repeat',
-            meeting?.repeat == 0
-              ? "Dosen't repeat"
-              : meeting?.repeat == 1
-              ? 'Repeat daily'
-              : meeting?.repeat == 2
-              ? 'Repeat weekly'
-              : meeting?.repeat == 3
-              ? 'Repeat monthly'
-              : 'Repeat yearly'
-          )}
-          {role == 'Member' && details('Required', 'Yes')}
-          {role == 'Member' && (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {item.answers == 'Suggest time' ? (
-                <View>
-                  {details('Your answer', 'Your suggestion time')}
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginTop: 48,
-                      marginLeft: SIZES[8]
-                    }}
-                  >
-                    <Text
-                      style={{
-                        ...Fonts.PoppinsSemiBold[14],
-                        color: Colors.bold
-                      }}
-                    >
-                      {item.suggestedTime}
-                    </Text>
-                  </View>
-                </View>
-              ) : (
-                details(
-                  'Your answer',
-                  answer?.suggestionTime == ''
-                    ? answer?.answer
-                    : `Your suggestion time - ${answer?.suggestionTime}`
-                )
-              )}
-              <TouchableOpacity
-                style={{
-                  marginLeft: SIZES[16],
-                  borderBottomWidth: 1,
-                  borderBottomColor: Colors.primary
-                }}
-                onPress={() => navigation.navigate('YourAnswer', { item })}
-              >
-                <Text
-                  style={{
-                    ...Fonts.PoppinsSemiBold[14],
-                    color: Colors.primary
-                  }}
-                >
-                  Edit
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.txtTitle}>Location</Text>
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
-            {details('Location Title', location?.title)}
-            <View
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: Colors.primary
-              }}
-            >
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('LocationDetails', {
-                    locationId: item.locationId,
-                    platform: platform,
-                    locationType: 1
-                  })
-                }
-              >
-                <Text style={styles.txtLink}>View details</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
-            {details('Vi-nce platform', 'Google Meet')}
+      <DetailsComponent item={item} isLiveMeetingDetails={true} />
 
-            {item?.platformlink && (
-              <View
-                style={{
-                  borderBottomWidth: 1,
-                  borderBottomColor: Colors.primary,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  width: '70%'
-                }}
-              >
-                <Text
-                  style={[styles.txtLink, { width: '80%' }]}
-                  numberOfLines={1}
-                >
-                  {item?.platformlink}
-                </Text>
-                <TouchableOpacity
-                  style={{ marginTop: 32, marginLeft: 14 }}
-                  onPress={() => {
-                    Clipboard.setString(item?.platformlink);
-                    if (
-                      location.googleMapURL !== '' ||
-                      location.googleMapURL !== null
-                    ) {
-                      if (Platform.OS == 'android') {
-                        ToastAndroid.show(
-                          `Copied Text :-  ${item?.platformlink}`,
-                          ToastAndroid.SHORT
-                        );
-                      } else {
-                        Alert.alert(`Copied Text :-  ${item?.platformlink}`);
-                      }
-                    }
-                  }}
-                >
-                  <Icon
-                    name={IconName.CopyText}
-                    height={SIZES[20]}
-                    width={SIZES[20]}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-          <View style={{ marginTop: SIZES[24], marginBottom: SIZES[24] }}>
-            <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
-            {fileResponse?.length > 0 ? (
-              fileResponse?.map((file, index) => {
-                return (
-                  <FilesCard
-                    key={index}
-                    download={true}
-                    filePath={file.name}
-                    fileSize={file.size}
-                    fileUrl={file.downloadUrl}
-                    fileType={file.type}
-                    style={{
-                      borderBottomWidth: SIZES[1],
-                      borderBottomColor: Colors.Approved
-                    }}
-                  />
-                );
-              })
-            ) : (
-              <Text>There is no any file</Text>
-            )}
-          </View>
-          <Divider style={styles.divider} />
-          <TouchableOpacity
-            style={styles.committeeView}
-            activeOpacity={0.5}
-            onPress={() =>
-              navigation.navigate('Users', {
-                userDetails: meeting?.userDetails
-              })
-            }
-          >
-            <Text style={styles.txtCommittee}>Users</Text>
-            <View style={styles.btnCommittees}>
-              <Text style={styles.txtBtnCommittees}>
-                {meeting?.userIds?.length > 0 ? meeting?.userIds?.length : 0}
-              </Text>
-              <Icon
-                name={IconName.Arrow_Right}
-                height={SIZES[12]}
-                width={SIZES[6]}
-              />
-            </View>
-          </TouchableOpacity>
-          <Divider style={styles.divider} />
-          <TouchableOpacity
-            style={styles.committeeView}
-            activeOpacity={0.5}
-            onPress={() =>
-              navigation.navigate('subjects', {
-                subjectId: meeting?.subjectIds,
-                role,
-                deadlinedDate: meeting?.deadlineDate
-              })
-            }
-          >
-            <Text style={styles.txtCommittee}>Subjects</Text>
-            <View style={styles.btnCommittees}>
-              <Text style={styles.txtBtnCommittees}>
-                {meeting?.subjectIds?.length > 0
-                  ? meeting?.subjectIds?.length
-                  : 0}
-              </Text>
-              <Icon
-                name={IconName.Arrow_Right}
-                height={SIZES[12]}
-                width={SIZES[6]}
-              />
-            </View>
-          </TouchableOpacity>
-          <Divider style={styles.divider} />
-        </View>
-      </ScrollView>
       {role == 'Head' || role == 'Secretory' ? (
         <View style={styles.bottomContainer}>
           <Divider style={styles.divider} />

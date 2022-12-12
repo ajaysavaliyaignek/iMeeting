@@ -14,7 +14,6 @@ import DeviceInfo from 'react-native-device-info';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Divider } from 'react-native-paper';
 import moment from 'moment';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useQuery } from '@apollo/client';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -27,6 +26,7 @@ import { Fonts } from '../../../../themes';
 import { Button } from '../../../../component/button/Button';
 import { GET_TIMEZONE } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
 const AddMeetingDateAndTime = () => {
   const navigation = useNavigation();
@@ -300,7 +300,7 @@ const AddMeetingDateAndTime = () => {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.timezoneContainer}>
+          {/* <View style={styles.timezoneContainer}>
             <Text style={styles.txtTitle}>TIMEZONE</Text>
             <Dropdown
               placeholderStyle={{
@@ -337,63 +337,50 @@ const AddMeetingDateAndTime = () => {
             />
 
             <Divider style={styles.divider} />
-          </View>
-          <View style={styles.repeatContainer}>
-            <Text style={styles.txtTitle}>REPEAT</Text>
-            <Dropdown
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              style={{
-                borderWidth: 0,
-                paddingRight: SIZES[16],
-                paddingLeft: 0
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              arrowIconStyle={{
-                height: SIZES[12],
-                width: SIZES[14]
-              }}
-              // search
-              data={[
-                {
-                  label: "Dosen't repeat",
-                  value: 0
-                },
-                {
-                  label: 'Repeat daily',
-                  value: 1
-                },
-                {
-                  value: 2,
-                  label: 'Repeat weekly'
-                },
-                {
-                  value: 3,
-                  label: 'Repeat monthly'
-                },
-                {
-                  value: 4,
-                  label: 'Repeat yearly'
-                }
-              ]}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={''}
-              searchPlaceholder="Search..."
-              value={valueRepeat}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={(item) => {
-                setValueRepeat(item.value);
-                setIsFocus(false);
-              }}
-            />
-            <Divider style={styles.divider} />
-          </View>
+          </View> */}
+          {/* dropdown timezone */}
+          <DropDownPicker
+            data={timeZone?.map((item) => ({
+              label: item.timeZone,
+              value: item.timeZoneId
+            }))}
+            disable={false}
+            placeholder={''}
+            setData={setValueTimeZone}
+            title={'TIMEZONE'}
+            value={valueTimeZone}
+          />
+
+          {/* dropdown repeat */}
+          <DropDownPicker
+            data={[
+              {
+                label: "Dosen't repeat",
+                value: 0
+              },
+              {
+                label: 'Repeat daily',
+                value: 1
+              },
+              {
+                value: 2,
+                label: 'Repeat weekly'
+              },
+              {
+                value: 3,
+                label: 'Repeat monthly'
+              },
+              {
+                value: 4,
+                label: 'Repeat yearly'
+              }
+            ]}
+            disable={false}
+            placeholder={''}
+            setData={setValueRepeat}
+            title={'REPEAT'}
+            value={valueRepeat}
+          />
         </View>
         <DateTimePickerModal
           isVisible={openCalendar}

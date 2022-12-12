@@ -293,6 +293,7 @@ export const GET_All_SUBJECTS = gql`
     $sort: String
     $deadline: Boolean
     $screen: Int
+    $meetingId: Long
   ) {
     subjects(
       page: $page
@@ -302,6 +303,7 @@ export const GET_All_SUBJECTS = gql`
       committeeIds: $committeeIds
       deadline: $deadline
       screen: $screen
+      meetingId: $meetingId
     ) {
       items {
         attachFileIds
@@ -426,6 +428,7 @@ export const GET_All_COMMITTEE = gql`
         setUpDate
         userIds
         status
+        categoryTitle
       }
       pageSize
       pageSize

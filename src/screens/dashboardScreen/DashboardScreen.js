@@ -3,9 +3,10 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  FlatList
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
@@ -16,9 +17,75 @@ import { Icon, IconName } from '../../component';
 import DashboardCard from '../../component/Cards/DashboardCard';
 import { Fonts } from '../../themes';
 import CommitteesCard from '../../component/Cards/CommitteesCard';
+import {
+  GET_All_APPOINTMENT,
+  GET_All_COMMITTEE,
+  GET_All_MEETING
+} from '../../graphql/query';
+import { useQuery } from '@apollo/client';
 
 const DashboardScreen = () => {
   const navigation = useNavigation();
+  const [meetingData, setMeetingData] = useState(null);
+  const [appointmentsData, setAppointmentData] = useState(null);
+  const [committeeData, setCommitteeData] = useState(null);
+
+  // get ALL MEETINGS
+  const {
+    loading: loadingGetMeetings,
+    error: errorGetMeetings,
+    data: dataGetMeetings
+  } = useQuery(GET_All_MEETING, {
+    variables: {
+      onlyMyMeeting: false,
+      committeeIds: '',
+      screen: 0,
+      searchValue: '',
+      page: -1,
+      pageSize: -1
+    },
+    onCompleted: (data) => {
+      if (data) {
+        setMeetingData(data?.meetings.items);
+      }
+    },
+    onError: (data) => {
+      console.log('GetMeetings error---', data.message);
+    }
+  });
+
+  // get ALL appointment
+  const Appointment = useQuery(GET_All_APPOINTMENT, {
+    variables: {
+      searchValue: '',
+      page: -1,
+      pageSize: -1
+    },
+
+    onCompleted: (data) => {
+      setAppointmentData(data?.appointments.items);
+    },
+    onError: (data) => {
+      console.log('all appointment error', data);
+    }
+  });
+
+  const Committes = useQuery(GET_All_COMMITTEE, {
+    variables: {
+      page: -1,
+      pageSize: -1,
+      searchValue: '',
+      isDeleted: true
+    },
+    onCompleted: (data) => {
+      console.log('all committes', data.committees.items);
+      setCommitteeData(data.committees.items);
+    },
+    onError: (data) => {
+      console.log('get all committees error', data.message);
+    }
+  });
+
   return (
     <View style={{ flex: 1 }}>
       {/* header */}
@@ -48,7 +115,7 @@ const DashboardScreen = () => {
             width={Normalize(20)}
             title={'Meeting'}
             cardBackgroundColor={'rgba(101, 142, 180, 0.1)'}
-            count={23}
+            count={meetingData?.length}
             addBackgroundColor={'#658EB4'}
           />
           <DashboardCard
@@ -57,7 +124,7 @@ const DashboardScreen = () => {
             width={Normalize(20)}
             title={'Appointment'}
             cardBackgroundColor={'rgba(171, 158, 200, 0.1)'}
-            count={7}
+            count={appointmentsData?.length}
             addBackgroundColor={'#AB9EC8'}
           />
           <DashboardCard
@@ -82,7 +149,14 @@ const DashboardScreen = () => {
 
         {/* committes  */}
         <Text style={styles.txtCommittees}>Committees</Text>
-        <CommitteesCard
+        <FlatList
+          data={committeeData}
+          keyExtractor={(index) => index.toString()}
+          renderItem={({ item, index }) => {
+            return <CommitteesCard item={item} index={index} />;
+          }}
+        />
+        {/* <CommitteesCard
           committeesTitle={'Sports committee'}
           committeeIdNumber={'983 317'}
           committeeCategoryName={'Sport'}
@@ -109,7 +183,7 @@ const DashboardScreen = () => {
           committeeCategoryName={'Sport'}
           committeeRoleName={'Secretary'}
           committeeDate={'27 oct 2021'}
-        />
+        /> */}
       </ScrollView>
     </View>
   );

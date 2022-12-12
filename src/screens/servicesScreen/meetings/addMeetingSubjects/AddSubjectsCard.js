@@ -23,10 +23,9 @@ const AddSubjectsCard = ({
   setVisibleIndex,
   openIndex,
   setOpenIndex,
-  deleted
+  deleted,
+  onDeletehandler
 }) => {
-  console.log('item from add subject card', item);
-
   const navigation = useNavigation();
   const [valueStatus, setValueStatus] = useState(
     item.statusTitle == 'Approved'
@@ -50,7 +49,6 @@ const AddSubjectsCard = ({
   const getSubjectStatus = useQuery(GET_ALL_SUBJECTS_STATUS, {
     variables: { subject: true, decision: false },
     onCompleted: (data) => {
-      console.log('subject status', data.subjectStatus.items);
       if (data) {
         setSubectStatus(data.subjectStatus.items);
       }
@@ -62,8 +60,6 @@ const AddSubjectsCard = ({
 
   useEffect(() => {
     subjectStatus?.map((status) => {
-      console.log('subjectStatusId', status.statusId);
-      console.log('subjectStatus', status.statusTitle);
       setItems([
         {
           label: status.statusTitle,
@@ -72,26 +68,6 @@ const AddSubjectsCard = ({
       ]);
     });
   }, [subjectStatus]);
-
-  const onDeleteHandler = () => {
-    Alert.alert('Remove subject', 'Are you sure you want to remove this?', [
-      {
-        text: 'Delete',
-        onPress: () => {
-          const filterData = selectedSubjects.filter(
-            (user) => user.subjectId !== item.subjectId
-          );
-          setSelectedSubjects(filterData);
-        },
-        style: 'destructive'
-      },
-      {
-        text: 'Cancel',
-        // onPress: () => navigation.navigate("Login"),
-        style: 'cancel'
-      }
-    ]);
-  };
 
   const [updateSubjectStatus] = useMutation(UPDATE_SUBJECT_STATUS, {
     onCompleted: (data) => {
@@ -242,7 +218,7 @@ const AddSubjectsCard = ({
             onPressDownload={() => navigation.navigate('SubjectDownload')}
             subjectStatus={item.statusTitle}
             onPressDelete={() => {
-              onDeleteHandler();
+              onDeletehandler(item);
               setVisibleIndex(-1);
             }}
             onPressEdit={() => {

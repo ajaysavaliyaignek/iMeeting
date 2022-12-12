@@ -5,20 +5,15 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
-  KeyboardAvoidingView,
   Platform,
-  PermissionsAndroid,
   FlatList
 } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, TextInput } from 'react-native-paper';
-import RNFetchBlob from 'rn-fetch-blob';
 
 import { styles } from './styles';
-import FilesCard from '../../../../component/Cards/FilesCard';
 import { Colors } from '../../../../themes/Colors';
-import { Fonts } from '../../../../themes';
 import { Button } from '../../../../component/button/Button';
 import CommentCard from '../../../../component/Cards/commentCard/CommentCard';
 import { Icon, IconName } from '../../../../component';
@@ -32,6 +27,7 @@ import {
   GET_SUBJECT_BY_ID
 } from '../../../../graphql/query';
 import { DELETE_SUBJECTS, UPDATE_COMMENT } from '../../../../graphql/mutation';
+import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 
 const SubjectDetails = () => {
   const navigation = useNavigation();
@@ -220,20 +216,16 @@ const SubjectDetails = () => {
         {generalDetails('Date of creation', item.dateOfCreation)}
 
         {/* attach file */}
-        <Text style={styles.txtAttachedTitle}>ATTACHED FILES</Text>
-        {fileResponse?.map((file, index) => {
-          return (
-            <FilesCard
-              download={true}
-              deleted={false}
-              key={index}
-              filePath={file.name}
-              fileSize={file.size}
-              fileUrl={file.downloadUrl}
-              fileType={file.type}
-            />
-          );
-        })}
+
+        {fileResponse?.length > 0 && (
+          <AttachFiles
+            fileResponse={fileResponse}
+            setFileResponse={setFileResponse}
+            showAttachButton={false}
+            deleted={false}
+            download={true}
+          />
+        )}
 
         {/* comments     */}
         <Text style={styles.txtcommentsTitle}>Comments</Text>

@@ -130,11 +130,12 @@ const SelectUsers = () => {
           (user) => user.userId === item.userId
         );
         let isSelected = false;
+        let isRequired = false;
 
         if (previousUserIndex >= 0) {
           isSelected = true;
         }
-        return { ...item, isSelected };
+        return { ...item, isSelected, isRequired };
       });
       if (usersData) {
         //set all user to the user list
@@ -160,12 +161,13 @@ const SelectUsers = () => {
               (user) => user.userId === item.userId
             );
             let isSelected = false;
+            let isRequired = false;
 
             if (previousUserIndex >= 0) {
               isSelected = true;
             }
 
-            return { ...item, isSelected };
+            return { ...item, isSelected, isRequired };
           }
         );
         if (externalUserData) {

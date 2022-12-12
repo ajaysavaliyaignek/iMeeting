@@ -10,7 +10,8 @@ export const styles = StyleSheet.create({
   subContainer: {
     flex: 1,
     backgroundColor: Colors.white,
-    padding: SIZES[16]
+    padding: SIZES[16],
+    paddingBottom: 200
   },
   profilePicContainer: {
     alignSelf: 'center',
@@ -19,13 +20,15 @@ export const styles = StyleSheet.create({
   titleContainer: {
     borderBottomWidth: SIZES[1],
     borderBottomColor: Colors.line,
-    marginBottom: SIZES[24]
+    marginBottom: SIZES[24],
+    flexGrow: 1
   },
   txtTitle: { ...Fonts.PoppinsRegular[12], color: Colors.secondary },
   textInput: {
     paddingVertical: SIZES[10],
     ...Fonts.PoppinsRegular[14],
-    color: Colors.bold
+    color: Colors.bold,
+    flexGrow: 1
   },
   txtLabel: { ...Fonts.PoppinsRegular[14], color: Colors.bold },
   rowContainer: {

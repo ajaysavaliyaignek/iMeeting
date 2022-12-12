@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import FileViewer from 'react-native-file-viewer';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, Switch } from 'react-native-paper';
 import { useLazyQuery } from '@apollo/client';
@@ -22,6 +21,7 @@ import Header from '../../../../component/header/Header';
 import { styles } from './styles';
 import { GET_ZIP_PDF_DOWNLOAD } from '../../../../graphql/query';
 import moment from 'moment';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
 const SubjectDownload = () => {
   const route = useRoute();
@@ -147,25 +147,15 @@ const SubjectDownload = () => {
       />
       <View style={styles.subContainer}>
         <Text style={styles.txtDownloadTitle}>Download</Text>
-        <View style={styles.exportContainer}>
-          <Text style={styles.txtExportTitle}>EXPORT FORMAT</Text>
-          <DropDownPicker
-            open={open}
-            value={valueType}
-            items={items}
-            setOpen={setOpen}
-            setValue={setValueType}
-            setItems={setItems}
-            placeholder={'Format'}
-            placeholderStyle={styles.txtExportTitle}
-            style={{
-              borderWidth: 0,
 
-              zIndex: 999
-            }}
-            textStyle={{ ...Fonts.PoppinsRegular[14] }}
-          />
-        </View>
+        <DropDownPicker
+          data={items}
+          disable={false}
+          placeholder={''}
+          setData={setValueType}
+          title={'EXPORT FORMAT'}
+          value={valueType}
+        />
         <View style={styles.rowContainer}>
           <Text style={styles.txtLabel}>Attach files</Text>
           <Switch

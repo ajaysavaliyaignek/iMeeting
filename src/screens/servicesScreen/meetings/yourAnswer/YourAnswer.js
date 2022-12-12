@@ -11,7 +11,6 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { styles } from './styles';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { SIZES } from '../../../../themes/Sizes';
 import { Fonts } from '../../../../themes';
 import { Colors } from '../../../../themes/Colors';
@@ -23,8 +22,11 @@ import { UPDATE_ANSWER } from '../../../../graphql/mutation';
 import moment from 'moment';
 import {
   GET_All_APPOINTMENT,
-  GET_All_MEETING
+  GET_All_MEETING,
+  GET_ANSWER,
+  GET_USER_PAYLOAD
 } from '../../../../graphql/query';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
 const YourAnswer = () => {
   const navigation = useNavigation();
@@ -62,6 +64,12 @@ const YourAnswer = () => {
           page: -1,
           pageSize: -1
         }
+      },
+      {
+        query: GET_ANSWER
+      },
+      {
+        query: GET_USER_PAYLOAD
       }
     ],
     onCompleted: (data) => {
@@ -92,30 +100,14 @@ const YourAnswer = () => {
         onRightPress={() => navigation.goBack()}
       />
       <View style={styles.subContainer}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.txtTitle}>YOUR ANSWER</Text>
-          <DropDownPicker
-            listMode="SCROLLVIEW"
-            open={open}
-            value={valueAnswer}
-            items={items}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setItems}
-            placeholder={''}
-            placeholderStyle={{
-              ...Fonts.PoppinsRegular[12],
-              color: Colors.secondary
-            }}
-            style={{
-              borderWidth: 0,
-              paddingLeft: 0,
-              paddingRight: SIZES[16]
-            }}
-            textStyle={{ ...Fonts.PoppinsRegular[14] }}
-          />
-          {/* <TextInput style={styles.textInput} /> */}
-        </View>
+        <DropDownPicker
+          data={items}
+          disable={false}
+          placeholder={''}
+          setData={setValue}
+          title={'YOUR ANSWER'}
+          value={valueAnswer}
+        />
         {valueAnswer == 'Suggest time' ? (
           <View>
             <TouchableOpacity

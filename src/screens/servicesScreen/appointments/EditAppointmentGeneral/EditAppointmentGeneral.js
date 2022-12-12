@@ -3,15 +3,12 @@ import React, { useState, useCallback, useEffect, useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { Divider } from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 import { useLazyQuery, useQuery } from '@apollo/client';
 
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
-import { Fonts } from '../../../../themes';
-import FilesCard from '../../../../component/Cards/FilesCard';
 import { Button } from '../../../../component/button/Button';
 import Header from '../../../../component/header/Header';
 import { SIZES } from '../../../../themes/Sizes';
@@ -24,6 +21,8 @@ import {
 } from '../../../../graphql/query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from '../../../../context';
+import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
+import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 
 const EditAppointmentGeneral = () => {
   const navigation = useNavigation();
@@ -191,56 +190,6 @@ const EditAppointmentGeneral = () => {
     console.log('commitee error', CommitteeError);
   }
 
-  const handleDocumentSelection = useCallback(async () => {
-    try {
-      const response = await DocumentPicker.pickMultiple({
-        presentationStyle: 'fullScreen',
-        type: [DocumentPicker.types.allFiles]
-      });
-      const url = await AsyncStorage.getItem('@url');
-      response.map((res) => {
-        if (res !== null) {
-          const formData = new FormData();
-          formData.append('file', res);
-          console.log('formdata', formData);
-
-          fetch(`https://${url}//o/imeeting-rest/v1.0/file-upload`, {
-            method: 'POST',
-            headers: {
-              Authorization: 'Bearer ' + `${token}`,
-              'Content-Type': 'multipart/form-data'
-            },
-            body: formData
-          })
-            .then((response) => response.json())
-            .then((responseData) => {
-              if (responseData) {
-                setFileResponse((prev) => {
-                  const pevDaa = prev.filter((ite) => {
-                    return ite.fileEnteryId !== responseData.fileEnteryId;
-                  });
-                  return [...pevDaa, responseData];
-                });
-              }
-            })
-            .then(() => {})
-            .catch((e) => console.log('file upload error--', e));
-        }
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const removeFile = (file) => {
-    setFileResponse((prev) => {
-      const pevDaa = prev.filter((ite) => {
-        return ite.fileEnteryId !== file.fileEnteryId;
-      });
-      return [...pevDaa];
-    });
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -262,36 +211,19 @@ const EditAppointmentGeneral = () => {
         </View>
         <Text style={styles.txtAddSubjectTitle}>General</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* title */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.txtTitle}>CHOOSE COMMITTEE</Text>
-            <DropDownPicker
-              listMode="SCROLLVIEW"
-              open={open}
-              disabled={true}
-              value={valueCommitee}
-              items={
-                committee?.map((item) => ({
-                  label: item.committeeTitle,
-                  value: item.organizationId
-                })) || items
-              }
-              setOpen={setOpen}
-              setValue={setValue}
-              setItems={setItems}
-              placeholder={appointment?.committeeName}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[14]
-              }}
-              style={{
-                borderWidth: 0,
-                paddingLeft: 0,
-                paddingRight: SIZES[16]
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-            />
-            {/* <TextInput style={styles.textInput} /> */}
-          </View>
+          {/* dropdown committee */}
+          <DropDownPicker
+            data={committee?.map((item) => ({
+              label: item.committeeTitle,
+              value: item.organizationId
+            }))}
+            placeholder={appointment?.committeeName}
+            setData={setValue}
+            title={'CHOOSE COMMITTEE'}
+            value={valueCommitee}
+            disable={true}
+          />
+
           <View style={styles.discriptionContainer}>
             <Text style={styles.txtTitle}>TITLE</Text>
             <TextInput
@@ -309,37 +241,17 @@ const EditAppointmentGeneral = () => {
               value={discription}
             />
           </View>
-          <View style={{ marginTop: 24 }}>
-            <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
-            {fileResponse?.map((file, index) => {
-              console.log('from return', file);
-              return (
-                <FilesCard
-                  key={index}
-                  filePath={file.name}
-                  fileSize={file.size}
-                  fileUrl={file.downloadUrl}
-                  fileType={file.type}
-                  onRemovePress={() => removeFile(file)}
-                  style={{
-                    borderBottomWidth: SIZES[1],
-                    borderBottomColor: Colors.Approved
-                  }}
-                  download={true}
-                  deleted={true}
-                />
-              );
-            })}
-            <Button
-              title={'Attach file'}
-              layoutStyle={{ backgroundColor: 'rgba(243, 246, 249,1)' }}
-              textStyle={{
-                ...Fonts.PoppinsSemiBold[14],
-                color: Colors.primary
-              }}
-              onPress={() => handleDocumentSelection()}
-            />
-          </View>
+          <AttachFiles
+            fileResponse={fileResponse}
+            setFileResponse={setFileResponse}
+            showAttachButton={true}
+            styleFileCard={{
+              borderBottomWidth: SIZES[1],
+              borderBottomColor: Colors.Approved
+            }}
+            deleted={true}
+            download={true}
+          />
         </ScrollView>
       </View>
 

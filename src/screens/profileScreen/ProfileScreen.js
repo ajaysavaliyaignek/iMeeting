@@ -1,4 +1,4 @@
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, NativeModules } from 'react-native';
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -9,10 +9,14 @@ const ProfileScreen = ({ navigation }) => {
     try {
       await AsyncStorage.clear()
         .then(console.log('cleared'))
-        .then(navigation.navigate('Login'));
+        .then(NativeModules.DevSettings.reload());
     } catch (error) {
       console.log(error);
     }
+    // navigation.reset({
+    //   index: 0,
+    //   routes: [{ name: 'Login' }]
+    // });
   };
   return (
     <SafeAreaView>
