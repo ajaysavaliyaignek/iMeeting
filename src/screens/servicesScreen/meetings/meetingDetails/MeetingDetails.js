@@ -37,7 +37,7 @@ import {
 
 import { DELETE_MEETING } from '../../../../graphql/mutation';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
-import DetailsComponent from '../../../../component/detailsComponent/MeetingDetailsComponent';
+import DetailsComponent from '../../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 
 const MeetingDetails = () => {
   const navigation = useNavigation();
@@ -231,14 +231,6 @@ const MeetingDetails = () => {
     ]);
   };
 
-  const details = (title, discription) => {
-    return (
-      <View style={{ marginTop: SIZES[24] }}>
-        <Text style={styles.txtDetailTitle}>{title}</Text>
-        <Text style={styles.txtDetailDiscription}>{discription}</Text>
-      </View>
-    );
-  };
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -274,7 +266,7 @@ const MeetingDetails = () => {
                 title={'Start'}
                 layoutStyle={[styles.btnLayout]}
                 onPress={() => {
-                  navigation.navigate('LiveMeetingMenu', { item });
+                  // navigation.navigate('LiveMeetingMenu', { item });
                 }}
               />
             </View>

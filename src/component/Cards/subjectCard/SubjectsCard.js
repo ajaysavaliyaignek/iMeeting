@@ -174,7 +174,7 @@ const SubjectsCard = ({
         onPress={() => setVisibleIndex(!visibleIndex ? -1 : index)}
         style={styles.dotsView}
       >
-        <Icon name={IconName.Dots} height={16} width={6} />
+        <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
       {visibleIndex == index && (
         <View style={styles.modalView}>

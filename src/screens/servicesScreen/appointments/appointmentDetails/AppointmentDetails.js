@@ -33,9 +33,9 @@ import {
 } from '../../../../graphql/query';
 
 import { DELETE_APPOINTMENT } from '../../../../graphql/mutation';
-import UserCard from '../../../../component/Cards/userCard/UserCard';
 import Clipboard from '@react-native-clipboard/clipboard';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
+import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
 const AppointmentsDetails = () => {
   const navigation = useNavigation();
@@ -357,41 +357,19 @@ const AppointmentsDetails = () => {
               download={true}
             />
           )}
-          <Divider style={styles.divider} />
-          <View style={{ marginTop: SIZES[40] }}>
-            <Text style={styles.txtTitle}>Users</Text>
-            <Divider style={[styles.divider, { marginVertical: SIZES[24] }]} />
-            {appointment?.userDetails?.length > 0 ? (
-              <FlatList
-                data={appointment?.userDetails}
-                keyExtractor={(item, index) => {
-                  return index.toString();
-                }}
-                renderItem={({ item, index }) => {
-                  return (
-                    <UserCard
-                      item={item}
-                      index={index}
-                      isSwitchOnRow={true}
-                      userSelect={false}
-                      text={''}
-                      setRequired={() => {}}
-                      deleted={false}
-                      editable={false}
-                      valueIndex={valueIndex}
-                      setValueIndex={setValueIndex}
-                      disableSwitch={true}
-                    />
-                  );
-                }}
-              />
-            ) : (
-              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <Text>No selected user</Text>
-              </View>
-            )}
-          </View>
         </View>
+        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
+        <View style={{ marginTop: SIZES[40], marginHorizontal: SIZES[16] }}>
+          <Text style={styles.txtTitle}>Users</Text>
+        </View>
+        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
+        <UserDetailsComponent
+          users={appointment?.userDetails}
+          isUserRequired={true}
+          isSwitchOnRow={true}
+          isSwichDisabled={true}
+          searchText={''}
+        />
       </ScrollView>
       {role == 'Head' || role == 'Secretory' ? (
         <View style={styles.bottomContainer}>

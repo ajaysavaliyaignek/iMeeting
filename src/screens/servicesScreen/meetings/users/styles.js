@@ -8,7 +8,6 @@ export const styles = StyleSheet.create({
     flex: 1
   },
   subContainer: {
-    paddingHorizontal: SIZES[16],
     backgroundColor: Colors.white,
     flex: 1
   },
@@ -19,7 +18,8 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.gray,
     borderRadius: SIZES[10],
     marginVertical: SIZES[22],
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginHorizontal: SIZES[16]
     // height: SIZES[36]
   },
   textInput: {

@@ -15,12 +15,12 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import momentDurationFormatSetup from 'moment-duration-format';
 
-import { Icon, IconName } from '..';
+import { Icon, IconName } from '../..';
 import { styles } from './styles';
-import { SIZES } from '../../themes/Sizes';
-import { Colors } from '../../themes/Colors';
+import { SIZES } from '../../../themes/Sizes';
+import { Colors } from '../../../themes/Colors';
 import { Divider } from 'react-native-paper';
-import { Fonts } from '../../themes';
+import { Fonts } from '../../../themes';
 
 import {
   GET_ALL_LOCATION_BY_ID,
@@ -31,11 +31,11 @@ import {
   GET_MEETING_BY_ID,
   GET_PLATFORMLINK,
   GET_USER_PAYLOAD
-} from '../../graphql/query';
+} from '../../../graphql/query';
 
-import { DELETE_MEETING } from '../../graphql/mutation';
-import AttachFiles from '../attachFiles/AttachFiles';
-import { dateTimeFormate } from '../../Constans/data';
+import { DELETE_MEETING } from '../../../graphql/mutation';
+import AttachFiles from '../../attachFiles/AttachFiles';
+import { dateTimeFormate } from '../../../Constans/data';
 
 const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const navigation = useNavigation();
@@ -291,7 +291,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    marginTop: 48,
+                    marginTop: SIZES[48],
                     marginLeft: SIZES[8]
                   }}
                 >

@@ -123,7 +123,7 @@ const AttachFiles = ({
           title={'Attach file'}
           layoutStyle={{
             backgroundColor: 'rgba(243, 246, 249,1)',
-            marginBottom: 32
+            marginBottom: SIZES[32]
           }}
           textStyle={{
             ...Fonts.PoppinsSemiBold[14],

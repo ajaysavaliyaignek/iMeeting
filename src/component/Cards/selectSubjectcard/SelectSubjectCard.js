@@ -15,6 +15,7 @@ import { SIZES } from '../../../themes/Sizes';
 import CheckBox from '../../checkBox/CheckBox';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
 import { UserContext } from '../../../context';
+import { useNavigation } from '@react-navigation/native';
 
 const SelectSubjectCard = ({
   item,
@@ -26,6 +27,7 @@ const SelectSubjectCard = ({
   setChecked,
   checked
 }) => {
+  const navigation = useNavigation();
   const checkToggle = (id) => {
     subjectData?.map((subject) => {
       if (subject.subjectId == item.subjectId) {
@@ -81,11 +83,17 @@ const SelectSubjectCard = ({
         onPress={() => setVisibleIndex(!visibleIndex ? -1 : index)}
         style={styles.dotsView}
       >
-        <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[4]} />
+        <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
       {visibleIndex == index && (
         <View style={styles.modalView}>
-          <EditDeleteModal download={false} />
+          <EditDeleteModal
+            download={false}
+            onPressView={() => {
+              navigation.navigate('SubjectDetails', { item });
+              setVisibleIndex(-1);
+            }}
+          />
         </View>
       )}
     </TouchableOpacity>

@@ -8,7 +8,6 @@ export const styles = StyleSheet.create({
     flex: 1
   },
   subContainer: {
-    paddingHorizontal: SIZES[16],
     backgroundColor: Colors.white,
     flex: 1
   },
@@ -23,7 +22,8 @@ export const styles = StyleSheet.create({
     marginTop: SIZES[4]
   },
   detailsContainer: {
-    marginVertical: SIZES[24]
+    marginVertical: SIZES[24],
+    marginHorizontal: SIZES[16]
   },
   txtDuration: {
     position: 'absolute',

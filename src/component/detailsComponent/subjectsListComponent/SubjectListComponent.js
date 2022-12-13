@@ -57,7 +57,7 @@ const SubjectListComponent = ({
     onCompleted: (data) => {
       setFilterData(data?.subjects.items);
 
-      setSubjectData(data?.subjects.items);
+      // setSubjectData(data?.subjects.items);
     },
     onError: (data) => {
       console.log('subjects error---', data.message);

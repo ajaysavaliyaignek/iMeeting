@@ -7,12 +7,42 @@ import { styles } from './styles';
 import { Divider } from 'react-native-paper';
 import { Colors } from '../../../themes/Colors';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
+import { useQuery } from '@apollo/client';
+import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
 
 const LiveMeetingUsers = ({ item }) => {
   console.log('item from LM Users', item);
   const [searchText, setSearchText] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  const [activeTab, setActiveTab] = useState('0');
+  const [activeTab, setActiveTab] = useState('AllUsers');
+  const [filterData, setFilterData] = useState(item.userDetails);
+  const [userData, setUserData] = useState(item.userDetails);
+
+  const searchFilterUsers = (text) => {
+    console.log('text', text);
+    if (text) {
+      const newData = filterData?.filter((item) => {
+        const itemData = item.userName ? item.userName : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+      setSearchText(text);
+      setUserData(newData);
+    } else {
+      setSearchText(text);
+      setUserData(filterData);
+    }
+  };
+
+  const getMeetingUser = useQuery(GET_LIVE_MEETING_USERS, {
+    variables: {
+      meetingId: item.meetingId,
+      isSpeaker: true
+    },
+    onCompleted: (data) => {
+      console.log('is speaker data', data.liveMeetingUsers.userDetails);
+    }
+  });
   return (
     <TouchableOpacity
       style={styles.container}
@@ -25,8 +55,9 @@ const LiveMeetingUsers = ({ item }) => {
         <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
         <TextInput
           style={styles.textInput}
+          value={searchText}
           placeholder={'Search users'}
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={(text) => searchFilterUsers(text)}
         />
         <TouchableOpacity onPress={() => startRecording()}>
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
@@ -38,12 +69,13 @@ const LiveMeetingUsers = ({ item }) => {
           layoutStyle={[
             styles.btnServices,
             {
-              backgroundColor: activeTab === '0' ? Colors.white : 'transparent'
+              backgroundColor:
+                activeTab === 'AllUsers' ? Colors.white : 'transparent'
             }
           ]}
           textStyle={styles.txtBtnServices}
           onPress={() => {
-            setActiveTab('0');
+            setActiveTab('AllUsers');
           }}
         />
 
@@ -52,17 +84,38 @@ const LiveMeetingUsers = ({ item }) => {
           layoutStyle={[
             styles.btnServices,
             {
-              backgroundColor: activeTab === '1' ? Colors.white : 'transparent'
+              backgroundColor:
+                activeTab == 'Speaker' ? Colors.white : 'transparent'
             }
           ]}
           textStyle={styles.txtBtnServices}
           onPress={() => {
-            setActiveTab('1');
+            setActiveTab('Speaker');
           }}
         />
       </View>
       <Divider style={styles.divider} />
-      <UserDetailsComponent users={item.userDetails} />
+      {activeTab == 'AllUsers' && (
+        <UserDetailsComponent
+          users={userData}
+          isGeneralUser={true}
+          openPopup={true}
+          visibleIndex={visibleIndex}
+          setVisibleIndex={setVisibleIndex}
+          searchText={searchText}
+        />
+      )}
+      {activeTab == 'Speaker' && (
+        <UserDetailsComponent
+          users={userData}
+          isSpeaker={true}
+          openPopup={true}
+          visibleIndex={visibleIndex}
+          setVisibleIndex={setVisibleIndex}
+          searchText={searchText}
+        />
+      )}
+      {/* <UserDetailsComponent users={item.userDetails} /> */}
     </TouchableOpacity>
   );
 };

@@ -14,8 +14,8 @@ import { styles } from './styles';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
 import { SIZES } from '../../../../themes/Sizes';
-import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { UserContext } from '../../../../context';
+import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
 const Users = () => {
   const navigation = useNavigation();
@@ -97,26 +97,12 @@ const Users = () => {
           </TouchableOpacity>
         </View>
         <Divider style={styles.divider} />
-
-        <FlatList
-          data={filterData}
-          keyExtractor={(item, index) => {
-            return index.toString();
-          }}
-          renderItem={({ item, index }) => (
-            <UserCard
-              item={item}
-              index={index}
-              isSwitchOnRow={true}
-              text={searchText}
-              required={required}
-              setRequired={setRequired}
-              setValueIndex={setValueIndex}
-              valueIndex={valueIndex}
-              disableSwitch={true}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
+        <UserDetailsComponent
+          users={filterData}
+          isUserRequired={true}
+          isSwitchOnRow={true}
+          isSwichDisabled={true}
+          searchText={searchText}
         />
       </View>
     </SafeAreaView>

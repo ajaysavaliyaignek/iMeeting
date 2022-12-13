@@ -115,7 +115,7 @@ const TasksDetailsCard = ({
         onPress={() => setVisibleIndex(visibleIndex == -1 ? index : -1)}
         style={styles.dotsView}
       >
-        <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[4]} />
+        <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
 
       {visibleIndex == index && (

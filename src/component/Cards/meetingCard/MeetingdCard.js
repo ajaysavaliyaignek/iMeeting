@@ -141,7 +141,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
             color: Colors.bold,
             ...Fonts.PoppinsSemiBold[14]
           }}
-          marginLeft={24}
+          marginLeft={SIZES[24]}
           btnStyle={{
             backgroundColor: Colors.white,
             marginLeft: SIZES[24],
@@ -160,7 +160,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
         }}
         style={styles.dotsView}
       >
-        <Icon name={IconName.Dots} height={16} width={6} />
+        <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
       {visibleIndex === index && showModal && (
         <View style={styles.modalView}>

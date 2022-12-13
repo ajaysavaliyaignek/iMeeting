@@ -8,7 +8,6 @@ import { Colors } from '../../themes/Colors';
 import Normalize from '../../themes/mixins';
 import { Fonts } from '../../themes';
 import FilesCard from '../../component/Cards/FilesCard';
-import UserCard from '../../component/Cards/UsersCard';
 
 const CommitteesDetails = () => {
   const navigation = useNavigation();
@@ -66,27 +65,6 @@ const CommitteesDetails = () => {
         <FilesCard filePath={'videoQuestion...mov'} fileSize={'837 KB'} />
         <FilesCard filePath={'archi...zip'} fileSize={'837 KB'} />
         <Text style={styles.txtTitle}>Users</Text>
-        <UserCard
-          userTitle={'Head'}
-          userIdNumber={'894 432'}
-          UserEmail={'marvin.mc@exam.com'}
-          userMobile={'(423) 3424235'}
-          userRole={'Head'}
-        />
-        <UserCard
-          userTitle={'Secretary'}
-          userIdNumber={'894 432'}
-          UserEmail={'marvin.mc@exam.com'}
-          userMobile={'(423) 3424235'}
-          userRole={'Secretary'}
-        />
-        <UserCard
-          userTitle={'Secretary'}
-          userIdNumber={'894 432'}
-          UserEmail={'marvin.mc@exam.com'}
-          userMobile={'(423) 3424235'}
-          userRole={'Secretary'}
-        />
       </ScrollView>
     </View>
   );

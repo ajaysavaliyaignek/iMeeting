@@ -22,12 +22,13 @@ export const styles = StyleSheet.create({
   discription: {
     ...Fonts.PoppinsRegular[14],
     color: Colors.bold,
-    width: '60%'
+    width: '78%'
+    // backgroundColor: 'red'
   },
   committeeDetailView: {
     paddingVertical: SIZES[24],
-    paddingHorizontal: SIZES[16]
-    // width: "100%",
+    paddingHorizontal: SIZES[16],
+    width: '100%'
   },
   txtCommitteeTitle: {
     ...Fonts.PoppinsBold[20],
@@ -37,9 +38,9 @@ export const styles = StyleSheet.create({
   dotsView: {
     position: 'absolute',
     right: SIZES[16],
-    top: SIZES[32],
-    width: 24,
-    height: 24,
+    top: SIZES[24],
+    width: SIZES[24],
+    height: SIZES[24],
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -55,7 +56,8 @@ export const styles = StyleSheet.create({
   userDetailsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: '90%'
   },
   Checkbox: {
     borderRadius: SIZES[4],

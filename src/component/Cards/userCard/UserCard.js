@@ -72,7 +72,11 @@ const UserCard = ({
       {/* committee details */}
       <View style={styles.committeeDetailView}>
         <View style={styles.userDetails}>
-          <Avatar name={item.firstName} size={SIZES[32]} />
+          <Avatar
+            name={item.firstName == undefined ? item.userName : item.firstName}
+            source={item.profilePicture}
+            size={SIZES[32]}
+          />
           {/* <Text
             style={styles.txtCommitteeTitle}
           >{`${item.firstName} ${item.secondName}`}</Text> */}
@@ -85,7 +89,7 @@ const UserCard = ({
             numberOfLines={1}
           >
             {getHighlightedText(
-              item.firstName
+              item.firstName != undefined
                 ? item.firstName + ' ' + item.secondName
                 : `${item.userName}`,
               text
@@ -116,7 +120,7 @@ const UserCard = ({
             backgroundColor:
               item?.isAvailable == 'Unknown'
                 ? '#E6C54F'
-                : item?.isAvailable == 'conflict'
+                : item?.isAvailable == 'Conflict'
                 ? '#DD7878'
                 : '#81AB96',
             borderRadius: SIZES[4],
@@ -144,13 +148,13 @@ const UserCard = ({
           }}
           style={styles.dotsView}
         >
-          <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[4]} />
+          <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
         </TouchableOpacity>
       )}
       {valueIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
-            onPressDelete={onDeleteHandler(item)}
+            onPressDelete={() => onDeleteHandler(item)}
             subjectStatus={'NoDeleted'}
             deleted={deleted}
             editable={editable}

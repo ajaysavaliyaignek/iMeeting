@@ -45,9 +45,9 @@ const EditMeetingSubjects = () => {
   } = useContext(UserContext);
   const { item } = route?.params;
 
-  const [calendarValue, setCalendarValue] = useState('5-11 September');
+  const [calendarValue, setCalendarValue] = useState(item.suggestedTime);
   const [searchText, setSearchText] = useState('');
-  const [filterData, setFilterData] = useState(selectedSubjects);
+  const [filterData, setFilterData] = useState([]);
   const [subjectsId, setSubjectsId] = useState([]);
   const [subject, setSubject] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
@@ -56,39 +56,6 @@ const EditMeetingSubjects = () => {
   const [previosSubjects, setPreviosSubjects] = useState([]);
   const [backUpUser, setBackupUser] = useState([]);
   let subjects = [];
-
-  item?.subjectIds?.map((id) => {
-    const { loading, error } = useQuery(GET_SUBJECT_BY_ID, {
-      variables: {
-        subjectId: id
-      },
-      onCompleted: (data) => {
-        if (data) {
-          setSubject((prev) => {
-            const pevDaa = prev.filter((ite) => {
-              return ite.subjectId !== data.subject.subjectId;
-            });
-            return [...pevDaa, data.subject];
-          });
-          setPreviosSubjects((prev) => {
-            const pevDaa = prev.filter((ite) => {
-              return ite.subjectId !== data.subject.subjectId;
-            });
-            return [...pevDaa, data.subject];
-          });
-          setBackupUser((prev) => {
-            const pevDaa = prev.filter((ite) => {
-              return ite.subjectId !== data.subject.subjectId;
-            });
-            return [...pevDaa, data.subject];
-          });
-        }
-      }
-    });
-    if (error) {
-      console.log('file error', error);
-    }
-  });
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
@@ -111,7 +78,7 @@ const EditMeetingSubjects = () => {
                 (obj) => obj?.subjectId === subject?.subjectId
               )
             : -1;
-
+        console.log('index', index);
         if (index == -1) {
           newUsers.push(JSON.parse(JSON.stringify(subject)));
         } else {
@@ -126,8 +93,10 @@ const EditMeetingSubjects = () => {
       }
     });
 
-    setPreviosSubjects(newUsers);
-    setFilterData(newUsers);
+    setPreviosSubjects((pre) => {
+      return [...pre, newUsers[0]];
+    });
+    // setFilterData(newUsers);
   };
 
   useEffect(() => {
@@ -168,12 +137,18 @@ const EditMeetingSubjects = () => {
     data: SubjectsData
   } = useQuery(GET_All_SUBJECTS, {
     variables: {
+      committeeIds: '',
       searchValue: searchText,
-      screen: 1,
-      committeeId: meetingsData?.committee
+      screen: 0,
+      page: -1,
+      pageSize: -1,
+      meetingId: item.meetingId
     },
 
     onCompleted: (data) => {
+      console.log('meeting selected subjects', data.subjects.items);
+      setPreviosSubjects(data?.subjects.items);
+      setBackupUser(data?.subjects.items);
       setFilterData(data?.subjects.items);
       // setSubjectData(data?.subjects.items);
     }
@@ -284,6 +259,7 @@ const EditMeetingSubjects = () => {
               style={styles.textInput}
               placeholder={'Search'}
               onChangeText={(text) => setSearchText(text)}
+              value={searchText}
             />
             <TouchableOpacity onPress={() => startRecording()}>
               <Icon

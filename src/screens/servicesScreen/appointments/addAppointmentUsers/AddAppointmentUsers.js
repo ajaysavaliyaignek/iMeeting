@@ -19,9 +19,9 @@ import { Colors } from '../../../../themes/Colors';
 import { Icon, IconName } from '../../../../component';
 import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
-import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { styles } from './styles';
 import { UserContext } from '../../../../context';
+import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
 const AddAppointmentUsers = () => {
   const navigation = useNavigation();
@@ -35,7 +35,7 @@ const AddAppointmentUsers = () => {
   const [filterData, setFilterData] = useState([]);
   console.log('selected user from add appointment user', appointmentsData);
   const [previousUser, setPreviousUser] = useState([]);
-  const [valueIndex, setValueIndex] = useState(-1);
+  const [visibleIndex, setVisibleIndex] = useState(-1);
   let users = [];
   let requiredUsers = [];
 
@@ -116,7 +116,7 @@ const AddAppointmentUsers = () => {
   };
 
   const onDeleteHandler = (item) => {
-    setValueIndex(-1);
+    setVisibleIndex(-1);
     Alert.alert('Remove User', 'Are you sure you want to remove this?', [
       {
         text: 'Delete',
@@ -140,7 +140,7 @@ const AddAppointmentUsers = () => {
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
         style={{ flex: 1 }}
-        onPress={() => setValueIndex(-1)}
+        onPress={() => setVisibleIndex(-1)}
         activeOpacity={1}
       >
         <Header
@@ -219,30 +219,18 @@ const AddAppointmentUsers = () => {
             </View>
           </TouchableOpacity>
           <Divider style={styles.divider} />
-
-          <FlatList
-            data={previousUser}
-            keyExtractor={(item, index) => {
-              return index.toString();
-            }}
-            renderItem={({ item, index }) => (
-              <UserCard
-                item={item}
-                index={index}
-                text={searchText}
-                isSwitchOnRow={true}
-                userSelect={true}
-                deleted={true}
-                committee={appointmentsData.committee}
-                onChangeUser={onChangeUserState}
-                setPreviousUser={setSelectedUsers}
-                onDeleteHandler={onDeleteHandler}
-                valueIndex={valueIndex}
-                setValueIndex={setValueIndex}
-                disableSwitch={false}
-              />
-            )}
-            showsVerticalScrollIndicator={false}
+          <UserDetailsComponent
+            users={previousUser}
+            isUserRequired={true}
+            isDeletable={true}
+            committee={appointmentsData.committee}
+            isSwitchOnRow={true}
+            onChangeUser={onChangeUserState}
+            openPopup={true}
+            searchText={searchText}
+            onPressDelete={onDeleteHandler}
+            visibleIndex={visibleIndex}
+            setVisibleIndex={setVisibleIndex}
           />
         </View>
 

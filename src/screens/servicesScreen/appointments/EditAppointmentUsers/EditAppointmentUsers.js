@@ -19,12 +19,11 @@ import { Colors } from '../../../../themes/Colors';
 import { Icon, IconName } from '../../../../component';
 import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
-import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { styles } from './styles';
 import { UserContext } from '../../../../context';
-import { Fonts } from '../../../../themes';
 import { useQuery } from '@apollo/client';
 import { GET_APPOINTMENT_BY_ID } from '../../../../graphql/query';
+import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
 const EditAppointmentUsers = () => {
   const navigation = useNavigation();
@@ -32,7 +31,7 @@ const EditAppointmentUsers = () => {
   // const { item } = route?.params;
   const [searchText, setSearchText] = useState('');
   const [required, setRequired] = useState([]);
-  const [valueIndex, setValueIndex] = useState(-1);
+  const [visibleIndex, setVisibleIndex] = useState(-1);
   const { attachFiles, committee, title, discription, item } = route?.params;
   console.log({ attachFiles, committee, title, discription, item });
   const { selectedUsers, appointmentsData, setAppointmentsData } =
@@ -157,7 +156,7 @@ const EditAppointmentUsers = () => {
   };
 
   const onDeleteHandler = (item) => {
-    setValueIndex(-1);
+    setVisibleIndex(-1);
     Alert.alert('Remove User', 'Are you sure you want to remove this?', [
       {
         text: 'Delete',
@@ -191,7 +190,7 @@ const EditAppointmentUsers = () => {
       <TouchableOpacity
         style={{ flex: 1 }}
         onPress={() => {
-          setValueIndex(-1);
+          setVisibleIndex(-1);
         }}
       >
         <Header
@@ -217,7 +216,7 @@ const EditAppointmentUsers = () => {
             <TextInput
               style={styles.textInput}
               placeholder={'Search'}
-              onChangeText={(text) => setSearchText(text)}
+              onChangeText={(text) => searchFilterUsers(text)}
             />
             <TouchableOpacity onPress={() => startRecording()}>
               <Icon
@@ -268,47 +267,19 @@ const EditAppointmentUsers = () => {
             </View>
           </TouchableOpacity>
           <Divider style={styles.divider} />
-
-          {previousUser?.length > 0 ? (
-            <FlatList
-              data={previousUser}
-              keyExtractor={(item, index) => {
-                return index.toString();
-              }}
-              renderItem={({ item, index }) => (
-                <UserCard
-                  item={item}
-                  index={index}
-                  text={searchText}
-                  userSelect={true}
-                  required={required}
-                  setRequired={setRequired}
-                  isSwitchOnRow={true}
-                  deleted={true}
-                  editable={false}
-                  committee={committee}
-                  onChangeUser={onChangeUserState}
-                  onDeleteHandler={onDeleteHandler}
-                  valueIndex={valueIndex}
-                  setValueIndex={setValueIndex}
-                  disableSwitch={false}
-                />
-              )}
-              showsVerticalScrollIndicator={false}
-            />
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-                No selected user
-              </Text>
-            </View>
-          )}
+          <UserDetailsComponent
+            users={previousUser}
+            isUserRequired={true}
+            isDeletable={true}
+            committee={committee}
+            isSwitchOnRow={true}
+            onChangeUser={onChangeUserState}
+            openPopup={true}
+            searchText={searchText}
+            onPressDelete={onDeleteHandler}
+            visibleIndex={visibleIndex}
+            setVisibleIndex={setVisibleIndex}
+          />
         </View>
 
         <View

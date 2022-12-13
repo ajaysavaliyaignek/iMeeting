@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
 
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
@@ -12,7 +11,6 @@ import Avatar from '../Avatar/Avatar';
 import EditDeleteModal from '../EditDeleteModal';
 import CheckBox from '../checkBox/CheckBox';
 import { getHighlightedText } from '../highlitedText/HighlitedText';
-import { UserContext } from '../../context';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 
 const UsersCard = ({
@@ -132,7 +130,7 @@ const UsersCard = ({
           onPress={() => setEditModal(!editModal)}
           style={styles.dotsView}
         >
-          <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[4]} />
+          <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
         </TouchableOpacity>
       )}
       {editModal && (
@@ -181,8 +179,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: SIZES[16],
     top: SIZES[32],
-    width: 24,
-    height: 24,
+    width: SIZES[24],
+    height: SIZES[24],
     alignItems: 'center',
     justifyContent: 'center'
   },

@@ -1,5 +1,23 @@
 import { gql } from '@apollo/client';
 
+export const GET_LIVE_MEETING_USERS = gql`
+  query ($meetingId: Long, $isSpeaker: Boolean) {
+    liveMeetingUsers(meetingId: $meetingId, isSpeaker: $isSpeaker) {
+      userDetails {
+        duration
+        email
+        isSpeaker
+        roleId
+        roleName
+        status
+        userId
+        userName
+        speakingDuration
+      }
+    }
+  }
+`;
+
 export const GET_ANSWER = gql`
   query answer($id: Long, $userId: Long, $type: Int) {
     answer(id: $id, userId: $userId, type: $type) {

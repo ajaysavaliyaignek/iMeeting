@@ -12,6 +12,7 @@ import { GET_All_SUBJECTS } from '../../../graphql/query';
 import { DELETE_SUBJECTS } from '../../../graphql/mutation';
 import { styles } from './styles';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
+import { SIZES } from '../../../themes/Sizes';
 
 const SubjectCard = ({
   item,
@@ -156,7 +157,7 @@ const SubjectCard = ({
           onPress={() => setValueIndex(valueIndex == -1 ? index : -1)}
           style={styles.dotsView}
         >
-          <Icon name={IconName.Dots} height={16} width={6} />
+          <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
         </TouchableOpacity>
       )}
       {valueIndex == index && (

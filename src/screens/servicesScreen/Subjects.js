@@ -73,11 +73,11 @@ const Subjects = () => {
         console.log('subject by id from subjects', data);
         if (data) {
           setSubject((prev) => {
-            subject?.filter((ite) => {
-              console.log('item id', ite.subjectId);
-              console.log('data id', data.subject.subjectId);
-            });
-            return [...subject, data.subject];
+            // subject?.filter((ite) => {
+            //   console.log('item id', ite.subjectId);
+            //   console.log('data id', data.subject.subjectId);
+            return [...prev, data.subject];
+            // });
           });
         }
       }

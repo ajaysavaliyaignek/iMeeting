@@ -14,29 +14,10 @@ const SelectUser = () => {
   const { selectedUsers } = route?.params;
   console.log('selected users from time line select user', selectedUsers);
   const [requiredSwitchOn, setRequiredSwitchOn] = useState(false);
-  const [requiredCheckBox, setRequiredCheckBox] = useState(false);
   const [optionalSwitchOn, setOptionalSwitchOn] = useState(false);
   const [optionalCheckbox, setOptionalCheckBox] = useState(false);
   const [requiredUsers, setRequiredUsers] = useState([]);
   const [optionalUser, setOptionalUser] = useState([]);
-  const users = [
-    {
-      profileImage: 'https://picsum.photos/200/300',
-      userName: 'Kristin Watson'
-    },
-    {
-      profileImage: 'https://picsum.photos/200/310',
-      userName: 'Eleanor Pena'
-    },
-    {
-      profileImage: 'https://picsum.photos/200/320',
-      userName: 'Ronald Richards'
-    },
-    {
-      profileImage: 'https://picsum.photos/200/330',
-      userName: 'Bessie Cooper'
-    }
-  ];
 
   useEffect(() => {
     selectedUsers?.map((user) => {
@@ -88,13 +69,19 @@ const SelectUser = () => {
               <View style={styles.userContainer} key={index}>
                 <View style={styles.switchContainer}>
                   <Avatar
-                    name={user.firstName}
+                    name={
+                      user.firstName == undefined
+                        ? user.userName
+                        : user.firstName
+                    }
                     source={user.profileImage}
                     size={SIZES[34]}
                   />
-                  <Text
-                    style={styles.txtUserName}
-                  >{`${user.firstName} ${user.familyName}`}</Text>
+                  <Text style={styles.txtUserName}>
+                    {user.firstName == undefined
+                      ? user.userName
+                      : `${user.firstName} ${user.familyName}`}
+                  </Text>
                 </View>
                 <CheckBox
                   value={true}
@@ -120,13 +107,19 @@ const SelectUser = () => {
               <View style={styles.userContainer} key={index}>
                 <View style={styles.switchContainer}>
                   <Avatar
-                    name={user.firstName}
+                    name={
+                      user.firstName == undefined
+                        ? user.userName
+                        : user.firstName
+                    }
                     source={user.profileImage}
                     size={SIZES[34]}
                   />
-                  <Text
-                    style={styles.txtUserName}
-                  >{`${user.firstName} ${user.familyName}`}</Text>
+                  <Text style={styles.txtUserName}>
+                    {user.firstName == undefined
+                      ? user.userName
+                      : `${user.firstName} ${user.familyName}`}
+                  </Text>
                 </View>
                 <CheckBox
                   value={false}

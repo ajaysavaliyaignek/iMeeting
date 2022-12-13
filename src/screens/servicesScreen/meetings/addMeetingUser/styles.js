@@ -6,12 +6,15 @@ import { SIZES } from '../../../../themes/Sizes';
 export const styles = StyleSheet.create({
   container: { flex: 1 },
   subContainer: {
-    paddingHorizontal: SIZES[16],
     paddingTop: SIZES[16],
     backgroundColor: Colors.white,
     flex: 1
   },
-  txtAddSubjectTitle: { ...Fonts.PoppinsBold[24], color: Colors.bold },
+  txtAddSubjectTitle: {
+    ...Fonts.PoppinsBold[24],
+    color: Colors.bold,
+    marginHorizontal: SIZES[16]
+  },
   buttonContainer: {
     paddingHorizontal: SIZES[16],
     flexDirection: 'row',
@@ -75,7 +78,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: SIZES[16]
+    marginBottom: SIZES[16],
+    marginHorizontal: SIZES[16]
   },
   txtProgress: {
     ...Fonts.PoppinsRegular[14],
@@ -99,7 +103,8 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.gray,
     paddingHorizontal: SIZES[16],
     borderRadius: SIZES[10],
-    marginVertical: SIZES[22]
+    marginVertical: SIZES[22],
+    marginHorizontal: SIZES[16]
   },
   textInput: {
     ...Fonts.PoppinsRegular[14],
@@ -115,7 +120,8 @@ export const styles = StyleSheet.create({
     marginVertical: SIZES[10],
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginHorizontal: SIZES[16]
   },
   txtCommittee: {
     ...Fonts.PoppinsRegular[14],

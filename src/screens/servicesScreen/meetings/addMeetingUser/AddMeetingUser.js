@@ -4,7 +4,6 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
-  FlatList,
   Alert
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
@@ -19,10 +18,9 @@ import { Colors } from '../../../../themes/Colors';
 import { Icon, IconName } from '../../../../component';
 import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
-import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { styles } from './styles';
-import { Fonts } from '../../../../themes';
 import { UserContext } from '../../../../context';
+import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
 const AddMeetingUser = () => {
   const navigation = useNavigation();
@@ -33,7 +31,7 @@ const AddMeetingUser = () => {
   const { selectedUsers, meetingsData, setMeetingsData, setSelectedUsers } =
     useContext(UserContext);
   const [previousUser, setPreviousUser] = useState([]);
-  const [valueIndex, setValueIndex] = useState(-1);
+  const [visibleIndex, setVisibleIndex] = useState(-1);
   let users = [];
   let requiredUsers = [];
 
@@ -111,7 +109,7 @@ const AddMeetingUser = () => {
   };
 
   const onDeleteHandler = (item) => {
-    setValueIndex(-1);
+    setVisibleIndex(-1);
     Alert.alert('Remove User', 'Are you sure you want to remove this?', [
       {
         text: 'Delete',
@@ -136,7 +134,7 @@ const AddMeetingUser = () => {
       <TouchableOpacity
         style={{ flex: 1 }}
         onPress={() => {
-          setValueIndex(-1);
+          setVisibleIndex(-1);
         }}
         activeOpacity={1}
       >
@@ -221,47 +219,19 @@ const AddMeetingUser = () => {
             </View>
           </TouchableOpacity>
           <Divider style={styles.divider} />
-
-          {previousUser?.length > 0 ? (
-            <FlatList
-              data={previousUser}
-              keyExtractor={(item, index) => {
-                return index.toString();
-              }}
-              renderItem={({ item, index }) => (
-                <UserCard
-                  item={item}
-                  index={index}
-                  text={searchText}
-                  isSwitchOnRow={true}
-                  userSelect={true}
-                  deleted={true}
-                  editable={false}
-                  committee={meetingsData.committee}
-                  onChangeUser={onChangeUserState}
-                  userDetails={selectedUsers}
-                  setPreviousUser={setSelectedUsers}
-                  valueIndex={valueIndex}
-                  setValueIndex={setValueIndex}
-                  onDeleteHandler={onDeleteHandler}
-                  disableSwitch={false}
-                />
-              )}
-              showsVerticalScrollIndicator={false}
-            />
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-                No selected user
-              </Text>
-            </View>
-          )}
+          <UserDetailsComponent
+            users={previousUser}
+            isUserRequired={true}
+            isDeletable={true}
+            committee={meetingsData.committee}
+            isSwitchOnRow={true}
+            onChangeUser={onChangeUserState}
+            openPopup={true}
+            searchText={searchText}
+            onPressDelete={onDeleteHandler}
+            visibleIndex={visibleIndex}
+            setVisibleIndex={setVisibleIndex}
+          />
         </View>
 
         <View

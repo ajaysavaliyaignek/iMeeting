@@ -27,7 +27,7 @@ const SelectSubjects = () => {
   const route = useRoute();
 
   const { committee, onUpdateSelection, previosSubjects } = route?.params;
-  console.log('committee from select subjects', committee);
+  console.log('committee from select subjects', committee.toString());
   const [searchText, setSearchText] = useState('');
   const [subjectData, setSubjectData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState([]);
@@ -44,7 +44,7 @@ const SelectSubjects = () => {
     variables: {
       searchValue: searchText,
       screen: 1,
-      committeeId: committee
+      committeeIds: committee.toString()
     },
 
     onCompleted: (data) => {

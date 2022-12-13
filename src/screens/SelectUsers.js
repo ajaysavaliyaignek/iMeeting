@@ -5,9 +5,8 @@ import {
   TextInput,
   TouchableOpacity
 } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { FlatList } from 'react-native-gesture-handler';
 import { Divider } from 'react-native-paper';
 import { useQuery } from '@apollo/client';
 import Voice from '@react-native-community/voice';
@@ -18,10 +17,9 @@ import { SIZES } from '../themes/Sizes';
 import { Colors } from '../themes/Colors';
 import { Fonts } from '../themes';
 import { Button } from '../component/button/Button';
-import UsersCard from '../component/Cards/UsersCard';
 import { GET_All_USERS } from '../graphql/query';
-import { UserContext } from '../context';
 import Loader from '../component/Loader/Loader';
+import UserDetailsComponent from '../component/userDetailsComponent/UserDetailsComponent';
 
 const SelectUsers = () => {
   const navigation = useNavigation();
@@ -34,6 +32,7 @@ const SelectUsers = () => {
   const [activeTab, setActiveTab] = useState('0');
   //used to search text
   const [searchText, setSearchText] = useState('');
+  const [visibleIndex, setVisibleIndex] = useState(-1);
   var usersData = [];
   var externalUserData = [];
   useEffect(() => {
@@ -253,23 +252,16 @@ const SelectUsers = () => {
             {UsersLoading ? (
               <Loader />
             ) : (
-              <FlatList
-                data={allUsers}
-                keyExtractor={(item, index) => {
-                  return index.toString();
-                }}
-                key={(item) => `${item.userId}`}
-                renderItem={({ item, index }) => (
-                  <UsersCard
-                    item={item}
-                    index={index}
-                    searchText={searchText}
-                    onChecked={setOnAllUserClick}
-                    committee={committee}
-                    openPopup={false}
-                  />
-                )}
-                showsVerticalScrollIndicator={false}
+              <UserDetailsComponent
+                users={allUsers}
+                isGeneralUser={true}
+                committee={committee}
+                onChecked={setOnAllUserClick}
+                isCheckboxView={true}
+                visibleIndex={visibleIndex}
+                setVisibleIndex={setVisibleIndex}
+                openPopup={true}
+                searchText={searchText}
               />
             )}
           </View>
@@ -285,25 +277,22 @@ const SelectUsers = () => {
               onPress={() => navigation.navigate('AddExternalUser')}
             />
             <Divider style={styles.divider} />
-            <FlatList
-              data={externalUser}
-              keyExtractor={(item, index) => {
-                return index.toString();
-              }}
-              renderItem={({ item, index }) => (
-                <UsersCard
-                  item={item}
-                  index={index}
-                  external={true}
-                  onChecked={setOnExternalUserClick}
-                  searchText={searchText}
-                  committee={committee}
-                  openPopup={false}
-                />
-              )}
-              showsVerticalScrollIndicator={false}
-              ListFooterComponent={<View style={{ height: 20 }} />}
-            />
+            {externalUsersLoading ? (
+              <Loader />
+            ) : (
+              <UserDetailsComponent
+                users={externalUser}
+                isExternalUser={true}
+                committee={committee}
+                onChecked={setOnExternalUserClick}
+                isCheckboxView={true}
+                isSwichDisabled={true}
+                visibleIndex={visibleIndex}
+                setVisibleIndex={setVisibleIndex}
+                openPopup={true}
+                searchText={searchText}
+              />
+            )}
           </View>
         )}
       </View>
@@ -351,7 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.line
   },
   subContainer: {
-    paddingHorizontal: SIZES[16],
+    // paddingHorizontal: SIZES[16],
     backgroundColor: Colors.white,
     flex: 1
   },
@@ -362,8 +351,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray,
     borderRadius: SIZES[10],
     marginVertical: SIZES[22],
-    justifyContent: 'center'
-    // height: SIZES[36]
+    justifyContent: 'center',
+    // height: SIZES[36],
+    marginHorizontal: SIZES[16]
   },
   textInput: {
     ...Fonts.PoppinsRegular[14],
@@ -388,7 +378,8 @@ const styles = StyleSheet.create({
     borderRadius: SIZES[10],
     marginBottom: SIZES[16],
     padding: SIZES[2],
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginHorizontal: SIZES[16]
   },
   txtBtnServices: { ...Fonts.PoppinsSemiBold[12], color: Colors.bold },
   btnExternalUser: {

@@ -26,7 +26,7 @@ import LiveMeetingDecisions from '../liveMeetingDecisions/LiveMeetingDecisions';
 import LiveMeetingChats from '../liveMeetingChats/LiveMeetingChats';
 import { useQuery } from '@apollo/client';
 import { GET_MEETING_BY_ID } from '../../../graphql/query';
-import DetailsComponent from '../../../component/detailsComponent/MeetingDetailsComponent';
+import DetailsComponent from '../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 
 const LiveMeetingMenu = () => {
   const navigation = useNavigation();

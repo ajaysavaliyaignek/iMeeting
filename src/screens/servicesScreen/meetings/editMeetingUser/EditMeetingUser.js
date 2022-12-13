@@ -19,10 +19,9 @@ import { Colors } from '../../../../themes/Colors';
 import { Icon, IconName } from '../../../../component';
 import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
-import UserCard from '../../../../component/Cards/userCard/UserCard';
 import { styles } from './styles';
-import { Fonts } from '../../../../themes';
 import { UserContext } from '../../../../context';
+import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
 const EditMeetingUser = () => {
   const navigation = useNavigation();
@@ -34,7 +33,7 @@ const EditMeetingUser = () => {
   const [required, setRequired] = useState([]);
   const [filterData, setFilterData] = useState([]);
   const [previousUser, setPreviousUser] = useState([]);
-  const [valueIndex, setValueIndex] = useState(-1);
+  const [visibleIndex, setVisibleIndex] = useState(-1);
   let users = [];
   let requiredUsers = [];
 
@@ -152,7 +151,7 @@ const EditMeetingUser = () => {
   };
 
   const onDeleteHandler = (item) => {
-    setValueIndex(-1);
+    setVisibleIndex(-1);
     Alert.alert('Remove User', 'Are you sure you want to remove this?', [
       {
         text: 'Delete',
@@ -177,7 +176,7 @@ const EditMeetingUser = () => {
       <TouchableOpacity
         style={{ flex: 1 }}
         onPress={() => {
-          setValueIndex(-1);
+          setVisibleIndex(-1);
         }}
         activeOpacity={1}
       >
@@ -263,45 +262,19 @@ const EditMeetingUser = () => {
             </View>
           </TouchableOpacity>
           <Divider style={styles.divider} />
-
-          {previousUser?.length > 0 ? (
-            <FlatList
-              data={previousUser}
-              keyExtractor={(item, index) => {
-                return index.toString();
-              }}
-              renderItem={({ item, index }) => (
-                <UserCard
-                  item={item}
-                  index={index}
-                  text={searchText}
-                  userSelect={true}
-                  isSwitchOnRow={true}
-                  deleted={true}
-                  editable={false}
-                  committee={meetingsData.committee}
-                  onChangeUser={onChangeUserState}
-                  onDeleteHandler={onDeleteHandler}
-                  valueIndex={valueIndex}
-                  setValueIndex={setValueIndex}
-                  disableSwitch={false}
-                />
-              )}
-              showsVerticalScrollIndicator={false}
-            />
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-                No selected user
-              </Text>
-            </View>
-          )}
+          <UserDetailsComponent
+            users={previousUser}
+            isUserRequired={true}
+            isDeletable={true}
+            committee={meetingsData.committee}
+            isSwitchOnRow={true}
+            onChangeUser={onChangeUserState}
+            openPopup={true}
+            searchText={searchText}
+            onPressDelete={onDeleteHandler}
+            visibleIndex={visibleIndex}
+            setVisibleIndex={setVisibleIndex}
+          />
         </View>
 
         <View

@@ -41,6 +41,22 @@ const AddSubjectScreen = () => {
   const [committees, setCommittee] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [committeeData, setCommitteeData] = useState([]);
+  let queryParams = [];
+  if (committee) {
+    queryParams = {
+      searchValue: '',
+      screen: 1,
+      committeeIds: committee.toString()
+    };
+  } else {
+    queryParams = {
+      searchValue: '',
+      screen: 0,
+      committeeIds: '',
+      page: -1,
+      pageSize: -1
+    };
+  }
 
   // fetch file
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
@@ -116,13 +132,7 @@ const AddSubjectScreen = () => {
     refetchQueries: [
       {
         query: GET_All_SUBJECTS,
-        variables: {
-          searchValue: '',
-          screen: committee ? 1 : 0,
-          committeeIds: '',
-          page: -1,
-          pageSize: -1
-        }
+        variables: queryParams
       }
     ],
     onCompleted: (data) => {

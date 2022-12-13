@@ -280,7 +280,7 @@ const LoginScreen = ({ navigation }) => {
                 >
                   <Icon
                     name={IconName.Eye}
-                    height={22}
+                    height={SIZES[22]}
                     width={DeviceInfo.isTablet() ? SIZES[12] : SIZES[22]}
                   />
                 </TouchableOpacity>
