@@ -177,6 +177,7 @@ const UserDetailsCard = ({
                   discription={
                     item.roleName == undefined
                       ? item?.roles !== null &&
+                        item?.roles != undefined &&
                         item?.roles[item?.organizationIds?.indexOf(committee)]
                       : item.roleName
                   }
@@ -264,6 +265,7 @@ const UserDetailsCard = ({
                   discription={
                     item.roleName == undefined
                       ? item?.roles !== null &&
+                        item?.roles !== undefined &&
                         item.roles[item?.organizationIds?.indexOf(committee)]
                       : item.roleName
                   }

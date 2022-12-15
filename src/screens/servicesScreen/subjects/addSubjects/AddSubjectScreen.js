@@ -189,7 +189,7 @@ const AddSubjectScreen = () => {
             label: item.committeeTitle,
             value: item.organizationId
           }))}
-          disable={false}
+          disable={committee ? true : false}
           placeholder={''}
           setData={setValueCommittee}
           title={'SELECT COMMITTEE'}
@@ -202,7 +202,7 @@ const AddSubjectScreen = () => {
             label: item.meetingTitle,
             value: item.meetingId
           }))}
-          disable={false}
+          disable={committee ? true : false}
           placeholder={''}
           setData={setValueMeeting}
           title={'SELECT MEETING'}

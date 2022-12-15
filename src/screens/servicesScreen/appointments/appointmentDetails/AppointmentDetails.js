@@ -199,7 +199,7 @@ const AppointmentsDetails = () => {
           <View>
             {details(
               'Start date',
-              `${moment(appointment?.setDate).format('DD MMM,YYYY')},${
+              `${moment(appointment?.setDate).format('DD MMM, YYYY')}, ${
                 appointment?.setTime
               }`
             )}
@@ -369,6 +369,8 @@ const AppointmentsDetails = () => {
           isSwitchOnRow={true}
           isSwichDisabled={true}
           searchText={''}
+          visibleIndex={-1}
+          setVisibleIndex={() => {}}
         />
       </ScrollView>
       {role == 'Head' || role == 'Secretory' ? (

@@ -8,7 +8,7 @@ import {
   Platform,
   ToastAndroid
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import moment from 'moment';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
@@ -38,9 +38,14 @@ import {
 import { DELETE_MEETING } from '../../../../graphql/mutation';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 import DetailsComponent from '../../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
+import { UserContext } from '../../../../context';
 
 const MeetingDetails = () => {
   const navigation = useNavigation();
+  const {
+    setMeetingsData
+    // setSelectedSubjects
+  } = useContext(UserContext);
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item } = route?.params;
@@ -253,9 +258,10 @@ const MeetingDetails = () => {
                   ...Fonts.PoppinsSemiBold[14],
                   color: Colors.primary
                 }}
-                onPress={() =>
-                  navigation.navigate('EditMeetingGeneral', { item: item })
-                }
+                onPress={() => {
+                  navigation.navigate('EditMeetingGeneral', { item: item });
+                  setMeetingsData([]);
+                }}
               />
               <Button
                 title={'Delete'}

@@ -16,7 +16,7 @@ import { IconName } from '../../component';
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
 import { SIZES } from '../../themes/Sizes';
-import { GET_All_COMMITTEE } from '../../graphql/query';
+import { GET_All_COMMITTEE, GET_COMMITTEES_BY_ROLE } from '../../graphql/query';
 import Loader from '../../component/Loader/Loader';
 import { Button } from '../../component/button/Button';
 import CommitteeCard from '../../component/Cards/committeeCard/CommitteeCard';
@@ -45,15 +45,13 @@ const CommitteeScreen = () => {
 
   console.log('COMMITTE FROM COMMITTE SCRREN', selectCommittee);
 
-  const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
-    GET_All_COMMITTEE,
-    {
-      variables: { isDeleted: true },
+  const { loading: CommitteeLoadingByRole, error: CommitteeErrorByRole } =
+    useQuery(GET_COMMITTEES_BY_ROLE, {
+      variables: { head: true, secretary: true, member: false },
       onCompleted: (data) => {
         if (data) {
-          console.log('committees', data?.committees.items);
-
-          filterCommittee = data?.committees?.items.map((item, index) => {
+          console.log('committees', data?.committeesByRole.items);
+          filterCommittee = data?.committeesByRole.items.map((item, index) => {
             let previousUserIndex = committee?.findIndex(
               (user) => user.organizationId === item.organizationId
             );
@@ -67,12 +65,12 @@ const CommitteeScreen = () => {
           if (filterCommittee) {
             setCommittees(filterCommittee);
           }
+          // setCommittee(data.committeesByRole.items);
         }
       }
-    }
-  );
-  if (CommitteeError) {
-    console.log('commitee error', CommitteeError);
+    });
+  if (CommitteeErrorByRole) {
+    console.log('commitee error', CommitteeErrorByRole);
   }
 
   const setSelectedCommitee = () => {
@@ -127,14 +125,14 @@ const CommitteeScreen = () => {
         >
           Committees
         </Text>
-        {CommitteeLoading ? (
+        {CommitteeLoadingByRole ? (
           <Loader />
-        ) : CommitteeError ? (
+        ) : CommitteeErrorByRole ? (
           <View
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
           >
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-              {CommitteeError.message}
+              {CommitteeErrorByRole.message}
             </Text>
           </View>
         ) : (

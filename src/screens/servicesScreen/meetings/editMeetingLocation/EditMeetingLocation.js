@@ -24,10 +24,10 @@ import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker'
 
 const EditMeetingLocation = () => {
   const navigation = useNavigation();
-  const { meetingsData, setMeetingsData } = useContext(UserContext);
+  const { meetingsData, setMeetingsData, data } = useContext(UserContext);
   const route = useRoute();
   const { item } = route?.params;
-  console.log('meeting data from Editmeetinglocation', meetingsData);
+  console.log('meeting data from Editmeetinglocation', data);
   console.log('item from Editmeetinglocation', item);
   const [openLocation, setOpenLocation] = useState(false);
   const [onFocus, setIsFocus] = useState(false);

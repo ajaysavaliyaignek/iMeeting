@@ -25,67 +25,27 @@ import { GET_SUBJECT_BY_ID } from '../../graphql/query';
 const Subjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { subjectId, role, deadlinedDate } = route?.params;
+  const { subjects, role, deadlinedDate } = route?.params;
   const [searchText, setSearchText] = useState('');
-  const [subject, setSubject] = useState([]);
+  const [subject, setSubject] = useState(subjects);
+  const [filterData, setFilterData] = useState(subjects);
   const [valueIndex, setValueIndex] = useState(-1);
-  let subjects = [];
+  // let subjects = [];
 
-  console.log('subject id', subjectId);
-
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStartHandler = (e) => {
-    console.log('startHandler', e);
-  };
-
-  const onSpeechEndHandler = (e) => {
-    console.log('onSpeechEndHandler', e);
-  };
-
-  const onSpeechResultsHandler = (e) => {
-    console.log('onSpeechResultsHandler', e);
-    let text = e.value[0];
-    setSearchText(text);
-  };
-  const startRecording = async () => {
-    try {
-      await Voice.start('en-US');
-    } catch (error) {
-      console.log('voice error', error);
+  const searchFilterUsers = (text) => {
+    if (text) {
+      const newData = filterData?.filter((item) => {
+        const itemData = item.subjectTitle ? item.subjectTitle : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+      setSearchText(text);
+      setSubject(newData);
+    } else {
+      setSearchText(text);
+      setSubject(filterData);
     }
   };
-
-  subjectId?.map((id) => {
-    const { loading, error } = useQuery(GET_SUBJECT_BY_ID, {
-      variables: {
-        subjectId: id
-      },
-      onCompleted: (data) => {
-        console.log('subject by id from subjects', data);
-        if (data) {
-          setSubject((prev) => {
-            // subject?.filter((ite) => {
-            //   console.log('item id', ite.subjectId);
-            //   console.log('data id', data.subject.subjectId);
-            return [...prev, data.subject];
-            // });
-          });
-        }
-      }
-    });
-    if (error) {
-      console.log('file error', error);
-    }
-  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -103,11 +63,12 @@ const Subjects = () => {
           <View style={styles.searchContainer}>
             <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
             <TextInput
+              value={searchText}
               style={styles.textInput}
               placeholder={'Search'}
-              onChangeText={(text) => setSearchText(text)}
+              onChangeText={(text) => searchFilterUsers(text)}
             />
-            <TouchableOpacity onPress={() => startRecording()}>
+            <TouchableOpacity>
               <Icon
                 name={IconName.Speaker}
                 height={SIZES[15]}

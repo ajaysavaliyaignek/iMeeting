@@ -34,7 +34,9 @@ const AddAppointmentUsers = () => {
   } = useContext(UserContext);
   const [filterData, setFilterData] = useState([]);
   console.log('selected user from add appointment user', appointmentsData);
-  const [previousUser, setPreviousUser] = useState([]);
+  const [previousUser, setPreviousUser] = useState(
+    appointmentsData.userDetails
+  );
   const [visibleIndex, setVisibleIndex] = useState(-1);
   let users = [];
   let requiredUsers = [];
@@ -250,7 +252,8 @@ const AddAppointmentUsers = () => {
                 setAppointmentsData({
                   ...appointmentsData,
                   users,
-                  userRequired: requiredUsers
+                  userRequired: requiredUsers,
+                  userDetails: previousUser
                 });
               }}
               layoutStyle={styles.cancelBtnLayout}
@@ -262,7 +265,8 @@ const AddAppointmentUsers = () => {
                 setAppointmentsData({
                   ...appointmentsData,
                   users,
-                  userRequired: requiredUsers
+                  userRequired: requiredUsers,
+                  userDetails: previousUser
                 });
                 navigation.navigate('AddAppointmentDateAndTime');
               }}

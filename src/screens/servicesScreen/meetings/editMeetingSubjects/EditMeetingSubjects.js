@@ -51,84 +51,13 @@ const EditMeetingSubjects = () => {
   const [subjectsId, setSubjectsId] = useState([]);
   const [subject, setSubject] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
+  const [viewIndex, setViewIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
   const [selectSubjects, setSelectedSubjects] = useState([]);
   const [previosSubjects, setPreviosSubjects] = useState([]);
-  const [backUpUser, setBackupUser] = useState([]);
+  const [backUpSubject, setBackUpSubject] = useState([]);
   let subjects = [];
-
-  const onUpdateSelection = (items) => {
-    let newUsers = [];
-    console.log('new added subjects', items);
-    console.log('previous subject', previosSubjects);
-    console.log('backup subject', backUpUser);
-
-    items?.map((subject) => {
-      let indexPreviousUser =
-        previosSubjects?.length > 0
-          ? previosSubjects?.findIndex(
-              (obj) => obj?.subjectId === subject?.subjectId
-            )
-          : -1;
-
-      if (indexPreviousUser === -1) {
-        let index =
-          backUpUser?.length > 0
-            ? backUpUser?.findIndex(
-                (obj) => obj?.subjectId === subject?.subjectId
-              )
-            : -1;
-        console.log('index', index);
-        if (index == -1) {
-          newUsers.push(JSON.parse(JSON.stringify(subject)));
-        } else {
-          newUsers.push(JSON.parse(JSON.stringify(backUpUser[index])));
-        }
-      } else {
-        newUsers.push(
-          JSON.parse(JSON.stringify(previosSubjects[indexPreviousUser]))
-        );
-
-        // newUsers.push(previousUser[indexPreviousUser]);
-      }
-    });
-
-    setPreviosSubjects((pre) => {
-      return [...pre, newUsers[0]];
-    });
-    // setFilterData(newUsers);
-  };
-
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStartHandler = (e) => {
-    console.log('startHandler', e);
-  };
-
-  const onSpeechEndHandler = (e) => {
-    console.log('onSpeechEndHandler', e);
-  };
-
-  const onSpeechResultsHandler = (e) => {
-    console.log('onSpeechResultsHandler', e);
-    let text = e.value[0];
-    setSearchText(text);
-  };
-  const startRecording = async () => {
-    try {
-      await Voice.start('en-US');
-    } catch (error) {
-      console.log('voice error', error);
-    }
-  };
+  // let backUpSubject = [];
 
   // get ALL SUBJECTS
   const {
@@ -147,16 +76,63 @@ const EditMeetingSubjects = () => {
 
     onCompleted: (data) => {
       console.log('meeting selected subjects', data.subjects.items);
-      setPreviosSubjects(data?.subjects.items);
-      setBackupUser(data?.subjects.items);
-      setFilterData(data?.subjects.items);
-      // setSubjectData(data?.subjects.items);
+      let subjectData = [];
+      data.subjects.items?.map((subject) => {
+        backUpSubject.push(JSON.parse(JSON.stringify(subject)));
+        subjectData.push(JSON.parse(JSON.stringify(subject)));
+      });
+      // backUpSubject = subjectData;
+      setPreviosSubjects(subjectData);
+      setFilterData(subjectData);
+      setBackUpSubject(subjectData);
     }
   });
 
   if (SubjectsError) {
     console.log('subjects error---', SubjectsError);
   }
+
+  const onUpdateSelection = (items) => {
+    let newSubjects = [];
+    console.log('new added subjects', items);
+    console.log('previous subject', previosSubjects);
+    console.log('backup subject', backUpSubject);
+    // items?.map((subject) => {
+    //   let indexPreviousUser =
+    //     previosSubjects?.length > 0
+    //       ? previosSubjects?.findIndex(
+    //           (obj) => obj.subjectId === subject?.subjectId
+    //         )
+    //       : -1;
+    //   if (indexPreviousUser === -1) {
+    //     let index =
+    //       backUpSubject?.length > 0
+    //         ? backUpSubject?.findIndex(
+    //             (obj) => obj.subjectId === subject.subjectId
+    //           )
+    //         : -1;
+    //     if (index == -1) {
+    //       newSubjects.push(JSON.parse(JSON.stringify(subject)));
+    //     } else {
+    //       newSubjects.push(JSON.parse(JSON.stringify(backUpSubject[index])));
+    //     }
+    //   } else {
+    //     newSubjects.push(
+    //       JSON.parse(JSON.stringify(previosSubjects[indexPreviousUser]))
+    //     );
+
+    //     // newUsers.push(previousUser[indexPreviousUser]);
+    //   }
+    // });
+
+    setSelectedSubjects(items);
+    setFilterData(items);
+    // items?.map((subject) => {
+    //   setPreviosSubjects((prev) => {
+    //     return [...prev, subject];
+    //   });
+    // });
+  };
 
   // edit meeting mutation
   const [addMeeting, { data, loading, error }] = useMutation(UPDATE_MEETING, {
@@ -178,13 +154,31 @@ const EditMeetingSubjects = () => {
         variables: {
           meetingId: item?.meetingId
         }
+      },
+      {
+        query: GET_All_SUBJECTS,
+        variables: {
+          committeeIds: '',
+          searchValue: '',
+          screen: 0,
+          page: -1,
+          pageSize: -1,
+          meetingId: item?.meetingId
+        }
+      },
+      {
+        query: GET_All_SUBJECTS,
+        variables: {
+          searchValue: '',
+          screen: 1,
+          committeeIds: `${meetingsData?.committee}`
+        }
       }
     ],
     onCompleted: (data) => {
       if (data.updateMeeting.status[0].statusCode == '200') {
         setSelectedUsers([]);
         setMeetingsData([]);
-        setSelectedSubjects([]);
 
         navigation.navigate('Details', {
           title: 'Meetings',
@@ -199,8 +193,11 @@ const EditMeetingSubjects = () => {
 
   useEffect(() => {
     subjects = previosSubjects?.map((item) => item.subjectId);
+    selectSubjects?.map((item) => {
+      subjects.push(item.subjectId);
+    });
     console.log('userId', subjects);
-  }, [previosSubjects]);
+  }, [previosSubjects, selectSubjects]);
 
   // delete subject from selected subject
   const onDeletehandler = (item) => {
@@ -212,6 +209,10 @@ const EditMeetingSubjects = () => {
             (subject) => subject?.subjectId !== item.subjectId
           );
           setPreviosSubjects(filterData);
+          const filterNewData = selectSubjects.filter(
+            (subject) => subject?.subjectId !== item.subjectId
+          );
+          setSelectedSubjects(filterNewData);
         },
         style: 'destructive'
       },
@@ -261,7 +262,7 @@ const EditMeetingSubjects = () => {
               onChangeText={(text) => setSearchText(text)}
               value={searchText}
             />
-            <TouchableOpacity onPress={() => startRecording()}>
+            <TouchableOpacity>
               <Icon
                 name={IconName.Speaker}
                 height={SIZES[15]}
@@ -271,28 +272,42 @@ const EditMeetingSubjects = () => {
           </View>
           <Divider style={styles.divider} />
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <FlatList
-              data={previosSubjects}
-              keyExtractor={(item, index) => {
-                return index.toString();
-              }}
-              renderItem={({ item, index }) => {
-                return (
-                  <AddSubjectsCard
-                    item={item}
-                    searchText={searchText}
-                    index={index}
-                    visibleIndex={visibleIndex}
-                    setVisibleIndex={setVisibleIndex}
-                    openIndex={openIndex}
-                    setOpenIndex={setOpenIndex}
-                    deleted={true}
-                    onDeletehandler={onDeletehandler}
-                  />
-                );
-              }}
-            />
+          <ScrollView>
+            {/* for existing subject list */}
+            {previosSubjects?.map((subject, index) => {
+              return (
+                <AddSubjectsCard
+                  item={subject}
+                  searchText={searchText}
+                  index={index}
+                  visibleIndex={visibleIndex}
+                  setVisibleIndex={setVisibleIndex}
+                  openIndex={openIndex}
+                  setOpenIndex={setOpenIndex}
+                  deleted={true}
+                  onDeletehandler={onDeletehandler}
+                  isPreviousSubject={true}
+                />
+              );
+            })}
+
+            {/* for new selected subjects list */}
+            {selectSubjects?.map((subject, index) => {
+              return (
+                <AddSubjectsCard
+                  item={subject}
+                  searchText={searchText}
+                  index={index}
+                  visibleIndex={viewIndex}
+                  setVisibleIndex={setViewIndex}
+                  openIndex={openIndex}
+                  setOpenIndex={setOpenIndex}
+                  deleted={true}
+                  onDeletehandler={onDeletehandler}
+                  isNewSubject={true}
+                />
+              );
+            })}
 
             <View style={styles.deadlineContainer}>
               <Text style={styles.txtTitle}>DEADLINE SUGGESTING</Text>
@@ -320,9 +335,8 @@ const EditMeetingSubjects = () => {
                 onPress={() =>
                   navigation.navigate('SelectSubjects', {
                     committee: meetingsData?.committee,
-                    setSelectedSubjects: setSelectedSubjects,
                     onUpdateSelection: onUpdateSelection,
-                    previosSubjects: previosSubjects
+                    previosSubjects: selectSubjects
                   })
                 }
               />

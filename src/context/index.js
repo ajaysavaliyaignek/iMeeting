@@ -21,6 +21,25 @@ export const AppProvider = ({ children }) => {
   const [companyUrl, setCompanyUrl] = useState(null);
   const [meetingsData, setMeetingsData] = useState(null);
   const [appointmentsData, setAppointmentsData] = useState(null);
+  const [data, setData] = useState({
+    attachFiles: [],
+    committee: null,
+    title: '',
+    discription: '',
+    users: [],
+    userRequired: [],
+    userDetails: [],
+    startDate: '',
+    endDate: '',
+    startTime: '',
+    endTime: '',
+    TimeZone: null,
+    Repeat: null,
+    platform: '',
+    location: null,
+    videoConference: null,
+    subjects: []
+  });
   return (
     <UserContext.Provider
       value={{
@@ -39,7 +58,9 @@ export const AppProvider = ({ children }) => {
         meetingsData,
         setMeetingsData,
         appointmentsData,
-        setAppointmentsData
+        setAppointmentsData,
+        data,
+        setData
       }}
     >
       {children}

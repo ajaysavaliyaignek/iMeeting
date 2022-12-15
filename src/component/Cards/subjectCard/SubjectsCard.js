@@ -24,7 +24,8 @@ const SubjectsCard = ({
   setVisibleIndex,
   isSubjectStatus,
   download,
-  deleted
+  deleted,
+  editable
 }) => {
   const navigation = useNavigation();
 
@@ -197,7 +198,7 @@ const SubjectsCard = ({
               setVisibleIndex(-1);
             }}
             download={download}
-            editable={item.statusTitle === 'Deleted' ? false : true}
+            editable={editable}
             deleted={deleted}
           />
         </View>

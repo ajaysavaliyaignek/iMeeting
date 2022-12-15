@@ -37,7 +37,7 @@ const AddAppointmentDateAndTime = () => {
 
   const [startDate, setStartdate] = useState(
     appointmentsData?.startDate
-      ? appointmentsData?.startDate
+      ? moment(appointmentsData?.startDate).format('DD MMM,YYYY')
       : moment(new Date()).format('DD MMM,YYYY')
   );
   const [startNewDate, setStartNewDate] = useState(
@@ -56,7 +56,9 @@ const AddAppointmentDateAndTime = () => {
       : moment(new Date()).format('LT')
   );
   const [endDate, setEnddate] = useState(
-    appointmentsData?.endDate ? appointmentsData?.endDate : startDate
+    appointmentsData?.endDate
+      ? moment(appointmentsData?.endDate).format('DD MMM,YYYY')
+      : startDate
   );
   const [endTime, setEndTime] = useState(
     appointmentsData?.endTime ? appointmentsData?.endTime : startTime

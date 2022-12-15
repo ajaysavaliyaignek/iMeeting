@@ -34,7 +34,7 @@ const AddMeetingDateAndTime = () => {
   console.log('meeting data from date and time', meetingsData);
   const [startDate, setStartdate] = useState(
     meetingsData?.startDate
-      ? meetingsData?.startDate
+      ? moment(meetingsData?.startDate).format('DD MMM,YYYY')
       : moment(new Date()).format('DD MMM,YYYY')
   );
   const [startNewDate, setStartNewDate] = useState(
@@ -48,7 +48,9 @@ const AddMeetingDateAndTime = () => {
       : moment(new Date()).format('LT')
   );
   const [endDate, setEnddate] = useState(
-    meetingsData?.endDate ? meetingsData?.endDate : startDate
+    meetingsData?.endDate
+      ? moment(meetingsData?.endDate).format('DD MMM,YYYY')
+      : startDate
   );
   const [endNewDate, setEndNewdate] = useState(
     meetingsData?.endDate

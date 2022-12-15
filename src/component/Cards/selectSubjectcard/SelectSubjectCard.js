@@ -25,16 +25,10 @@ const SelectSubjectCard = ({
   setVisibleIndex,
   subjectData,
   setChecked,
-  checked
+  checked,
+  onCheked
 }) => {
   const navigation = useNavigation();
-  const checkToggle = (id) => {
-    subjectData?.map((subject) => {
-      if (subject.subjectId == item.subjectId) {
-        item.isSelected = !item.isSelected;
-      }
-    });
-  };
 
   const RowData = ({ name, discription }) => {
     return (
@@ -52,8 +46,9 @@ const SelectSubjectCard = ({
       activeOpacity={1}
       onPress={() => {
         setVisibleIndex(-1);
-        checkToggle(item.userId);
-        setChecked(!checked);
+        onCheked(item);
+        // checkToggle(item.userId);
+        // setChecked(!checked);
       }}
     >
       {/* committee details */}
@@ -70,8 +65,9 @@ const SelectSubjectCard = ({
         <CheckBox
           value={item.isSelected}
           onValueChange={() => {
-            checkToggle(item.subjectId);
-            setChecked(!checked);
+            // checkToggle(item.subjectId);
+            onCheked(item);
+            // setChecked(!checked);
           }}
           // disabled={item.isSelected}
         />

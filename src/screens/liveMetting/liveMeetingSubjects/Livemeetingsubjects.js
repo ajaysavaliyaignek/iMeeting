@@ -105,6 +105,7 @@ const Livemeetingsubjects = ({ item }) => {
         meetingId={item.meetingId}
         searchText={searchText}
         isSubjectStatus={false}
+        editable={false}
       />
     </TouchableOpacity>
   );

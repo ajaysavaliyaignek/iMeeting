@@ -9,6 +9,7 @@ import { Colors } from '../../../themes/Colors';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
 import { useQuery } from '@apollo/client';
 import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
+import { Fonts } from '../../../themes';
 
 const LiveMeetingUsers = ({ item }) => {
   console.log('item from LM Users', item);
@@ -94,12 +95,24 @@ const LiveMeetingUsers = ({ item }) => {
           }}
         />
       </View>
+      {activeTab == 'Speaker' && (
+        <Button
+          title={'Add speaker'}
+          layoutStyle={{
+            backgroundColor: '#F3F6F9',
+            marginBottom: SIZES[24],
+            marginHorizontal: SIZES[16]
+            // marginVertical: SIZES[12]
+          }}
+          textStyle={{ ...Fonts.PoppinsSemiBold[14], color: Colors.primary }}
+        />
+      )}
       <Divider style={styles.divider} />
       {activeTab == 'AllUsers' && (
         <UserDetailsComponent
           users={userData}
           isGeneralUser={true}
-          openPopup={true}
+          openPopup={false}
           visibleIndex={visibleIndex}
           setVisibleIndex={setVisibleIndex}
           searchText={searchText}

@@ -15,7 +15,8 @@ const SubjectListComponent = ({
   searchText,
   download,
   deleted,
-  isSubjectStatus
+  isSubjectStatus,
+  editable
 }) => {
   console.log('meeting id', meetingId);
   const [filterData, setFilterData] = useState([]);
@@ -99,6 +100,7 @@ const SubjectListComponent = ({
               isSubjectStatus={isSubjectStatus}
               download={download}
               deleted={deleted}
+              editable={editable}
             />
           )}
         />

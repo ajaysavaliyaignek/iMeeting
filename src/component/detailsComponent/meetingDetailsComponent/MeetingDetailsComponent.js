@@ -8,7 +8,7 @@ import {
   Platform,
   ToastAndroid
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
@@ -25,6 +25,7 @@ import { Fonts } from '../../../themes';
 import {
   GET_ALL_LOCATION_BY_ID,
   GET_All_MEETING,
+  GET_All_SUBJECTS,
   GET_ANSWER,
   GET_COMMITTEE_BY_ID,
   GET_FILE,
@@ -52,6 +53,8 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const [role, setRole] = useState('');
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
+  const [subjects, setSubjects] = useState(null);
+  const [searchText, setSearchText] = useState('');
   let file = [];
 
   //Get meeting attachments
@@ -229,6 +232,34 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       }
     ]);
   };
+
+  // get ALL SUBJECTS
+  const {
+    loading: SubjectsLoading,
+    error: SubjectsError,
+    data: SubjectsData
+  } = useQuery(GET_All_SUBJECTS, {
+    variables: {
+      committeeIds: '',
+      searchValue: searchText,
+      screen: 0,
+      page: -1,
+      pageSize: -1,
+      meetingId: item?.meetingId
+    },
+
+    onCompleted: (data) => {
+      console.log('meeting selected subjects', data.subjects.items);
+      setSubjects(data?.subjects.items);
+      // setBackupUser(data?.subjects.items);
+      // setFilterData(data?.subjects.items);
+      // setSubjectData(data?.subjects.items);
+    }
+  });
+
+  if (SubjectsError) {
+    console.log('subjects error---', SubjectsError);
+  }
 
   const details = (title, discription) => {
     return (
@@ -456,18 +487,18 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
               activeOpacity={0.5}
               onPress={() =>
                 navigation.navigate('subjects', {
-                  subjectId: meeting?.subjectIds,
+                  subjects: subjects,
                   role,
-                  deadlinedDate: item?.deadlineDate
+                  deadlinedDate: item?.deadlineDate,
+                  setSearchText: setSearchText,
+                  searchText: searchText
                 })
               }
             >
               <Text style={styles.txtCommittee}>Subjects</Text>
               <View style={styles.btnCommittees}>
                 <Text style={styles.txtBtnCommittees}>
-                  {meeting?.subjectIds?.length > 0
-                    ? meeting?.subjectIds?.length
-                    : 0}
+                  {subjects?.length > 0 ? subjects?.length : 0}
                 </Text>
                 <Icon
                   name={IconName.Arrow_Right}

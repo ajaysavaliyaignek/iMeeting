@@ -30,7 +30,7 @@ const AddMeetingUser = () => {
   const [filterData, setFilterData] = useState([]);
   const { selectedUsers, meetingsData, setMeetingsData, setSelectedUsers } =
     useContext(UserContext);
-  const [previousUser, setPreviousUser] = useState([]);
+  const [previousUser, setPreviousUser] = useState(meetingsData.userDetails);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   let users = [];
   let requiredUsers = [];
@@ -38,13 +38,10 @@ const AddMeetingUser = () => {
   let backUpUser = [];
 
   useEffect(() => {
-    console.log('pre data', previousUser);
-
     users = previousUser?.map((item) => item.userId);
-    console.log('userId', users);
+
     requiredUsers = previousUser?.map((item) => item.isRequired);
-    console.log('userRequired', requiredUsers);
-  }, [previousUser]);
+  }, [previousUser, meetingsData]);
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
@@ -250,7 +247,8 @@ const AddMeetingUser = () => {
                 setMeetingsData({
                   ...meetingsData,
                   users: users,
-                  userRequired: requiredUsers
+                  userRequired: requiredUsers,
+                  userDetails: previousUser
                 });
               }}
               layoutStyle={styles.cancelBtnLayout}
@@ -263,7 +261,8 @@ const AddMeetingUser = () => {
                 setMeetingsData({
                   ...meetingsData,
                   users: users,
-                  userRequired: requiredUsers
+                  userRequired: requiredUsers,
+                  userDetails: previousUser
                 });
                 navigation.navigate('AddMeetingDateAndTime');
               }}

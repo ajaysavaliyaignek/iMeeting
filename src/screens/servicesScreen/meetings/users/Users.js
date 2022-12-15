@@ -103,6 +103,9 @@ const Users = () => {
           isSwitchOnRow={true}
           isSwichDisabled={true}
           searchText={searchText}
+          isCheckboxView={false}
+          visibleIndex={-1}
+          setVisibleIndex={() => {}}
         />
       </View>
     </SafeAreaView>

@@ -5,12 +5,14 @@ import {
   TextInput,
   Switch,
   ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import DocumentPicker from 'react-native-document-picker';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 import { styles } from './styles';
 import Header from '../../../../component/header/Header';
@@ -37,6 +39,7 @@ const AddExternalUser = () => {
   const [privateDetails, setPrivateDetails] = useState(false);
   const [profileImage, setprofileImage] = useState('');
   const [user, setUser] = useState(null);
+  const [base64Url, setBase64Url] = useState(null);
 
   const [
     addExternalUser,
@@ -86,26 +89,30 @@ const AddExternalUser = () => {
     try {
       const response = await DocumentPicker.pickSingle({
         presentationStyle: 'fullScreen',
-        type: [DocumentPicker.types.images],
-        bas
+        type: [DocumentPicker.types.images]
       });
-      console.log('file response', response.uri.ba);
 
-      const result = await RNFetchBlob.fs.readFile(
-        // file path
-        response.uri,
-        // encoding, should be one of `base64`, `utf8`, `ascii`
-        'base64'
-        // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
-        // when reading file in BASE64 encoding, buffer size must be multiples of 3.
-      );
+      const result = await RNFetchBlob.fs
+        .readFile(
+          Platform.OS === 'android'
+            ? response.uri
+            : response.uri.replace('file://', ''),
+          'base64'
+        )
+        .then((basedata) => {
+          setBase64Url(`'data:${response.type};base64,${basedata}'`);
+        });
       setprofileImage(response?.uri);
-
-      console.log('base64', result);
+      // const base64 = await result.onData();
     } catch (err) {
       console.log(err);
     }
   }, []);
+
+  useEffect(() => {
+    console.log('base64Url', base64Url);
+  }, [base64Url]);
+  // console.log('base64Url', base64Url);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -238,6 +245,27 @@ const AddExternalUser = () => {
           <Button
             title={'Save'}
             onPress={() => {
+              console.log('external user data', {
+                attachFiles: [],
+                emails: [email],
+                externalUser: true,
+                externalUserOrganization: organization,
+                familyName: lastName,
+                firstName: firstName,
+                googleCalendarSync: false,
+                organizationIds: [],
+                organizations: [],
+                outlookCalendarSync: false,
+                phoneNumber: number,
+                privateDetails: privateDetails,
+                profilePicture: base64Url,
+                roles: [],
+                secondName: secondName,
+                sendSMS: sensSMS,
+                thirdName: '',
+                title: '',
+                userId: 0
+              });
               addExternalUser({
                 variables: {
                   committeeMember: {
@@ -253,7 +281,7 @@ const AddExternalUser = () => {
                     outlookCalendarSync: false,
                     phoneNumber: number,
                     privateDetails: privateDetails,
-                    profilePicture: profileImage,
+                    profilePicture: base64Url,
                     roles: [],
                     secondName: secondName,
                     sendSMS: sensSMS,

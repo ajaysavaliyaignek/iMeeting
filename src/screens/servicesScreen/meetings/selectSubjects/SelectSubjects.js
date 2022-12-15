@@ -44,7 +44,7 @@ const SelectSubjects = () => {
     variables: {
       searchValue: searchText,
       screen: 1,
-      committeeIds: committee.toString()
+      committeeIds: `${committee}`
     },
 
     onCompleted: (data) => {
@@ -71,17 +71,26 @@ const SelectSubjects = () => {
       console.log('subjects error---', data);
     }
   });
+  const setOnSubjectClick = (item) => {
+    subjectData.map((subject) => {
+      if (subject.subjectId === item.subjectId) {
+        subject.isSelected = !subject.isSelected;
+      }
+    });
+    setSubjectData([...subjectData]);
+  };
 
   const setSelectedUserInSelectedList = () => {
     const selectedUserList = [];
-    subjectData.map((user) => {
-      if (user.isSelected) {
-        selectedUserList.push(user);
+    subjectData.map((subject) => {
+      if (subject.isSelected) {
+        selectedUserList.push(subject);
       }
     });
 
     onUpdateSelection(selectedUserList);
     // setSelectedUsers(selectedUserList);
+    console.log('selectedUserList', selectedUserList);
 
     navigation.goBack();
   };
@@ -159,6 +168,7 @@ const SelectSubjects = () => {
                 setChecked={setChecked}
                 checked={checked}
                 key={item.userId}
+                onCheked={setOnSubjectClick}
               />
             )}
           />

@@ -47,7 +47,9 @@ const AddMeetingSubjects = () => {
   const [subjectsId, setSubjectsId] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
-  const [previousSubject, setPreviousSubject] = useState([]);
+  const [previousSubject, setPreviousSubject] = useState(
+    meetingsData.subjects == undefined ? [] : meetingsData.subjects
+  );
   let subjects = [];
 
   let backUpUser = [];
@@ -221,6 +223,7 @@ const AddMeetingSubjects = () => {
                   subjectsId={subjectsId}
                   deleted={true}
                   onDeletehandler={onDeletehandler}
+                  isPreviousSubject={true}
                 />
               );
             })
@@ -285,7 +288,8 @@ const AddMeetingSubjects = () => {
                 setMeetingsData({
                   ...meetingsData,
                   subjectid: subjectsId,
-                  deadlineDate: calendarValue
+                  deadlineDate: calendarValue,
+                  subjects: previousSubject
                 });
               }}
               layoutStyle={styles.cancelBtnLayout}

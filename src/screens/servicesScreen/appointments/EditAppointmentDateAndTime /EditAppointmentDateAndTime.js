@@ -68,9 +68,9 @@ const EditAppointmentDateAndTime = () => {
       : moment(item.setDate).format('YYYY-MM-DD')
   );
   const [endNewDate, setEndNewdate] = useState(
-    item.end == null
-      ? moment(new Date()).format('YYYY-MM-DD')
-      : moment(item.endDate).format('YYYY-MM-DD')
+    appointmentsData?.endDate
+      ? moment(appointmentsData?.endDate).format('YYYY-MM-DD')
+      : moment(item?.endDate).format('YYYY-MM-DD')
   );
   const [startTime, setStartTime] = useState(
     item?.setTime
@@ -80,11 +80,9 @@ const EditAppointmentDateAndTime = () => {
       : moment(new Date()).format('LT')
   );
   const [endDate, setEnddate] = useState(
-    item.endDate == null
-      ? moment(new Date()).format('DD MMM,YYYY')
-      : appointmentsData?.endDate
+    appointmentsData?.endDate
       ? appointmentsData?.endDate
-      : moment(item.endDate).format('DD MMM,YYYY')
+      : moment(item?.endDate).format('DD MMM,YYYY')
   );
   const [endTime, setEndTime] = useState(
     item.endTime == null
@@ -194,6 +192,7 @@ const EditAppointmentDateAndTime = () => {
       setStartTime(time);
       setEndTime(time);
       setTime(date);
+      setEndNewdate(newDate);
     }
     if (value == 'endDate') {
       setEnddate(Date);
