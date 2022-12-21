@@ -63,6 +63,7 @@ const DetailsScreen = () => {
     error: errorGetMeetings,
     data: dataGetMeetings
   } = useQuery(GET_All_MEETING, {
+    // fetchPolicy: 'no-cache',
     variables: {
       onlyMyMeeting: onlyMyMeetings,
       committeeIds: committeeId,
@@ -350,6 +351,7 @@ const DetailsScreen = () => {
               isSubjectStatus={true}
               deleted={true}
               download={true}
+              editable={true}
             />
           )}
         </View>

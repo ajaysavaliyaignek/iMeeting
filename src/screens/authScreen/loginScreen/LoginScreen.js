@@ -97,45 +97,54 @@ const LoginScreen = ({ navigation }) => {
     console.log('comapny url from login', companyUrl);
 
     if (clientId !== '' && clientSecret !== '') {
-      fetch(`https://${Companyurl}//o/oauth2/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      })
-        .then((response) => response.json())
-        .then((responseData) => {
-          console.log('responseData-----', responseData);
-          if (responseData.error) {
-            setError(responseData.error);
-            setLoading(false);
-            console.log('login error', responseData.error);
-          } else {
-            const dataToken = responseData.access_token;
-            let user = {
-              userName: userName,
-              url: url,
-              clientId: clientId,
-              clientSecret: clientSecret,
-              dataToken: dataToken
-            };
-            console.log(user);
-            storeToken(user);
-            storeUserToken(dataToken);
-            navigation.navigate('MainBottomTab');
-            setUrl('');
-            setUserName('');
-            setPassword('');
-            setLoading(false);
+      try {
+        fetch(`https://${Companyurl}//o/oauth2/token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData.toString()
+        })
+          .then((response) => response.json())
+          .then((responseData) => {
+            console.log('responseData-----', responseData);
+            if (responseData.error) {
+              setError(responseData.error);
+              setLoading(false);
+              console.log('login error', responseData.error);
+            } else {
+              const dataToken = responseData.access_token;
+              let user = {
+                userName: userName,
+                url: url,
+                clientId: clientId,
+                clientSecret: clientSecret,
+                dataToken: dataToken
+              };
+              console.log(user);
+              storeToken(user);
+              storeUserToken(dataToken);
+              // navigation.navigate('MainBottomTab');
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'MainBottomTab' }]
+              });
+              setUrl('');
+              setUserName('');
+              setPassword('');
+              setLoading(false);
 
-            const interval = setInterval(() => {
-              refreshToken();
-            }, responseData.expires_in);
+              const interval = setInterval(() => {
+                refreshToken();
+              }, responseData.expires_in);
 
-            return () => clearInterval(interval);
-          }
-        });
+              return () => clearInterval(interval);
+            }
+          });
+      } catch (error) {
+        console.log('login error', error);
+        setLoading(false);
+      }
     }
   };
 
@@ -146,12 +155,12 @@ const LoginScreen = ({ navigation }) => {
     formData.append('grant_type', 'password');
     formData.append('username', userName);
     formData.append('password', password);
-    // console.log('client_id', clientId.toString());
-    // console.log('client_secret', clientSecret.toString());
-    // console.log('grant_type', 'password');
-    // console.log('username', userName);
-    // console.log('password', password);
-    // console.log('url', url);
+    console.log('client_id', clientId.toString());
+    console.log('client_secret', clientSecret.toString());
+    console.log('grant_type', 'password');
+    console.log('username', userName);
+    console.log('password', password);
+    console.log('url', url);
     const Companyurl = await AsyncStorage.getItem('@url');
 
     if (clientId !== '' && clientSecret !== '') {
@@ -209,6 +218,7 @@ const LoginScreen = ({ navigation }) => {
           onChangeText={(text) => {
             setUrl(text);
           }}
+          keyboardType={'email-address'}
           onChange={() => {
             console.log('i am called', url);
             setCompanyUrl(url);
@@ -224,8 +234,8 @@ const LoginScreen = ({ navigation }) => {
                   <TouchableOpacity
                     onPress={() => setUrl('')}
                     style={{
-                      height: 24,
-                      width: 24,
+                      height: SIZES[24],
+                      width: SIZES[24],
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}

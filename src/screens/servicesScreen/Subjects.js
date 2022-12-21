@@ -77,8 +77,10 @@ const Subjects = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.deadlineContainer}>
-            <Text style={styles.txtDeadlineTitle}>Deadline suggesting</Text>
-            {role == 'Head' || role == 'Secretory' ? (
+            <Text style={styles.txtDeadlineTitle}>
+              RECIEVING SUBJECTS DEADLINE
+            </Text>
+            {role == 'Head' || role == 'Secretary' ? (
               <TouchableOpacity
                 style={styles.chooseDateContainer}
                 onPress={() => navigation.navigate('DeadlineSuggestion')}
@@ -112,7 +114,7 @@ const Subjects = () => {
               </Text>
             )}
           </View>
-          {role == 'Head' || role == 'Secretory' ? null : (
+          {role == 'Head' || role == 'Secretary' ? null : (
             <Button
               title="Add draft subject"
               layoutStyle={styles.cancelBtnLayout}

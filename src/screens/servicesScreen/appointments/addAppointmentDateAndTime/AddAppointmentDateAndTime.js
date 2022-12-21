@@ -35,21 +35,33 @@ const AddAppointmentDateAndTime = () => {
     appointmentsData
   );
 
+  const [startDateTime, setStartDateTime] = useState(
+    appointmentsData?.startDateTime
+      ? new Date(appointmentsData?.startDateTime)
+      : new Date()
+  );
+  const [endDateTime, setEndDateTime] = useState(
+    appointmentsData?.startDateTime
+      ? new Date(appointmentsData?.endDateTime)
+      : new Date()
+  );
+  const [isStartDate, setIsStartDate] = useState(false);
+
   const [startDate, setStartdate] = useState(
     appointmentsData?.startDate
       ? moment(appointmentsData?.startDate).format('DD MMM,YYYY')
       : moment(new Date()).format('DD MMM,YYYY')
   );
-  const [startNewDate, setStartNewDate] = useState(
-    appointmentsData?.startDate
-      ? appointmentsData?.startDate
-      : moment(new Date()).format('YYYY-MM-DD')
-  );
-  const [endNewDate, setEndNewdate] = useState(
-    appointmentsData?.endDate
-      ? appointmentsData?.startDate
-      : moment(new Date()).format('YYYY-MM-DD')
-  );
+  // const [startNewDate, setStartNewDate] = useState(
+  //   appointmentsData?.startDate
+  //     ? appointmentsData?.startDate
+  //     : moment(new Date()).format('YYYY-MM-DD')
+  // );
+  // const [endNewDate, setEndNewdate] = useState(
+  //   appointmentsData?.endDate
+  //     ? appointmentsData?.startDate
+  //     : moment(new Date()).format('YYYY-MM-DD')
+  // );
   const [startTime, setStartTime] = useState(
     appointmentsData?.startTime
       ? appointmentsData?.startTime
@@ -63,9 +75,9 @@ const AddAppointmentDateAndTime = () => {
   const [endTime, setEndTime] = useState(
     appointmentsData?.endTime ? appointmentsData?.endTime : startTime
   );
-  const [date, setDate] = useState(new Date());
-  const [dates, setDates] = useState(new Date());
-  const [time, setTime] = useState(new Date());
+  // const [date, setDate] = useState(new Date());
+  // const [dates, setDates] = useState(new Date());
+  // const [time, setTime] = useState(new Date());
   const [timeZone, setTimeZone] = useState([]);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [openClock, setOpenClock] = useState(false);
@@ -93,95 +105,143 @@ const AddAppointmentDateAndTime = () => {
   ];
 
   const handleConfirmClock = (date) => {
-    console.log('A time has been picked: ', date);
-
-    const time = moment(date).format('LT');
-    console.log('time', time);
-
-    var d = dates.toLocaleDateString();
-    let currentDate = moment().format('DD/MM/YYYY');
-
-    if (d == currentDate) {
-      console.log(
-        moment(time, 'hh:mm A').isSameOrAfter(moment()),
-        "moment(time, 'hh:mm A').isSameOrAfter(moment())"
-      );
-      if (moment(time, 'hh:mm A').isAfter(moment())) {
-        if (value == 'startTime') {
-          setStartTime(time);
-          setEndTime(time);
-          setTime(date);
-        }
-        if (value == 'endTime') {
-          setEndTime(time);
-        }
+    console.log('status of isStartDate ', isStartDate);
+    if (isStartDate) {
+      date = moment(date).date(startDateTime.date);
+      if (moment(date).isBefore(moment(new Date()))) {
+        console.log('start time issue');
+        Alert.alert('Invalid start time');
         setOpenClock(false);
-      } else {
-        Alert.alert('Please select future time');
+
+        return;
       }
+      setStartDateTime(date);
     } else {
-      if (value == 'startTime') {
-        setStartTime(time);
-        setEndTime(time);
-        setTime(date);
+      date = moment(date).date(endDateTime.date);
+
+      if (moment(date).isBefore(moment(startDateTime))) {
+        console.log('end time issue');
+        Alert.alert('Invalid end time');
+        setOpenClock(false);
+        return;
       }
-      // if (value == 'endTime') {
-      //   setEndTime(time);
-      // }
-      setOpenClock(false);
+      setEndDateTime(date);
     }
-    console.log(
-      moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A')),
-      'time compare'
-    );
-    console.log(startTime, 'startTime');
-    if (value == 'endTime') {
-      if (startDate == endDate) {
-        if (moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A'))) {
-          if (value == 'startTime') {
-            setStartTime(time);
-            setEndTime(time);
-            setTime(date);
-          }
-          if (value == 'endTime') {
-            setEndTime(time);
-          }
-          setOpenClock(false);
-        } else {
-          Alert.alert('Please select future time');
-        }
-      } else {
-        if (value == 'endTime') {
-          setEndTime(time);
-        }
-      }
-    }
+    // console.log('A time has been picked: ', date);
+
+    // const time = moment(date).format('LT');
+    // console.log('time', time);
+
+    // var d = dates.toLocaleDateString();
+    // let currentDate = moment().format('DD/MM/YYYY');
+
+    // if (d == currentDate) {
+    //   console.log(
+    //     moment(time, 'hh:mm A').isSameOrAfter(moment()),
+    //     "moment(time, 'hh:mm A').isSameOrAfter(moment())"
+    //   );
+    //   if (moment(time, 'hh:mm A').isAfter(moment())) {
+    //     if (value == 'startTime') {
+    //       setStartTime(time);
+    //       setEndTime(time);
+    //       setTime(date);
+    //     }
+    //     if (value == 'endTime') {
+    //       setEndTime(time);
+    //     }
+    //     setOpenClock(false);
+    //   } else {
+    //     Alert.alert('Please select future time');
+    //   }
+    // } else {
+    //   if (value == 'startTime') {
+    //     setStartTime(time);
+    //     setEndTime(time);
+    //     setTime(date);
+    //   }
+    //   // if (value == 'endTime') {
+    //   //   setEndTime(time);
+    //   // }
+    //   setOpenClock(false);
+    // }
+    // console.log(
+    //   moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A')),
+    //   'time compare'
+    // );
+    // console.log(startTime, 'startTime');
+    // if (value == 'endTime') {
+    //   if (startDate == endDate) {
+    //     if (moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A'))) {
+    //       if (value == 'startTime') {
+    //         setStartTime(time);
+    //         setEndTime(time);
+    //         setTime(date);
+    //       }
+    //       if (value == 'endTime') {
+    //         setEndTime(time);
+    //       }
+    //       setOpenClock(false);
+    //     } else {
+    //       Alert.alert('Please select future time');
+    //     }
+    //   } else {
+    //     if (value == 'endTime') {
+    //       setEndTime(time);
+    //     }
+    //   }
+    // }
+    setOpenClock(false);
   };
   const handleConfirmCalendar = (date) => {
-    console.log('A date has been picked: ', date);
+    if (isStartDate) {
+      date = moment(date)
+        .hour(moment(startDateTime).hour)
+        .minute(moment(startDateTime).minute);
+      if (moment(date).isAfter(moment(new Date()))) {
+        console.log('start date issue');
+        // Alert.alert('Invalid start date');
+        setStartDateTime(date);
+        setEndDateTime(date);
+        setOpenCalendar(false);
+        return;
+      }
+      setStartDateTime(date);
+    } else {
+      date = moment(date)
+        .hour(moment(endDateTime).hour)
+        .minute(moment(endDateTime).minute);
+      if (moment(date).isBefore(moment(startDateTime))) {
+        console.log('end date issue');
+        Alert.alert('Invalid end date');
+        setOpenCalendar(false);
+        return;
+      }
+      setEndDateTime(date);
+    }
+    // console.log('A date has been picked: ', date);
 
-    const Date = moment(date).format('DD MMM,YYYY');
-    const newDate = moment(date).format('YYYY-MM-DD');
-    const time = moment(date).format('LT');
-    console.log('time', time);
-    console.log('new date', newDate);
-    console.log('time', Date);
-    if (value == 'startDate') {
-      setStartdate(Date);
-      setStartNewDate(newDate);
-      setDates(date);
-      setEnddate(Date);
-      setDate(date);
-      setStartTime(time);
-      setEndTime(time);
-      setTime(date);
-    }
-    if (value == 'endDate') {
-      setEnddate(Date);
-      setEndNewdate(newDate);
-      setDate(date);
-      setEndTime(time);
-    }
+    // const Date = moment(date).format('DD MMM,YYYY');
+    // const newDate = moment(date).format('YYYY-MM-DD');
+    // const time = moment(date).format('LT');
+    // console.log('time', time);
+    // console.log('new date', newDate);
+    // console.log('time', Date);
+    // if (value == 'startDate') {
+    //   setStartdate(Date);
+    //   setStartNewDate(newDate);
+    //   setDates(date);
+    //   setEnddate(Date);
+    //   setDate(date);
+    //   setStartTime(time);
+    //   setEndTime(time);
+    //   setTime(date);
+    // }
+    // if (value == 'endDate') {
+    //   setEnddate(Date);
+    //   setEndNewdate(newDate);
+    //   setDate(date);
+    //   setEndTime(time);
+    // }
     setOpenCalendar(false);
   };
 
@@ -234,6 +294,7 @@ const AddAppointmentDateAndTime = () => {
             <TouchableOpacity
               style={styles.dateContainer}
               onPress={() => {
+                setIsStartDate(true);
                 setOpenCalendar(!openCalendar);
                 setOpenClock(false);
                 setValue('startDate');
@@ -241,7 +302,7 @@ const AddAppointmentDateAndTime = () => {
             >
               <TextInput
                 style={styles.textInput}
-                value={startDate}
+                value={moment(startDateTime).format('DD MMM,YYYY')}
                 editable={false}
               />
 
@@ -255,6 +316,7 @@ const AddAppointmentDateAndTime = () => {
             <TouchableOpacity
               style={styles.dateContainer}
               onPress={() => {
+                setIsStartDate(true);
                 setOpenClock(!openClock);
                 setOpenCalendar(false);
                 setValue('startTime');
@@ -262,7 +324,7 @@ const AddAppointmentDateAndTime = () => {
             >
               <TextInput
                 style={styles.textInput}
-                value={startTime}
+                value={moment(startDateTime).format('LT')}
                 editable={false}
               />
 
@@ -280,6 +342,7 @@ const AddAppointmentDateAndTime = () => {
             <TouchableOpacity
               style={styles.dateContainer}
               onPress={() => {
+                setIsStartDate(false);
                 setOpenCalendar(!openCalendar);
                 setOpenClock(false);
                 setValue('endDate');
@@ -287,7 +350,7 @@ const AddAppointmentDateAndTime = () => {
             >
               <TextInput
                 style={styles.textInput}
-                value={endDate}
+                value={moment(endDateTime).format('DD MMM,YYYY')}
                 editable={false}
               />
 
@@ -300,6 +363,7 @@ const AddAppointmentDateAndTime = () => {
             <TouchableOpacity
               style={styles.dateContainer}
               onPress={() => {
+                setIsStartDate(false);
                 setOpenClock(!openClock);
                 setOpenCalendar(false);
                 setValue('endTime');
@@ -307,7 +371,7 @@ const AddAppointmentDateAndTime = () => {
             >
               <TextInput
                 style={styles.textInput}
-                value={endTime}
+                value={moment(endDateTime).format('LT')}
                 editable={false}
               />
 
@@ -368,8 +432,8 @@ const AddAppointmentDateAndTime = () => {
           mode="date"
           onConfirm={handleConfirmCalendar}
           onCancel={() => setOpenCalendar(false)}
-          minimumDate={value === 'startDate' ? new Date() : dates}
-          date={value === 'startDate' ? dates : date}
+          minimumDate={isStartDate ? new Date() : new Date(startDateTime)}
+          date={isStartDate ? new Date(startDateTime) : new Date(endDateTime)}
         />
 
         <DateTimePickerModal
@@ -377,9 +441,10 @@ const AddAppointmentDateAndTime = () => {
           mode="time"
           onConfirm={handleConfirmClock}
           onCancel={() => setOpenClock(false)}
-          minimumDate={
-            value == 'startTime' ? new Date() : startDate == endDate && time
-          }
+          // minimumDate={
+          //   value == 'startTime' ? new Date() : startDate == endDate && time
+          // }
+          date={isStartDate ? new Date(startDateTime) : new Date(endDateTime)}
         />
       </View>
       <View
@@ -397,8 +462,8 @@ const AddAppointmentDateAndTime = () => {
               navigation.goBack();
               setAppointmentsData({
                 ...appointmentsData,
-                startDate: startNewDate,
-                endDate: endNewDate,
+                startDateTime: startDateTime,
+                endDateTime: endDateTime,
                 startTime: startTime,
                 endTime: endTime,
                 TimeZone: valueTimeZone,
@@ -413,10 +478,8 @@ const AddAppointmentDateAndTime = () => {
             onPress={() => {
               setAppointmentsData({
                 ...appointmentsData,
-                startDate: startNewDate,
-                endDate: endNewDate,
-                startTime: startTime,
-                endTime: endTime,
+                startDateTime: startDateTime,
+                endDateTime: endDateTime,
                 TimeZone: valueTimeZone,
                 Repeat: valueRepeat
               });

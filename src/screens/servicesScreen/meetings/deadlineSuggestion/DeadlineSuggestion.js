@@ -46,12 +46,14 @@ const DeadlineSuggestion = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        name={'Deadline suggestion'}
+        name={'Recieving subjects deadline'}
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
       <View style={styles.subContainer}>
-        <Text style={styles.txtAddSubjectTitle}>Deadline suggestion</Text>
+        <Text style={styles.txtAddSubjectTitle}>
+          Recieving subjects deadline
+        </Text>
         <Calendar
           markingType="custom"
           hideArrows={true}
@@ -61,6 +63,7 @@ const DeadlineSuggestion = () => {
             setCalendarValue(date.dateString);
             navigation.goBack();
           }}
+          minDate={new Date()}
           monthFormat={'yyyy MM'}
           enableSwipeMonths={true}
           theme={{
@@ -68,7 +71,7 @@ const DeadlineSuggestion = () => {
             calendarBackground: '#ffffff',
             todayTextColor: Colors.primary,
             dayTextColor: '#222222',
-            textDisabledColor: Colors.white,
+            textDisabledColor: Colors.line,
             monthTextColor: '#57B9BB',
             arrowColor: '#57B9BB',
             textDayFontWeight: '300',

@@ -1,13 +1,12 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import React, { useState } from 'react';
+import { useQuery } from '@apollo/client';
+
 import Loader from '../../Loader/Loader';
 import SubjectsCard from '../../Cards/subjectCard/SubjectsCard';
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
 import { GET_All_SUBJECTS } from '../../../graphql/query';
-import { useQuery } from '@apollo/client';
-
-let queryParams = {};
 
 const SubjectListComponent = ({
   meetingId,
@@ -18,7 +17,6 @@ const SubjectListComponent = ({
   isSubjectStatus,
   editable
 }) => {
-  console.log('meeting id', meetingId);
   const [filterData, setFilterData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const AllTypesSubjects = 0;

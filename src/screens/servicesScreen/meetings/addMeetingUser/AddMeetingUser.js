@@ -37,11 +37,10 @@ const AddMeetingUser = () => {
 
   let backUpUser = [];
 
-  useEffect(() => {
-    users = previousUser?.map((item) => item.userId);
-
-    requiredUsers = previousUser?.map((item) => item.isRequired);
-  }, [previousUser, meetingsData]);
+  users = previousUser?.map((item) => item.userId);
+  console.log('users', users);
+  requiredUsers = previousUser?.map((item) => item.isRequired);
+  console.log('requiredUsers', requiredUsers);
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
@@ -270,13 +269,13 @@ const AddMeetingUser = () => {
                 styles.nextBtnLayout,
                 {
                   opacity:
-                    users.length <= 0 && requiredUsers.length <= 0 ? 0.7 : null
+                    users?.length <= 0 && requiredUsers?.length <= 0 ? 0.5 : 1
                 }
               ]}
               textStyle={styles.txtNextBtn}
-              // disable={
-              //   users.length <= 0 && requiredUsers.length <= 0 ? true : false
-              // }
+              disable={
+                users?.length <= 0 && requiredUsers?.length <= 0 ? true : false
+              }
             />
           </View>
         </View>

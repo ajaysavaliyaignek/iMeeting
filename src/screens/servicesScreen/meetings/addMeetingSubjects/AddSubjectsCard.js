@@ -237,6 +237,7 @@ const AddSubjectsCard = ({
                   setVisibleIndex(-1);
                 }}
                 deleted={deleted}
+                isViewable={true}
               />
             </View>
           )}
@@ -387,6 +388,7 @@ const AddSubjectsCard = ({
                   setVisibleIndex(-1);
                 }}
                 deleted={deleted}
+                isViewable={true}
               />
             </View>
           )}

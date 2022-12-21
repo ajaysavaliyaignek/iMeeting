@@ -200,6 +200,7 @@ const SubjectsCard = ({
             download={download}
             editable={editable}
             deleted={deleted}
+            isViewable={true}
           />
         </View>
       )}

@@ -1,12 +1,12 @@
 import {
   View,
   Text,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Alert,
   Platform,
-  ToastAndroid
+  ToastAndroid,
+  Linking
 } from 'react-native';
 import React, { useState } from 'react';
 import moment from 'moment';
@@ -14,14 +14,13 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import momentDurationFormatSetup from 'moment-duration-format';
+import { Divider } from 'react-native-paper';
 
 import { Icon, IconName } from '../..';
 import { styles } from './styles';
 import { SIZES } from '../../../themes/Sizes';
 import { Colors } from '../../../themes/Colors';
-import { Divider } from 'react-native-paper';
 import { Fonts } from '../../../themes';
-
 import {
   GET_ALL_LOCATION_BY_ID,
   GET_All_MEETING,
@@ -33,7 +32,6 @@ import {
   GET_PLATFORMLINK,
   GET_USER_PAYLOAD
 } from '../../../graphql/query';
-
 import { DELETE_MEETING } from '../../../graphql/mutation';
 import AttachFiles from '../../attachFiles/AttachFiles';
 import { dateTimeFormate } from '../../../Constans/data';
@@ -43,7 +41,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   // const { item } = route?.params;
-  console.log('item', item);
+  console.log('item from meeting details', item);
 
   const [fileResponse, setFileResponse] = useState(null);
   const [meeting, setMeeting] = useState(null);
@@ -149,22 +147,6 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
     onCompleted: (data) => {
       if (data) {
         setLocation(data.location);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-
-  // get link
-  const Link = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: meeting?.platformId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        console.log('platform link', data.videoConferencePlatformLink);
-        setPlatform(data.videoConferencePlatformLink);
       }
     },
     onError: (data) => {
@@ -312,7 +294,8 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
             ? 'Repeat monthly'
             : 'Repeat yearly'
         )}
-        {role == 'Member' && details('Required', 'Yes')}
+        {role == 'Member' &&
+          details('Required', item?.isRequired ? 'Yes' : 'No')}
         {role == 'Member' && (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {item.answers == 'Suggest time' ? (
@@ -350,7 +333,9 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
                 borderBottomWidth: 1,
                 borderBottomColor: Colors.primary
               }}
-              onPress={() => navigation.navigate('YourAnswer', { item })}
+              onPress={() =>
+                navigation.navigate('YourAnswer', { item, userID: user })
+              }
             >
               <Text
                 style={{
@@ -380,8 +365,9 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
               onPress={() =>
                 navigation.navigate('LocationDetails', {
                   locationId: item.locationId,
-                  platform: platform,
-                  locationType: 1
+
+                  locationType: 1,
+                  role: item.yourRoleName
                 })
               }
             >
@@ -414,12 +400,19 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
                 paddingBottom: SIZES[8]
               }}
             >
-              <Text
-                style={[styles.txtLink, { width: '90%' }]}
-                numberOfLines={1}
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL(item?.platformlink);
+                }}
+                style={{ width: '80%' }}
               >
-                {item?.platformlink}
-              </Text>
+                <Text
+                  style={[styles.txtLink, { width: '90%' }]}
+                  numberOfLines={1}
+                >
+                  {item?.platformlink}
+                </Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 // style={{ marginTop: 32, marginLeft: 14 }}
                 onPress={() => {
@@ -489,7 +482,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
                 navigation.navigate('subjects', {
                   subjects: subjects,
                   role,
-                  deadlinedDate: item?.deadlineDate,
+                  deadlinedDate: meeting?.deadlineDate,
                   setSearchText: setSearchText,
                   searchText: searchText
                 })

@@ -28,6 +28,7 @@ import {
 } from '../../../../graphql/query';
 import { DELETE_SUBJECTS, UPDATE_COMMENT } from '../../../../graphql/mutation';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
+import moment from 'moment';
 
 const SubjectDetails = () => {
   const navigation = useNavigation();
@@ -213,7 +214,12 @@ const SubjectDetails = () => {
         {generalDetails('Subject category', item.subjectCategoryName)}
         {generalDetails('Committeee ', item.committeeName)}
         {generalDetails('Creator', item.createrName)}
-        {generalDetails('Date of creation', item.dateOfCreation)}
+        {generalDetails(
+          'Date of creation',
+          moment(item.dateOfCreation, 'YYYY-MM-DD hh:mm a').format(
+            'MMM DD, YYYY'
+          )
+        )}
 
         {/* attach file */}
 
@@ -228,87 +234,95 @@ const SubjectDetails = () => {
         )}
 
         {/* comments     */}
-        <Text style={styles.txtcommentsTitle}>Comments</Text>
+        {item.statusTitle == 'Approved' && (
+          <View>
+            <Text style={styles.txtcommentsTitle}>Comments</Text>
 
-        <View>
-          <FlatList
-            data={comments?.childComment}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item, index) => {
-              return index.toString();
-            }}
-            renderItem={({ item, index }) => (
-              <CommentCard
-                item={item}
-                commentThreadId={commentThreadId}
-                index={index}
-                setComment={setCommentText}
-                setCommentId={setCommentId}
-                commenttext={commenttext}
+            <View>
+              <FlatList
+                data={comments?.childComment}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item, index) => {
+                  return index.toString();
+                }}
+                renderItem={({ item, index }) => (
+                  <CommentCard
+                    item={item}
+                    commentThreadId={commentThreadId}
+                    index={index}
+                    setComment={setCommentText}
+                    setCommentId={setCommentId}
+                    commenttext={commenttext}
+                  />
+                )}
               />
-            )}
-          />
-        </View>
+            </View>
 
-        {
-          <View
-            style={{
-              paddingVertical: SIZES[14],
-              paddingHorizontal: SIZES[16],
-              borderWidth: SIZES[1],
-              borderColor: Colors.line,
-              borderRadius: SIZES[8],
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: SIZES[32],
-              marginBottom: SIZES[24]
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                height: SIZES[30],
-                backgroundColor: Colors.white
-              }}
-              value={commenttext}
-              underlineColor={Colors.white}
-              activeUnderlineColor={Colors.white}
-              placeholder={'Your comment'}
-              onChangeText={(text) => setCommentText(text)}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                console.log('commenttext', commenttext);
-                console.log('parentCommentId', commentThreadId);
-                console.log('commentId', commentId);
-                if (commentId == null) {
-                  addComment({
-                    variables: {
-                      comment: {
-                        comment: commenttext,
-                        commentId: 0,
-                        parentCommentId: comments.commentId
-                      }
+            {
+              <View
+                style={{
+                  paddingVertical: SIZES[14],
+                  paddingHorizontal: SIZES[16],
+                  borderWidth: SIZES[1],
+                  borderColor: Colors.line,
+                  borderRadius: SIZES[8],
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: SIZES[32],
+                  marginBottom: SIZES[24]
+                }}
+              >
+                <TextInput
+                  style={{
+                    flex: 1,
+                    height: SIZES[30],
+                    backgroundColor: Colors.white
+                  }}
+                  value={commenttext}
+                  underlineColor={Colors.white}
+                  activeUnderlineColor={Colors.white}
+                  placeholder={'Your comment'}
+                  onChangeText={(text) => setCommentText(text)}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log('commenttext', commenttext);
+                    console.log('parentCommentId', commentThreadId);
+                    console.log('commentId', commentId);
+                    if (commentId == null) {
+                      addComment({
+                        variables: {
+                          comment: {
+                            comment: commenttext,
+                            commentId: 0,
+                            parentCommentId: comments.commentId
+                          }
+                        }
+                      });
+                    } else {
+                      addComment({
+                        variables: {
+                          comment: {
+                            comment: commenttext,
+                            commentId: commentId
+                          }
+                        }
+                      });
                     }
-                  });
-                } else {
-                  addComment({
-                    variables: {
-                      comment: {
-                        comment: commenttext,
-                        commentId: commentId
-                      }
-                    }
-                  });
-                }
 
-                setCommentText('');
-              }}
-            >
-              <Icon name={IconName.Send} height={SIZES[22]} width={SIZES[20]} />
-            </TouchableOpacity>
+                    setCommentText('');
+                  }}
+                >
+                  <Icon
+                    name={IconName.Send}
+                    height={SIZES[22]}
+                    width={SIZES[20]}
+                  />
+                </TouchableOpacity>
+              </View>
+            }
           </View>
-        }
+        )}
       </ScrollView>
 
       <View

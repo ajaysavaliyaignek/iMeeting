@@ -20,7 +20,8 @@ export const styles = StyleSheet.create({
   textInput: {
     backgroundColor: Colors.white,
     height: SIZES[62],
-    ...Fonts.PoppinsRegular[14]
+    ...Fonts.PoppinsRegular[14],
+    paddingHorizontal: 0
   },
   divider: {
     width: '100%',

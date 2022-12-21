@@ -1,5 +1,23 @@
 import { gql } from '@apollo/client';
 
+export const UPDATE_VOTING = gql`
+  mutation addVotingQuestion($voting: InputVoting!) {
+    addVotingQuestion(voting: $voting) {
+      votingId
+      status
+    }
+  }
+`;
+
+export const UPDATE_SPEAKER = gql`
+  mutation updateSpeaker($userDetail: InputUserDetail!) {
+    updateSpeaker(userDetail: $userDetail) {
+      userId
+      status
+    }
+  }
+`;
+
 export const UPDATE_SUBJECT_STATUS = gql`
   mutation updateSubjectStatus($subject: InputSubject!) {
     updateSubjectStatus(subject: $subject) {

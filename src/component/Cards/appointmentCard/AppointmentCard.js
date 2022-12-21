@@ -1,15 +1,14 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
+import { useMutation, useQuery } from '@apollo/client';
+import { Divider } from 'react-native-paper';
 
-import { Colors } from '../../../themes/Colors';
-import { Fonts } from '../../../themes';
 import Icon from '../../Icon';
 import IconName from '../../Icon/iconName';
-import { Divider } from 'react-native-paper';
 import EditDeleteModal from '../../EditDeleteModal';
 import { SIZES } from '../../../themes/Sizes';
-import { useMutation, useQuery } from '@apollo/client';
 import {
   GET_All_APPOINTMENT,
   GET_APPOINTMENT_BY_ID
@@ -17,7 +16,6 @@ import {
 import { DELETE_APPOINTMENT, DELETE_SUBJECTS } from '../../../graphql/mutation';
 import { styles } from './styles';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
-import moment from 'moment';
 import { UserContext } from '../../../context';
 
 const AppoinmentCard = ({
@@ -58,8 +56,6 @@ const AppoinmentCard = ({
       console.log('delete appointment', data.deleteAppointment.status);
     }
   });
-
-  // <View> {getHighlightedText(item.subjectTitle)} </View>;
 
   const onDeleteHandler = (id) => {
     console.log(id);
@@ -116,13 +112,16 @@ const AppoinmentCard = ({
       activeOpacity={1}
       onPress={() => setVisibleIndex(-1)}
       key={item.appointmentId}
-      style={{ opacity: item.isDisable && 0.5 }}
+      // style={{ opacity: item.isDisable && 0.5 }}
     >
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
       <View
-        style={styles.committeeDetailView}
+        style={[
+          styles.committeeDetailView,
+          { opacity: item.isDisable ? 0.5 : 1 }
+        ]}
         onPress={() => {
           // navigation.navigate("SubjectDetails");
           setEditModal(false);
@@ -145,7 +144,7 @@ const AppoinmentCard = ({
 
       {/* dotsView */}
       <TouchableOpacity
-        onPress={() => setVisibleIndex(!visibleIndex ? -1 : index)}
+        onPress={() => setVisibleIndex(visibleIndex == -1 ? index : -1)}
         style={styles.dotsView}
       >
         <Icon name={IconName.Dots} height={16} width={6} />
@@ -174,11 +173,12 @@ const AppoinmentCard = ({
               setVisibleIndex(-1);
             }}
             editable={
-              item.yourRoleName == 'Member' && item.isDisable ? false : true
+              item.yourRoleName == 'Member' || item.isDisable ? false : true
             }
             deleted={
-              item.yourRoleName == 'Member' && item.isDisable ? false : true
+              item.yourRoleName == 'Member' || item.isDisable ? false : true
             }
+            isViewable={true}
           />
         </View>
       )}

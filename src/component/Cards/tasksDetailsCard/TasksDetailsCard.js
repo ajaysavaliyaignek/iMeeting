@@ -125,6 +125,7 @@ const TasksDetailsCard = ({
             subjectStatus={'NoDeleted'}
             // deleted={deleted}
             // editable={editable}
+            isViewable={true}
           />
         </View>
       )}

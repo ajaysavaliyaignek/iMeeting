@@ -1,14 +1,6 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Pressable
-} from 'react-native';
+import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import React, { useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
 
 import { Colors } from '../../../themes/Colors';
 import { Fonts } from '../../../themes';
@@ -18,10 +10,13 @@ import { SIZES } from '../../../themes/Sizes';
 import Avatar from '../../Avatar/Avatar';
 import EditDeleteModal from '../../EditDeleteModal';
 import { styles } from './styles';
-import { useQuery } from '@apollo/client';
-import { GET_USER_BY_ID } from '../../../graphql/query';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_LIVE_MEETING_USERS, GET_USER_BY_ID } from '../../../graphql/query';
 import CheckBox from '../../checkBox/CheckBox';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
+import { Dropdown } from 'react-native-element-dropdown';
+import { UPDATE_SPEAKER } from '../../../graphql/mutation';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const UserDetailsCard = ({
   item,
@@ -38,15 +33,42 @@ const UserDetailsCard = ({
   isSwichDisabled,
   isSpeaker,
   onChangeUser,
-
+  editable,
+  onPressEdit,
   onPressDelete,
   visibleIndex,
   setVisibleIndex,
-  isDeletable
+  isDeletable,
+  meetingId
 }) => {
-  const [editModal, setEditModal] = useState(false);
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
+  const [valueStatus, setValueStatus] = useState(item.status);
+  const [open, setOpen] = useState(false);
+  const [statusItems, setStatusItems] = useState([
+    {
+      label: 'Waiting',
+      value: 'Waiting',
+      disabled:
+        item.status == 'Waiting' ||
+        item.status == 'Speaking' ||
+        item.status == 'Completed'
+          ? true
+          : false
+    },
+    {
+      label: 'Speaking',
+      value: 'Speaking',
+      disabled:
+        item.status == 'Speaking' || item.status == 'Completed' ? true : false
+    },
+    {
+      label: 'Completed',
+      value: 'Completed',
+      disabled: item.status == 'Completed' ? true : false
+    }
+  ]);
+
+  console.log('value status', valueStatus);
 
   const getUser = useQuery(GET_USER_BY_ID, {
     variables: {
@@ -61,6 +83,57 @@ const UserDetailsCard = ({
     }
   });
 
+  console.log('item from user details', item);
+
+  const [updateSpeaker] = useMutation(UPDATE_SPEAKER, {
+    refetchQueries: [
+      {
+        query: GET_LIVE_MEETING_USERS,
+        variables: {
+          meetingId: meetingId,
+          isSpeaker: true
+        }
+      }
+    ],
+    onCompleted: (data) => {
+      console.log('update speaker', data);
+      // if (data.updateSpeaker.status == '200') {
+      //   navigation.goBack();
+      // }
+    },
+    onError: (data) => console.log('update speaker error', data)
+  });
+
+  const renderItem = (items) => {
+    console.log('render item', items);
+    return (
+      <TouchableOpacity
+        style={[styles.item, { opacity: items.disabled ? 0.1 : 1 }]}
+        disabled={items.disabled}
+        onPress={() => {
+          console.log('items.disabled', items.disabled);
+          if (items.disabled) {
+            setValueStatus(item.status);
+          } else {
+            setValueStatus(items.value);
+            updateSpeaker({
+              variables: {
+                userDetail: {
+                  userId: item.userId,
+                  meetingId: meetingId,
+                  duration: item.duration,
+                  status: items.value
+                }
+              }
+            });
+          }
+        }}
+      >
+        <Text style={styles.textItem}>{items.label}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   // committee row view
   const RowData = ({
     name,
@@ -70,7 +143,8 @@ const UserDetailsCard = ({
     styleText,
     switchValue,
     descriptionContainer,
-    value
+    value,
+    isDropDown
   }) => {
     return (
       <View style={styles.container}>
@@ -88,6 +162,96 @@ const UserDetailsCard = ({
               onChangeUser(value, isRequired);
             }}
           />
+        ) : isDropDown ? (
+          <View
+            style={{
+              flex: 1,
+              paddingLeft: SIZES[4],
+              backgroundColor:
+                valueStatus == 'Waiting'
+                  ? 'rgba(230, 197, 79, 0.1)'
+                  : valueStatus == 'Speaking'
+                  ? 'rgba(129, 171, 150, 0.1)'
+                  : valueStatus == 'Completed'
+                  ? 'rgba(101, 142, 180, 0.1)'
+                  : Colors.white,
+              borderRadius: SIZES[4],
+              paddingBottom: SIZES[6],
+              borderBottomWidth: SIZES[1],
+              borderBottomColor:
+                valueStatus == 'Waiting'
+                  ? 'rgba(230, 197, 79, 1)'
+                  : valueStatus == 'Speaking'
+                  ? 'rgba(129, 171, 150, 1)'
+                  : valueStatus == 'Completed'
+                  ? 'rgba(101, 142, 180, 1)'
+                  : Colors.bold
+            }}
+          >
+            <Dropdown
+              style={{
+                flex: 1,
+                paddingLeft: '30%'
+              }}
+              placeholder={item.status}
+              disable={
+                item.roleName == 'Head' || item.roleName == 'Secretary'
+                  ? false
+                  : true
+              }
+              data={statusItems}
+              valueField="value"
+              labelField="label"
+              value={item.status}
+              iconColor={
+                valueStatus == 'Waiting'
+                  ? 'rgba(230, 197, 79, 1)'
+                  : valueStatus == 'Speaking'
+                  ? 'rgba(129, 171, 150, 1)'
+                  : valueStatus == 'Completed'
+                  ? 'rgba(101, 142, 180, 1)'
+                  : Colors.bold
+              }
+              onChange={(items) => {
+                // setValueStatus(items.value);
+
+                // updateSpeaker({
+                //   variables: {
+                //     userDetail: {
+                //       userId: item.userId,
+                //       meetingId: meetingId,
+                //       duration: item.duration,
+                //       status: items.value
+                //     }
+                //   }
+                // });
+                console.log('on change', items);
+              }}
+              selectedTextStyle={{
+                color:
+                  valueStatus == 'Waiting'
+                    ? 'rgba(230, 197, 79, 1)'
+                    : valueStatus == 'Speaking'
+                    ? 'rgba(129, 171, 150, 1)'
+                    : valueStatus == 'Completed'
+                    ? 'rgba(101, 142, 180, 1)'
+                    : Colors.bold
+              }}
+              renderItem={(item) => renderItem(item)}
+              // visibleSelectedItem={false}
+            />
+            {/* <DropDownPicker
+              zIndex={9999}
+              items={statusItems}
+              value={valueStatus}
+              setValue={setValueStatus}
+              open={open}
+              setOpen={setOpen}
+              style={{ borderWidth: 0, paddingLeft: 0 }}
+              placeholder={''}
+              disabledItemLabelStyle={{ color: Colors.line }}
+            /> */}
+          </View>
         ) : (
           <View
             style={[
@@ -114,9 +278,6 @@ const UserDetailsCard = ({
       // activeOpacity={0.8}
 
       onPress={() => {
-        setEditModal(false);
-        // onChecked(item);
-        // checkToggle(item.userId);
         setVisibleIndex(-1);
         if (isCheckboxView) {
           onChecked(item);
@@ -138,22 +299,6 @@ const UserDetailsCard = ({
               : item.userName,
             searchText
           )}
-          {/* <Text
-            style={{
-              marginLeft: SIZES[12],
-              ...Fonts.PoppinsBold[20],
-              color: Colors.bold,
-              width: '80%'
-            }}
-            numberOfLines={1}
-          >
-            {item.userName == undefined
-              ? item.firstName + ' ' + item.familyName
-              : item.userName}
-          </Text> */}
-          {/* <Text style={styles.txtCommitteeTitle}>
-            {item.firstName} {item.secondName}
-          </Text> */}
         </View>
         <View
           style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}
@@ -260,27 +405,23 @@ const UserDetailsCard = ({
             )}
             {isSpeaker && (
               <View>
-                <RowData
-                  name={'Role'}
-                  discription={
-                    item.roleName == undefined
-                      ? item?.roles !== null &&
-                        item?.roles !== undefined &&
-                        item.roles[item?.organizationIds?.indexOf(committee)]
-                      : item.roleName
-                  }
-                />
+                <RowData name={'Role'} discription={item.roleName} />
                 <RowData
                   name={'Duration'}
-                  discription={'5 min'}
+                  discription={`${item.duration} min`}
                   descriptionContainer={{
                     borderBottomWidth: 1,
                     paddingBottom: 6,
                     borderBottomColor: Colors.line,
-                    marginTop: 6
+                    marginTop: 6,
+                    width: '70%'
                   }}
                 />
-                <RowData name={'Status'} discription={'Completed'} />
+                <RowData
+                  name={'Status'}
+                  discription={item.status}
+                  isDropDown={true}
+                />
               </View>
             )}
           </View>
@@ -309,9 +450,18 @@ const UserDetailsCard = ({
       {visibleIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
-            onPressDelete={() => onPressDelete(item)}
+            onPressDelete={() => {
+              onPressDelete(item);
+              setVisibleIndex(-1);
+            }}
             download={false}
             deleted={isDeletable}
+            editable={editable}
+            onPressEdit={() => {
+              onPressEdit(item);
+              setVisibleIndex(-1);
+            }}
+            isViewable={false}
           />
         </View>
       )}

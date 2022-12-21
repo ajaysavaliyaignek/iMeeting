@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList
-} from 'react-native';
+import { View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Voice from '@react-native-community/voice';
 
@@ -14,12 +8,7 @@ import { SIZES } from '../../../themes/Sizes';
 import { Button } from '../../../component/button/Button';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
-import { subjectData } from '../../../Constans/data';
-import SubjectsCard from '../../../component/Cards/subjectCard/SubjectsCard';
 import { GET_SUBJECT_BY_ID } from '../../../graphql/query';
-import Loader from '../../../component/Loader/Loader';
-import { Fonts } from '../../../themes';
-import { Colors } from '../../../themes/Colors';
 import SubjectListComponent from '../../../component/detailsComponent/subjectsListComponent/SubjectListComponent';
 
 const Livemeetingsubjects = ({ item }) => {
@@ -29,18 +18,18 @@ const Livemeetingsubjects = ({ item }) => {
   const [visibleIndex, setVisibleIndex] = useState(-1);
 
   const searchFilterSubject = (text) => {
-    // if (text) {
-    //   const newData = selectedSubjects.filter((item) => {
-    //     const itemData = item.subjectTitle ? item.subjectTitle : '';
-    //     const textData = text;
-    //     return itemData.indexOf(textData) > -1;
-    //   });
-    //   setSearchText(text);
-    //   setFilterData(newData);
-    // } else {
-    //   setSearchText(text);
-    //   setFilterData(selectedSubjects);
-    // }
+    if (text) {
+      const newData = selectedSubjects.filter((item) => {
+        const itemData = item.subjectTitle ? item.subjectTitle : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+      setSearchText(text);
+      setFilterData(newData);
+    } else {
+      setSearchText(text);
+      setFilterData(selectedSubjects);
+    }
   };
 
   useEffect(() => {
@@ -87,7 +76,7 @@ const Livemeetingsubjects = ({ item }) => {
         <TextInput
           style={styles.textInput}
           placeholder={'Search subjects'}
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={(text) => searchFilterSubject(text)}
         />
         <TouchableOpacity onPress={() => startRecording()}>
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
@@ -106,6 +95,8 @@ const Livemeetingsubjects = ({ item }) => {
         searchText={searchText}
         isSubjectStatus={false}
         editable={false}
+        searchFilterSubject={searchFilterSubject}
+        setSearchText={setSearchText}
       />
     </TouchableOpacity>
   );

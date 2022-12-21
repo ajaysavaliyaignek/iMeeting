@@ -1,29 +1,17 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Platform,
-  ToastAndroid
-} from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import { View, SafeAreaView, Alert } from 'react-native';
+import React, { useContext, useState } from 'react';
 import moment from 'moment';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import momentDurationFormatSetup from 'moment-duration-format';
+import { Divider } from 'react-native-paper';
 
 import Header from '../../../../component/header/Header';
-import { Icon, IconName } from '../../../../component';
+import { IconName } from '../../../../component';
 import { styles } from './styles';
-import { SIZES } from '../../../../themes/Sizes';
 import { Colors } from '../../../../themes/Colors';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 import { Fonts } from '../../../../themes';
-
 import {
   GET_ALL_LOCATION_BY_ID,
   GET_All_MEETING,
@@ -34,9 +22,7 @@ import {
   GET_PLATFORMLINK,
   GET_USER_PAYLOAD
 } from '../../../../graphql/query';
-
 import { DELETE_MEETING } from '../../../../graphql/mutation';
-import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 import DetailsComponent from '../../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 import { UserContext } from '../../../../context';
 
@@ -159,22 +145,6 @@ const MeetingDetails = () => {
     }
   });
 
-  // get link
-  const Link = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: meeting?.platformId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        console.log('platform link', data.videoConferencePlatformLink);
-        setPlatform(data.videoConferencePlatformLink);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-
   // get committee
   const Committee = useQuery(GET_COMMITTEE_BY_ID, {
     variables: {
@@ -246,7 +216,7 @@ const MeetingDetails = () => {
 
       <DetailsComponent item={item} isLiveMeetingDetails={true} />
 
-      {role == 'Head' || role == 'Secretory' ? (
+      {role == 'Head' || role == 'Secretary' ? (
         <View style={styles.bottomContainer}>
           <Divider style={styles.divider} />
           {item.meetingStatusTitle !== 'Deleted' && (

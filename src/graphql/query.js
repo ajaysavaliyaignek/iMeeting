@@ -1,5 +1,37 @@
 import { gql } from '@apollo/client';
 
+export const GET_VOTING_DETAILS = gql`
+  query votingDetails(
+    $meetingId: Long
+    $subjectId: Long
+    $type: Int
+    $searchValue: String
+  ) {
+    votingDetails(
+      meetingId: $meetingId
+      subjectId: $subjectId
+      type: $type
+      searchValue: $searchValue
+    ) {
+      items {
+        isMultipleSelect
+        isPrivate
+        meetingId
+        subjectId
+        subjectName
+        type
+        votingId
+        votingTitle
+        userSelectedId
+        answerIds
+        answers
+        optionCounts
+        optionPercentages
+      }
+    }
+  }
+`;
+
 export const GET_LIVE_MEETING_USERS = gql`
   query ($meetingId: Long, $isSpeaker: Boolean) {
     liveMeetingUsers(meetingId: $meetingId, isSpeaker: $isSpeaker) {

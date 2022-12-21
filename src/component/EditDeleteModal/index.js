@@ -16,21 +16,24 @@ const EditDeleteModal = ({
   onPressDownload,
   download,
   editable,
-  deleted
+  deleted,
+  isViewable
 }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.btnView} onPress={onPressView}>
-        <Text style={styles.txtEditBtn}>View</Text>
-        <Icon
-          name={IconName.Eye_Primary}
-          height={SIZES[20]}
-          width={SIZES[18]}
-        />
-      </TouchableOpacity>
+      {isViewable && (
+        <TouchableOpacity style={styles.btnView} onPress={onPressView}>
+          <Text style={styles.txtEditBtn}>View</Text>
+          <Icon
+            name={IconName.Eye_Primary}
+            height={SIZES[20]}
+            width={SIZES[18]}
+          />
+        </TouchableOpacity>
+      )}
       {editable && subjectStatus !== 'Deleted' && (
         <View>
-          <Divider style={styles.divider} />
+          {isViewable && <Divider style={styles.divider} />}
           <TouchableOpacity style={styles.btnView} onPress={onPressEdit}>
             <Text style={styles.txtEditBtn}>Edit</Text>
             <Icon name={IconName.Edit} height={SIZES[18]} width={SIZES[18]} />

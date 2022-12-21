@@ -126,7 +126,7 @@ const LiveMeetingMenu = () => {
         {activeTab == 'Users' && (
           <LiveMeetingUsers item={item} meeting={meeting} />
         )}
-        {activeTab == 'Votings' && <LiveMeetingVotings />}
+        {activeTab == 'Votings' && <LiveMeetingVotings item={item} />}
         {activeTab == 'Tasks' && <LiveMeetingTasks />}
         {activeTab == 'Decisions' && <LiveMeetingDecisions />}
         {activeTab == 'Online' && <LiveMeetingOnline />}

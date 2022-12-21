@@ -7,6 +7,10 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { Divider } from 'react-native-paper';
+import { useMutation } from '@apollo/client';
+import moment from 'moment';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
@@ -15,11 +19,7 @@ import { SIZES } from '../../../../themes/Sizes';
 import { Fonts } from '../../../../themes';
 import { Colors } from '../../../../themes/Colors';
 import { Button } from '../../../../component/button/Button';
-import { Divider } from 'react-native-paper';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { useMutation } from '@apollo/client';
 import { UPDATE_ANSWER } from '../../../../graphql/mutation';
-import moment from 'moment';
 import {
   GET_All_APPOINTMENT,
   GET_All_MEETING,
@@ -31,8 +31,8 @@ import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker'
 const YourAnswer = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { item } = route?.params;
-  console.log('item from your answer', item);
+  const { item, userID } = route?.params;
+  console.log('item from your answer', item.meetingId, userID);
   const [open, setOpen] = useState(false);
   const [valueAnswer, setValue] = useState(null);
   const [suggestedTime, setSuggestedTime] = useState('');
@@ -43,6 +43,24 @@ const YourAnswer = () => {
     { label: 'Unknown', value: 'Unknown' },
     { label: 'Suggest time', value: 'Suggest time' }
   ]);
+
+  let queryParams;
+
+  if (item.meetingId == undefined) {
+    queryParams = {
+      id: +item.appointmentId,
+
+      userId: +userID,
+      type: 2
+    };
+  } else {
+    queryParams = {
+      id: +item.meetingId,
+
+      userId: +userID,
+      type: 1
+    };
+  }
 
   const [updateAnswer] = useMutation(UPDATE_ANSWER, {
     refetchQueries: [
@@ -66,7 +84,8 @@ const YourAnswer = () => {
         }
       },
       {
-        query: GET_ANSWER
+        query: GET_ANSWER,
+        variables: queryParams
       },
       {
         query: GET_USER_PAYLOAD

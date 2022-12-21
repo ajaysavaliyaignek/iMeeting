@@ -368,6 +368,8 @@ PODS:
     - React-Core
   - RNCClipboard (1.11.1):
     - React-Core
+  - RNCPicker (2.4.8):
+    - React-Core
   - RNDateTimePicker (6.5.0):
     - React-Core
   - RNDeviceInfo (10.1.1):
@@ -451,6 +453,7 @@ DEPENDENCIES:
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
+  - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
@@ -555,6 +558,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
     :path: "../node_modules/@react-native-clipboard/clipboard"
+  RNCPicker:
+    :path: "../node_modules/@react-native-picker/picker"
   RNDateTimePicker:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
@@ -624,6 +629,7 @@ SPEC CHECKSUMS:
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCAsyncStorage: 0c357f3156fcb16c8589ede67cc036330b6698ca
   RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
+  RNCPicker: 0bf8ef8f7800524f32d2bb2a8bcadd53eda0ecd1
   RNDateTimePicker: 154f8246e9c32fd663995647a7f9f667a8c6b258
   RNDeviceInfo: 89bc4fe36cf4c8955965609b140d29a335d5350d
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592

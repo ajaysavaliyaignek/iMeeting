@@ -7,7 +7,8 @@ import {
   Alert,
   FlatList,
   ToastAndroid,
-  Platform
+  Platform,
+  Linking
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
@@ -42,7 +43,7 @@ const AppointmentsDetails = () => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item, isDisable } = route?.params;
-  console.log(item);
+  console.log('item from appoinment details', item);
   console.log(isDisable);
   const [fileResponse, setFileResponse] = useState([]);
   const [appointment, setAppointment] = useState(null);
@@ -221,7 +222,8 @@ const AppointmentsDetails = () => {
               ? 'Repeat monthly'
               : 'Repeat yearly'
           )}
-          {role == 'Member' && details('Required', 'Yes')}
+          {role == 'Member' &&
+            details('Required', item?.isRequired ? 'Yes' : 'No')}
           {role == 'Member' && (
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               {item.answers == 'Suggest time' ? (
@@ -259,7 +261,9 @@ const AppointmentsDetails = () => {
                   borderBottomWidth: 1,
                   borderBottomColor: Colors.primary
                 }}
-                onPress={() => navigation.navigate('YourAnswer', { item })}
+                onPress={() =>
+                  navigation.navigate('YourAnswer', { item, userID: user })
+                }
               >
                 <Text
                   style={{
@@ -290,7 +294,8 @@ const AppointmentsDetails = () => {
                   navigation.navigate('LocationDetails', {
                     locationId: appointment?.locationId,
                     platform: appointment?.platformName,
-                    locationType: 2
+                    locationType: 2,
+                    role: item?.yourRoleName
                   })
                 }
               >
@@ -314,9 +319,16 @@ const AppointmentsDetails = () => {
                   marginBottom: fileResponse?.length > 0 ? 0 : SIZES[24]
                 }}
               >
-                <Text style={[styles.txtLink, { width: '80%' }]}>
-                  {appointment?.platformlink}
-                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    Linking.openURL(appointment?.platformlink);
+                  }}
+                  style={{ width: '80%' }}
+                >
+                  <Text style={[styles.txtLink]} numberOfLines={1}>
+                    {appointment?.platformlink}
+                  </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={{ marginTop: 32, marginLeft: 14 }}
                   onPress={() => {
@@ -373,7 +385,7 @@ const AppointmentsDetails = () => {
           setVisibleIndex={() => {}}
         />
       </ScrollView>
-      {role == 'Head' || role == 'Secretory' ? (
+      {role == 'Head' || role == 'Secretary' ? (
         <View style={styles.bottomContainer}>
           <Divider style={styles.divider} />
           {!isDisable && (

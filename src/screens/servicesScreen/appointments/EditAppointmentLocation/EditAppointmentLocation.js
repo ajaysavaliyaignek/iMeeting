@@ -88,26 +88,6 @@ const EditAppointmentLocation = () => {
     }
   });
 
-  // get platform link
-  const {
-    loading: platformLoading,
-    error: platformError,
-    data: platformData
-  } = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: valueVideoConference
-    },
-
-    onCompleted: (data) => {
-      if (data) {
-        setPlatform(data?.videoConferencePlatformLink);
-      }
-    },
-    onError: (data) => {
-      console.log('platformError', data);
-    }
-  });
-
   const [addAppointment] = useMutation(UPDATE_APPOINTMENT, {
     // export const GET_All_SUBJECTS = gql`
     refetchQueries: [
@@ -133,8 +113,9 @@ const EditAppointmentLocation = () => {
   const handleViewDetails = () => {
     navigation.navigate('LocationDetails', {
       locationId: valueLocation,
-      platform: platform,
-      locationType: 2
+
+      locationType: 2,
+      role: item?.yourRoleName
     });
   };
 

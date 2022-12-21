@@ -4,15 +4,13 @@ import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
 import { useMutation, useQuery } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-import { Dropdown } from 'react-native-element-dropdown';
+import { Divider } from 'react-native-paper';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
 import { SIZES } from '../../../../themes/Sizes';
-import { Fonts } from '../../../../themes';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 
 import {
@@ -23,6 +21,7 @@ import {
 import { UPDATE_APPOINTMENT } from '../../../../graphql/mutation';
 import { UserContext } from '../../../../context';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
+import moment from 'moment';
 
 const AddAppointmentLocation = () => {
   const navigation = useNavigation();
@@ -30,11 +29,12 @@ const AddAppointmentLocation = () => {
     useContext(UserContext);
 
   console.log('meeting data from addmeetinglocation', appointmentsData);
-  const [openLocation, setOpenLocation] = useState(false);
-  const [valueLocation, setValueLocation] = useState(null);
-  const [openVideoConference, setOpenVideoConference] = useState(false);
-  const [valueVideoConference, setValueVideoConference] = useState(null);
-  const [onFocus, setIsFocus] = useState(false);
+  const [valueLocation, setValueLocation] = useState(
+    appointmentsData?.locationId ? appointmentsData?.locationId : null
+  );
+  const [valueVideoConference, setValueVideoConference] = useState(
+    appointmentsData?.videoConference ? appointmentsData?.videoConference : null
+  );
 
   const [platform, setPlatform] = useState(null);
   const [location, setLocation] = useState([]);
@@ -63,28 +63,6 @@ const AddAppointmentLocation = () => {
     console.log('LocationError', LocationError);
   }
 
-  // get platform link
-  const {
-    loading: platformLoading,
-    error: platformError,
-    data: platformData
-  } = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: valueVideoConference
-    },
-
-    onCompleted: (data) => {
-      console.log('get platform link', data.videoConferencePlatformLink);
-      // setSubjectData(data?.subjects.items);
-      if (data) {
-        setPlatform(data?.videoConferencePlatformLink);
-      }
-    }
-  });
-  if (platformError) {
-    console.log('platformError', platformError);
-  }
-
   const [addAppointment] = useMutation(UPDATE_APPOINTMENT, {
     // export const GET_All_SUBJECTS = gql`
     refetchQueries: [
@@ -109,8 +87,9 @@ const AddAppointmentLocation = () => {
   const handleViewDetails = () => {
     navigation.navigate('LocationDetails', {
       locationId: valueLocation,
-      platform: platform,
-      locationType: 2
+
+      locationType: 2,
+      role: 'Head'
     });
   };
 
@@ -213,7 +192,7 @@ const AddAppointmentLocation = () => {
               setAppointmentsData({
                 ...appointmentsData,
                 locationId: valueLocation,
-                platformId: platform.platformId,
+
                 videoConference: valueVideoConference
               });
             }}
@@ -233,10 +212,14 @@ const AddAppointmentLocation = () => {
                 platformId: valueVideoConference,
                 repeat: appointmentsData?.Repeat,
                 required: appointmentsData?.userRequired,
-                setDate: appointmentsData?.startDate,
-                setTime: appointmentsData?.startTime,
-                endDate: appointmentsData?.endDate,
-                endTime: appointmentsData?.endTime,
+                setDate: moment(appointmentsData?.startDateTime).format(
+                  'YYYY-MM-DD'
+                ),
+                setTime: moment(appointmentsData?.startDateTime).format('LT'),
+                endDate: moment(appointmentsData?.endDateTime).format(
+                  'YYYY-MM-DD'
+                ),
+                endTime: moment(appointmentsData?.endDateTime).format('LT'),
                 timeZone: appointmentsData?.TimeZone,
                 userIds: appointmentsData?.users
               });
@@ -249,13 +232,20 @@ const AddAppointmentLocation = () => {
                     attachFileIds: appointmentsData?.attachFiles,
                     committeeId: appointmentsData?.committee,
                     locationId: valueLocation,
-                    platformId: valueVideoConference,
+                    platformId:
+                      valueVideoConference == null ? 0 : valueVideoConference,
                     repeat: appointmentsData?.Repeat,
                     required: appointmentsData?.userRequired,
-                    setDate: appointmentsData?.startDate,
-                    setTime: appointmentsData?.startTime,
-                    endDate: appointmentsData?.endDate,
-                    endTime: appointmentsData?.endTime,
+                    setDate: moment(appointmentsData?.startDateTime).format(
+                      'YYYY-MM-DD'
+                    ),
+                    setTime: moment(appointmentsData?.startDateTime).format(
+                      'LT'
+                    ),
+                    endDate: moment(appointmentsData?.endDateTime).format(
+                      'YYYY-MM-DD'
+                    ),
+                    endTime: moment(appointmentsData?.endDateTime).format('LT'),
                     timeZone: appointmentsData?.TimeZone,
                     userIds: appointmentsData?.users
                   }

@@ -31,6 +31,7 @@ import {
 import { UPDATE_MEETING } from '../../../../graphql/mutation';
 import { UserContext } from '../../../../context';
 import AddSubjectsCard from '../addMeetingSubjects/AddSubjectsCard';
+import { Fonts } from '../../../../themes';
 
 const EditMeetingSubjects = () => {
   const navigation = useNavigation();
@@ -49,7 +50,6 @@ const EditMeetingSubjects = () => {
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState([]);
   const [subjectsId, setSubjectsId] = useState([]);
-  const [subject, setSubject] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [viewIndex, setViewIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
@@ -57,9 +57,7 @@ const EditMeetingSubjects = () => {
   const [previosSubjects, setPreviosSubjects] = useState([]);
   const [backUpSubject, setBackUpSubject] = useState([]);
   let subjects = [];
-  // let backUpSubject = [];
 
-  // get ALL SUBJECTS
   const {
     loading: SubjectsLoading,
     error: SubjectsError,
@@ -92,46 +90,34 @@ const EditMeetingSubjects = () => {
     console.log('subjects error---', SubjectsError);
   }
 
+  // get meeting by id
+  const {
+    loading: MeetingLoading,
+    error: MeetingError,
+    data: MeetingData
+  } = useQuery(GET_MEETING_BY_ID, {
+    variables: {
+      meetingId: item.meetingId
+    },
+
+    onCompleted: (data) => {
+      console.log('meeting by id', data);
+      setCalendarValue(data.meeting.deadlineDate);
+    }
+  });
+
+  if (MeetingError) {
+    console.log('subjects error---', MeetingError);
+  }
+
   const onUpdateSelection = (items) => {
     let newSubjects = [];
     console.log('new added subjects', items);
     console.log('previous subject', previosSubjects);
     console.log('backup subject', backUpSubject);
-    // items?.map((subject) => {
-    //   let indexPreviousUser =
-    //     previosSubjects?.length > 0
-    //       ? previosSubjects?.findIndex(
-    //           (obj) => obj.subjectId === subject?.subjectId
-    //         )
-    //       : -1;
-    //   if (indexPreviousUser === -1) {
-    //     let index =
-    //       backUpSubject?.length > 0
-    //         ? backUpSubject?.findIndex(
-    //             (obj) => obj.subjectId === subject.subjectId
-    //           )
-    //         : -1;
-    //     if (index == -1) {
-    //       newSubjects.push(JSON.parse(JSON.stringify(subject)));
-    //     } else {
-    //       newSubjects.push(JSON.parse(JSON.stringify(backUpSubject[index])));
-    //     }
-    //   } else {
-    //     newSubjects.push(
-    //       JSON.parse(JSON.stringify(previosSubjects[indexPreviousUser]))
-    //     );
-
-    //     // newUsers.push(previousUser[indexPreviousUser]);
-    //   }
-    // });
 
     setSelectedSubjects(items);
     setFilterData(items);
-    // items?.map((subject) => {
-    //   setPreviosSubjects((prev) => {
-    //     return [...prev, subject];
-    //   });
-    // });
   };
 
   // edit meeting mutation
@@ -191,13 +177,11 @@ const EditMeetingSubjects = () => {
     }
   });
 
-  useEffect(() => {
-    subjects = previosSubjects?.map((item) => item.subjectId);
-    selectSubjects?.map((item) => {
-      subjects.push(item.subjectId);
-    });
-    console.log('userId', subjects);
-  }, [previosSubjects, selectSubjects]);
+  subjects = previosSubjects?.map((item) => item.subjectId);
+  selectSubjects?.map((item) => {
+    subjects.push(item.subjectId);
+  });
+  console.log('userId', subjects);
 
   // delete subject from selected subject
   const onDeletehandler = (item) => {
@@ -308,9 +292,28 @@ const EditMeetingSubjects = () => {
                 />
               );
             })}
+            {previosSubjects.length <= 0 && selectSubjects.length <= 0 && (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: SIZES[16]
+                }}
+              >
+                <Text
+                  style={{
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.primary
+                  }}
+                >
+                  No Selected Subjects
+                </Text>
+              </View>
+            )}
 
             <View style={styles.deadlineContainer}>
-              <Text style={styles.txtTitle}>DEADLINE SUGGESTING</Text>
+              <Text style={styles.txtTitle}>RECIEVING SUBJECTS DEADLINE</Text>
               <TouchableOpacity
                 style={styles.deadlineRowContainer}
                 onPress={() =>
@@ -371,6 +374,7 @@ const EditMeetingSubjects = () => {
             <Button
               title={'Submit'}
               onPress={() => {
+                console.log('edit meeting data');
                 addMeeting({
                   variables: {
                     meeting: {
@@ -383,7 +387,7 @@ const EditMeetingSubjects = () => {
                       locationId: meetingsData.location,
                       meetingId: item.meetingId,
                       meetingTitle: meetingsData.title,
-                      platformlink: meetingsData.platform.platformlink,
+
                       platformId:
                         meetingsData.videoConference !== null
                           ? meetingsData.videoConference

@@ -15,13 +15,16 @@ const Input = ({
   onChange,
   onPressOut,
   labelStyle,
-  placeholder
+  placeholder,
+  keyboardType
 }) => {
   return (
     <TextInput
       onPressOut={onPressOut}
+      autoCapitalize={false}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
+      keyboardType={keyboardType}
       onBlur={onChange}
       value={value}
       label={
@@ -37,7 +40,7 @@ const Input = ({
       right={right}
       underlineColor={Colors.line}
       activeUnderlineColor={Colors.line}
-      style={style}
+      style={[{ ...Fonts.PoppinsRegular[14], color: Colors.bold }, style]}
       placeholder={placeholder}
     />
   );

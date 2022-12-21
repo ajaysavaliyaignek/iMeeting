@@ -162,6 +162,11 @@ const AddAppointmentGeneral = () => {
           />
           <Button
             title={'Next'}
+            disable={
+              title == '' || discription == '' || valueCommitee == null
+                ? true
+                : false
+            }
             onPress={() => {
               setAppointmentsData({
                 ...appointmentsData,
@@ -173,9 +178,12 @@ const AddAppointmentGeneral = () => {
               navigation.navigate('AddAppointmentUsers');
             }}
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity:
+                  title === '' || discription === '' || valueCommitee == null
+                    ? 0.5
+                    : null
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}

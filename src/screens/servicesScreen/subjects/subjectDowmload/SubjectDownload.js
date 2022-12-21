@@ -26,6 +26,7 @@ import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker'
 const SubjectDownload = () => {
   const route = useRoute();
   const { item } = route?.params;
+  console.log('subject from subject download', item);
 
   const navigation = useNavigation();
   const [open, setOpen] = useState(false);
@@ -40,6 +41,13 @@ const SubjectDownload = () => {
   const [fileName, setFileName] = useState(null);
 
   const checkPermission = async () => {
+    console.log('download params', {
+      attachFile: isAttachFileSwitchOn,
+      comments: isCommentsSwitchOn,
+      format: valueType,
+      id: +item?.subjectId,
+      type: 2
+    });
     console.log('check permission');
     if (Platform.OS === 'ios') {
       downloadFiles({
@@ -47,7 +55,7 @@ const SubjectDownload = () => {
           attachFile: isAttachFileSwitchOn,
           comments: isCommentsSwitchOn,
           format: valueType,
-          id: item?.subjectId,
+          id: +item?.subjectId,
           type: 2
         }
       });
@@ -75,7 +83,7 @@ const SubjectDownload = () => {
               attachFile: isAttachFileSwitchOn,
               comments: isCommentsSwitchOn,
               format: valueType,
-              id: item?.subjectId,
+              id: +item?.subjectId,
               type: 2
             }
           });
@@ -94,6 +102,7 @@ const SubjectDownload = () => {
     GET_ZIP_PDF_DOWNLOAD,
     {
       onCompleted: async (data, error) => {
+        console.log('subject download data', data);
         let base64Str = data?.report?.fileData.base64;
 
         let fPath = Platform.select({
@@ -108,7 +117,7 @@ const SubjectDownload = () => {
         if (Platform.OS == 'ios') {
           await RNFetchBlob.fs.createFile(fPath, base64Str, 'base64');
         } else {
-          await RNFetchBlob.config({
+          RNFetchBlob.config({
             addAndroidDownloads: {
               title: 'Downloading',
               useDownloadManager: true,

@@ -30,6 +30,7 @@ const EditMeetingUser = () => {
   const [searchText, setSearchText] = useState('');
   const { selectedUsers, meetingsData, setMeetingsData, setSelectedUsers } =
     useContext(UserContext);
+  console.log('meeting data from edit user', meetingsData);
   const [required, setRequired] = useState([]);
   const [filterData, setFilterData] = useState([]);
   const [previousUser, setPreviousUser] = useState([]);
@@ -45,7 +46,9 @@ const EditMeetingUser = () => {
       backUpUser.push(JSON.parse(JSON.stringify(user)));
       userData.push(JSON.parse(JSON.stringify(user)));
     });
-    setPreviousUser(userData);
+    setPreviousUser(
+      meetingsData?.userDetails ? meetingsData?.userDetails : userData
+    );
     setFilterData(userData);
   }, []);
 
@@ -80,14 +83,10 @@ const EditMeetingUser = () => {
   //   }
   // };
 
-  useEffect(() => {
-    console.log('pre data', previousUser);
-
-    users = previousUser?.map((item) => item.userId);
-    console.log('userId', users);
-    requiredUsers = previousUser?.map((item) => item.isRequired);
-    console.log('userRequired', requiredUsers);
-  }, [previousUser]);
+  users = previousUser?.map((item) => item.userId);
+  console.log('userId', users);
+  requiredUsers = previousUser?.map((item) => item.isRequired);
+  console.log('userRequired', requiredUsers);
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
@@ -293,7 +292,8 @@ const EditMeetingUser = () => {
                 setMeetingsData({
                   ...meetingsData,
                   users: users,
-                  userRequired: requiredUsers
+                  userRequired: requiredUsers,
+                  userDetails: previousUser
                 });
               }}
               layoutStyle={styles.cancelBtnLayout}
@@ -305,7 +305,8 @@ const EditMeetingUser = () => {
                 setMeetingsData({
                   ...meetingsData,
                   users: users,
-                  userRequired: requiredUsers
+                  userRequired: requiredUsers,
+                  userDetails: previousUser
                 });
                 navigation.navigate('EditMeetingDateAndTime', { item: item });
               }}

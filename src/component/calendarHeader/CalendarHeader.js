@@ -4,6 +4,7 @@ import { styles } from './styles';
 import Icon from '../Icon';
 import IconName from '../Icon/iconName';
 import { SIZES } from '../../themes/Sizes';
+import moment from 'moment';
 
 const weekDaysNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -16,7 +17,9 @@ const CalendarHeader = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.dateText}>{headerData}</Text>
+        <Text style={styles.dateText}>
+          {moment(headerData).format('DD MMM, YYYY')}
+        </Text>
         <TouchableOpacity
           style={[styles.iconContainer, styles.leftIcon]}
           onPress={onPressArrowLeft}

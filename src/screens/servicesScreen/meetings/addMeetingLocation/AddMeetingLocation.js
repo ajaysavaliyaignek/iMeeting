@@ -2,18 +2,16 @@ import { View, Text, SafeAreaView } from 'react-native';
 import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
-import { Dropdown } from 'react-native-element-dropdown';
+import { useNavigation } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+import { useQuery } from '@apollo/client';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
-import { Fonts } from '../../../../themes';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
-import { useQuery } from '@apollo/client';
 import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
@@ -23,12 +21,9 @@ const AddMeetingLocation = () => {
   const { meetingsData, setMeetingsData } = useContext(UserContext);
 
   console.log('meeting data from addmeetinglocation', meetingsData);
-  const [openLocation, setOpenLocation] = useState(false);
-  const [onFocus, setIsFocus] = useState(false);
   const [valueLocation, setValueLocation] = useState(
     meetingsData?.location ? meetingsData?.location : null
   );
-  const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(
     meetingsData?.videoConference ? meetingsData?.videoConference : null
   );
@@ -60,33 +55,12 @@ const AddMeetingLocation = () => {
     console.log('LocationError', LocationError);
   }
 
-  // get platform link
-  const {
-    loading: platformLoading,
-    error: platformError,
-    data: platformData
-  } = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: valueVideoConference
-    },
-
-    onCompleted: (data) => {
-      console.log('get platform link', data.videoConferencePlatformLink);
-      // setSubjectData(data?.subjects.items);
-      if (data) {
-        setPlatform(data?.videoConferencePlatformLink);
-      }
-    }
-  });
-  if (platformError) {
-    console.log('platformError', platformError);
-  }
-
   const handleViewDetails = () => {
     navigation.navigate('LocationDetails', {
       locationId: valueLocation,
-      platform: platform,
-      locationType: 1
+
+      locationType: 1,
+      role: 'Head' || 'Secretary'
     });
   };
 
@@ -191,7 +165,7 @@ const AddMeetingLocation = () => {
               navigation.goBack();
               setMeetingsData({
                 ...meetingsData,
-                platform: platform,
+
                 location: valueLocation,
                 videoConference: valueVideoConference
               });
@@ -204,9 +178,10 @@ const AddMeetingLocation = () => {
             onPress={() => {
               setMeetingsData({
                 ...meetingsData,
-                platform: platform,
+
                 location: valueLocation,
-                videoConference: valueVideoConference
+                videoConference:
+                  valueVideoConference == null ? 0 : valueVideoConference
               });
               navigation.navigate('AddMeetingSubjects');
             }}

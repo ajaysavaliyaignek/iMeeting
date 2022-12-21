@@ -135,7 +135,11 @@ const UsersCard = ({
       )}
       {editModal && (
         <View style={styles.modalView}>
-          <EditDeleteModal onPressDelete={onDeleteHandler} download />
+          <EditDeleteModal
+            onPressDelete={onDeleteHandler}
+            download
+            isViewable={true}
+          />
         </View>
       )}
     </Pressable>

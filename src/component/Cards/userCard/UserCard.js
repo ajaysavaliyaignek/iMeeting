@@ -158,6 +158,7 @@ const UserCard = ({
             subjectStatus={'NoDeleted'}
             deleted={deleted}
             editable={editable}
+            isViewable={false}
           />
         </View>
       )}

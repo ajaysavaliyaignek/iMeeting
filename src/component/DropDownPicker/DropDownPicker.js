@@ -10,11 +10,13 @@ const DropDownPicker = ({
   value,
   title,
   placeholder,
-  disable
+  disable,
+  styleContainer
 }) => {
   const [isFocus, setIsFocus] = useState(false);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, styleContainer]}>
       <Text style={styles.txtTitle}>{title}</Text>
       <Dropdown
         disable={disable}

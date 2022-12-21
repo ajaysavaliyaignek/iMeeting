@@ -183,8 +183,9 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
               navigation.navigate('EditMeetingGeneral', { item });
             }}
             subjectStatus={item.meetingStatusTitle}
-            editable={role == 'Head' || role == 'Secretory' ? true : false}
-            deleted={role == 'Head' || role == 'Secretory' ? true : false}
+            editable={role == 'Head' || role == 'Secretary' ? true : false}
+            deleted={role == 'Head' || role == 'Secretary' ? true : false}
+            isViewable={true}
           />
         </View>
       )}

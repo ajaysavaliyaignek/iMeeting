@@ -89,6 +89,7 @@ const SelectSubjectCard = ({
               navigation.navigate('SubjectDetails', { item });
               setVisibleIndex(-1);
             }}
+            isViewable={true}
           />
         </View>
       )}

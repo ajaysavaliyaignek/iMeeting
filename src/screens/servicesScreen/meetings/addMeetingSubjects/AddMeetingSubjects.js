@@ -54,12 +54,8 @@ const AddMeetingSubjects = () => {
 
   let backUpUser = [];
 
-  useEffect(() => {
-    console.log('pre data', previousSubject);
-
-    subjects = previousSubject?.map((item) => item.subjectId);
-    console.log('userId', subjects);
-  }, [previousSubject]);
+  subjects = previousSubject?.map((item) => item.subjectId);
+  console.log('userId', subjects);
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
@@ -234,7 +230,7 @@ const AddMeetingSubjects = () => {
           )}
 
           <View style={styles.deadlineContainer}>
-            <Text style={styles.txtTitle}>DEADLINE SUGGESTING</Text>
+            <Text style={styles.txtTitle}>RECIEVING SUBJECTS DEADLINE</Text>
             <TouchableOpacity
               style={styles.deadlineRowContainer}
               onPress={() =>
@@ -303,18 +299,22 @@ const AddMeetingSubjects = () => {
                   committeeId: meetingsData.committee,
                   creatorName: '',
                   description: meetingsData.discription,
-                  endDate: meetingsData.endDate,
-                  endTime: meetingsData.endTime,
+                  endDate: moment(meetingsData.endDateTime).format(
+                    'YYYY-MM-DD'
+                  ),
+                  endTime: moment(meetingsData.endDateTime).format('LT'),
                   locationId: meetingsData.location,
                   meetingId: 0,
                   meetingTitle: meetingsData.title,
-                  platformlink: meetingsData.platform.platformlink,
+
                   platformId: meetingsData.videoConference,
                   repeat: meetingsData.Repeat,
                   repeatName: meetingsData.Repeat,
                   required: meetingsData.userRequired,
-                  setDate: meetingsData.startDate,
-                  setTime: meetingsData.startTime,
+                  setDate: moment(meetingsData.startDateTime).format(
+                    'YYYY-MM-DD'
+                  ),
+                  setTime: moment(meetingsData.startDateTime).format('LT'),
                   subjectIds: subjects,
                   timeZone: meetingsData.TimeZone,
                   userIds: meetingsData.users,
@@ -329,18 +329,22 @@ const AddMeetingSubjects = () => {
                       committeeId: meetingsData.committee,
                       creatorName: '',
                       description: meetingsData.discription,
-                      endDate: meetingsData.endDate,
-                      endTime: meetingsData.endTime,
+                      endDate: moment(meetingsData.endDateTime).format(
+                        'YYYY-MM-DD'
+                      ),
+                      endTime: moment(meetingsData.endDateTime).format('LT'),
                       locationId: meetingsData.location,
                       meetingId: 0,
                       meetingTitle: meetingsData.title,
-                      platformlink: meetingsData.platform.platformlink,
+
                       platformId: meetingsData.videoConference,
                       repeat: meetingsData.Repeat,
 
                       required: meetingsData.userRequired,
-                      setDate: meetingsData.startDate,
-                      setTime: meetingsData.startTime,
+                      setDate: moment(meetingsData.startDateTime).format(
+                        'YYYY-MM-DD'
+                      ),
+                      setTime: moment(meetingsData.startDateTime).format('LT'),
                       subjectIds: subjects,
                       timeZone: meetingsData.TimeZone,
                       userIds: meetingsData.users,
