@@ -1,5 +1,3 @@
-const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
-
 var offset = new Date().getTimezoneOffset();
 if (offset < 0) {
   var extraZero = '';

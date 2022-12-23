@@ -219,7 +219,7 @@ const TimelineScreen = () => {
           <Text style={styles.txtUsers}>Users</Text>
           <View style={styles.btnCommittees}>
             <Text style={styles.txtBtnCommittees}>
-              Selected {selectedUsers?.length} users
+              Selected {selectUser?.length} users
             </Text>
             <Icon
               name={IconName.Arrow_Right}

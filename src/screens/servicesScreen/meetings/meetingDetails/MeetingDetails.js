@@ -242,7 +242,7 @@ const MeetingDetails = () => {
                 title={'Start'}
                 layoutStyle={[styles.btnLayout]}
                 onPress={() => {
-                  navigation.navigate('LiveMeetingMenu', { item });
+                  // navigation.navigate('LiveMeetingMenu', { item });
                 }}
               />
             </View>
