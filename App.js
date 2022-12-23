@@ -1,9 +1,10 @@
 import 'react-native-gesture-handler';
 import React, { useContext, useEffect, useState } from 'react';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useColorScheme } from 'react-native';
 
 import MainStack from './routes';
 import { AppProvider, UserContext } from './src/context';
@@ -16,6 +17,28 @@ const App = () => {
   const [token, setToken] = useState(null);
   const [url, setUrl] = useState('');
   // const { companyUrl, setCompanyUrl } = useContext(UserContext);
+
+  const darkTheme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#1A1A1A',
+      accent: '#FAFAFA'
+    }
+  };
+
+  const lightTheme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#FAFAFA',
+      accent: '#1A1A1A'
+    }
+  };
+
+  const scheme = useColorScheme();
 
   useEffect(() => {
     const getToken = () => {
@@ -50,7 +73,7 @@ const App = () => {
   return (
     <AppProvider>
       <ApolloProvider client={Client()}>
-        <PaperProvider>
+        <PaperProvider theme={scheme === 'dark' ? darkTheme : lightTheme}>
           <NavigationContainer>
             {token && <MainStack initialRouteName={token} />}
           </NavigationContainer>

@@ -22,25 +22,12 @@ import { styles } from './styles';
 import { UserContext } from '../../../../context';
 import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
-const AddMeetingUser = () => {
+const AddMeetingUser = ({ previousUser, setPreviousUser, committee }) => {
   const navigation = useNavigation();
-  // const [users, setUsers] = useState([]);
   const [searchText, setSearchText] = useState('');
-
   const [filterData, setFilterData] = useState([]);
-  const { selectedUsers, meetingsData, setMeetingsData, setSelectedUsers } =
-    useContext(UserContext);
-  const [previousUser, setPreviousUser] = useState(meetingsData.userDetails);
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  let users = [];
-  let requiredUsers = [];
-
   let backUpUser = [];
-
-  users = previousUser?.map((item) => item.userId);
-  console.log('users', users);
-  requiredUsers = previousUser?.map((item) => item.isRequired);
-  console.log('requiredUsers', requiredUsers);
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
@@ -126,161 +113,98 @@ const AddMeetingUser = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        style={{ flex: 1 }}
-        onPress={() => {
-          setVisibleIndex(-1);
-        }}
-        activeOpacity={1}
-      >
-        <Header
-          name={'Add meeting'}
-          rightIconName={IconName.Close}
-          onRightPress={() =>
-            navigation.navigate('Details', {
-              title: 'Meetings',
-              active: '0'
+    <TouchableOpacity
+      style={{ flex: 1 }}
+      onPress={() => {
+        setVisibleIndex(-1);
+      }}
+      activeOpacity={1}
+    >
+      <View style={styles.subContainer}>
+        <View style={styles.progressContainer}>
+          <Progress.Bar
+            color={Colors.switch}
+            progress={0.4}
+            borderColor={Colors.white}
+            unfilledColor={'#e6e7e9'}
+            width={DeviceInfo.isTablet() ? 800 : 264}
+          />
+          <Text style={styles.txtProgress}>Step 2/5</Text>
+        </View>
+        <Text style={styles.txtAddSubjectTitle}>Users</Text>
+        <View style={styles.searchContainer}>
+          <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
+          <TextInput
+            style={styles.textInput}
+            placeholder={'Search'}
+            onChangeText={(text) => {
+              searchFilterUsers(text);
+            }}
+          />
+          <TouchableOpacity onPress={() => startRecording()}>
+            <Icon
+              name={IconName.Speaker}
+              height={SIZES[15]}
+              width={SIZES[10]}
+            />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+          style={styles.committeeView}
+          activeOpacity={0.5}
+          onPress={() =>
+            navigation.navigate('Timeline', { selectedUsers: previousUser })
+          }
+        >
+          <Text style={styles.txtCommittee}>Timeline</Text>
+          <View style={styles.btnCommittees}>
+            <Icon
+              name={IconName.Arrow_Right}
+              height={SIZES[12]}
+              width={SIZES[6]}
+            />
+          </View>
+        </TouchableOpacity>
+        <Divider style={styles.divider} />
+        <TouchableOpacity
+          style={styles.committeeView}
+          activeOpacity={0.5}
+          onPress={() =>
+            navigation.navigate('SelectUsers', {
+              committee: committee,
+              previousUser: previousUser,
+              onUpdateSelection: onUpdateSelection
             })
           }
-        />
-
-        <View style={styles.subContainer}>
-          <View style={styles.progressContainer}>
-            <Progress.Bar
-              color={Colors.switch}
-              progress={0.4}
-              borderColor={Colors.white}
-              unfilledColor={'#e6e7e9'}
-              width={DeviceInfo.isTablet() ? 800 : 264}
-            />
-            <Text style={styles.txtProgress}>Step 2/5</Text>
-          </View>
-          <Text style={styles.txtAddSubjectTitle}>Users</Text>
-          <View style={styles.searchContainer}>
-            <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-            <TextInput
-              style={styles.textInput}
-              placeholder={'Search'}
-              onChangeText={(text) => {
-                searchFilterUsers(text);
-              }}
-            />
-            <TouchableOpacity onPress={() => startRecording()}>
-              <Icon
-                name={IconName.Speaker}
-                height={SIZES[15]}
-                width={SIZES[10]}
-              />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            style={styles.committeeView}
-            activeOpacity={0.5}
-            onPress={() =>
-              navigation.navigate('Timeline', { selectedUsers: previousUser })
-            }
-          >
-            <Text style={styles.txtCommittee}>Timeline</Text>
-            <View style={styles.btnCommittees}>
-              <Icon
-                name={IconName.Arrow_Right}
-                height={SIZES[12]}
-                width={SIZES[6]}
-              />
-            </View>
-          </TouchableOpacity>
-          <Divider style={styles.divider} />
-          <TouchableOpacity
-            style={styles.committeeView}
-            activeOpacity={0.5}
-            onPress={() =>
-              navigation.navigate('SelectUsers', {
-                committee: meetingsData.committee,
-                previousUser: previousUser,
-                onUpdateSelection: onUpdateSelection
-              })
-            }
-          >
-            <Text style={styles.txtCommittee}>Users</Text>
-            <View style={styles.btnCommittees}>
-              <Text style={styles.txtBtnCommittees}>
-                Select {previousUser?.length > 0 ? previousUser?.length : ''}
-              </Text>
-              <Icon
-                name={IconName.Arrow_Right}
-                height={SIZES[12]}
-                width={SIZES[6]}
-              />
-            </View>
-          </TouchableOpacity>
-          <Divider style={styles.divider} />
-          <UserDetailsComponent
-            users={previousUser}
-            isUserRequired={true}
-            isDeletable={true}
-            committee={meetingsData.committee}
-            isSwitchOnRow={true}
-            onChangeUser={onChangeUserState}
-            openPopup={true}
-            searchText={searchText}
-            onPressDelete={onDeleteHandler}
-            visibleIndex={visibleIndex}
-            setVisibleIndex={setVisibleIndex}
-          />
-        </View>
-
-        <View
-          style={{
-            backgroundColor: Colors.white,
-            justifyContent: 'flex-end'
-          }}
         >
-          {/* Divider */}
-          <Divider style={styles.divider} />
-          <View style={styles.buttonContainer}>
-            <Button
-              title={'Back'}
-              onPress={() => {
-                navigation.goBack();
-                setMeetingsData({
-                  ...meetingsData,
-                  users: users,
-                  userRequired: requiredUsers,
-                  userDetails: previousUser
-                });
-              }}
-              layoutStyle={styles.cancelBtnLayout}
-              textStyle={styles.txtCancelButton}
-            />
-            <Button
-              title={'Next'}
-              onPress={() => {
-                console.log(users.length, requiredUsers.length);
-                setMeetingsData({
-                  ...meetingsData,
-                  users: users,
-                  userRequired: requiredUsers,
-                  userDetails: previousUser
-                });
-                navigation.navigate('AddMeetingDateAndTime');
-              }}
-              layoutStyle={[
-                styles.nextBtnLayout,
-                {
-                  opacity:
-                    users?.length <= 0 && requiredUsers?.length <= 0 ? 0.5 : 1
-                }
-              ]}
-              textStyle={styles.txtNextBtn}
-              disable={
-                users?.length <= 0 && requiredUsers?.length <= 0 ? true : false
-              }
+          <Text style={styles.txtCommittee}>Users</Text>
+          <View style={styles.btnCommittees}>
+            <Text style={styles.txtBtnCommittees}>
+              Select {previousUser?.length > 0 ? previousUser?.length : ''}
+            </Text>
+            <Icon
+              name={IconName.Arrow_Right}
+              height={SIZES[12]}
+              width={SIZES[6]}
             />
           </View>
-        </View>
-      </TouchableOpacity>
-    </SafeAreaView>
+        </TouchableOpacity>
+        <Divider style={styles.divider} />
+        <UserDetailsComponent
+          users={previousUser}
+          isUserRequired={true}
+          isDeletable={true}
+          committee={committee}
+          isSwitchOnRow={true}
+          onChangeUser={onChangeUserState}
+          openPopup={true}
+          searchText={searchText}
+          onPressDelete={onDeleteHandler}
+          visibleIndex={visibleIndex}
+          setVisibleIndex={setVisibleIndex}
+        />
+      </View>
+    </TouchableOpacity>
   );
 };
 

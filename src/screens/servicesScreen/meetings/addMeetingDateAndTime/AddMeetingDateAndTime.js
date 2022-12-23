@@ -27,21 +27,31 @@ import { Button } from '../../../../component/button/Button';
 import { GET_TIMEZONE } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
+import { currentTimeZone } from '../../../../component/currentTimeZone/CurrentTimezone';
 
-const AddMeetingDateAndTime = () => {
+const AddMeetingDateAndTime = ({
+  startDateTime,
+  setStartDateTime,
+  endDateTime,
+  setEndDateTime,
+  valueRepeat,
+  setValueRepeat,
+  valueTimeZone,
+  setValueTimeZone
+}) => {
   const navigation = useNavigation();
   const { meetingsData, setMeetingsData } = useContext(UserContext);
   console.log('meeting data from date and time', meetingsData);
-  const [startDateTime, setStartDateTime] = useState(
-    meetingsData?.startDateTime
-      ? new Date(meetingsData?.startDateTime)
-      : new Date()
-  );
-  const [endDateTime, setEndDateTime] = useState(
-    meetingsData?.startDateTime
-      ? new Date(meetingsData?.endDateTime)
-      : new Date()
-  );
+  // const [startDateTime, setStartDateTime] = useState(
+  //   meetingsData?.startDateTime
+  //     ? new Date(meetingsData?.startDateTime)
+  //     : new Date()
+  // );
+  // const [endDateTime, setEndDateTime] = useState(
+  //   meetingsData?.startDateTime
+  //     ? new Date(meetingsData?.endDateTime)
+  //     : new Date()
+  // );
   const [isStartDate, setIsStartDate] = useState(false);
 
   const [startDate, setStartdate] = useState(
@@ -49,44 +59,16 @@ const AddMeetingDateAndTime = () => {
       ? moment(meetingsData?.startDate).format('DD MMM,YYYY')
       : moment(new Date()).format('DD MMM,YYYY')
   );
-  // const [startNewDate, setStartNewDate] = useState(
-  //   meetingsData?.startDate
-  //     ? meetingsData?.startDate
-  //     : moment(new Date()).format('YYYY-MM-DD')
-  // );
-  const [startTime, setStartTime] = useState(
-    meetingsData?.startTime
-      ? meetingsData?.startTime
-      : moment(new Date()).format('LT')
-  );
-  const [endDate, setEnddate] = useState(
-    meetingsData?.endDate
-      ? moment(meetingsData?.endDate).format('DD MMM,YYYY')
-      : startDate
-  );
-  // const [endNewDate, setEndNewdate] = useState(
-  //   meetingsData?.endDate
-  //     ? meetingsData?.startDate
-  //     : moment(new Date()).format('YYYY-MM-DD')
-  // );
-  const [endTime, setEndTime] = useState(
-    meetingsData?.endTime
-      ? meetingsData?.endTime
-      : moment(new Date()).format('LT')
-  );
-  // const [date, setDate] = useState(new Date());
-  // const [dates, setDates] = useState(new Date());
-  // const [time, setTime] = useState(new Date());
-  // const [times, setTimes] = useState(new Date());
-  const [timeZone, setTimeZone] = useState([]);
+
+  const [timezone, setTimeZone] = useState([]);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [openClock, setOpenClock] = useState(false);
-  const [valueRepeat, setValueRepeat] = useState(
-    meetingsData?.Repeat ? meetingsData?.Repeat : null
-  );
-  const [valueTimeZone, setValueTimeZone] = useState(
-    meetingsData?.TimeZone ? meetingsData?.TimeZone : null
-  );
+  // const [valueRepeat, setValueRepeat] = useState(
+  //   meetingsData?.Repeat ? meetingsData?.Repeat : null
+  // );
+  // const [valueTimeZone, setValueTimeZone] = useState(
+  //   meetingsData?.TimeZone ? meetingsData?.TimeZone : null
+  // );
   const [itemsRepeat, setItems] = useState([
     {
       label: "Dosen't repeat",
@@ -109,7 +91,50 @@ const AddMeetingDateAndTime = () => {
       label: 'Repeat yearly'
     }
   ]);
+  // const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
 
+  // var offset = new Date().getTimezoneOffset();
+  // if (offset < 0) {
+  //   var extraZero = '';
+  //   if (-offset % 60 < 10) extraZero = '0';
+
+  //   console.log('Your timezone is- GMT+', {
+  //     timezone:
+  //       (offset / -60).toString().split('.')[0] +
+  //       ':' +
+  //       extraZero +
+  //       (-offset % 60)
+  //   });
+  // } else {
+  //   var extraZero = '';
+  //   if (offset % 60 < 10) extraZero = '0';
+
+  //   console.log(
+  //     'Your timezone is- GMT-' +
+  //       Math.floor(offset / 60) +
+  //       ':' +
+  //       extraZero +
+  //       (offset % 60)
+  //   );
+  // }
+
+  // let currentTimeZone = `${
+  //   offset < 0
+  //     ? `GMT+${
+  //         (offset / -60).toString().split('.')[0] +
+  //         ':' +
+  //         extraZero +
+  //         (-offset % 60)
+  //       }`
+  //     : `GMT-${
+  //         (offset / 60).toString().split('.')[0] +
+  //         ':' +
+  //         extraZero +
+  //         (offset % 60)
+  //       }`
+  // } (${timeZone})`;
+
+  // set date time from clock model
   const handleConfirmClock = (date) => {
     console.log('status of isStartDate ', isStartDate);
     if (isStartDate) {
@@ -136,71 +161,10 @@ const AddMeetingDateAndTime = () => {
       setEndDateTime(date);
     }
 
-    // console.log('A time has been picked: ', date);
-
-    // const time = moment(date).format('LT');
-    // console.log('time', time);
-
-    // var d = dates.toLocaleDateString();
-    // let currentDate = moment().format('DD/MM/YYYY');
-
-    // if (d == currentDate) {
-    //   console.log(
-    //     moment(time, 'hh:mm A').isAfter(moment()),
-    //     "moment(time, 'hh:mm A').isSameOrAfter(moment())"
-    //   );
-    //   if (moment(time, 'hh:mm A').isAfter(moment())) {
-    //     if (value == 'startTime') {
-    //       setStartTime(time);
-    //       setEndTime(time);
-    //       setTime(date);
-    //     }
-    //     if (value == 'endTime') {
-    //       setEndTime(time);
-    //     }
-    //     setOpenClock(false);
-    //   } else {
-    //     Alert.alert('Please select future time');
-    //   }
-    // } else {
-    //   if (value == 'startTime') {
-    //     setStartTime(time);
-    //     setEndTime(time);
-    //     setTime(date);
-    //   }
-    //   // if (value == 'endTime') {
-    //   //   setEndTime(time);
-    //   // }
-    //   setOpenClock(false);
-    // }
-    // console.log('startDate', startDate);
-    // console.log('endDate', endDate);
-    // console.log(startTime, 'startTime');
-    // console.log('value', value);
-
-    // if (startDate === endDate) {
-    //   console.log('-----');
-    //   if (moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A'))) {
-    //     if (value == 'endTime') {
-    //       setEndTime(time);
-    //     }
-    //     setOpenClock(false);
-    //   } else {
-    //     Alert.alert('Please select future time');
-    //   }
-    // } else {
-    //   if (value == 'endTime') {
-    //     console.log('+++++++++');
-    //     setEndTime(time);
-    //   }
-    //   // if (value == 'endTime') {
-    //   //   setEndTime(time);
-    //   // }
-    //   setOpenClock(false);
-    // }
-
     setOpenClock(false);
   };
+
+  // set date time from calendar model
   const handleConfirmCalendar = (date) => {
     if (isStartDate) {
       date = moment(date)
@@ -228,30 +192,6 @@ const AddMeetingDateAndTime = () => {
       setEndDateTime(date);
     }
 
-    // console.log('A date has been picked: ', date);
-
-    // const Date = moment(date).format('DD MMM,YYYY');
-    // const newDate = moment(date).format('YYYY-MM-DD');
-    // const time = moment(date).format('LT');
-    // console.log('time', time);
-    // console.log('new date', newDate);
-    // console.log('time', Date);
-    // if (value == 'startDate') {
-    //   setStartdate(Date);
-    //   setStartNewDate(newDate);
-    //   setDates(date);
-    //   setEnddate(Date);
-    //   setDate(date);
-    //   setStartTime(time);
-    //   setEndTime(time);
-    //   setTime(date);
-    // }
-    // if (value == 'endDate') {
-    //   setEnddate(Date);
-    //   setEndNewdate(newDate);
-    //   setDate(date);
-    //   setEndTime(time);
-    // }
     setOpenCalendar(false);
   };
 
@@ -260,6 +200,13 @@ const AddMeetingDateAndTime = () => {
       console.log(data.timeZone.items);
       if (data) {
         setTimeZone(data.timeZone.items);
+        let filterTimeZone = data?.timeZone?.items?.filter((time) => {
+          if (time.timeZone.split(' ')[0] == currentTimeZone) {
+            return time;
+          }
+        });
+        console.log('currentTimeZone', filterTimeZone);
+        setValueTimeZone(filterTimeZone[0]?.timeZoneId);
       }
     },
     onError: (data) => {
@@ -269,16 +216,6 @@ const AddMeetingDateAndTime = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        name={'Add meeting'}
-        rightIconName={IconName.Close}
-        onRightPress={() =>
-          navigation.navigate('Details', {
-            title: 'Meetings',
-            active: '0'
-          })
-        }
-      />
       <ScrollView style={styles.subContainer}>
         <View style={styles.progressContainer}>
           <Progress.Bar
@@ -391,7 +328,7 @@ const AddMeetingDateAndTime = () => {
 
           {/* dropdown timezone */}
           <DropDownPicker
-            data={timeZone?.map((item) => ({
+            data={timezone?.map((item) => ({
               label: item.timeZone,
               value: item.timeZoneId
             }))}
@@ -433,70 +370,6 @@ const AddMeetingDateAndTime = () => {
           date={isStartDate ? new Date(startDateTime) : new Date(endDateTime)}
         />
       </ScrollView>
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Divider */}
-        <Divider style={styles.divider} />
-        <View style={styles.buttonContainer}>
-          <Button
-            title={'Back'}
-            onPress={() => {
-              navigation.goBack();
-              setMeetingsData({
-                ...meetingsData,
-                startDateTime: startDateTime,
-                endDateTime: endDateTime,
-                TimeZone: valueTimeZone,
-                Repeat: valueRepeat
-              });
-            }}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Next'}
-            onPress={() => {
-              setMeetingsData({
-                ...meetingsData,
-                startDateTime: startDateTime,
-                endDateTime: endDateTime,
-                TimeZone: valueTimeZone,
-                Repeat: valueRepeat
-              });
-              navigation.navigate('AddMeetingLocation');
-            }}
-            layoutStyle={[
-              {
-                opacity:
-                  // startNewDate == '' ||
-                  endDate == '' ||
-                  startTime == '' ||
-                  endTime == '' ||
-                  valueTimeZone == '' ||
-                  valueRepeat == null
-                    ? 0.5
-                    : null
-              },
-              styles.nextBtnLayout
-            ]}
-            textStyle={styles.txtNextBtn}
-            disable={
-              // startNewDate == '' ||
-              endDate == '' ||
-              startTime == '' ||
-              endTime == '' ||
-              valueTimeZone == '' ||
-              valueRepeat == null
-                ? true
-                : false
-            }
-          />
-        </View>
-      </View>
     </SafeAreaView>
   );
 };

@@ -51,7 +51,15 @@ const AppointmentsList = () => {
     <SafeAreaView style={styles.container}>
       {/* header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            height: SIZES[24],
+            width: SIZES[24],
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
           <Icon
             name={IconName.Arrow_Left}
             height={SIZES[14]}
@@ -74,8 +82,8 @@ const AppointmentsList = () => {
               navigation.navigate('AddAppointmentGeneral');
             }}
             style={{
-              height: 20,
-              width: 20,
+              height: SIZES[24],
+              width: SIZES[24],
               alignItems: 'center',
               justifyContent: 'center'
             }}

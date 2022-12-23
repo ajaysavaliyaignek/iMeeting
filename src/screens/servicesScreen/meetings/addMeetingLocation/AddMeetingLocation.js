@@ -16,17 +16,14 @@ import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
-const AddMeetingLocation = () => {
+const AddMeetingLocation = ({
+  valueLocation,
+  setValueLocation,
+  valueVideoConference,
+  setValueVideoConference
+}) => {
   const navigation = useNavigation();
-  const { meetingsData, setMeetingsData } = useContext(UserContext);
 
-  console.log('meeting data from addmeetinglocation', meetingsData);
-  const [valueLocation, setValueLocation] = useState(
-    meetingsData?.location ? meetingsData?.location : null
-  );
-  const [valueVideoConference, setValueVideoConference] = useState(
-    meetingsData?.videoConference ? meetingsData?.videoConference : null
-  );
   const [platform, setPlatform] = useState(null);
   const [location, setLocation] = useState([]);
   const [error, setError] = useState(null);
@@ -65,12 +62,7 @@ const AddMeetingLocation = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        name={'Add meeting'}
-        rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
-      />
+    <View style={{ flex: 1 }}>
       <View style={styles.subContainer}>
         <View style={styles.progressContainer}>
           <Progress.Bar
@@ -148,62 +140,7 @@ const AddMeetingLocation = () => {
           value={valueVideoConference}
         />
       </View>
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Divider */}
-        <Divider style={styles.divider} />
-        <View
-          style={[styles.buttonContainer, { paddingHorizontal: SIZES[16] }]}
-        >
-          <Button
-            title={'Back'}
-            onPress={() => {
-              navigation.goBack();
-              setMeetingsData({
-                ...meetingsData,
-
-                location: valueLocation,
-                videoConference: valueVideoConference
-              });
-            }}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Next'}
-            onPress={() => {
-              setMeetingsData({
-                ...meetingsData,
-
-                location: valueLocation,
-                videoConference:
-                  valueVideoConference == null ? 0 : valueVideoConference
-              });
-              navigation.navigate('AddMeetingSubjects');
-            }}
-            layoutStyle={[
-              {
-                opacity:
-                  valueLocation == null || valueVideoConference == null
-                    ? 0.5
-                    : null
-              },
-              styles.nextBtnLayout
-            ]}
-            textStyle={styles.txtNextBtn}
-            disable={
-              valueLocation == null || valueVideoConference == null
-                ? true
-                : false
-            }
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -52,5 +52,15 @@ export const styles = StyleSheet.create({
     top: SIZES[60],
     right: SIZES[8],
     zIndex: 20
+  },
+  item: {
+    padding: SIZES[16],
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  textItem: {
+    flex: 1,
+    fontSize: SIZES[16]
   }
 });

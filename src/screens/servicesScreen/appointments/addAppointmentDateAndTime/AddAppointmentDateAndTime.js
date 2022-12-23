@@ -26,6 +26,7 @@ import { Button } from '../../../../component/button/Button';
 import { GET_TIMEZONE } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
+import { currentTimeZone } from '../../../../component/currentTimeZone/CurrentTimezone';
 
 const AddAppointmentDateAndTime = () => {
   const navigation = useNavigation();
@@ -111,11 +112,13 @@ const AddAppointmentDateAndTime = () => {
       if (moment(date).isBefore(moment(new Date()))) {
         console.log('start time issue');
         Alert.alert('Invalid start time');
+        // setStartDateTime(date);
         setOpenClock(false);
 
         return;
       }
       setStartDateTime(date);
+      setEndDateTime(date);
     } else {
       date = moment(date).date(endDateTime.date);
 
@@ -127,69 +130,7 @@ const AddAppointmentDateAndTime = () => {
       }
       setEndDateTime(date);
     }
-    // console.log('A time has been picked: ', date);
 
-    // const time = moment(date).format('LT');
-    // console.log('time', time);
-
-    // var d = dates.toLocaleDateString();
-    // let currentDate = moment().format('DD/MM/YYYY');
-
-    // if (d == currentDate) {
-    //   console.log(
-    //     moment(time, 'hh:mm A').isSameOrAfter(moment()),
-    //     "moment(time, 'hh:mm A').isSameOrAfter(moment())"
-    //   );
-    //   if (moment(time, 'hh:mm A').isAfter(moment())) {
-    //     if (value == 'startTime') {
-    //       setStartTime(time);
-    //       setEndTime(time);
-    //       setTime(date);
-    //     }
-    //     if (value == 'endTime') {
-    //       setEndTime(time);
-    //     }
-    //     setOpenClock(false);
-    //   } else {
-    //     Alert.alert('Please select future time');
-    //   }
-    // } else {
-    //   if (value == 'startTime') {
-    //     setStartTime(time);
-    //     setEndTime(time);
-    //     setTime(date);
-    //   }
-    //   // if (value == 'endTime') {
-    //   //   setEndTime(time);
-    //   // }
-    //   setOpenClock(false);
-    // }
-    // console.log(
-    //   moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A')),
-    //   'time compare'
-    // );
-    // console.log(startTime, 'startTime');
-    // if (value == 'endTime') {
-    //   if (startDate == endDate) {
-    //     if (moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A'))) {
-    //       if (value == 'startTime') {
-    //         setStartTime(time);
-    //         setEndTime(time);
-    //         setTime(date);
-    //       }
-    //       if (value == 'endTime') {
-    //         setEndTime(time);
-    //       }
-    //       setOpenClock(false);
-    //     } else {
-    //       Alert.alert('Please select future time');
-    //     }
-    //   } else {
-    //     if (value == 'endTime') {
-    //       setEndTime(time);
-    //     }
-    //   }
-    // }
     setOpenClock(false);
   };
   const handleConfirmCalendar = (date) => {
@@ -197,7 +138,7 @@ const AddAppointmentDateAndTime = () => {
       date = moment(date)
         .hour(moment(startDateTime).hour)
         .minute(moment(startDateTime).minute);
-      if (moment(date).isAfter(moment(new Date()))) {
+      if (moment(date).isBefore(moment(new Date()))) {
         console.log('start date issue');
         // Alert.alert('Invalid start date');
         setStartDateTime(date);
@@ -218,30 +159,7 @@ const AddAppointmentDateAndTime = () => {
       }
       setEndDateTime(date);
     }
-    // console.log('A date has been picked: ', date);
 
-    // const Date = moment(date).format('DD MMM,YYYY');
-    // const newDate = moment(date).format('YYYY-MM-DD');
-    // const time = moment(date).format('LT');
-    // console.log('time', time);
-    // console.log('new date', newDate);
-    // console.log('time', Date);
-    // if (value == 'startDate') {
-    //   setStartdate(Date);
-    //   setStartNewDate(newDate);
-    //   setDates(date);
-    //   setEnddate(Date);
-    //   setDate(date);
-    //   setStartTime(time);
-    //   setEndTime(time);
-    //   setTime(date);
-    // }
-    // if (value == 'endDate') {
-    //   setEnddate(Date);
-    //   setEndNewdate(newDate);
-    //   setDate(date);
-    //   setEndTime(time);
-    // }
     setOpenCalendar(false);
   };
 
@@ -250,6 +168,13 @@ const AddAppointmentDateAndTime = () => {
       console.log(data.timeZone.items);
       if (data) {
         setTimeZone(data.timeZone.items);
+        let filterTimeZone = data?.timeZone?.items?.filter((time) => {
+          if (time.timeZone.split(' ')[0] == currentTimeZone) {
+            return time;
+          }
+        });
+
+        setValueTimeZone(filterTimeZone[0]?.timeZoneId);
       }
     },
     onError: (data) => {
@@ -273,7 +198,7 @@ const AddAppointmentDateAndTime = () => {
       <Header
         name={'Add appointment'}
         rightIconName={IconName.Close}
-        onRightPress={() => navigation.goBack()}
+        onRightPress={() => navigation.navigate('AppointmentsList')}
       />
       <View style={styles.subContainer}>
         <View style={styles.progressContainer}>

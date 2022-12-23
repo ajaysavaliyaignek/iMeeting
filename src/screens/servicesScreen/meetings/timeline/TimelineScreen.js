@@ -37,14 +37,40 @@ const TimelineScreen = () => {
   const route = useRoute();
   const { selectedUsers } = route?.params;
   // console.log(' from timeline', selectedUsers);
-  const userId = selectedUsers?.map((user) => user.userId.toString()).join(',');
-  console.log('userId', userId);
 
   const [date, setDate] = useState(new Date());
   const [selected, setSelected] = useState(false);
   const [event, setEvents] = useState(null);
   const [items, setItems] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [timelineUser, setTimelineUser] = useState(selectedUsers);
+
+  useEffect(() => {
+    let selectForTimeline = selectedUsers.map((user) => {
+      let isSelectedForTimeline = true;
+      return { ...user, isSelectedForTimeline };
+    });
+    if (selectForTimeline) {
+      setTimelineUser(selectForTimeline);
+    }
+    // setTimelineUser(selectForTimeline);
+  }, []);
+
+  const userId = timelineUser
+    ?.map((user) => {
+      console.log('user', user);
+      if (user.isSelectedForTimeline == true) {
+        return user.userId.toString();
+      }
+    })
+    .join(',');
+
+  // if (userId.length > 1) {
+  //   return userId.join(',');
+  // } else {
+  //   return userId;
+  // }
+  console.log('userId', { userid: userId.toString() });
 
   const { data, error, loading } = useQuery(GET_TIMELINE_REVIEW, {
     variables: {
@@ -57,10 +83,9 @@ const TimelineScreen = () => {
       timeEnd: '11:59 PM'
     },
     onCompleted: (data) => {
-      console.log('timeline review data', data.timeReviewMobile.userEvents);
       Object.keys(data.timeReviewMobile.userEvents).forEach(function (key) {
         var value = data.timeReviewMobile.userEvents[key];
-        console.log('key', value);
+
         setEvents(value);
         // ...
       });
@@ -77,10 +102,6 @@ const TimelineScreen = () => {
     // });
   }, []);
 
-  console.log('events', event);
-  console.log('startTime', event?.startTime);
-  console.log('endTime', event?.endTime);
-
   useEffect(() => {
     if (event !== null) {
       setItems([
@@ -88,9 +109,7 @@ const TimelineScreen = () => {
           title: event,
           startDate: moment(event?.startTime, 'YYYY-MM-DD hh:mm A'),
           endDate: moment(event?.endTime, 'YYYY-MM-DD hh:mm A'),
-          //2022-12-02 07:58 AM
-          // startDate: moment('2022-12-01 03:54 PM', 'YYYY-MM-DD hh:mm a'),
-          // endDate: moment('2022-12-02 07:58 AM', 'YYYY-MM-DD hh:mm a'),
+
           color: '#FDF5F1',
           borderColor: '#E79D73'
         }
@@ -98,16 +117,7 @@ const TimelineScreen = () => {
     }
   }, [event]);
 
-  let datesWhitelist = [
-    {
-      start: moment(),
-      end: moment().add(3, 'days') // total 4 days enabled
-    }
-  ];
-  let datesBlacklist = [moment().add(1, 'days')];
-
   function MyItemCard({ style, item, dayIndex, daysTotal }) {
-    console.log('item from timeline', item);
     return (
       <TouchableOpacity
         style={{
@@ -128,7 +138,6 @@ const TimelineScreen = () => {
           initialNumToRender={3}
           data={item.title.events}
           renderItem={({ item, index }) => {
-            console.log('item ', item);
             return (
               <View
                 style={{
@@ -153,33 +162,6 @@ const TimelineScreen = () => {
             );
           }}
         />
-        {/* {item.title.map((ite, index) => {
-            return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginLeft: SIZES[4],
-                  marginBottom: SIZES[4]
-                }}
-                key={index}
-              >
-                <Avatar
-                  source={'https://picsum.photos/200/300'}
-                  size={SIZES[24]}
-                />
-                <Text
-                  style={{
-                    ...Fonts.PoppinsSemiBold[14],
-                    color: Colors.bold,
-                    marginLeft: SIZES[8]
-                  }}
-                >
-                  {ite.title}
-                </Text>
-              </View>
-            );
-          })} */}
 
         <Text
           style={{
@@ -234,7 +216,12 @@ const TimelineScreen = () => {
         <TouchableOpacity
           style={styles.usersView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('SelectUser', { selectedUsers })}
+          onPress={() =>
+            navigation.navigate('SelectUser', {
+              selectedUsers: timelineUser,
+              setTimelineUser: setTimelineUser
+            })
+          }
         >
           <Text style={styles.txtUsers}>Users</Text>
           <View style={styles.btnCommittees}>
@@ -251,7 +238,7 @@ const TimelineScreen = () => {
         <Divider style={styles.divider} />
 
         <CalendarStrip
-          calendarAnimation={{ type: 'sequence', duration: 30 }}
+          // calendarAnimation={{ type: 'sequence', duration: 30 }}
           style={{ height: 100, marginTop: SIZES[16] }}
           calendarHeaderPosition={'above'}
           // calendarHeaderFormat={moment(date).format('MMMM DD,YYYY')}
@@ -327,6 +314,7 @@ const TimelineScreen = () => {
             date={date} // optional
             // range={range} // optional
             // width={width - 40}
+            theme={{ text: Colors.bold }}
             hideNowLine={true}
             linesLeftInset={-5}
             linesTopOffset={20}

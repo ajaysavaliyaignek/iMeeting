@@ -6,7 +6,7 @@ import Loader from '../../Loader/Loader';
 import SubjectsCard from '../../Cards/subjectCard/SubjectsCard';
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
-import { GET_All_SUBJECTS } from '../../../graphql/query';
+import { GET_All_SUBJECTS, GET_USER_PAYLOAD } from '../../../graphql/query';
 
 const SubjectListComponent = ({
   meetingId,
@@ -19,6 +19,7 @@ const SubjectListComponent = ({
 }) => {
   const [filterData, setFilterData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
+  const [userData, setUserData] = useState([]);
   const AllTypesSubjects = 0;
   let queryParams = {};
 
@@ -99,6 +100,7 @@ const SubjectListComponent = ({
               download={download}
               deleted={deleted}
               editable={editable}
+              userData={userData}
             />
           )}
         />

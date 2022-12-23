@@ -5,7 +5,7 @@ interface Style {
   scrollViewStyle: ViewStyle;
 }
 
-export default StyleSheet.create<Style>({
+export default StyleSheet.create({
   scrollViewStyle: {
     flexGrow: 1,
   },

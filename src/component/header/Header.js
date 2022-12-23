@@ -34,7 +34,7 @@ const Header = ({
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={onLeftPress}
-            style={style}
+            style={[{}, style]}
           >
             <Icon
               name={leftIconName}
@@ -66,7 +66,16 @@ const Header = ({
           </Text>
 
           {/* rightIconName */}
-          <TouchableOpacity activeOpacity={0.5} onPress={onRightPress}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={onRightPress}
+            style={{
+              height: SIZES[24],
+              width: SIZES[24],
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <Icon name={rightIconName} height={SIZES[14]} width={SIZES[14]} />
           </TouchableOpacity>
         </View>

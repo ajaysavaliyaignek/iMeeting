@@ -6,9 +6,9 @@ import {
   Animated,
 } from "react-native";
 
-import { Fonts } from '../../../../../themes';
-import { Colors } from '../../../../..//themes/Colors';
-import { SIZES } from '../../../../../themes/Sizes';
+import { Fonts } from '../../../themes';
+import { Colors } from '../../../themes/Colors';
+import { SIZES } from '../../../themes/Sizes';
 
 export const _container = (
   borderColor: string,
@@ -41,9 +41,10 @@ interface Style {
   pollItemContainer: ViewStyle;
   percentageTextStyle: TextStyle;
   checkMarkImageStyle: ImageStyle;
+  votesCount: TextStyle;
 }
 
-export default StyleSheet.create<Style>({
+export default StyleSheet.create({
   container: {},
   choiceTextStyle: {
     flexShrink: 1,

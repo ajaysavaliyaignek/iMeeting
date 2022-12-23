@@ -369,6 +369,7 @@ export const GET_All_SUBJECTS = gql`
         subjectTitle
         userId
         statusTitle
+        statusId
         meetingId
       }
       pageSize

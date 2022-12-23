@@ -29,33 +29,33 @@ import { UPDATE_MEETING } from '../../../../graphql/mutation';
 import { UserContext } from '../../../../context';
 import Loader from '../../../../component/Loader/Loader';
 
-const AddMeetingSubjects = () => {
+const AddMeetingSubjects = ({
+  calendarValue,
+  setCalendarValue,
+  previousSubject,
+  setPreviousSubject,
+  committee
+}) => {
   const navigation = useNavigation();
 
   const { selectedSubjects, setSelectedUsers, meetingsData, setMeetingsData } =
     useContext(UserContext);
 
-  console.log('meetingsData', meetingsData);
-
-  const [calendarValue, setCalendarValue] = useState(
-    meetingsData?.deadlineDate
-      ? meetingsData?.deadlineDate
-      : moment(new Date()).format('YYYY-MM-DD')
-  );
+  // const [calendarValue, setCalendarValue] = useState(
+  //   meetingsData?.deadlineDate
+  //     ? meetingsData?.deadlineDate
+  //     : moment(new Date()).format('YYYY-MM-DD')
+  // );
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState([]);
   const [subjectsId, setSubjectsId] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
-  const [previousSubject, setPreviousSubject] = useState(
-    meetingsData.subjects == undefined ? [] : meetingsData.subjects
-  );
-  let subjects = [];
+  // const [previousSubject, setPreviousSubject] = useState(
+  //   meetingsData.subjects == undefined ? [] : meetingsData.subjects
+  // );
 
   let backUpUser = [];
-
-  subjects = previousSubject?.map((item) => item.subjectId);
-  console.log('userId', subjects);
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
@@ -162,18 +162,7 @@ const AddMeetingSubjects = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        name={'Add meeting'}
-        rightIconName={IconName.Close}
-        onRightPress={() =>
-          navigation.navigate('Details', {
-            title: 'Meetings',
-            active: '0'
-          })
-        }
-      />
-
+    <View style={styles.container}>
       <View style={styles.subContainer}>
         <View style={styles.progressContainer}>
           <Progress.Bar
@@ -254,7 +243,7 @@ const AddMeetingSubjects = () => {
               textStyle={styles.txtCancelButton}
               onPress={() =>
                 navigation.navigate('SelectSubjects', {
-                  committee: meetingsData.committee,
+                  committee: committee,
                   onUpdateSelection: onUpdateSelection,
                   previosSubjects: previousSubject
                 })
@@ -263,110 +252,7 @@ const AddMeetingSubjects = () => {
           </View>
         </ScrollView>
       </View>
-      {addMeetingLoading ? (
-        <Loader />
-      ) : (
-        <View
-          style={{
-            backgroundColor: Colors.white,
-            justifyContent: 'flex-end'
-          }}
-        >
-          {/* Divider */}
-          <Divider style={styles.divider} />
-          <View
-            style={[styles.buttonContainer, { paddingHorizontal: SIZES[16] }]}
-          >
-            <Button
-              title={'Back'}
-              onPress={() => {
-                navigation.goBack();
-                setMeetingsData({
-                  ...meetingsData,
-                  subjectid: subjectsId,
-                  deadlineDate: calendarValue,
-                  subjects: previousSubject
-                });
-              }}
-              layoutStyle={styles.cancelBtnLayout}
-              textStyle={styles.txtCancelButton}
-            />
-            <Button
-              title={'Submit'}
-              onPress={() => {
-                console.log('add meeting data', {
-                  attachFileIds: meetingsData.attachFiles,
-                  committeeId: meetingsData.committee,
-                  creatorName: '',
-                  description: meetingsData.discription,
-                  endDate: moment(meetingsData.endDateTime).format(
-                    'YYYY-MM-DD'
-                  ),
-                  endTime: moment(meetingsData.endDateTime).format('LT'),
-                  locationId: meetingsData.location,
-                  meetingId: 0,
-                  meetingTitle: meetingsData.title,
-
-                  platformId: meetingsData.videoConference,
-                  repeat: meetingsData.Repeat,
-                  repeatName: meetingsData.Repeat,
-                  required: meetingsData.userRequired,
-                  setDate: moment(meetingsData.startDateTime).format(
-                    'YYYY-MM-DD'
-                  ),
-                  setTime: moment(meetingsData.startDateTime).format('LT'),
-                  subjectIds: subjects,
-                  timeZone: meetingsData.TimeZone,
-                  userIds: meetingsData.users,
-                  subjectStatusIds: [],
-                  meetingStatusId: 0,
-                  deadlineDate: calendarValue
-                });
-                addMeeting({
-                  variables: {
-                    meeting: {
-                      attachFileIds: meetingsData.attachFiles,
-                      committeeId: meetingsData.committee,
-                      creatorName: '',
-                      description: meetingsData.discription,
-                      endDate: moment(meetingsData.endDateTime).format(
-                        'YYYY-MM-DD'
-                      ),
-                      endTime: moment(meetingsData.endDateTime).format('LT'),
-                      locationId: meetingsData.location,
-                      meetingId: 0,
-                      meetingTitle: meetingsData.title,
-
-                      platformId: meetingsData.videoConference,
-                      repeat: meetingsData.Repeat,
-
-                      required: meetingsData.userRequired,
-                      setDate: moment(meetingsData.startDateTime).format(
-                        'YYYY-MM-DD'
-                      ),
-                      setTime: moment(meetingsData.startDateTime).format('LT'),
-                      subjectIds: subjects,
-                      timeZone: meetingsData.TimeZone,
-                      userIds: meetingsData.users,
-                      subjectStatusIds: [],
-                      meetingStatusId: 0,
-                      deadlineDate: calendarValue
-                    }
-                  }
-                });
-              }}
-              layoutStyle={[
-                // {
-                //     opacity: title === "" || discription === "" ? 0.5 : null,
-                // },
-                styles.nextBtnLayout
-              ]}
-              textStyle={styles.txtNextBtn}
-            />
-          </View>
-        </View>
-      )}
-    </SafeAreaView>
+    </View>
   );
 };
 

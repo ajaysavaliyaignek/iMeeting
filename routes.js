@@ -66,6 +66,7 @@ import FilterTask from './src/screens/servicesScreen/tasks/filterTask/FilterTask
 import LiveMeetingMenu from './src/screens/liveMetting/liveMeetingMenu/LiveMeetingMenu';
 import AddSpeaker from './src/screens/liveMetting/addSpeaker/AddSpeaker';
 import AddVoting from './src/screens/liveMetting/addVoting/AddVoting';
+import AddMeeting from './src/screens/servicesScreen/meetings/addMeeting/AddMeeting';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -268,10 +269,7 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="SubjectDetails" component={SubjectDetails} />
       <Stack.Screen name="EditSubject" component={EditSubjectScreen} />
       <Stack.Screen name="SubjectDownload" component={SubjectDownload} />
-      <Stack.Screen
-        name="AddMeetingGeneral"
-        component={AddMeetingGeneralScreen}
-      />
+      <Stack.Screen name="AddMeetingGeneral" component={AddMeeting} />
       <Stack.Screen
         name="EditMeetingGeneral"
         component={EditMeetingGeneralScreen}

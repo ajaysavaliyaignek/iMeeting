@@ -43,7 +43,9 @@ export const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    marginRight: SIZES[12]
+    marginRight: SIZES[12],
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold
   },
   dateTimeRowView: {
     flexDirection: 'row',

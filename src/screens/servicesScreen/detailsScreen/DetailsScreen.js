@@ -93,7 +93,15 @@ const DetailsScreen = () => {
         activeOpacity={1}
       >
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{
+              height: SIZES[24],
+              width: SIZES[24],
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <Icon
               name={IconName.Arrow_Left}
               height={SIZES[14]}
@@ -122,6 +130,13 @@ const DetailsScreen = () => {
                 } else if (activeTab === '1') {
                   navigation.navigate('AddSubject', { committee: null });
                 }
+              }}
+              activeOpacity={0.5}
+              style={{
+                height: SIZES[24],
+                width: SIZES[24],
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
               <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />

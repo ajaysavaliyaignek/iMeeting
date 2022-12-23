@@ -3,10 +3,10 @@ import { Fonts } from '../../themes';
 import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
 
-export const getHighlightedText = (txt, searchText) => {
+export const getHighlightedText = (txt, searchText, styleTitle) => {
   const parts = txt?.split(new RegExp(`(${searchText})`, 'gi'));
   return (
-    <Text style={{ width: '80%', marginLeft: SIZES[8] }} numberOfLines={1}>
+    <Text style={[{ width: '80%' }, styleTitle]} numberOfLines={1}>
       {parts.map((part) =>
         part.toUpperCase() === searchText.toUpperCase() ? (
           <Text

@@ -20,20 +20,29 @@ import { UserContext } from '../../../../context';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 
-const AddMeetingGeneralScreen = () => {
+const AddMeetingGeneralScreen = ({
+  setActiveScreen,
+  setDiscription,
+  setValue,
+  setTitle,
+  setFilesId,
+  valueCommitee,
+  title,
+  discription,
+  setFileResponse,
+  fileResponse,
+  filesId
+}) => {
   const navigation = useNavigation();
-  const [title, setTitle] = useState('');
-  const [discription, setDiscription] = useState('');
-  const [open, setOpen] = useState(false);
-  const [valueCommitee, setValue] = useState(null);
+  // const [title, setTitle] = useState('');
+  // const [discription, setDiscription] = useState('');
+  // const [valueCommitee, setValue] = useState(null);
   const [committee, setCommittee] = useState(null);
-  const [items, setItems] = useState([{ label: 'Design', value: 'design' }]);
-  const [fileResponse, setFileResponse] = useState([]);
-  const [filesId, setFilesId] = useState(null);
+  // const [fileResponse, setFileResponse] = useState([]);
+  // const [filesId, setFilesId] = useState(null);
   const [token, setToken] = useState('');
-  const { meetingsData, setMeetingsData } = useContext(UserContext);
 
-  const [fetchFile, getFile] = useLazyQuery(GET_FILE);
+  const { meetingsData, setMeetingsData } = useContext(UserContext);
 
   // fetch commitees
   const {
@@ -43,7 +52,6 @@ const AddMeetingGeneralScreen = () => {
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     variables: { head: true, secretary: true, member: false },
     onCompleted: (data) => {
-      console.log('committees by  role', data?.committeesByRole.items);
       if (data) {
         setCommittee(data?.committeesByRole?.items);
       }
@@ -64,83 +72,14 @@ const AddMeetingGeneralScreen = () => {
     setToken(JSON.parse(user)?.dataToken);
   };
 
-  const handleDocumentSelection = useCallback(async () => {
-    try {
-      const response = await DocumentPicker.pickMultiple({
-        presentationStyle: 'fullScreen',
-        type: [DocumentPicker.types.allFiles],
-        allowMultiSelection: true,
-        copyTo: 'cachesDirectory'
-      });
-      const url = await AsyncStorage.getItem('@url');
-      const user = await AsyncStorage.getItem('@token');
-
-      // console.log('file response', response);
-      console.log('token', user);
-      response.map((res) => {
-        if (res !== null) {
-          const formData = new FormData();
-          formData.append('file', res);
-          console.log('formdata', formData);
-          console.log('companyUrl', url);
-
-          fetch(`https://${url}//o/imeeting-rest/v1.0/file-upload`, {
-            method: 'POST',
-            headers: {
-              Authorization: 'Bearer ' + `${user}`,
-              'Content-Type': 'multipart/form-data'
-            },
-            body: formData
-          })
-            .then((response) => response.json())
-            .then((responseData) => {
-              console.log('response data', responseData);
-              if (responseData) {
-                setFileResponse((prev) => {
-                  const pevDaa = prev.filter((ite) => {
-                    return ite.fileEnteryId !== responseData.fileEnteryId;
-                  });
-                  return [...pevDaa, responseData];
-                });
-              }
-            })
-
-            .catch((e) => console.log('file upload error--', e));
-        }
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
   useEffect(() => {
     const fileId = fileResponse.map((file) => file.fileEnteryId);
 
     setFilesId(fileId);
   }, [fileResponse]);
 
-  const removeFile = (file) => {
-    setFileResponse((prev) => {
-      const pevDaa = prev.filter((ite) => {
-        return ite.fileEnteryId !== file.fileEnteryId;
-      });
-      return [...pevDaa];
-    });
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        name={'Add meeting'}
-        rightIconName={IconName.Close}
-        onRightPress={() =>
-          navigation.navigate('Details', {
-            title: 'Meetings',
-            active: '0'
-          })
-        }
-      />
-
+    <View style={{ flex: 1 }}>
       <View style={styles.subContainer}>
         <View style={styles.progressContainer}>
           <Progress.Bar
@@ -172,6 +111,7 @@ const AddMeetingGeneralScreen = () => {
           <View style={styles.discriptionContainer}>
             <Text style={styles.txtTitle}>TITLE</Text>
             <TextInput
+              value={title}
               style={styles.textInput}
               onChangeText={(text) => {
                 setTitle(text);
@@ -186,6 +126,7 @@ const AddMeetingGeneralScreen = () => {
               onChangeText={(text) => {
                 setDiscription(text);
               }}
+              value={discription}
             />
           </View>
 
@@ -203,47 +144,7 @@ const AddMeetingGeneralScreen = () => {
           />
         </ScrollView>
       </View>
-
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Divider */}
-        <Divider style={styles.divider} />
-        <View style={styles.buttonContainer}>
-          <Button
-            disable={
-              title == '' || discription == '' || valueCommitee == null
-                ? true
-                : false
-            }
-            title={'Next'}
-            onPress={() => {
-              setMeetingsData({
-                ...meetingsData,
-                attachFiles: filesId,
-                committee: valueCommitee,
-                title: title,
-                discription: discription
-              });
-              navigation.navigate('AddMeetingUser');
-            }}
-            layoutStyle={[
-              {
-                opacity:
-                  title === '' || discription === '' || valueCommitee == null
-                    ? 0.5
-                    : null
-              },
-              styles.nextBtnLayout
-            ]}
-            textStyle={styles.txtNextBtn}
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

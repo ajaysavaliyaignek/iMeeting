@@ -43,7 +43,6 @@ const UserDetailsCard = ({
 }) => {
   const [userDetails, setUserDetails] = useState(null);
   const [valueStatus, setValueStatus] = useState(item.status);
-  const [open, setOpen] = useState(false);
   const [statusItems, setStatusItems] = useState([
     {
       label: 'Waiting',
@@ -193,6 +192,10 @@ const UserDetailsCard = ({
                 flex: 1,
                 paddingLeft: '30%'
               }}
+              itemTextStyle={{
+                ...Fonts.PoppinsRegular[14],
+                color: Colors.bold
+              }}
               placeholder={item.status}
               disable={
                 item.roleName == 'Head' || item.roleName == 'Secretary'
@@ -213,18 +216,6 @@ const UserDetailsCard = ({
                   : Colors.bold
               }
               onChange={(items) => {
-                // setValueStatus(items.value);
-
-                // updateSpeaker({
-                //   variables: {
-                //     userDetail: {
-                //       userId: item.userId,
-                //       meetingId: meetingId,
-                //       duration: item.duration,
-                //       status: items.value
-                //     }
-                //   }
-                // });
                 console.log('on change', items);
               }}
               selectedTextStyle={{
@@ -297,7 +288,8 @@ const UserDetailsCard = ({
             item.userName == undefined
               ? item.firstName + ' ' + item.familyName
               : item.userName,
-            searchText
+            searchText,
+            (styleTitle = { marginLeft: SIZES[8] })
           )}
         </View>
         <View
