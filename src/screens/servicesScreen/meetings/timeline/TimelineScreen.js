@@ -28,7 +28,6 @@ import { useQuery } from '@apollo/client';
 import { GET_TIMELINE_REVIEW } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
 import EventCalendar from 'react-native-events-calendar';
-import { Data } from 'victory-core';
 
 const TimelineScreen = () => {
   const { width, height } = useWindowDimensions();
@@ -37,13 +36,17 @@ const TimelineScreen = () => {
   const route = useRoute();
   const { selectedUsers } = route?.params;
   // console.log(' from timeline', selectedUsers);
+  let userId = [];
 
   const [date, setDate] = useState(new Date());
   const [selected, setSelected] = useState(false);
   const [event, setEvents] = useState(null);
   const [items, setItems] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [timelineUser, setTimelineUser] = useState(selectedUsers);
+  const [timelineUser, setTimelineUser] = useState([]);
+  const [selectUser, setSelectuser] = useState([]);
+  const [userIds, setUserIds] = useState([]);
+  console.log('selectUser', selectUser);
 
   useEffect(() => {
     let selectForTimeline = selectedUsers.map((user) => {
@@ -52,32 +55,26 @@ const TimelineScreen = () => {
     });
     if (selectForTimeline) {
       setTimelineUser(selectForTimeline);
+      setSelectuser(selectForTimeline);
     }
     // setTimelineUser(selectForTimeline);
   }, []);
 
-  const userId = timelineUser
-    ?.map((user) => {
-      console.log('user', user);
-      if (user.isSelectedForTimeline == true) {
-        return user.userId.toString();
-      }
-    })
-    .join(',');
+  useEffect(() => {
+    const userId = selectUser?.map((com) => {
+      return com.userId;
+    });
+    setUserIds(userId?.join());
+  }, [selectUser]);
 
-  // if (userId.length > 1) {
-  //   return userId.join(',');
-  // } else {
-  //   return userId;
-  // }
-  console.log('userId', { userid: userId.toString() });
+  console.log('userIds', { userid: userIds });
 
   const { data, error, loading } = useQuery(GET_TIMELINE_REVIEW, {
     variables: {
       startTime: `${moment(date).format('YYYY-MM-DD')} 00:00 AM `,
       endTime: `${moment(date).format('YYYY-MM-DD')} 11:59 PM `,
       date: moment(date).format('YYYY-MM-DD'),
-      requiredUserIds: userId,
+      requiredUserIds: userIds,
       optionalUserIds: '',
       timeStart: '00:00 AM',
       timeEnd: '11:59 PM'
@@ -94,13 +91,6 @@ const TimelineScreen = () => {
       console.log('timeline error', data);
     }
   });
-
-  const onEventClick = React.useCallback((event) => {
-    console.log('pressed event', event.event.title);
-    // toast({
-    //   message: event.event.title
-    // });
-  }, []);
 
   useEffect(() => {
     if (event !== null) {
@@ -219,7 +209,10 @@ const TimelineScreen = () => {
           onPress={() =>
             navigation.navigate('SelectUser', {
               selectedUsers: timelineUser,
-              setTimelineUser: setTimelineUser
+              setTimelineUser: setTimelineUser,
+
+              selectUser,
+              setSelectuser
             })
           }
         >
@@ -238,7 +231,7 @@ const TimelineScreen = () => {
         <Divider style={styles.divider} />
 
         <CalendarStrip
-          // calendarAnimation={{ type: 'sequence', duration: 30 }}
+          calendarAnimation={{ type: 'sequence', duration: 30 }}
           style={{ height: 100, marginTop: SIZES[16] }}
           calendarHeaderPosition={'above'}
           // calendarHeaderFormat={moment(date).format('MMMM DD,YYYY')}

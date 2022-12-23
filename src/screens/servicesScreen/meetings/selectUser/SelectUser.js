@@ -8,17 +8,48 @@ import { SIZES } from '../../../../themes/Sizes';
 import CheckBox from '../../../../component/checkBox/CheckBox';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import TimeLineSelectUserComponent from './TimeLineSelectUserComponent';
+import { Divider } from 'react-native-paper';
+import { Button } from '../../../../component/button/Button';
+import { Colors } from '../../../../themes/Colors';
 
 const SelectUser = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { selectedUsers, setTimelineUser } = route?.params;
+  const { selectedUsers, setSelectuser } = route?.params;
 
   const [requiredSwitchOn, setRequiredSwitchOn] = useState(false);
   const [optionalSwitchOn, setOptionalSwitchOn] = useState(false);
   const [optionalCheckbox, setOptionalCheckBox] = useState(false);
   const [requiredUsers, setRequiredUsers] = useState([]);
   const [optionalUser, setOptionalUser] = useState([]);
+
+  const setSelectedUser = () => {
+    const selectedUserList = [];
+    selectedUsers.map((user) => {
+      if (user.isSelectedForTimeline) {
+        selectedUserList.push(user);
+        // console.log('selectCommittee', selectCommittee);
+      }
+    });
+
+    setSelectuser(selectedUserList);
+    navigation.goBack();
+  };
+
+  const onChecked = (item) => {
+    requiredUsers?.map((user) => {
+      if (user.userId === item.userId) {
+        user.isSelectedForTimeline = !user.isSelectedForTimeline;
+      }
+    });
+    setRequiredUsers([...requiredUsers]);
+    optionalUser?.map((user) => {
+      if (user.userId === item.userId) {
+        user.isSelectedForTimeline = !user.isSelectedForTimeline;
+      }
+    });
+    setOptionalUser([...optionalUser]);
+  };
 
   useEffect(() => {
     selectedUsers?.map((user) => {
@@ -38,14 +69,6 @@ const SelectUser = () => {
     // setRequiredUsers([...requiredUsers]);
   }, [selectedUsers]);
 
-  const onChecked = (item) => {
-    selectedUsers.map((user) => {
-      if (user.userId === item.userId) {
-        user.isSelectedForTimeline = !user.isSelectedForTimeline;
-      }
-    });
-    setTimelineUser([...selectedUsers]);
-  };
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -96,6 +119,31 @@ const SelectUser = () => {
               />
             );
           })}
+        </View>
+      </View>
+      <View
+        style={{
+          backgroundColor: Colors.white,
+          justifyContent: 'flex-end'
+        }}
+      >
+        {/* Divider */}
+        <Divider style={styles.divider} />
+        <View style={styles.buttonContainer}>
+          <Button
+            title={'Cancel'}
+            onPress={() => navigation.goBack()}
+            layoutStyle={styles.cancelBtnLayout}
+            textStyle={styles.txtCancelButton}
+          />
+          <Button
+            title={'Save'}
+            onPress={() => {
+              setSelectedUser();
+            }}
+            layoutStyle={styles.nextBtnLayout}
+            textStyle={styles.txtNextBtn}
+          />
         </View>
       </View>
     </SafeAreaView>

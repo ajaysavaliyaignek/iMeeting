@@ -1,25 +1,14 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TextInput,
-  TouchableOpacity,
-  Alert
-} from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
-import Voice from '@react-native-community/voice';
 
 import { SIZES } from '../../../../themes/Sizes';
 import { Colors } from '../../../../themes/Colors';
 import { Icon, IconName } from '../../../../component';
-import Header from '../../../../component/header/Header';
-import { Button } from '../../../../component/button/Button';
 import { styles } from './styles';
-import { UserContext } from '../../../../context';
 import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
 const AddMeetingUser = ({ previousUser, setPreviousUser, committee }) => {
