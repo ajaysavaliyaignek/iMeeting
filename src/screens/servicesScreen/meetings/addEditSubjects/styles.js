@@ -6,7 +6,6 @@ import { SIZES } from '../../../../themes/Sizes';
 export const styles = StyleSheet.create({
   container: { flex: 1 },
   subContainer: {
-    paddingTop: SIZES[16],
     backgroundColor: Colors.white,
     flex: 1
   },

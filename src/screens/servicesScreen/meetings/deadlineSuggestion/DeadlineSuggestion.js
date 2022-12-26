@@ -60,7 +60,9 @@ const DeadlineSuggestion = () => {
           current={calendarDate}
           onDayPress={(date) => {
             console.log('date', date.dateString);
-            setCalendarValue(date.dateString);
+            setCalendarValue((prev) => {
+              return { ...prev, calendarValue: date.dateString };
+            });
             navigation.goBack();
           }}
           minDate={new Date()}

@@ -163,7 +163,7 @@ const TasksList = () => {
             </Text>
           </View>
         ) : Tasks.loading ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>

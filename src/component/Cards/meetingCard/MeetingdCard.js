@@ -180,7 +180,19 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
 
               setVisibleIndex(-1);
 
-              navigation.navigate('EditMeetingGeneral', { item });
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Edit meeting',
+                type: 'Meeting',
+                screensArray: [
+                  'general',
+                  'users',
+                  'dateandtime',
+                  'location',
+                  'subjects'
+                ],
+                isEdit: true,
+                details: item
+              });
             }}
             subjectStatus={item.meetingStatusTitle}
             editable={role == 'Head' || role == 'Secretary' ? true : false}

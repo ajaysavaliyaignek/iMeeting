@@ -9,7 +9,7 @@ import {
 import React, { useContext, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { Divider, TextInput } from 'react-native-paper';
-import { ApolloProvider, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Icon, IconName } from '../../../component';
@@ -20,6 +20,7 @@ import { SIZES } from '../../../themes/Sizes';
 import { styles } from './styles';
 import Loader from '../../../component/Loader/Loader';
 import { UserContext } from '../../../context';
+import { Colors } from '../../../themes/Colors';
 
 const LoginScreen = ({ navigation }) => {
   const [url, setUrl] = useState('');
@@ -32,10 +33,16 @@ const LoginScreen = ({ navigation }) => {
   const [loadingLogin, setLoading] = useState(false);
   const { companyUrl, setCompanyUrl } = useContext(UserContext);
 
+  // Query for get client id and client secret
+  // For this query need company url
   const [getAuth, { loading, data }] = useLazyQuery(GET_AUTH, {
     onCompleted: (data) => {
       console.log(data);
+
+      // set client id
       setClientId(data.oAuth2Application.clientId);
+
+      // set Client secret
       setClientSecret(data.oAuth2Application.clientSecret);
       setError(data.error);
       if (
@@ -53,16 +60,17 @@ const LoginScreen = ({ navigation }) => {
     }
   });
 
+  // For store user data in async storage
   const storeToken = async (user) => {
-    console.log('store data called-----');
     try {
       await AsyncStorage.setItem('@user', JSON.stringify(user));
     } catch (error) {
       console.log(error);
     }
   };
+
+  // For store company url in async storage
   const storeUrl = async (url) => {
-    console.log('store data called-----', url);
     if (!url) return;
     try {
       const savedToken = await AsyncStorage.setItem('@url', url);
@@ -71,8 +79,9 @@ const LoginScreen = ({ navigation }) => {
       console.log(error);
     }
   };
+
+  // For store token in async storage
   const storeUserToken = (token) => {
-    console.log('store data called-----');
     try {
       AsyncStorage.setItem('@token', token);
     } catch (error) {
@@ -80,6 +89,9 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  // For user login
+  // for login required  clientId,clientSecret,userName,password
+  // In this function we get user token
   const Login = async () => {
     setLoading(true);
     const formData = new URLSearchParams();
@@ -88,13 +100,9 @@ const LoginScreen = ({ navigation }) => {
     formData.append('grant_type', 'password');
     formData.append('username', userName);
     formData.append('password', password);
-    console.log('client_id', clientId.toString());
-    console.log('client_secret', clientSecret.toString());
-    console.log('grant_type', 'password');
-    console.log('username', userName);
-    console.log('password', password);
+
+    // get company url from asyncstorage
     const Companyurl = await AsyncStorage.getItem('@url');
-    console.log('comapny url from login', companyUrl);
 
     if (clientId !== '' && clientSecret !== '') {
       try {
@@ -124,7 +132,8 @@ const LoginScreen = ({ navigation }) => {
               console.log(user);
               storeToken(user);
               storeUserToken(dataToken);
-              // navigation.navigate('MainBottomTab');
+
+              // after login success it redirect to the services screen
               navigation.reset({
                 index: 0,
                 routes: [{ name: 'MainBottomTab' }]
@@ -148,6 +157,7 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  // this function is used for refresh token when it expired
   const refreshToken = async () => {
     const formData = new URLSearchParams();
     formData.append('client_id', clientId);
@@ -155,12 +165,7 @@ const LoginScreen = ({ navigation }) => {
     formData.append('grant_type', 'password');
     formData.append('username', userName);
     formData.append('password', password);
-    console.log('client_id', clientId.toString());
-    console.log('client_secret', clientSecret.toString());
-    console.log('grant_type', 'password');
-    console.log('username', userName);
-    console.log('password', password);
-    console.log('url', url);
+
     const Companyurl = await AsyncStorage.getItem('@url');
 
     if (clientId !== '' && clientSecret !== '') {
@@ -207,13 +212,15 @@ const LoginScreen = ({ navigation }) => {
       >
         {/* header */}
         <Text style={styles.txtHeader}>Log in</Text>
+
+        {/* show error during login */}
         {error && (
           <View style={styles.errorView}>
             <Text style={{ color: 'red' }}>{error}</Text>
           </View>
         )}
 
-        {/* url-input */}
+        {/* company url-input */}
         <Input
           onChangeText={(text) => {
             setUrl(text);
@@ -301,15 +308,6 @@ const LoginScreen = ({ navigation }) => {
         />
       </ScrollView>
 
-      {/* create account button */}
-      {/* <TouchableOpacity
-        onPress={() => navigation.push("CreateAccount")}
-        activeOpacity={0.5}
-        style={styles.createButtonContainer}
-      >
-        <Text style={styles.txtCreateAccount}>Create an account</Text>
-      </TouchableOpacity> */}
-
       <View
         style={{
           justifyContent: 'flex-end'
@@ -321,7 +319,10 @@ const LoginScreen = ({ navigation }) => {
         {/* login button */}
         <View style={styles.btnView}>
           {loadingLogin ? (
-            <Loader layOutStyle={{ paddingVertical: SIZES[10] }} />
+            <Loader
+              layOutStyle={{ paddingVertical: SIZES[10] }}
+              color={Colors.primary}
+            />
           ) : (
             <Button
               onPress={Login}
@@ -341,21 +342,6 @@ const LoginScreen = ({ navigation }) => {
               textStyle={styles.txtButton}
             />
           )}
-          {/* <Button
-            onPress={Login}
-            title={'Log in'}
-            disable={
-              url === '' || userName === '' || password === '' ? true : false
-            }
-            layoutStyle={[
-              {
-                opacity:
-                  url === '' || userName === '' || password === '' ? 0.5 : null
-              },
-              styles.loginButton
-            ]}
-            textStyle={styles.txtButton}
-          /> */}
         </View>
       </View>
     </SafeAreaView>

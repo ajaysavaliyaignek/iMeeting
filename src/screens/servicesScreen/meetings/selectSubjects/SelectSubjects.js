@@ -26,7 +26,8 @@ const SelectSubjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { committee, onUpdateSelection, previosSubjects } = route?.params;
+  const { meetingName, committee, onUpdateSelection, previosSubjects } =
+    route?.params;
   console.log('committee from select subjects', committee.toString());
   const [searchText, setSearchText] = useState('');
   const [subjectData, setSubjectData] = useState([]);
@@ -108,7 +109,15 @@ const SelectSubjects = () => {
         rightIconName={IconName.Add}
         leftIconName={IconName.Arrow_Left}
         onLeftPress={() => navigation.goBack()}
-        onRightPress={() => navigation.navigate('AddSubject', { committee })}
+        onRightPress={() =>
+          navigation.navigate('AddSubject', {
+            committee: committee,
+            isEdit: false,
+            subjectDetails: null,
+            screenName: 'Add subject',
+            meetingName: meetingName
+          })
+        }
       />
       <View style={styles.subContainer}>
         <View style={styles.searchContainer}>
@@ -143,7 +152,7 @@ const SelectSubjects = () => {
         </TouchableOpacity>
         <Divider style={styles.divider} />
         {SubjectsLoading ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : SubjectsError ? (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text>{SubjectsError.message}</Text>

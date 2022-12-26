@@ -11,31 +11,11 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     flex: 1
   },
-  txtAddSubjectTitle: { ...Fonts.PoppinsBold[24], color: Colors.bold },
-  buttonContainer: {
-    paddingHorizontal: SIZES[16],
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
+  txtAddSubjectTitle: {
+    ...Fonts.PoppinsBold[24],
+    color: Colors.bold
   },
 
-  nextBtnLayout: {
-    marginVertical: SIZES[12],
-    width: '48%'
-  },
-  txtNextBtn: {
-    ...Fonts.PoppinsSemiBold[14],
-    color: Colors.white
-  },
-  cancelBtnLayout: {
-    backgroundColor: '#F3F6F9',
-    marginVertical: SIZES[12],
-    width: '48%'
-  },
-  txtCancelButton: {
-    ...Fonts.PoppinsSemiBold[14],
-    color: Colors.primary
-  },
   divider: {
     width: '100%',
     height: SIZES[1],

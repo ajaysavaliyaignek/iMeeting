@@ -31,19 +31,6 @@ const AppoinmentCard = ({
 
     setAppointmentsData
   } = useContext(UserContext);
-  const [data, setData] = useState('');
-
-  const LocationById = useQuery(GET_APPOINTMENT_BY_ID, {
-    variables: {
-      id: item.appointmentId
-    },
-    onCompleted: (data) => {
-      console.log('appointment by id', data.appointment);
-      if (data) {
-        setData(data.appointment);
-      }
-    }
-  });
 
   const [deleteAppointment] = useMutation(DELETE_APPOINTMENT, {
     refetchQueries: [
@@ -136,7 +123,7 @@ const AppoinmentCard = ({
         <RowData
           name={'Date & Time'}
           discription={`${moment(item.setDate).format('DD MMM YYYY')},${
-            data.setTime
+            item.setTime
           }`}
         />
         <RowData name={'Location'} discription={item.locationName} />
@@ -162,12 +149,19 @@ const AppoinmentCard = ({
               setSelectedUsers([]);
 
               setAppointmentsData([]);
-              navigation.navigate('EditAppointmentGeneral', { data });
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Edit appointment',
+                type: 'Appointment',
+                screensArray: ['general', 'users', 'dateandtime', 'location'],
+                isEdit: true,
+                details: item
+              });
+
               setVisibleIndex(-1);
             }}
             onPressView={() => {
               navigation.navigate('AppointmentDetails', {
-                item: data,
+                item: item,
                 isDisable: item.isDisable
               });
               setVisibleIndex(-1);

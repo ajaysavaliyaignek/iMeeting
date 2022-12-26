@@ -273,7 +273,7 @@ const TimelineScreen = () => {
             zIndex: 20
           }}
         />
-        {loading && <Loader />}
+        {loading && <Loader color={Colors.primary} />}
         <Text
           style={{
             ...Fonts.PoppinsBold[20],

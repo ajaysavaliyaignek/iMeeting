@@ -153,7 +153,7 @@ const FilesCard = ({
           )}
         </View>
       </View>
-      {loading && <Loader />}
+      {loading && <Loader color={Colors.primary} />}
       {error && <Text style={styles.txtError}>{error}</Text>}
     </View>
   );

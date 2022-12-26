@@ -60,7 +60,7 @@ const AttachFiles = ({
             .then((responseData) => {
               if (responseData) {
                 setFileResponse((prev) => {
-                  const pevDaa = prev.filter((ite) => {
+                  const pevDaa = prev?.filter((ite) => {
                     return ite.fileEnteryId !== responseData.fileEnteryId;
                   });
                   return [...pevDaa, responseData];
@@ -83,7 +83,7 @@ const AttachFiles = ({
 
   const removeFile = (file) => {
     setFileResponse((prev) => {
-      const pevDaa = prev.filter((ite) => {
+      const pevDaa = prev?.filter((ite) => {
         return ite.fileEnteryId !== file.fileEnteryId;
       });
       return [...pevDaa];
@@ -94,7 +94,7 @@ const AttachFiles = ({
     <View style={{ marginTop: SIZES[24] }}>
       <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
       {fileResponse?.length == 0 && loading ? (
-        <Loader />
+        <Loader color={Colors.primary} />
       ) : fileResponse?.length == 0 && error ? (
         <Text style={styles.txtError}>{error}</Text>
       ) : (

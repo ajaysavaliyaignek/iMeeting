@@ -1,21 +1,34 @@
 import React from 'react';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 
 import { Fonts } from '../../themes';
 import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
+import Loader from '../Loader/Loader';
 
-const _Button = ({ onPress, title, textStyle, layoutStyle, icon, disable }) => {
+const _Button = ({
+  onPress,
+  title,
+  textStyle,
+  layoutStyle,
+  icon,
+  disable,
+  isLoading
+}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disable}
       style={[style.layout, { backgroundColor: Colors.primary }, layoutStyle]}
     >
-      <Text style={[style.text, { color: Colors.white }, textStyle]}>
-        {icon}
-        {title}
-      </Text>
+      {isLoading ? (
+        <Loader color={Colors.white} />
+      ) : (
+        <Text style={[style.text, { color: Colors.white }, textStyle]}>
+          {icon}
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

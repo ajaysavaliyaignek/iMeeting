@@ -47,35 +47,6 @@ const MeetingDetails = () => {
   const [answer, setAnswer] = useState(null);
   let file = [];
 
-  item?.attachFileIds.map((id) => {
-    const getFile = useQuery(GET_FILE, {
-      variables: {
-        fileEntryId: id
-      },
-      onCompleted: (data) => {
-        console.log('file from meeting details', data);
-        setFileResponse((prev) => {
-          console.log('prev', prev);
-          const id = file.map((item) => {
-            return item.fileEnteryId;
-          });
-          console.log('id from inside', id);
-          console.log(
-            'fileEnteryId from inside',
-            data.uploadedFile.fileEnteryId
-          );
-          if (id != data.uploadedFile.fileEnteryId) {
-            file.push(data?.uploadedFile);
-            setFileResponse(file);
-          }
-        });
-      }
-    });
-    if (getFile.error) {
-      console.log('File error', getFile.error);
-    }
-  });
-
   // get meeting
   const { data, error, loading } = useQuery(GET_MEETING_BY_ID, {
     variables: {
@@ -229,7 +200,22 @@ const MeetingDetails = () => {
                   color: Colors.primary
                 }}
                 onPress={() => {
-                  navigation.navigate('EditMeetingGeneral', { item: item });
+                  navigation.navigate(
+                    'AddEditMeetingAppointmentVideoConference',
+                    {
+                      screenName: 'Edit meeting',
+                      type: 'Meeting',
+                      screensArray: [
+                        'general',
+                        'users',
+                        'dateandtime',
+                        'location',
+                        'subjects'
+                      ],
+                      isEdit: true,
+                      details: item
+                    }
+                  );
                   setMeetingsData([]);
                 }}
               />

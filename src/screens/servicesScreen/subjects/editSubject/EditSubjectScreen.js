@@ -179,7 +179,7 @@ const EditSubjectScreen = () => {
 
       <View style={styles.container}>
         {SubjectCategoryLoading ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : (
           <ScrollView
             style={styles.subContainer}

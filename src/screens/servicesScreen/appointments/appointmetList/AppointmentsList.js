@@ -79,7 +79,13 @@ const AppointmentsList = () => {
               setSelectedUsers([]);
               setAppointmentsData([]);
 
-              navigation.navigate('AddAppointmentGeneral');
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Add appointment',
+                type: 'Appointment',
+                screensArray: ['general', 'users', 'dateandtime', 'location'],
+                isEdit: false,
+                details: null
+              });
             }}
             style={{
               height: SIZES[24],
@@ -157,7 +163,7 @@ const AppointmentsList = () => {
             </Text>
           </View>
         ) : Appointment.loading ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>

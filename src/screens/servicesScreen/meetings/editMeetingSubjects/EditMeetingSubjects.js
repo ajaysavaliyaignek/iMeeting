@@ -292,25 +292,26 @@ const EditMeetingSubjects = () => {
                 />
               );
             })}
-            {previosSubjects.length <= 0 && selectSubjects.length <= 0 && (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: SIZES[16]
-                }}
-              >
-                <Text
+            {previosSubjects.length <= 0 ||
+              (selectSubjects.length <= 0 && (
+                <View
                   style={{
-                    ...Fonts.PoppinsSemiBold[14],
-                    color: Colors.primary
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: SIZES[16]
                   }}
                 >
-                  No Selected Subjects
-                </Text>
-              </View>
-            )}
+                  <Text
+                    style={{
+                      ...Fonts.PoppinsSemiBold[14],
+                      color: Colors.primary
+                    }}
+                  >
+                    No Selected Subjects
+                  </Text>
+                </View>
+              ))}
 
             <View style={styles.deadlineContainer}>
               <Text style={styles.txtTitle}>RECIEVING SUBJECTS DEADLINE</Text>

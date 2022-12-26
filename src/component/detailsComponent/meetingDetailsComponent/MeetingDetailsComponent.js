@@ -43,7 +43,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   // const { item } = route?.params;
   console.log('item from meeting details', item);
 
-  const [fileResponse, setFileResponse] = useState(null);
+  const [fileResponse, setFileResponse] = useState([]);
   const [meeting, setMeeting] = useState(null);
   const [location, setLocation] = useState(null);
   const [committe, setCommittee] = useState(null);
@@ -63,21 +63,13 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       },
       onCompleted: (data) => {
         console.log('file from meeting details', data);
-        setFileResponse((prev) => {
-          console.log('prev', prev);
-          const id = file.map((item) => {
-            return item.fileEnteryId;
-          });
-          console.log('id from inside', id);
-          console.log(
-            'fileEnteryId from inside',
-            data.uploadedFile.fileEnteryId
-          );
-          if (id != data.uploadedFile.fileEnteryId) {
-            file.push(data?.uploadedFile);
-            setFileResponse(file);
-          }
-        });
+        fileResponse.push(data.uploadedFile);
+        // setFileResponse((prev) => {
+        //   const pevDaa = prev?.filter((ite) => {
+        //     return ite.fileEnteryId !== data.fileEnteryId;
+        //   });
+        //   return [...pevDaa, data.uploadedFile];
+        // });
       }
     });
     if (getFile.error) {

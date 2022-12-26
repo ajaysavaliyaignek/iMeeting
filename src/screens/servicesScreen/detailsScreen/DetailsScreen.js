@@ -126,9 +126,29 @@ const DetailsScreen = () => {
                   setSelectedUsers([]);
                   setMeetingsData([]);
                   setSelectedSubjects([]);
-                  navigation.navigate('AddMeetingGeneral');
+                  navigation.navigate(
+                    'AddEditMeetingAppointmentVideoConference',
+                    {
+                      screenName: 'Add meeting',
+                      type: 'Meeting',
+                      screensArray: [
+                        'general',
+                        'users',
+                        'dateandtime',
+                        'location',
+                        'subjects'
+                      ],
+                      isEdit: false,
+                      details: null
+                    }
+                  );
                 } else if (activeTab === '1') {
-                  navigation.navigate('AddSubject', { committee: null });
+                  navigation.navigate('AddSubject', {
+                    committee: null,
+                    isEdit: false,
+                    subjectDetails: null,
+                    screenName: 'Add subject'
+                  });
                 }
               }}
               activeOpacity={0.5}
@@ -304,7 +324,7 @@ const DetailsScreen = () => {
               </View>
               <Divider style={styles.divider} />
               {loadingGetMeetings ? (
-                <Loader />
+                <Loader color={Colors.primary} />
               ) : errorGetMeetings ? (
                 <View
                   style={{

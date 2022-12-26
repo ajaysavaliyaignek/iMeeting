@@ -250,6 +250,7 @@ export const GET_All_APPOINTMENT = gql`
         setDate
         isDisable
         answers
+        setTime
       }
       page
       totalCount

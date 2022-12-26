@@ -398,9 +398,21 @@ const AppointmentsDetails = () => {
                   color: Colors.primary
                 }}
                 onPress={() =>
-                  navigation.navigate('EditAppointmentGeneral', {
-                    data: appointment
-                  })
+                  navigation.navigate(
+                    'AddEditMeetingAppointmentVideoConference',
+                    {
+                      screenName: 'Edit appointment',
+                      type: 'Appointment',
+                      screensArray: [
+                        'general',
+                        'users',
+                        'dateandtime',
+                        'location'
+                      ],
+                      isEdit: true,
+                      details: item
+                    }
+                  )
                 }
               />
               <Button

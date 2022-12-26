@@ -126,7 +126,7 @@ const CommitteeScreen = () => {
           Committees
         </Text>
         {CommitteeLoadingByRole ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : CommitteeErrorByRole ? (
           <View
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}

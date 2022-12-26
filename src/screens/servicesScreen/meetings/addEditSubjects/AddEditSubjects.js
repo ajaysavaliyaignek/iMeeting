@@ -1,70 +1,91 @@
 import {
   View,
   Text,
-  SafeAreaView,
   TextInput,
   TouchableOpacity,
   ScrollView,
-  FlatList,
   Alert
 } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import * as Progress from 'react-native-progress';
-import DeviceInfo from 'react-native-device-info';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import Voice from '@react-native-community/voice';
-import moment from 'moment';
-import { useMutation } from '@apollo/client';
+import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { useQuery } from '@apollo/client';
 import { Divider } from 'react-native-paper';
 
-import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
 import { SIZES } from '../../../../themes/Sizes';
 import { Button } from '../../../../component/button/Button';
 import AddSubjectsCard from './AddSubjectsCard';
-import { GET_All_MEETING } from '../../../../graphql/query';
-import { UPDATE_MEETING } from '../../../../graphql/mutation';
-import { UserContext } from '../../../../context';
-import Loader from '../../../../component/Loader/Loader';
+import { GET_All_SUBJECTS } from '../../../../graphql/query';
+import { Fonts } from '../../../../themes';
 
-const AddMeetingSubjects = ({
-  calendarValue,
-  setCalendarValue,
-  previousSubject,
-  setPreviousSubject,
-  committee
+const AddEditSubjects = ({
+  generaldData,
+  setGeneralData,
+  details,
+  visibleIndex,
+  setVisibleIndex
 }) => {
   const navigation = useNavigation();
-
-  const { selectedSubjects, setSelectedUsers, meetingsData, setMeetingsData } =
-    useContext(UserContext);
-
-  // const [calendarValue, setCalendarValue] = useState(
-  //   meetingsData?.deadlineDate
-  //     ? meetingsData?.deadlineDate
-  //     : moment(new Date()).format('YYYY-MM-DD')
-  // );
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState([]);
-  const [subjectsId, setSubjectsId] = useState([]);
-  const [visibleIndex, setVisibleIndex] = useState(-1);
   const [openIndex, setOpenIndex] = useState(-1);
-  // const [previousSubject, setPreviousSubject] = useState(
-  //   meetingsData.subjects == undefined ? [] : meetingsData.subjects
-  // );
+  const [selectSubjects, setSelectedSubjects] = useState([]);
+  const [previosSubjects, setPreviosSubjects] = useState([]);
+  let subjects = [];
 
   let backUpUser = [];
 
+  useEffect(() => {
+    subjects = previosSubjects?.map((item) => item);
+    selectSubjects?.map((item) => {
+      subjects.push(item);
+    });
+    setFilterData(subjects);
+    setGeneralData({ ...generaldData, previousSubject: subjects });
+  }, [previosSubjects, selectSubjects]);
+
+  // get subjects by meeting id
+  if (details != null) {
+    const {
+      loading: SubjectsLoading,
+      error: SubjectsError,
+      data: SubjectsData
+    } = useQuery(GET_All_SUBJECTS, {
+      variables: {
+        committeeIds: '',
+        searchValue: searchText,
+        screen: 0,
+        page: -1,
+        pageSize: -1,
+        meetingId: details?.meetingId
+      },
+
+      onCompleted: (data) => {
+        let subjectData = [];
+        data.subjects.items?.map((subject) => {
+          backUpUser.push(JSON.parse(JSON.stringify(subject)));
+          subjectData.push(JSON.parse(JSON.stringify(subject)));
+        });
+        // backUpSubject = subjectData;
+        setPreviosSubjects(subjectData);
+      }
+    });
+
+    if (SubjectsError) {
+      console.log('subjects error---', SubjectsError);
+    }
+  }
+
+  // select user from the select users screen
   const onUpdateSelection = (items) => {
     let newUsers = [];
-    console.log('Selected user from add appointment', items);
 
     items?.map((subject) => {
       let indexPreviousUser =
-        previousSubject?.length > 0
-          ? previousSubject?.findIndex(
+        previosSubjects?.length > 0
+          ? previosSubjects?.findIndex(
               (obj) => obj.subjectId === subject?.subjectId
             )
           : -1;
@@ -80,31 +101,14 @@ const AddMeetingSubjects = ({
         }
       } else {
         newUsers.push(
-          JSON.parse(JSON.stringify(previousSubject[indexPreviousUser]))
+          JSON.parse(JSON.stringify(previosSubjects[indexPreviousUser]))
         );
 
         // newUsers.push(previousUser[indexPreviousUser]);
       }
     });
 
-    setPreviousSubject(newUsers);
-    setFilterData(newUsers);
-  };
-
-  const searchFilterSubject = (text) => {
-    if (text) {
-      const newData = filterData?.filter((item) => {
-        const itemData = item.subjectTitle ? item.subjectTitle : '';
-        const textData = text;
-        return itemData.indexOf(textData) > -1;
-      });
-
-      setSearchText(text);
-      setPreviousSubject(newData);
-    } else {
-      setSearchText(text);
-      setPreviousSubject(selectedSubjects);
-    }
+    setSelectedSubjects(newUsers);
   };
 
   const onDeletehandler = (item) => {
@@ -112,10 +116,14 @@ const AddMeetingSubjects = ({
       {
         text: 'Delete',
         onPress: () => {
-          const filterData = previousSubject.filter(
+          const filterData = previosSubjects.filter(
             (subject) => subject?.subjectId !== item.subjectId
           );
-          setPreviousSubject(filterData);
+          setPreviosSubjects(filterData);
+          const filterNewData = selectSubjects.filter(
+            (subject) => subject?.subjectId !== item.subjectId
+          );
+          setSelectedSubjects(filterNewData);
         },
         style: 'destructive'
       },
@@ -127,53 +135,25 @@ const AddMeetingSubjects = ({
     ]);
   };
 
-  const [addMeeting, { data, loading: addMeetingLoading, error }] = useMutation(
-    UPDATE_MEETING,
-    {
-      // export const GET_All_SUBJECTS = gql`
-      refetchQueries: [
-        {
-          query: GET_All_MEETING,
-          variables: {
-            onlyMyMeeting: false,
-            committeeIds: '',
-            screen: 0,
-            searchValue: '',
-            page: -1,
-            pageSize: -1
-          }
-        }
-      ],
-      onCompleted: (data) => {
-        console.log('addmeeting data', data.updateMeeting);
-        if (data.updateMeeting.status[0].statusCode == '200') {
-          setSelectedUsers([]);
-          setMeetingsData([]);
-          navigation.navigate('Details', {
-            title: 'Meetings',
-            active: '0'
-          });
-        }
-      },
-      onError: (data) => {
-        console.log('addmeeting error--', data.message);
-      }
+  const searchFilterSubject = (text) => {
+    if (text) {
+      const newData = filterData?.filter((item) => {
+        const itemData = item.subjectTitle ? item.subjectTitle : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+
+      setSearchText(text);
+      setGeneralData({ ...generaldData, previousSubject: newData });
+    } else {
+      setSearchText(text);
+      setGeneralData({ ...generaldData, previousSubject: filterData });
     }
-  );
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <View style={styles.progressContainer}>
-          <Progress.Bar
-            color={Colors.switch}
-            progress={1}
-            borderColor={Colors.white}
-            unfilledColor={'#e6e7e9'}
-            width={DeviceInfo.isTablet() ? 800 : 264}
-          />
-          <Text style={styles.txtProgress}>Step 5/5</Text>
-        </View>
         <Text style={styles.txtAddSubjectTitle}>Subjects</Text>
 
         <View style={styles.searchContainer}>
@@ -194,18 +174,17 @@ const AddMeetingSubjects = ({
         <Divider style={styles.divider} />
 
         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-          {previousSubject.length > 0 ? (
-            previousSubject?.map((subjects, index) => {
+          {generaldData?.previousSubject?.length > 0 ? (
+            generaldData?.previousSubject.map((subject, index) => {
               return (
                 <AddSubjectsCard
-                  item={subjects}
+                  item={subject}
                   searchText={searchText}
                   index={index}
                   visibleIndex={visibleIndex}
                   setVisibleIndex={setVisibleIndex}
                   openIndex={openIndex}
                   setOpenIndex={setOpenIndex}
-                  subjectsId={subjectsId}
                   deleted={true}
                   onDeletehandler={onDeletehandler}
                   isPreviousSubject={true}
@@ -213,8 +192,18 @@ const AddMeetingSubjects = ({
               );
             })
           ) : (
-            <View>
-              <Text>No subjects found</Text>
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1
+              }}
+            >
+              <Text
+                style={{ ...Fonts.PoppinsSemiBold[14], color: Colors.primary }}
+              >
+                No selected subject
+              </Text>
             </View>
           )}
 
@@ -224,11 +213,11 @@ const AddMeetingSubjects = ({
               style={styles.deadlineRowContainer}
               onPress={() =>
                 navigation.navigate('DeadlineSuggestion', {
-                  setCalendarValue: setCalendarValue
+                  setCalendarValue: setGeneralData
                 })
               }
             >
-              <TextInput value={calendarValue} editable={false} />
+              <TextInput value={generaldData?.calendarValue} editable={false} />
               <Icon
                 name={IconName.Calendar}
                 width={SIZES[18]}
@@ -243,9 +232,10 @@ const AddMeetingSubjects = ({
               textStyle={styles.txtCancelButton}
               onPress={() =>
                 navigation.navigate('SelectSubjects', {
-                  committee: committee,
+                  committee: generaldData?.valueCommitee,
                   onUpdateSelection: onUpdateSelection,
-                  previosSubjects: previousSubject
+                  previosSubjects: generaldData?.previousSubject,
+                  meetingName: generaldData?.title
                 })
               }
             />
@@ -256,4 +246,4 @@ const AddMeetingSubjects = ({
   );
 };
 
-export default AddMeetingSubjects;
+export default AddEditSubjects;

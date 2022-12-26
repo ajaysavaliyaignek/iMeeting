@@ -15,28 +15,7 @@ export const styles = StyleSheet.create({
     color: Colors.bold,
     marginHorizontal: SIZES[16]
   },
-  buttonContainer: {
-    paddingHorizontal: SIZES[16],
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  cancelBtnLayout: {
-    backgroundColor: '#F3F6F9',
-    marginVertical: SIZES[12],
-    width: '48%'
-  },
-  txtCancelButton: {
-    ...Fonts.PoppinsSemiBold[14],
-    color: Colors.primary
-  },
-  nextBtnLayout: {
-    marginVertical: SIZES[12],
-    width: '48%'
-  },
-  txtNextBtn: {
-    ...Fonts.PoppinsSemiBold[14],
-    color: Colors.white
-  },
+
   divider: {
     width: '100%',
     height: SIZES[1],
@@ -54,15 +33,7 @@ export const styles = StyleSheet.create({
     borderBottomWidth: SIZES[1],
     borderBottomColor: Colors.line
   },
-  // textInput: {
-  //   ...Fonts.PoppinsRegular[14],
-  //   color: Colors.bold,
-  //   backgroundColor: 'transparent',
-  //   flex: 1,
-  //   marginHorizontal: SIZES[6],
-  //   // height: SIZES[36],
-  //   paddingVertical: 8
-  // },
+
   categoryContainer: {
     marginTop: SIZES[24],
     borderBottomWidth: SIZES[1],
@@ -74,27 +45,7 @@ export const styles = StyleSheet.create({
     color: Colors.secondary,
     marginBottom: SIZES[22]
   },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: SIZES[16],
-    marginHorizontal: SIZES[16]
-  },
-  txtProgress: {
-    ...Fonts.PoppinsRegular[14],
-    color: Colors.secondary
-  },
-  // searchContainer: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   paddingHorizontal: SIZES[10],
-  //   backgroundColor: Colors.gray,
-  //   borderRadius: SIZES[10],
-  //   marginVertical: SIZES[22],
-  //   justifyContent: 'center'
-  //   // height: SIZES[36]
-  // },
+
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',

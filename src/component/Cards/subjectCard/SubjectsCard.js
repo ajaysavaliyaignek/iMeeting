@@ -540,7 +540,12 @@ const SubjectsCard = ({
               setVisibleIndex(-1);
             }}
             onPressEdit={() => {
-              navigation.navigate('EditSubject', { item });
+              navigation.navigate('AddSubject', {
+                committee: null,
+                isEdit: true,
+                subjectDetails: item,
+                screenName: 'Edit subject'
+              });
               setVisibleIndex(-1);
             }}
             onPressView={() => {

@@ -27,7 +27,6 @@ import {
   GET_FILE
 } from '../../../../graphql/query';
 import { UPDATE_SUBJECTS } from '../../../../graphql/mutation';
-import Loader from '../../../../component/Loader/Loader';
 import { SIZES } from '../../../../themes/Sizes';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
@@ -36,9 +35,6 @@ const AddDraftSubject = () => {
   const navigation = useNavigation();
   const [title, setTitle] = useState('');
   const [discription, setDescription] = useState('');
-  const [openCategory, setOpenCategory] = useState(false);
-  const [openCommittee, setOpenCommitee] = useState(false);
-  const [openMeeting, setOpenMeeting] = useState(false);
   const [valueCategory, setValueCategory] = useState(null);
   const [valueCommittee, setValueCommittee] = useState(null);
   const [valueMeeting, setValueMeeting] = useState();

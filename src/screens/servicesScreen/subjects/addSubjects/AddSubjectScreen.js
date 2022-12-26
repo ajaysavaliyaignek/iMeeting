@@ -27,20 +27,26 @@ import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 const AddSubjectScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { committee } = route?.params;
-  console.log('committee from add subjects', committee);
-  const [title, setTitle] = useState('');
-  const [discription, setDescription] = useState('');
-  const [valueCategory, setValueCategory] = useState(null);
-  const [valueCommittee, setValueCommittee] = useState(committee || null);
-  const [valueMeeting, setValueMeeting] = useState(0);
-  const [fileResponse, setFileResponse] = useState([]);
-  const [filesId, setFilesId] = useState([]);
+  const { committee, isEdit, subjectDetails, screenName, meetingName } =
+    route?.params;
+  console.log('committee from add subjects', subjectDetails);
   const [token, setToken] = useState('');
   const [category, setCategory] = useState([]);
   const [committees, setCommittee] = useState([]);
   const [meetings, setMeetings] = useState([]);
-  const [committeeData, setCommitteeData] = useState([]);
+  const [fileResponse, setFileResponse] = useState([]);
+  const [subjectData, setSubjectData] = useState({
+    title: isEdit ? subjectDetails?.subjectTitle : '',
+    discription: isEdit ? subjectDetails?.description : '',
+    valueCommittee: isEdit
+      ? subjectDetails?.committeeId
+      : committee != null
+      ? committee
+      : null,
+    valueMeeting: isEdit ? subjectDetails?.meetingId : 0,
+    valueCategory: isEdit ? subjectDetails?.subjectCategoryId : null,
+    filesId: []
+  });
   let queryParams = [];
   if (committee) {
     queryParams = {
@@ -58,8 +64,31 @@ const AddSubjectScreen = () => {
     };
   }
 
+  console.log('subjectData', subjectData);
+
   // fetch file
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
+
+  subjectDetails?.attachFileIds?.map((id) => {
+    const { loading, error } = useQuery(GET_FILE, {
+      variables: {
+        fileEntryId: id
+      },
+      onCompleted: (data) => {
+        if (data) {
+          setFileResponse((prev) => {
+            const pevDaa = prev.filter((ite) => {
+              return ite.fileEnteryId !== data.fileEnteryId;
+            });
+            return [...pevDaa, data.uploadedFile];
+          });
+        }
+      }
+    });
+    if (error) {
+      console.log('file error', error);
+    }
+  });
 
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =
@@ -122,9 +151,9 @@ const AddSubjectScreen = () => {
   };
 
   useEffect(() => {
-    const fileId = fileResponse.map((file) => file.fileEnteryId);
+    const fileId = fileResponse?.map((file) => file.fileEnteryId);
 
-    setFilesId(fileId);
+    setSubjectData({ ...subjectData, filesId: fileId });
   }, [fileResponse]);
 
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
@@ -154,25 +183,10 @@ const AddSubjectScreen = () => {
     console.log('addsubject error--', error);
   }
 
-  const Committee = useQuery(GET_COMMITTEE_BY_ID, {
-    variables: {
-      organizationId: committee
-    },
-    onCompleted: (data) => {
-      console.log('get committee by id', data);
-      if (data) {
-        setCommitteeData(data.committee);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get committee by id', data);
-    }
-  });
-
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        name={'Add subject'}
+        name={screenName}
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
@@ -182,18 +196,20 @@ const AddSubjectScreen = () => {
         nestedScrollEnabled={true}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.txtAddSubjectTitle}>Add subject</Text>
+        <Text style={styles.txtAddSubjectTitle}>{screenName}</Text>
         {/* select committee */}
         <DropDownPicker
           data={committees?.map((item) => ({
             label: item.committeeTitle,
             value: item.organizationId
           }))}
-          disable={committee ? true : false}
+          disable={committee ? true : isEdit ? true : false}
           placeholder={''}
-          setData={setValueCommittee}
+          setData={(item) =>
+            setSubjectData({ ...subjectData, valueCommittee: item })
+          }
           title={'SELECT COMMITTEE'}
-          value={valueCommittee}
+          value={subjectData.valueCommittee}
         />
 
         {/* select meeting */}
@@ -203,25 +219,33 @@ const AddSubjectScreen = () => {
             value: item.meetingId
           }))}
           disable={committee ? true : false}
-          placeholder={''}
-          setData={setValueMeeting}
+          placeholder={committee != null ? meetingName : ''}
+          setData={(item) =>
+            setSubjectData({ ...subjectData, valueMeeting: item })
+          }
           title={'SELECT MEETING'}
-          value={valueMeeting}
+          value={subjectData.valueMeeting}
         />
         {/* title */}
         <View style={styles.titleContainer}>
           <Text style={styles.txtTitle}>TITLE</Text>
           <TextInput
+            value={subjectData?.title}
             style={styles.textInput}
-            onChangeText={(text) => setTitle(text)}
+            onChangeText={(text) =>
+              setSubjectData({ ...subjectData, title: text })
+            }
           />
         </View>
         <View style={styles.discriptionContainer}>
           <Text style={styles.txtTitle}>DESCRIPTION</Text>
           <TextInput
+            value={subjectData?.discription}
             style={styles.textInput}
             multiline={true}
-            onChangeText={(text) => setDescription(text)}
+            onChangeText={(text) =>
+              setSubjectData({ ...subjectData, discription: text })
+            }
           />
         </View>
         <View>
@@ -233,9 +257,11 @@ const AddSubjectScreen = () => {
             }))}
             disable={false}
             placeholder={''}
-            setData={setValueCategory}
+            setData={(item) =>
+              setSubjectData({ ...subjectData, valueCategory: item })
+            }
             title={'SUBJECT CATEGORY'}
-            value={valueCategory}
+            value={subjectData?.valueCategory}
           />
           <Button
             title={'Add category'}
@@ -284,13 +310,13 @@ const AddSubjectScreen = () => {
                 variables: {
                   subject: {
                     subjectId: 0,
-                    committeeId: valueCommittee,
-                    subjectTitle: title,
-                    description: discription,
-                    subjectCategoryId: valueCategory,
+                    committeeId: subjectData.valueCommittee,
+                    subjectTitle: subjectData.title,
+                    description: subjectData.discription,
+                    subjectCategoryId: subjectData.valueCategory,
                     draft: false,
-                    attachFileIds: filesId,
-                    meetingId: valueMeeting,
+                    attachFileIds: subjectData.filesId,
+                    meetingId: subjectData.valueMeeting,
                     id: 0
                   }
                 },
@@ -299,10 +325,21 @@ const AddSubjectScreen = () => {
                 }
               });
             }}
-            disable={title === '' || discription === '' ? true : false}
+            disable={
+              subjectData.title === '' ||
+              subjectData.discription === '' ||
+              subjectData.valueCommittee == null
+                ? true
+                : false
+            }
             layoutStyle={[
               {
-                opacity: title === '' || discription === '' ? 0.5 : null
+                opacity:
+                  subjectData.title === '' ||
+                  subjectData.discription === '' ||
+                  subjectData.valueCommittee == null
+                    ? 0.5
+                    : null
               },
               styles.nextBtnLayout
             ]}
