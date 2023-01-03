@@ -1,5 +1,134 @@
 import { gql } from '@apollo/client';
 
+export const GET_VOTING_HISTORY = gql`
+  query votingHistory($votingId: Long) {
+    votingHistory(votingId: $votingId) {
+      items {
+        createDate
+        userId
+        userName
+        votingId
+        answers
+      }
+    }
+  }
+`;
+
+export const GET_MEETING_STATUS = gql`
+  query {
+    meetingStatus {
+      items {
+        meetingStatusId
+        meetingStatusTitle
+      }
+    }
+  }
+`;
+
+export const GET_ALL_DECISION_BY_ID = gql`
+  query decision($decision: Long) {
+    decision(decisionId: $decision) {
+      decisionId
+      meetingId
+      committeeId
+      committeeName
+      dateOfCreation
+      subjectId
+      subjectTitle
+      statusId
+      statusTitle
+      description
+      attachFileIds
+    }
+  }
+`;
+
+export const GET_ALL_DECISIONS = gql`
+  query decisions(
+    $subjectId: Long
+    $page: Int
+    $pageSize: Int
+    $meetingId: Long
+    $momDecision: Boolean
+  ) {
+    decisions(
+      subjectId: $subjectId
+      page: $page
+      pageSize: $pageSize
+      meetingId: $meetingId
+      momDecision: $momDecision
+    ) {
+      items {
+        decisionId
+        committeeId
+        committeeName
+        dateOfCreation
+        subjectId
+        subjectTitle
+        statusId
+        statusTitle
+        description
+        attachFileIds
+      }
+    }
+  }
+`;
+
+export const GET_LIVE_MEETING_TAB_COUNT = gql`
+  query referencesCounts($id: Long, $type: Int) {
+    referencesCounts(id: $id, type: $type) {
+      referencesCounts
+    }
+  }
+`;
+
+export const GET_ALL_CHATS = gql`
+  query meetingChat($meetingId: Long) {
+    meetingChat(meetingId: $meetingId) {
+      items {
+        chatId
+        createDate
+        isOwner
+        meetingId
+        message
+        profilePicture
+        status
+        userId
+        userName
+        fileUploads {
+          contentUrl
+          downloadUrl
+          fileEnteryId
+          groupId
+          name
+          size
+          type
+        }
+      }
+    }
+  }
+`;
+
+export const GET_TASK_PRIORITY = gql`
+  query {
+    taskPriority {
+      items {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const GET_TASK_EXECUTORS = gql`
+  query {
+    taskExecutor {
+      executorIds
+      executorNames
+    }
+  }
+`;
+
 export const GET_VOTING_DETAILS = gql`
   query votingDetails(
     $meetingId: Long
@@ -101,6 +230,8 @@ export const GET_ALL_TASKS = gql`
     $taskStatusIds: String
     $taskTypeIds: String
     $date: String
+    $subjectId: Long
+    $meetingId: Long
   ) {
     tasks(
       onlyMyTask: $onlyMyTask
@@ -111,6 +242,8 @@ export const GET_ALL_TASKS = gql`
       taskStatusIds: $taskStatusIds
       taskTypeIds: $taskTypeIds
       date: $date
+      subjectId: $subjectId
+      meetingId: $meetingId
     ) {
       items {
         taskId
@@ -168,8 +301,18 @@ export const GET_TIMELINE_REVIEW = gql`
 `;
 
 export const GET_ALL_SUBJECTS_STATUS = gql`
-  query subjectStatus($subject: Boolean, $decision: Boolean) {
-    subjectStatus(subject: $subject, decision: $decision) {
+  query subjectStatus(
+    $decision: Boolean
+    $approveDecision: Boolean
+    $momDecision: Boolean
+    $subject: Boolean
+  ) {
+    subjectStatus(
+      decision: $decision
+      approveDecision: $approveDecision
+      momDecision: $momDecision
+      subject: $subject
+    ) {
       items {
         statusId
         statusTitle
@@ -251,6 +394,7 @@ export const GET_All_APPOINTMENT = gql`
         isDisable
         answers
         setTime
+        attachFileIds
       }
       page
       totalCount
@@ -342,7 +486,7 @@ export const GET_All_SUBJECTS = gql`
     $pageSize: Int
     $searchValue: String
     $sort: String
-    $deadline: Boolean
+    $isDraft: Boolean
     $screen: Int
     $meetingId: Long
   ) {
@@ -352,7 +496,7 @@ export const GET_All_SUBJECTS = gql`
       searchValue: $searchValue
       sort: $sort
       committeeIds: $committeeIds
-      deadline: $deadline
+      isDraft: $isDraft
       screen: $screen
       meetingId: $meetingId
     ) {

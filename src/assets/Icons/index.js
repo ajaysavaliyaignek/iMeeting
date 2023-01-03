@@ -67,3 +67,5 @@ export { default as LMUsers } from './LiveMeetingIcon/LMUsers';
 export { default as LMUsersWhite } from './LiveMeetingIcon/LMUsersWhite';
 export { default as LMVotings } from './LiveMeetingIcon/LMVotings';
 export { default as LMVotingsWhite } from './LiveMeetingIcon/LMVotingsWhite';
+export { default as AttachFile } from './AttachFile';
+export { default as Send_Gray } from './Send_Gray';

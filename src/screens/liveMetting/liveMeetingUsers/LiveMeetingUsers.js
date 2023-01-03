@@ -7,23 +7,22 @@ import { styles } from './styles';
 import { Divider } from 'react-native-paper';
 import { Colors } from '../../../themes/Colors';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
-import { useQuery } from '@apollo/client';
+import { useApolloClient, useQuery } from '@apollo/client';
 import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
 import { Fonts } from '../../../themes';
 import { useNavigation } from '@react-navigation/native';
 import Avatar from '../../../component/Avatar/Avatar';
 
-const LiveMeetingUsers = ({ item }) => {
+const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   const navigation = useNavigation();
-  console.log('item from LM Users', item);
+
   const [searchText, setSearchText] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [activeTab, setActiveTab] = useState('AllUsers');
-  const [filterData, setFilterData] = useState(item.userDetails);
   const [userData, setUserData] = useState(item.userDetails);
   const [speakerData, setSpeekerData] = useState([]);
   const [filterSpeakerData, setFilterSpeakerData] = useState([]);
-  const [activeSpeaker, setActiveSpeaker] = useState(null);
+  const client = useApolloClient();
 
   const getMeetingUser = useQuery(GET_LIVE_MEETING_USERS, {
     variables: {
@@ -31,14 +30,12 @@ const LiveMeetingUsers = ({ item }) => {
       isSpeaker: true
     },
     onCompleted: (data) => {
-      console.log('is speaker data', data.liveMeetingUsers.userDetails);
       setSpeekerData(data.liveMeetingUsers.userDetails);
       setFilterSpeakerData(data.liveMeetingUsers.userDetails);
     }
   });
 
   const searchFilterUsers = (text) => {
-    console.log('text', text);
     if (text) {
       const newData = filterSpeakerData?.filter((item) => {
         const itemData = item.userName ? item.userName : '';
@@ -53,16 +50,13 @@ const LiveMeetingUsers = ({ item }) => {
     }
   };
 
-  // useEffect(() => {
-  //   console.log('speakerData', speakerData);
-  //   let liveSpeaker = speakerData?.map((speaker) => {
-  //     if (speaker.status == 'Speaking') {
-  //       return speaker;
-  //     }
-  //   });
-  //   console.log('liveSpeaker', liveSpeaker);
-  //   setActiveSpeaker(liveSpeaker[0]);
-  // }, [speakerData]);
+  useEffect(() => {
+    if (socketEventUpdateMessage == 'Updated Speaker') {
+      client.refetchQueries({
+        include: ['liveMeetingUsers']
+      });
+    }
+  }, [socketEventUpdateMessage]);
 
   let liveSpeaker = speakerData?.filter((speaker) => {
     if (speaker.status == 'Speaking') {
@@ -71,10 +65,8 @@ const LiveMeetingUsers = ({ item }) => {
       return;
     }
   });
-  console.log('live speaker', liveSpeaker);
 
   const navigateToEditSpeaker = (items) => {
-    console.log('meeting id', item.meetingId);
     navigation.navigate('AddSpeaker', {
       meetingId: item.meetingId,
       activeScreen: 'EditSpeaker',
@@ -132,7 +124,7 @@ const LiveMeetingUsers = ({ item }) => {
           }}
         />
       </View>
-      {activeTab == 'Speaker' && (
+      {activeTab == 'Speaker' && item?.yourRoleName !== 'Member' && (
         <Button
           title={'Add speaker'}
           layoutStyle={{
@@ -167,7 +159,7 @@ const LiveMeetingUsers = ({ item }) => {
           <UserDetailsComponent
             users={speakerData}
             isSpeaker={true}
-            openPopup={true}
+            openPopup={item?.yourRoleName !== 'Member' ? true : false}
             visibleIndex={visibleIndex}
             setVisibleIndex={setVisibleIndex}
             searchText={searchText}

@@ -253,6 +253,7 @@ const EditSubjectScreen = () => {
               }}
               deleted={true}
               download={true}
+              isShowAttchTitle={true}
             />
           </ScrollView>
         )}

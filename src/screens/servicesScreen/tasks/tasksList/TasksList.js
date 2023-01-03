@@ -4,12 +4,13 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 
 import { styles } from './styles';
 import { Icon, IconName } from '../../../../component';
@@ -19,6 +20,7 @@ import { Colors } from '../../../../themes/Colors';
 import Loader from '../../../../component/Loader/Loader';
 import { GET_ALL_TASKS } from '../../../../graphql/query';
 import TasksDetailsCard from '../../../../component/Cards/tasksDetailsCard/TasksDetailsCard';
+import { DELETE_TASK } from '../../../../graphql/mutation';
 
 const TasksList = () => {
   const navigation = useNavigation();
@@ -43,6 +45,41 @@ const TasksList = () => {
     }
   });
 
+  const [deleteTask] = useMutation(DELETE_TASK, {
+    refetchQueries: ['tasks'],
+    onCompleted: (data) => {
+      console.log('delete tasks', data.deleteTask.status);
+    }
+  });
+
+  const onDeleteHandler = (id) => {
+    console.log(id);
+
+    Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
+      {
+        text: 'Delete',
+        onPress: () =>
+          deleteTask({
+            variables: {
+              id: id
+            }
+          }),
+        style: 'destructive'
+      },
+      {
+        text: 'Cancel',
+        // onPress: () => {
+        //   deleteSubject({
+        //     variables: {
+        //       subjectId: id
+        //     }
+        //   });
+        // },
+        style: 'cancel'
+      }
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* header */}
@@ -64,7 +101,12 @@ const TasksList = () => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('AddAppointmentGeneral');
+              navigation.navigate('AddTask', {
+                meetingDetails: null,
+                isMeetingTask: false,
+                isEdit: false,
+                taskData: null
+              });
             }}
           >
             <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />
@@ -149,23 +191,45 @@ const TasksList = () => {
                   item={item}
                   index={index}
                   visibleIndex={visibleIndex}
+                  editable={true}
                   setVisibleIndex={setVisibleIndex}
+                  isDeleteable={true}
+                  onPressDelete={(items) => {
+                    console.log('delete task item', items);
+                    onDeleteHandler(items?.taskId);
+                    setVisibleIndex(-1);
+                  }}
                   text={searchText}
+                  onPressEdit={(items) => {
+                    setVisibleIndex(-1);
+                    navigation.navigate('AddTask', {
+                      meetingDetails: null,
+                      isMeetingTask: false,
+                      isEdit: true,
+                      taskData: items
+                    });
+                  }}
                 />
               );
             }}
             showsVerticalScrollIndicator={false}
           />
         ) : Tasks.error ? (
-          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <View
+            style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
+          >
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-              {Tasks.error.message}
+              {Tasks?.error?.message == 'Network request failed'
+                ? 'No Internet connection'
+                : Tasks?.error?.message}
             </Text>
           </View>
         ) : Tasks.loading ? (
           <Loader color={Colors.primary} />
         ) : (
-          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <View
+            style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
+          >
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
               No tasks found
             </Text>

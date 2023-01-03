@@ -50,7 +50,9 @@ const IconName = {
   LMUsersWhite: 'LMUsersWhite',
   LMVotings: 'LMVotings',
   LMVotingsWhite: 'LMVotingsWhite',
-  Arrow_Right_Black: 'Arrow_Right_Black'
+  Arrow_Right_Black: 'Arrow_Right_Black',
+  AttachFile: 'AttachFile',
+  Send_Gray: 'Send_Gray'
 };
 
 export default IconName;

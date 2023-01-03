@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
-import React, { useState } from 'react';
-import { useQuery } from '@apollo/client';
+import React, { useEffect, useState } from 'react';
+import { useApolloClient, useQuery } from '@apollo/client';
 
 import Loader from '../../Loader/Loader';
 import SubjectsCard from '../../Cards/subjectCard/SubjectsCard';
@@ -15,16 +15,23 @@ const SubjectListComponent = ({
   download,
   deleted,
   isSubjectStatus,
-  editable
+  editable,
+  onPressView,
+  socketEventUpdateMessage,
+  isDecisionSubject,
+  onPressEdit,
+  meetingData,
+  setSearchText
 }) => {
   const [filterData, setFilterData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [userData, setUserData] = useState([]);
+  const [Subjects, setSubjectData] = useState([]);
+  const client = useApolloClient();
   const AllTypesSubjects = 0;
   let queryParams = {};
 
   if (meetingId == null) {
-    console.log('isNull');
     queryParams = {
       committeeIds: committeeIds,
       searchValue: searchText,
@@ -33,17 +40,35 @@ const SubjectListComponent = ({
       pageSize: -1
     };
   } else {
-    console.log('isNotNull');
-    console.log('searchtext', searchText);
     queryParams = {
       committeeIds: committeeIds,
       searchValue: searchText,
-      screen: AllTypesSubjects,
+      screen: 0,
       page: -1,
       pageSize: -1,
       meetingId: meetingId
     };
   }
+
+  // filter subjects
+  const searchFilterSubject = (text) => {
+    if (text) {
+      const newData = Subjects.filter((item) => {
+        const itemData = item.subjectTitle ? item.subjectTitle : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+      setSearchText(text);
+      setFilterData(newData);
+    } else {
+      setSearchText(text);
+      setFilterData(Subjects);
+    }
+  };
+
+  useEffect(() => {
+    searchFilterSubject(searchText);
+  }, [Subjects]);
 
   // get ALL SUBJECTS
 
@@ -57,12 +82,21 @@ const SubjectListComponent = ({
     onCompleted: (data) => {
       setFilterData(data?.subjects.items);
 
-      // setSubjectData(data?.subjects.items);
+      setSubjectData(data?.subjects.items);
     },
     onError: (data) => {
       console.log('subjects error---', data.message);
     }
   });
+
+  // use effect for when socket is update subject
+  useEffect(() => {
+    if (socketEventUpdateMessage == 'Updated Subject') {
+      client.refetchQueries({
+        include: ['subjects']
+      });
+    }
+  }, [socketEventUpdateMessage]);
 
   return (
     <TouchableOpacity
@@ -80,7 +114,9 @@ const SubjectListComponent = ({
           }}
         >
           <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-            {SubjectsError.message}
+            {SubjectsError.message == 'Network request failed'
+              ? 'No Internet connection'
+              : SubjectsError.message}
           </Text>
         </View>
       ) : filterData.length > 0 ? (
@@ -101,6 +137,10 @@ const SubjectListComponent = ({
               deleted={deleted}
               editable={editable}
               userData={userData}
+              onPressView={onPressView}
+              isDecisionSubject={isDecisionSubject}
+              onPressEdit={onPressEdit}
+              meetingData={meetingData}
             />
           )}
         />

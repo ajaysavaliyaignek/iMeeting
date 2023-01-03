@@ -30,7 +30,6 @@ import {
 } from '../../../../graphql/query';
 import { UPDATE_MEETING } from '../../../../graphql/mutation';
 import { UserContext } from '../../../../context';
-import AddSubjectsCard from '../addMeetingSubjects/AddSubjectsCard';
 import { Fonts } from '../../../../themes';
 
 const EditMeetingSubjects = () => {

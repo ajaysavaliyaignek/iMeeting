@@ -21,7 +21,7 @@ const AddEditGeneralScreen = ({
   const [committee, setCommittee] = useState(null);
   const [token, setToken] = useState('');
 
-  console.log('filesid', details?.attachFileIds);
+  console.log('generaldData', generaldData);
 
   details?.attachFileIds?.map((id) => {
     console.log('id', id);
@@ -104,7 +104,7 @@ const AddEditGeneralScreen = ({
             });
           }}
           title={'CHOOSE COMMITTEE'}
-          value={generaldData.valueCommitee}
+          value={generaldData?.valueCommitee}
         />
 
         <View style={styles.discriptionContainer}>
@@ -145,6 +145,7 @@ const AddEditGeneralScreen = ({
           }}
           deleted={true}
           download={true}
+          isShowAttchTitle={true}
         />
       </View>
     </ScrollView>

@@ -49,6 +49,10 @@ import MeetingDetails from './src/screens/servicesScreen/meetings/meetingDetails
 import Role from './src/screens/servicesScreen/meetings/role/Role';
 import YourAnswer from './src/screens/servicesScreen/meetings/yourAnswer/YourAnswer';
 import Users from './src/screens/servicesScreen/meetings/users/Users';
+import AddTask from './src/screens/liveMetting/addTask/AddTask';
+import AddEditDecision from './src/screens/liveMetting/addEditDecision/AddEditDecision';
+import LiveMeetingSubjectDetails from './src/screens/liveMetting/liveMeetingSubjectDetails/LiveMeetingSubjectDetails';
+import ViewVotingHistory from './src/screens/liveMetting/liveMeetingVotings/ViewVotingHistory';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -278,6 +282,13 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="LiveMeetingMenu" component={LiveMeetingMenu} />
       <Stack.Screen name="AddSpeaker" component={AddSpeaker} />
       <Stack.Screen name="AddVoting" component={AddVoting} />
+      <Stack.Screen name="AddTask" component={AddTask} />
+      <Stack.Screen name="AddEditDecision" component={AddEditDecision} />
+      <Stack.Screen
+        name="LiveMeetingSubjectDetails"
+        component={LiveMeetingSubjectDetails}
+      />
+      <Stack.Screen name="ViewVotingHistory" component={ViewVotingHistory} />
     </Stack.Navigator>
   );
 };

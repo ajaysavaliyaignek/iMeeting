@@ -85,7 +85,7 @@ const AppointmentsDetails = () => {
         variables: {
           id: +item?.appointmentId,
           userId: +data.userPayload.userId,
-          type: 2
+          type: 4
         }
       });
     }
@@ -111,6 +111,7 @@ const AppointmentsDetails = () => {
       console.log('file error', error);
     }
   });
+  console.log('file response', fileResponse);
 
   const DurationTime = moment(
     `${appointment?.endDate} ${appointment?.endTime}`,
@@ -294,7 +295,7 @@ const AppointmentsDetails = () => {
                   navigation.navigate('LocationDetails', {
                     locationId: appointment?.locationId,
                     platform: appointment?.platformName,
-                    locationType: 2,
+                    locationType: 4,
                     role: item?.yourRoleName
                   })
                 }
@@ -367,6 +368,7 @@ const AppointmentsDetails = () => {
               showAttachButton={false}
               deleted={false}
               download={true}
+              isShowAttchTitle={true}
             />
           )}
         </View>

@@ -21,6 +21,7 @@ import {
   convertPercentageString,
   calculateProgressBarAnimation,
 } from "../utils/RNPoll.utils";
+import { getHighlightedText } from "../../highlitedText/HighlitedText";
 
 const defaultCheckMarkImage = require("../local-assets/checkmark.png");
 
@@ -69,11 +70,13 @@ const RNPollItem: React.FC<IRNPollItemProps> = ({
   checkMarkIconImageSource = defaultCheckMarkImage,
   ImageComponent = Image,
   PollItemContainer = View,
+  answerIds,
+                setAnswerIds,
   ...rest
  
 }) => {
   const { width } = calculateProgressBarAnimation({
-    percentage,
+   percentage,
     hasBeenVoted,
   });
   const [_disableBuiltInIncreaseVote, setDisableBuiltInIncreaseVote] = React.useState(false);
@@ -85,11 +88,19 @@ const RNPollItem: React.FC<IRNPollItemProps> = ({
   }
 
   return (
-    <RNBounceable bounceEffectIn={0.97} onPress={() => { onPress();setDisableBuiltInIncreaseVote(!_disableBuiltInIncreaseVote)
-      !_disableBuiltInIncreaseVote &&
-        (eachChoice.votes = eachChoice.votes + 1);
+    <RNBounceable bounceEffectIn={0.97} onPress={() => {
+      onPress(); setDisableBuiltInIncreaseVote(!_disableBuiltInIncreaseVote)
+
     
-      _disableBuiltInIncreaseVote&&(eachChoice.votes = eachChoice.votes - 1); }} disabled={disabled} >
+      if (_disableBuiltInIncreaseVote) {
+        // eachChoice.votes = eachChoice.votes - 1 
+     const newAnswerId = answerIds?.filter(id => eachChoice?.id != id)
+      setAnswerIds(newAnswerId)
+      }
+    //   _disableBuiltInIncreaseVote && {(eachChoice.votes = eachChoice.votes - 1 const 
+    // };
+     
+    }} disabled={votedChoiceByID!==eachChoice?.id? disabled:false} >
       <View style={_container(borderColor, _borderWidth)}>
         <Animated.View
           style={[
@@ -97,14 +108,16 @@ const RNPollItem: React.FC<IRNPollItemProps> = ({
             _animatedViewStyle(fillBackgroundColor, width),
           ]}
         />
-        <Text style={[styles.choiceTextStyle, choiceTextStyle]}>{text}</Text>
+        <Text style={[styles.choiceTextStyle, choiceTextStyle]}>
+          {text}
+        </Text>
       
           <PollItemContainer style={styles.pollItemContainer} {...rest}>
          
               <Text style={styles.votesCount}>{eachChoice.votes} votes</Text>
      
             <Text style={[styles.percentageTextStyle, percentageTextStyle]}>
-              {convertPercentageString(percentage)}
+              {percentage.toFixed(2)} %
             </Text>
           </PollItemContainer>
    

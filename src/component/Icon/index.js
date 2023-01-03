@@ -208,6 +208,12 @@ const Icon = ({ name, height = SIZES[24], width = SIZES[24], fill }) => {
         return (
           <SVGImage.LMVotingsWhite height={height} width={width} fill={fill} />
         );
+      case IconName.AttachFile:
+        return (
+          <SVGImage.AttachFile height={height} width={width} fill={fill} />
+        );
+      case IconName.Send_Gray:
+        return <SVGImage.Send_Gray height={height} width={width} fill={fill} />;
 
       default:
         return null;

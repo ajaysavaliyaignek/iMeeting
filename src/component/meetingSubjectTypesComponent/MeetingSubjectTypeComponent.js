@@ -30,7 +30,6 @@ const MeetingSubjectTypeComponent = ({
     },
 
     onCompleted: (data) => {
-      console.log('subjects from add voting', data);
       setSubjects(data?.subjects.items);
 
       // setSubjectData(data?.subjects.items);

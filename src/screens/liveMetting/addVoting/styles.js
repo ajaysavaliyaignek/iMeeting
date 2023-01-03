@@ -20,9 +20,7 @@ export const styles = StyleSheet.create({
     color: Colors.secondary
   },
   optionsContainer: {
-    marginTop: SIZES[24],
-    borderBottomWidth: SIZES[1],
-    borderBottomColor: Colors.line
+    marginTop: SIZES[24]
   },
   textInput: {
     marginVertical: SIZES[10]

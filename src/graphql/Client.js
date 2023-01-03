@@ -3,19 +3,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ApolloLink } from 'apollo-link';
 import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';
+import { UserContext } from '../context';
 
 export const Client = () => {
   const [url, setUrl] = useState('');
-  // const { companyUrl, setCompanyUrl } = useContext(UserContext);
 
   useEffect(() => {
     DeviceEventEmitter.addListener('urlChanged', getUrl);
 
-    return () => {
-      DeviceEventEmitter.removeAllListeners('urlChanged');
-    };
+    // return () => {
+    //   DeviceEventEmitter.removeAllListeners('urlChanged');
+    // };
   }, []);
   console.log('url from client', url);
 

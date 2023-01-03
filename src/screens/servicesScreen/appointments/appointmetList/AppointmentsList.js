@@ -159,7 +159,9 @@ const AppointmentsList = () => {
         ) : Appointment.error ? (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-              {Appointment.error.message}
+              {Appointment?.error?.message == 'Network request failed'
+                ? 'No Internet connection'
+                : Appointment?.error?.message}
             </Text>
           </View>
         ) : Appointment.loading ? (

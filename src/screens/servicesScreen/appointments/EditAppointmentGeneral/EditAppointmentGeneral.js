@@ -251,6 +251,7 @@ const EditAppointmentGeneral = () => {
             }}
             deleted={true}
             download={true}
+            isShowAttchTitle={true}
           />
         </ScrollView>
       </View>

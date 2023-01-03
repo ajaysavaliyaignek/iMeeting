@@ -27,9 +27,15 @@ import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 const AddSubjectScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { committee, isEdit, subjectDetails, screenName, meetingName } =
-    route?.params;
-  console.log('committee from add subjects', subjectDetails);
+  const {
+    committee,
+    isEdit,
+    subjectDetails,
+    screenName,
+    meetingName,
+    meetingId
+  } = route?.params;
+
   const [token, setToken] = useState('');
   const [category, setCategory] = useState([]);
   const [committees, setCommittee] = useState([]);
@@ -43,16 +49,29 @@ const AddSubjectScreen = () => {
       : committee != null
       ? committee
       : null,
-    valueMeeting: isEdit ? subjectDetails?.meetingId : 0,
+    valueMeeting: isEdit
+      ? subjectDetails?.meetingId
+      : meetingId
+      ? meetingId
+      : 0,
     valueCategory: isEdit ? subjectDetails?.subjectCategoryId : null,
     filesId: []
   });
   let queryParams = [];
-  if (committee) {
+  if (committee && meetingId == null) {
     queryParams = {
       searchValue: '',
       screen: 1,
-      committeeIds: committee.toString()
+      committeeIds: `${committee}`
+    };
+  } else if (meetingId) {
+    queryParams = {
+      committeeIds: '',
+      searchValue: '',
+      screen: 0,
+      page: -1,
+      pageSize: -1,
+      meetingId: meetingId
     };
   } else {
     queryParams = {
@@ -63,8 +82,6 @@ const AddSubjectScreen = () => {
       pageSize: -1
     };
   }
-
-  console.log('subjectData', subjectData);
 
   // fetch file
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
@@ -95,7 +112,6 @@ const AddSubjectScreen = () => {
     useQuery(GET_All_SUBJECTS_CATEGORY, {
       onCompleted: (data) => {
         if (data) {
-          console.log('subject category', data.subjectCategories.items);
           setCategory(data.subjectCategories.items);
         }
       }
@@ -112,7 +128,6 @@ const AddSubjectScreen = () => {
       variables: { isDeleted: true },
       onCompleted: (data) => {
         if (data) {
-          console.log('committees', data?.committees.items);
           setCommittee(data.committees.items);
         }
       }
@@ -129,7 +144,6 @@ const AddSubjectScreen = () => {
       variables: { onlyMyMeeting: false, screen: 1 },
       onCompleted: (data) => {
         if (data) {
-          console.log('meetings', data?.meetings.items);
           setMeetings(data.meetings.items);
         }
       }
@@ -165,8 +179,8 @@ const AddSubjectScreen = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log(data);
-      if (data.updateSubject.status[0].statusCode == '200') {
+      console.log('update subject', data.updateSubject?.status);
+      if (data?.updateSubject?.status[0]?.statusCode == '200') {
         if (committee) {
           navigation.goBack();
         } else {
@@ -285,6 +299,7 @@ const AddSubjectScreen = () => {
           }}
           deleted={true}
           download={true}
+          isShowAttchTitle={true}
         />
       </ScrollView>
 
@@ -306,22 +321,33 @@ const AddSubjectScreen = () => {
           <Button
             title={'Save'}
             onPress={() => {
+              console.log({
+                subjectId: isEdit ? subjectDetails.subjectId : 0,
+                committeeId: subjectData.valueCommittee,
+                subjectTitle: subjectData.title,
+                description: subjectData.discription,
+                subjectCategoryId: subjectData.valueCategory,
+                draft: false,
+                attachFileIds: subjectData.filesId,
+                meetingId: subjectData.valueMeeting,
+                id: 0
+              });
               addSubject({
                 variables: {
                   subject: {
-                    subjectId: 0,
+                    subjectId: isEdit ? subjectDetails.subjectId : 0,
                     committeeId: subjectData.valueCommittee,
                     subjectTitle: subjectData.title,
                     description: subjectData.discription,
                     subjectCategoryId: subjectData.valueCategory,
                     draft: false,
                     attachFileIds: subjectData.filesId,
-                    meetingId: subjectData.valueMeeting,
+                    meetingId:
+                      subjectData.valueMeeting == null
+                        ? 0
+                        : subjectData.valueMeeting,
                     id: 0
                   }
-                },
-                onCompleted: (data) => {
-                  console.log(data.updateSubject);
                 }
               });
             }}

@@ -6,7 +6,7 @@ import {
   PermissionsAndroid,
   Platform
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Fonts } from '../../themes';
 import { Colors } from '../../themes/Colors';
@@ -16,6 +16,8 @@ import { SIZES } from '../../themes/Sizes';
 import ConvertBytes from '../convertBytes/ConvertBytes';
 import RNFetchBlob from 'rn-fetch-blob';
 import Loader from '../Loader/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { checkPermission } from '../downloadFile/DownloadFile';
 // import { checkPermission } from '../downloadFile/DownloadFile';
 
 const FilesCard = ({
@@ -29,99 +31,7 @@ const FilesCard = ({
   loading,
   error
 }) => {
-  const checkPermission = async (file) => {
-    console.log('check permission', file);
-    if (Platform.OS === 'ios') {
-      downloadFile(file);
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission Required',
-            message: 'Application needs access to your storage to download File'
-          }
-        );
-        console.log('permission', PermissionsAndroid.RESULTS.GRANTED);
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // Start downloading
-
-          downloadFile(file);
-
-          console.log('Storage Permission Granted.');
-        } else {
-          // If permission denied then show alert
-          Alert.alert('Error', 'Storage Permission Not Granted');
-        }
-      } catch (err) {
-        // To handle permission related exception
-        console.log('++++' + err);
-      }
-    }
-  };
-
-  const downloadFile = async (file) => {
-    console.log('downloadfile');
-    // Get today's date to add the time suffix in filename
-    let date = new Date();
-    // File URL which we want to download
-    let FILE_URL = file;
-    // Function to get extention of the file url
-    let file_ext = getFileExtention(FILE_URL);
-
-    file_ext = '.' + file_ext[0];
-
-    console.log('file_ext', file_ext);
-
-    // config: To get response by passing the downloading related options
-    // fs: Root directory path to download
-    const { config, fs } = RNFetchBlob;
-    const { DownloadDir } = fs.dirs;
-    let fPath = Platform.select({
-      ios: RNFetchBlob.fs.dirs.DocumentDir,
-      android: RNFetchBlob.fs.dirs.DownloadDir
-    });
-    if (Platform.OS == 'ios') {
-      await RNFetchBlob.fs.createFile(fPath);
-    }
-
-    if (Platform.OS == 'ios') {
-      RNFetchBlob.ios.openDocument(fPath);
-    } else {
-      console.log('file path2', fPath);
-
-      RNFetchBlob.android.actionViewIntent(fPath);
-      await FileViewer.open(fPath, { showOpenWithDialog: true });
-    }
-    // let options = {
-    //   fileCache: true,
-    //   addAndroidDownloads: {
-    //     useDownloadManager: true, // true will use native manager and be shown on notification bar.
-    //     notification: true,
-    //     path: `${fPath}/${Date.now()}${file_ext}`,
-
-    //     description: 'downloading file...',
-    //     notification: true,
-    //     // useDownloadManager works with Android only
-    //     useDownloadManager: true
-    //   }
-    // };
-    // config(options)
-    //   .fetch('GET', FILE_URL)
-    //   .then((res) => {
-    //     // Alert after successful downloading
-    //     console.log('res -> ', res.respInfo.redirects[0]);
-    //     alert('File Downloaded Successfully.');
-    //     if (Platform.OS == 'ios') {
-    //       RNFetchBlob.ios.openDocument(res.respInfo.redirects[0]);
-    //     }
-    //   });
-  };
-
-  const getFileExtention = (fileUrl) => {
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
+  let setIsDownloaded = () => {};
   return (
     <View>
       <View style={[styles.container, style]}>
@@ -134,7 +44,9 @@ const FilesCard = ({
 
         <View style={styles.leftView}>
           {download && (
-            <TouchableOpacity onPress={() => checkPermission(fileUrl)}>
+            <TouchableOpacity
+              onPress={() => checkPermission(fileUrl, setIsDownloaded)}
+            >
               <Icon
                 name={IconName.Download}
                 height={SIZES[18]}

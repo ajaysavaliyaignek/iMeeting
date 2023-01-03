@@ -19,12 +19,15 @@ import {
   GET_COMMITTEE_BY_ID,
   GET_FILE,
   GET_MEETING_BY_ID,
+  GET_MEETING_STATUS,
   GET_PLATFORMLINK,
   GET_USER_PAYLOAD
 } from '../../../../graphql/query';
 import { DELETE_MEETING } from '../../../../graphql/mutation';
 import DetailsComponent from '../../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 import { UserContext } from '../../../../context';
+import Loader from '../../../../component/Loader/Loader';
+import { SIZES } from '../../../../themes/Sizes';
 
 const MeetingDetails = () => {
   const navigation = useNavigation();
@@ -35,101 +38,10 @@ const MeetingDetails = () => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item } = route?.params;
-  console.log('item', item);
 
-  const [fileResponse, setFileResponse] = useState(null);
-  const [meeting, setMeeting] = useState(null);
-  const [location, setLocation] = useState(null);
-  const [committe, setCommittee] = useState(null);
-  const [platform, setPlatform] = useState(null);
-  const [role, setRole] = useState('');
-  const [user, setUser] = useState(null);
-  const [answer, setAnswer] = useState(null);
-  let file = [];
-
-  // get meeting
-  const { data, error, loading } = useQuery(GET_MEETING_BY_ID, {
-    variables: {
-      meetingId: item.meetingId
-    },
-    onCompleted: (data) => {
-      console.log('meeting by id', data.meeting);
-      if (data) {
-        setMeeting(data.meeting);
-        setRole(data.meeting.yourRoleName);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-  console.log('user', user);
-
-  const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
-    onCompleted: (data) => {
-      console.log('answer data', data.answer);
-      setAnswer(data.answer);
-    }
-  });
-
-  const getUserDetails = useQuery(GET_USER_PAYLOAD, {
-    onCompleted: (data) => {
-      console.log('user data', data.userPayload.userId);
-      setUser(data.userPayload.userId);
-      getAnswer({
-        variables: {
-          id: +item?.meetingId,
-          userId: +data.userPayload.userId,
-          type: 1
-        }
-      });
-    }
-  });
-
-  const DurationTime = moment(`${meeting?.endDate} ${meeting?.endTime}`, [
-    'YYYY-MM-DD hh:mm A'
-  ]).diff(
-    moment(`${meeting?.setDate} ${meeting?.setTime}`, ['YYYY-MM-DD hh:mm A']),
-    'minutes'
-  );
-  const durationHourMin = moment
-    .duration(DurationTime, 'minutes')
-    .format('h [hrs], m [min]');
-
-  // Calculate the duration
-  // Keep in mind you can get the duration in seconds, days, etc.
-
-  console.log('file id', meeting?.attachFileIds);
-
-  // get location
-  const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
-    variables: {
-      locationId: item.locationId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setLocation(data.location);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-
-  // get committee
-  const Committee = useQuery(GET_COMMITTEE_BY_ID, {
-    variables: {
-      organizationId: item.committeeId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setCommittee(data.committee);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get committee by id', data);
-    }
-  });
+  const [role, setRole] = useState(item?.yourRoleName);
+  const [meetingStatus, setMeetingStatus] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // delete meeting
   const [deleteMeeting] = useMutation(DELETE_MEETING, {
@@ -177,6 +89,18 @@ const MeetingDetails = () => {
     ]);
   };
 
+  // getMeetingSubjects for meeting
+  const getMeetingSubjects = useQuery(GET_MEETING_STATUS, {
+    onCompleted: (data) => {
+      if (data) {
+        setMeetingStatus(data.meetingStatus.items);
+      }
+    },
+    onError: (data) => {
+      console.log('error getMeetingSubjects ', data.message);
+    }
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -185,56 +109,84 @@ const MeetingDetails = () => {
         onLeftPress={() => navigation.goBack()}
       />
 
-      <DetailsComponent item={item} isLiveMeetingDetails={true} />
+      <View style={{ flex: 1 }}>
+        <DetailsComponent
+          item={item}
+          isLiveMeetingDetails={true}
+          setLoading={setLoading}
+        />
 
-      {role == 'Head' || role == 'Secretary' ? (
-        <View style={styles.bottomContainer}>
-          <Divider style={styles.divider} />
-          {item.meetingStatusTitle !== 'Deleted' && (
-            <View style={styles.btnContainer}>
-              <Button
-                title={'Edit'}
-                layoutStyle={[styles.btnLayout, { backgroundColor: '#F3F6F9' }]}
-                textStyle={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.primary
-                }}
-                onPress={() => {
-                  navigation.navigate(
-                    'AddEditMeetingAppointmentVideoConference',
-                    {
-                      screenName: 'Edit meeting',
-                      type: 'Meeting',
-                      screensArray: [
-                        'general',
-                        'users',
-                        'dateandtime',
-                        'location',
-                        'subjects'
-                      ],
-                      isEdit: true,
-                      details: item
-                    }
-                  );
-                  setMeetingsData([]);
-                }}
-              />
-              <Button
-                title={'Delete'}
-                layoutStyle={[styles.btnLayout, { backgroundColor: '#DD7878' }]}
-                onPress={onDeleteHandler}
-              />
-              <Button
-                title={'Start'}
-                layoutStyle={[styles.btnLayout]}
-                onPress={() => {
-                  // navigation.navigate('LiveMeetingMenu', { item });
-                }}
-              />
-            </View>
-          )}
-        </View>
-      ) : null}
+        {role == 'Head' || role == 'Secretary' ? (
+          <View style={styles.bottomContainer}>
+            <Divider style={styles.divider} />
+            {item.meetingStatusTitle !== 'Deleted' && (
+              <View style={styles.btnContainer}>
+                <Button
+                  title={'Edit'}
+                  layoutStyle={[
+                    styles.btnLayout,
+                    { backgroundColor: '#F3F6F9' }
+                  ]}
+                  textStyle={{
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.primary
+                  }}
+                  onPress={() => {
+                    navigation.navigate(
+                      'AddEditMeetingAppointmentVideoConference',
+                      {
+                        screenName: 'Edit meeting',
+                        type: 'Meeting',
+                        screensArray: [
+                          'general',
+                          'users',
+                          'dateandtime',
+                          'location',
+                          'subjects'
+                        ],
+                        isEdit: true,
+                        details: item
+                      }
+                    );
+                    setMeetingsData([]);
+                  }}
+                />
+                <Button
+                  title={'Delete'}
+                  layoutStyle={[
+                    styles.btnLayout,
+                    { backgroundColor: '#DD7878' }
+                  ]}
+                  onPress={onDeleteHandler}
+                />
+                <Button
+                  title={'Start'}
+                  layoutStyle={[styles.btnLayout]}
+                  onPress={() => {
+                    navigation.navigate('LiveMeetingMenu', {
+                      item,
+                      meetingStatus: meetingStatus
+                    });
+                  }}
+                />
+              </View>
+            )}
+          </View>
+        ) : (
+          <View style={{ padding: SIZES[16] }}>
+            <Button
+              title={'Start'}
+              layoutStyle={[styles.btnLayout, { width: '100%' }]}
+              onPress={() => {
+                navigation.navigate('LiveMeetingMenu', {
+                  item,
+                  meetingStatus: meetingStatus
+                });
+              }}
+            />
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 };

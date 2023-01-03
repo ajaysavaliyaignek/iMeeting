@@ -15,6 +15,7 @@ export interface IChoice {
   id: number;
   votes: number;
   choice: string;
+  percentage: string;
 }
 
 export interface IRNPollProps {
@@ -27,7 +28,13 @@ export interface IRNPollProps {
   pollContainerStyle?: CustomStyleProp;
   PollContainer?: any;
   PollItemContainer?: any;
-  isAddAnswer: Boolean;
+  isAddAnswer: boolean;
+  isDisable: boolean;
+  anserIds: Array;
+  isMultipleSelect: boolean;
+  disable: boolean;
+  setDisable: () => void;
+  setAnswerIds: () => void;
   onChoicePress: (selectedChoice: IChoice) => void;
 }
 
@@ -43,12 +50,18 @@ const RNPoll: React.FC<IRNPollProps> = ({
   PollContainer = View,
   onChoicePress,
   isAddAnswer,
+  isDisable,
+  answerIds,
+  setAnswerIds,
+  isMultipleSelect,
+  disable,
+  setDisable,
   ...rest
 }) => {
   const [_hasBeenVoted, setHasBeenVoted] = React.useState(hasBeenVoted);
   const [votedChoice, setVotedChoice] = React.useState(votedChoiceByID);
-  const [isDisable, setIsDisable] = React.useState(false);
   const [_disableBuiltInIncreaseVote, setDisableBuiltInIncreaseVote] = React.useState(disableBuiltInIncreaseVote);
+
 
   return (
     <View style={style}>
@@ -61,29 +74,36 @@ const RNPoll: React.FC<IRNPollProps> = ({
           {...rest}
         >
           {choices.map((eachChoice: IChoice) => {
-            const { choice, id, votes } = eachChoice;
-            const percentage = _hasBeenVoted
-              ? countPercentage(votes, totalVotes)
-              : countPercentage(votes, totalVotes);
+            const { choice, id, votes, percentage } = eachChoice;
+       
+            // const percentage = _hasBeenVoted
+            //   ? countPercentage(votes, totalVotes)
+            //   : countPercentage(votes, totalVotes);
 
             return (
               <RNPollItem
                 {...rest}
-                id={id}
+                id={eachChoice?.id}
               isAddAnswer={isAddAnswer}
                 key={id}
                 text={choice}
+                percentage={parseInt(percentage)}
                 eachChoice={eachChoice}
-                disabled={isDisable}
-                percentage={percentage}
+                disabled={disable}
+                answerIds={answerIds}
+                setAnswerIds={setAnswerIds}
                 hasBeenVoted={_hasBeenVoted}
                 votedChoiceByID={votedChoice}
                 PollItemContainer={PollItemContainer}
                 onPress={() => {
-                  setIsDisable(true)
+                  
                   setHasBeenVoted(true);
                   setVotedChoice(id);
-                  onChoicePress && onChoicePress(eachChoice);
+                  onChoicePress(eachChoice);
+                  // if (!isMultipleSelect) {
+                  //   setDisable(true)
+                  // }
+                  
                 }}
               />
             );

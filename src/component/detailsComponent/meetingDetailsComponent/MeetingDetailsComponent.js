@@ -41,14 +41,13 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   // const { item } = route?.params;
-  console.log('item from meeting details', item);
 
   const [fileResponse, setFileResponse] = useState([]);
   const [meeting, setMeeting] = useState(null);
   const [location, setLocation] = useState(null);
   const [committe, setCommittee] = useState(null);
   const [platform, setPlatform] = useState(null);
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState(item?.yourRoleName);
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
   const [subjects, setSubjects] = useState(null);
@@ -62,14 +61,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
         fileEntryId: id
       },
       onCompleted: (data) => {
-        console.log('file from meeting details', data);
         fileResponse.push(data.uploadedFile);
-        // setFileResponse((prev) => {
-        //   const pevDaa = prev?.filter((ite) => {
-        //     return ite.fileEnteryId !== data.fileEnteryId;
-        //   });
-        //   return [...pevDaa, data.uploadedFile];
-        // });
       }
     });
     if (getFile.error) {
@@ -83,7 +75,6 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       meetingId: item.meetingId
     },
     onCompleted: (data) => {
-      console.log('meeting by id', data.meeting);
       if (data) {
         setMeeting(data.meeting);
         setRole(data.meeting.yourRoleName);
@@ -93,18 +84,17 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       console.log('error in get meeting by id', data);
     }
   });
-  console.log('user', user);
+  if (loading) {
+  }
 
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
     onCompleted: (data) => {
-      console.log('answer data', data.answer);
       setAnswer(data.answer);
     }
   });
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
     onCompleted: (data) => {
-      console.log('user data', data.userPayload.userId);
       setUser(data.userPayload.userId);
       getAnswer({
         variables: {
@@ -116,20 +106,15 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
     }
   });
 
-  const DurationTime = moment(`${meeting?.endDate} ${meeting?.endTime}`, [
+  const DurationTime = moment(`${item?.endDate} ${item?.endTime}`, [
     dateTimeFormate
   ]).diff(
-    moment(`${meeting?.setDate} ${meeting?.setTime}`, [dateTimeFormate]),
+    moment(`${item?.setDate} ${item?.setTime}`, [dateTimeFormate]),
     'minutes'
   );
   const durationHourMin = moment
     .duration(DurationTime, 'minutes')
     .format('h [hrs], m [min]');
-
-  // Calculate the duration
-  // Keep in mind you can get the duration in seconds, days, etc.
-
-  console.log('file id', meeting?.attachFileIds);
 
   // get location
   const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
@@ -187,26 +172,6 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
     }
   });
 
-  const onDeleteHandler = () => {
-    Alert.alert('Delete meeting', 'Are you sure you want to delete this?', [
-      {
-        text: 'Delete',
-        onPress: () =>
-          deleteMeeting({
-            variables: {
-              meetingId: item.meetingId
-            }
-          }),
-        style: 'destructive'
-      },
-      {
-        text: 'Cancel',
-        // onPress: () => navigation.navigate("Login"),
-        style: 'cancel'
-      }
-    ]);
-  };
-
   // get ALL SUBJECTS
   const {
     loading: SubjectsLoading,
@@ -219,15 +184,13 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       screen: 0,
       page: -1,
       pageSize: -1,
-      meetingId: item?.meetingId
+      meetingId: item?.meetingId,
+      isDraft: false
     },
 
     onCompleted: (data) => {
-      console.log('meeting selected subjects', data.subjects.items);
       setSubjects(data?.subjects.items);
-      // setBackupUser(data?.subjects.items);
-      // setFilterData(data?.subjects.items);
-      // setSubjectData(data?.subjects.items);
+      console.log('subjects', data?.subjects.items);
     }
   });
 
@@ -251,19 +214,17 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       <View style={styles.detailsContainer}>
         <Text style={styles.txtTitle}>General</Text>
         {details('Committee', committe?.committeeTitle)}
-        {details('Your role', meeting?.yourRoleName)}
-        {details('Title', meeting?.meetingTitle)}
-        {details('Description', meeting?.description)}
-        {details('Creator', meeting?.creatorName)}
+        {details('Your role', item?.yourRoleName)}
+        {details('Title', item?.meetingTitle)}
+        {details('Description', item?.description)}
+        {details('Creator', item?.creatorName)}
       </View>
       <View style={styles.detailsContainer}>
         <Text style={styles.txtTitle}>Date & Time</Text>
         <View>
           {details(
             'Start date',
-            `${moment(meeting?.setDate).format('DD MMM, YYYY')}, ${
-              meeting?.setTime
-            }`
+            `${moment(item?.setDate).format('DD MMM, YYYY')}, ${item?.setTime}`
           )}
           <View>
             <Text style={styles.txtDuration}>
@@ -272,17 +233,17 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
             </Text>
           </View>
         </View>
-        {details('Timezone', meeting?.timeZone)}
+        {details('Timezone', item?.timeZone)}
 
         {details(
           'Repeat',
-          meeting?.repeat == 0
+          item?.repeat == 0
             ? "Dosen't repeat"
-            : meeting?.repeat == 1
+            : item?.repeat == 1
             ? 'Repeat daily'
-            : meeting?.repeat == 2
+            : item?.repeat == 2
             ? 'Repeat weekly'
-            : meeting?.repeat == 3
+            : item?.repeat == 3
             ? 'Repeat monthly'
             : 'Repeat yearly'
         )}
@@ -440,6 +401,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
             showAttachButton={false}
             deleted={false}
             download={true}
+            isShowAttchTitle={true}
           />
         )}
         {!!isLiveMeetingDetails && (
@@ -450,14 +412,16 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
               activeOpacity={0.5}
               onPress={() =>
                 navigation.navigate('Users', {
-                  userDetails: meeting?.userDetails
+                  userDetails: item?.userDetails
                 })
               }
             >
               <Text style={styles.txtCommittee}>Users</Text>
               <View style={styles.btnCommittees}>
                 <Text style={styles.txtBtnCommittees}>
-                  {meeting?.userIds?.length > 0 ? meeting?.userIds?.length : 0}
+                  {item?.userDetails?.length > 0
+                    ? item?.userDetails?.length
+                    : 0}
                 </Text>
                 <Icon
                   name={IconName.Arrow_Right}

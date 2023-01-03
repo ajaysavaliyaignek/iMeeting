@@ -49,7 +49,12 @@ const AddSubjectsCard = ({
   const { selectedSubjects, setSelectedSubjects } = useContext(UserContext);
 
   const getSubjectStatus = useQuery(GET_ALL_SUBJECTS_STATUS, {
-    variables: { subject: true, decision: false },
+    variables: {
+      subject: true,
+      decision: false,
+      approveDecision: false,
+      momDecision: false
+    },
     onCompleted: (data) => {
       if (data) {
         setSubectStatus(data.subjectStatus.items);

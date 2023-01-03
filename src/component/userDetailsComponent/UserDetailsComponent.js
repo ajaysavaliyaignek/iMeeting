@@ -26,8 +26,6 @@ const UserDetailsComponent = ({
   onPressEdit,
   meetingId
 }) => {
-  console.log('users', users);
-
   return (
     <View style={styles.container}>
       {users?.length > 0 ? (

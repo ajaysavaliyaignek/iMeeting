@@ -9,7 +9,7 @@ import {
 import React, { useContext, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { Divider, TextInput } from 'react-native-paper';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Icon, IconName } from '../../../component';

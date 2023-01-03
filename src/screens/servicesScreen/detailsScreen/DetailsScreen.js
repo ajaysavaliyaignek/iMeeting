@@ -336,7 +336,9 @@ const DetailsScreen = () => {
                   <Text
                     style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}
                   >
-                    {errorGetMeetings.message}
+                    {errorGetMeetings.message == 'Network request failed'
+                      ? 'No Internet connection'
+                      : errorGetMeetings.message}
                   </Text>
                 </View>
               ) : filterMeetingData.length > 0 ? (
@@ -383,10 +385,13 @@ const DetailsScreen = () => {
               meetingId={null}
               committeeIds={committeeId}
               searchText={searchText}
-              isSubjectStatus={true}
+              setSearchText={setSearchText}
               deleted={true}
               download={true}
               editable={true}
+              onPressView={(item) => {
+                navigation.navigate('SubjectDetails', { item });
+              }}
             />
           )}
         </View>

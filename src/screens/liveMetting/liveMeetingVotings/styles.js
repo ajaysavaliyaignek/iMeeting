@@ -64,5 +64,27 @@ export const styles = StyleSheet.create({
   questionContainer: {
     paddingVertical: SIZES[18]
   },
-  txtLabel: { ...Fonts.PoppinsRegular[14], color: Colors.bold }
+  txtLabel: { ...Fonts.PoppinsRegular[14], color: Colors.bold }.color,
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SIZES[12]
+  },
+  divider: {
+    width: '100%',
+    height: SIZES[1],
+    backgroundColor: Colors.line
+  },
+  txtCommitteeName: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.secondary,
+    width: '30%'
+  },
+  discription: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold
+  },
+  renderContainer: {
+    padding: SIZES[16]
+  }
 });

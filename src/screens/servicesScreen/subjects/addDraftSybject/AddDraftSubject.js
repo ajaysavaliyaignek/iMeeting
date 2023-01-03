@@ -213,6 +213,7 @@ const AddDraftSubject = () => {
           }}
           deleted={true}
           download={true}
+          isShowAttchTitle={true}
         />
       </ScrollView>
 

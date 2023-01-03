@@ -17,7 +17,8 @@ const AttachFiles = ({
   showAttachButton,
   styleFileCard,
   download,
-  deleted
+  deleted,
+  isShowAttchTitle
 }) => {
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
@@ -92,14 +93,15 @@ const AttachFiles = ({
 
   return (
     <View style={{ marginTop: SIZES[24] }}>
-      <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
+      {isShowAttchTitle && (
+        <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
+      )}
       {fileResponse?.length == 0 && loading ? (
         <Loader color={Colors.primary} />
       ) : fileResponse?.length == 0 && error ? (
         <Text style={styles.txtError}>{error}</Text>
       ) : (
         fileResponse?.map((file, index) => {
-          console.log('from retuen', file);
           return (
             <FilesCard
               download={download}
@@ -108,7 +110,7 @@ const AttachFiles = ({
               filePath={file.name}
               fileSize={file.size}
               fileType={file.type}
-              fileUrl={file.contentUrl}
+              fileUrl={file.downloadUrl}
               onRemovePress={() => removeFile(file)}
               style={styleFileCard}
               loading={loading}

@@ -67,7 +67,7 @@ const UserDetailsCard = ({
     }
   ]);
 
-  console.log('value status', valueStatus);
+  // get user by id
 
   const getUser = useQuery(GET_USER_BY_ID, {
     variables: {
@@ -82,7 +82,7 @@ const UserDetailsCard = ({
     }
   });
 
-  console.log('item from user details', item);
+  // update speaker
 
   const [updateSpeaker] = useMutation(UPDATE_SPEAKER, {
     refetchQueries: [
@@ -104,13 +104,11 @@ const UserDetailsCard = ({
   });
 
   const renderItem = (items) => {
-    console.log('render item', items);
     return (
       <TouchableOpacity
         style={[styles.item, { opacity: items.disabled ? 0.1 : 1 }]}
         disabled={items.disabled}
         onPress={() => {
-          console.log('items.disabled', items.disabled);
           if (items.disabled) {
             setValueStatus(item.status);
           } else {
@@ -156,8 +154,6 @@ const UserDetailsCard = ({
             value={switchValue}
             disabled={isSwichDisabled}
             onValueChange={(isRequired) => {
-              console.log('new changed value ', isRequired);
-
               onChangeUser(value, isRequired);
             }}
           />
@@ -231,17 +227,6 @@ const UserDetailsCard = ({
               renderItem={(item) => renderItem(item)}
               // visibleSelectedItem={false}
             />
-            {/* <DropDownPicker
-              zIndex={9999}
-              items={statusItems}
-              value={valueStatus}
-              setValue={setValueStatus}
-              open={open}
-              setOpen={setOpen}
-              style={{ borderWidth: 0, paddingLeft: 0 }}
-              placeholder={''}
-              disabledItemLabelStyle={{ color: Colors.line }}
-            /> */}
           </View>
         ) : (
           <View
@@ -272,7 +257,6 @@ const UserDetailsCard = ({
         setVisibleIndex(-1);
         if (isCheckboxView) {
           onChecked(item);
-          console.log('pressed');
         }
       }}
     >

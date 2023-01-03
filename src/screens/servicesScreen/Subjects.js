@@ -80,39 +80,28 @@ const Subjects = () => {
             <Text style={styles.txtDeadlineTitle}>
               RECIEVING SUBJECTS DEADLINE
             </Text>
-            {role == 'Head' || role == 'Secretary' ? (
-              <TouchableOpacity
-                style={styles.chooseDateContainer}
-                onPress={() => navigation.navigate('DeadlineSuggestion')}
-                disabled={true}
-              >
-                <View
-                  style={{
-                    borderBottomWidth: SIZES[1],
-                    borderBottomColor: Colors.primary,
-                    marginRight: SIZES[14]
-                  }}
-                >
-                  <Text style={styles.txtChooseDate}>{deadlinedDate}</Text>
-                </View>
 
-                <Icon
-                  name={IconName.Calendar_Focused}
-                  height={SIZES[20]}
-                  width={SIZES[18]}
-                />
-              </TouchableOpacity>
-            ) : (
-              <Text
+            <TouchableOpacity
+              style={styles.chooseDateContainer}
+              onPress={() => navigation.navigate('DeadlineSuggestion')}
+              disabled={true}
+            >
+              <View
                 style={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.bold,
-                  marginLeft: SIZES[8]
+                  borderBottomWidth: SIZES[1],
+                  borderBottomColor: Colors.primary,
+                  marginRight: SIZES[14]
                 }}
               >
-                5-11 September
-              </Text>
-            )}
+                <Text style={styles.txtChooseDate}>{deadlinedDate}</Text>
+              </View>
+
+              <Icon
+                name={IconName.Calendar_Focused}
+                height={SIZES[20]}
+                width={SIZES[18]}
+              />
+            </TouchableOpacity>
           </View>
           {role == 'Head' || role == 'Secretary' ? null : (
             <Button
@@ -164,8 +153,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES[10],
     backgroundColor: Colors.gray,
     borderRadius: SIZES[10],
-    marginVertical: SIZES[22],
-    height: SIZES[36]
+    marginVertical: SIZES[22]
+    // height: SIZES[36]
   },
   textInput: {
     ...Fonts.PoppinsRegular[14],

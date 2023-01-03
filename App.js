@@ -2,7 +2,12 @@ import 'react-native-gesture-handler';
 import React, { useContext, useEffect, useState } from 'react';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+  useQuery
+} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColorScheme } from 'react-native';
 
@@ -16,7 +21,6 @@ import { ApolloLink } from 'apollo-link';
 const App = () => {
   const [token, setToken] = useState(null);
   const [url, setUrl] = useState('');
-  // const { companyUrl, setCompanyUrl } = useContext(UserContext);
 
   const darkTheme = {
     ...DefaultTheme,

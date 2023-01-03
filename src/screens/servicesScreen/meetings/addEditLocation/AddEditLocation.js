@@ -9,7 +9,7 @@ import { Button } from '../../../../component/button/Button';
 import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
-const AddEditLocation = ({ generaldData, setGeneralData }) => {
+const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
   const navigation = useNavigation();
   const [location, setLocation] = useState([]);
   const [error, setError] = useState(null);
@@ -21,7 +21,7 @@ const AddEditLocation = ({ generaldData, setGeneralData }) => {
     data: LocationData
   } = useQuery(GET_ALL_LOCATION, {
     variables: {
-      locationType: 1
+      locationType: screenName == 'Meeting' ? 1 : 4
     },
 
     onCompleted: (data) => {
@@ -39,7 +39,7 @@ const AddEditLocation = ({ generaldData, setGeneralData }) => {
     navigation.navigate('LocationDetails', {
       locationId: generaldData?.valueLocation,
 
-      locationType: 1,
+      locationType: screenName == 'Meeting' ? 1 : 4,
       role: 'Head' || 'Secretary'
     });
   };

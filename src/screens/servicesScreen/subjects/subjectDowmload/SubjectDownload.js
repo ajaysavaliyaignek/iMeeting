@@ -117,16 +117,18 @@ const SubjectDownload = () => {
         if (Platform.OS == 'ios') {
           await RNFetchBlob.fs.createFile(fPath, base64Str, 'base64');
         } else {
-          RNFetchBlob.config({
+          let options = {
+            fileCache: true,
             addAndroidDownloads: {
-              title: 'Downloading',
-              useDownloadManager: true,
-              mediaScannable: true,
+              path: fPath,
+              description: 'downloading file...',
               notification: true,
-              description: 'File downloaded by download manager.',
-              path: fPath
+              // useDownloadManager works with Android only
+              useDownloadManager: true
             }
-          });
+          };
+          RNFetchBlob.config(options);
+
           await RNFetchBlob.fs.writeFile(fPath, base64Str, 'base64');
         }
 

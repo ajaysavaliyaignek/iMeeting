@@ -299,7 +299,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
             visibleIndex,
             setVisibleIndex,
             fileResponse,
-            setFileResponse
+            setFileResponse,
+            screenName
           )}
 
           {/* button container */}

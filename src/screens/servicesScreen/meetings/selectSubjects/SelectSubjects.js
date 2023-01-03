@@ -26,8 +26,13 @@ const SelectSubjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { meetingName, committee, onUpdateSelection, previosSubjects } =
-    route?.params;
+  const {
+    meetingName,
+    committee,
+    onUpdateSelection,
+    previosSubjects,
+    meetingId
+  } = route?.params;
   console.log('committee from select subjects', committee.toString());
   const [searchText, setSearchText] = useState('');
   const [subjectData, setSubjectData] = useState([]);
@@ -115,7 +120,8 @@ const SelectSubjects = () => {
             isEdit: false,
             subjectDetails: null,
             screenName: 'Add subject',
-            meetingName: meetingName
+            meetingName: meetingName,
+            meetingId: null
           })
         }
       />
@@ -135,7 +141,7 @@ const SelectSubjects = () => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
           onPress={() => navigation.navigate('Role')}
@@ -149,7 +155,7 @@ const SelectSubjects = () => {
               width={SIZES[6]}
             />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Divider style={styles.divider} />
         {SubjectsLoading ? (
           <Loader color={Colors.primary} />

@@ -196,6 +196,7 @@ const EditMeetingGeneralScreen = () => {
             }}
             deleted={true}
             download={true}
+            isShowAttchTitle={true}
           />
         </ScrollView>
       </View>

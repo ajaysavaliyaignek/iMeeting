@@ -48,16 +48,18 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
   ]);
 
   // set date time from clock model
-  const handleConfirmClock = (date) => {
+  const handleConfirmCalendar = (date) => {
     console.log('status of isStartDate ', isStartDate);
+    console.log('clock', moment(date).date(generaldData?.startDateTime.date));
     if (isStartDate) {
       date = moment(date).date(generaldData?.startDateTime.date);
-      if (moment(date).isBefore(moment(new Date()))) {
-        console.log('start time issue');
-        // Alert.alert('Invalid start time');
-        setGeneralData({ ...generaldData, startDateTime: date });
 
-        setOpenClock(false);
+      if (moment(date).isBefore(moment(new Date()))) {
+        console.log('start date issue');
+        Alert.alert('Invalid start date');
+        // setGeneralData({ ...generaldData, startDateTime: date });
+
+        setOpenCalendar(false);
 
         return;
       }
@@ -66,44 +68,9 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
       date = moment(date).date(generaldData?.endDateTime.date);
 
       if (moment(date).isBefore(moment(generaldData?.startDateTime))) {
-        console.log('end time issue');
-        Alert.alert('Invalid end time');
-
-        setOpenClock(false);
-        return;
-      }
-      setGeneralData({ ...generaldData, endDateTime: date });
-    }
-
-    setOpenClock(false);
-  };
-
-  // set date time from calendar model
-  const handleConfirmCalendar = (date) => {
-    if (isStartDate) {
-      date = moment(date)
-        .hour(moment(generaldData?.startDateTime).hour)
-        .minute(moment(generaldData?.startDateTime).minute);
-      if (moment(date).isAfter(moment(new Date()))) {
-        console.log('start date issue');
-        // Alert.alert('Invalid start date');
-        setGeneralData({
-          ...generaldData,
-          startDateTime: date,
-          endDateTime: date
-        });
-
-        setOpenCalendar(false);
-        return;
-      }
-      setGeneralData({ ...generaldData, startDateTime: date });
-    } else {
-      date = moment(date)
-        .hour(moment(generaldData?.endDateTime).hour)
-        .minute(moment(generaldData?.endDateTime).minute);
-      if (moment(date).isBefore(moment(generaldData?.startDateTime))) {
         console.log('end date issue');
         Alert.alert('Invalid end date');
+
         setOpenCalendar(false);
         return;
       }
@@ -111,6 +78,45 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
     }
 
     setOpenCalendar(false);
+  };
+
+  // set date time from calendar model
+  const handleConfirmClock = (date) => {
+    if (isStartDate) {
+      date = moment(date)
+        .hour(moment(generaldData?.startDateTime).hour)
+        .minute(moment(generaldData?.startDateTime).minute);
+      if (moment(date).isBefore(moment(new Date()))) {
+        console.log('start time issue');
+        Alert.alert('Invalid start time');
+        // setGeneralData({
+        //   ...generaldData,
+        //   startDateTime: date,
+        //   endDateTime: date
+        // });
+
+        setOpenClock(false);
+        return;
+      }
+      setGeneralData({
+        ...generaldData,
+        startDateTime: date,
+        endDateTime: date
+      });
+    } else {
+      date = moment(date)
+        .hour(moment(generaldData?.endDateTime).hour)
+        .minute(moment(generaldData?.endDateTime).minute);
+      if (moment(date).isBefore(moment(generaldData?.startDateTime))) {
+        console.log('end time issue');
+        Alert.alert('Invalid end time');
+        setOpenClock(false);
+        return;
+      }
+      setGeneralData({ ...generaldData, endDateTime: date });
+    }
+
+    setOpenClock(false);
   };
 
   // get timezone dropdown list

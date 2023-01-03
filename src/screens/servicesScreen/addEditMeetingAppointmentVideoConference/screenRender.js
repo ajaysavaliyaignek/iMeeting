@@ -12,7 +12,8 @@ export const screenRender = (
   visibleIndex,
   setVisibleIndex,
   fileResponse,
-  setFileResponse
+  setFileResponse,
+  screenName
 ) => {
   switch (screen) {
     case 'general':
@@ -52,6 +53,7 @@ export const screenRender = (
         <AddMeetingLocation
           generaldData={generaldData}
           setGeneralData={setGeneralData}
+          screenName={screenName}
         />
       );
       break;
