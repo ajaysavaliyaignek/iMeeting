@@ -55,7 +55,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   let file = [];
 
   //Get meeting attachments
-  item?.attachFileIds.map((id) => {
+  item?.attachFileIds?.map((id) => {
     const getFile = useQuery(GET_FILE, {
       variables: {
         fileEntryId: id
@@ -84,8 +84,6 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       console.log('error in get meeting by id', data);
     }
   });
-  if (loading) {
-  }
 
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
     onCompleted: (data) => {

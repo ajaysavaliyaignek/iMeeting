@@ -80,9 +80,9 @@ const SubjectDetailsComponent = ({
     >
       <Text style={styles.txtTitle}>General</Text>
       {generalDetails('Title', item.subjectTitle)}
-      {generalDetails('Discription', item.description)}
+      {generalDetails('Description', item.description)}
       {generalDetails('Subject category', item.subjectCategoryName)}
-      {generalDetails('Committeee ', item.committeeName)}
+      {generalDetails('Committee ', item.committeeName)}
       {generalDetails('Creator', item.createrName)}
       {generalDetails(
         'Date of creation',

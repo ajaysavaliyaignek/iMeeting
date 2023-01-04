@@ -164,7 +164,10 @@ const SubjectCard = ({
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDownload={() => {
-              navigation.navigate('SubjectDownload', { item });
+              navigation.navigate('SubjectDownload', {
+                item,
+                downloadType: 'Subject'
+              });
               setValueIndex(-1);
             }}
             subjectStatus={item.statusTitle}

@@ -53,6 +53,9 @@ import AddTask from './src/screens/liveMetting/addTask/AddTask';
 import AddEditDecision from './src/screens/liveMetting/addEditDecision/AddEditDecision';
 import LiveMeetingSubjectDetails from './src/screens/liveMetting/liveMeetingSubjectDetails/LiveMeetingSubjectDetails';
 import ViewVotingHistory from './src/screens/liveMetting/liveMeetingVotings/ViewVotingHistory';
+import TaskDetails from './src/screens/servicesScreen/tasks/taskDetails/TaskDetails';
+import SecretaryPermission from './src/screens/servicesScreen/tasks/secretaryPermission/SecretaryPermission';
+import EventsViewByDayScreen from './src/screens/calenderScreen/eventsViewBydayScreen/EventsViewByDayScreen';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -289,6 +292,15 @@ const MainStack = ({ initialRouteName }) => {
         component={LiveMeetingSubjectDetails}
       />
       <Stack.Screen name="ViewVotingHistory" component={ViewVotingHistory} />
+      <Stack.Screen name="TaskDetails" component={TaskDetails} />
+      <Stack.Screen
+        name="SecretaryPermission"
+        component={SecretaryPermission}
+      />
+      <Stack.Screen
+        name="EventsViewByDayScreen"
+        component={EventsViewByDayScreen}
+      />
     </Stack.Navigator>
   );
 };

@@ -1,5 +1,17 @@
 import { gql } from '@apollo/client';
 
+export const GET_TASK_SECRETARY_PERMISSION = gql`
+  query taskSecretaryPermission($committeeId: Long) {
+    taskSecretaryPermission(committeeId: $committeeId) {
+      committeeId
+      userRole
+      allTaskTypesApproveByHead
+      isMinutesofMeetingApproval
+      isSubjectApproval
+    }
+  }
+`;
+
 export const GET_VOTING_HISTORY = gql`
   query votingHistory($votingId: Long) {
     votingHistory(votingId: $votingId) {
@@ -249,6 +261,7 @@ export const GET_ALL_TASKS = gql`
         taskId
         attachFiles
         committeeId
+        committeeName
         createBy
         deadlineDate
         description
@@ -269,6 +282,9 @@ export const GET_ALL_TASKS = gql`
         isTaskApproval
         isMeetingApproval
         isSubjectApproval
+        userName
+        dateOfCreation
+        commentThreadId
       }
       totalCount
       pageSize

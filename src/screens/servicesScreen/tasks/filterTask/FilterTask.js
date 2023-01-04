@@ -5,25 +5,46 @@ import { GET_TASK_STATUS, GET_TASK_TYPES } from '../../../../graphql/query';
 import Header from '../../../../component/header/Header';
 import { styles } from './styles';
 import { IconName } from '../../../../component';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import CheckBox from '../../../../component/checkBox/CheckBox';
 import { Divider } from 'react-native-paper';
 import { Colors } from '../../../../themes/Colors';
 import { Button } from '../../../../component/button/Button';
+import TaskTypeCard from '../../../../component/taskTypeCard/TaskTypeCard';
+import TaskStatusCard from '../../../../component/taskStatusCard/TaskStatusCard';
 
 const FilterTask = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { taskType, taskStatusList, onUpdateFilter, onlyMyTask } =
+    route?.params;
   const [taskTypes, setTaskTypes] = useState([]);
   const [taskStatus, setTaskStatus] = useState([]);
-  const [onlyMyTasks, setOnlyMyTasks] = useState(false);
+  const [onlyMyTasks, setOnlyMyTasks] = useState(onlyMyTask);
   const [checkedTypes, setCheckedTypes] = useState({});
+  var newTaskType = [];
+  var newTaksStatus = [];
 
   // get all task type
-  const taskType = useQuery(GET_TASK_TYPES, {
+  const TaskType = useQuery(GET_TASK_TYPES, {
     onCompleted: (data) => {
-      console.log('task type', data.taskType.items);
       if (data) {
-        setTaskTypes(data.taskType.items);
+        // setTaskTypes(data.taskType.items);
+        newTaskType = data?.taskType?.items.map((item, index) => {
+          let previousTaskIndex = taskType?.findIndex(
+            (task) => task.id === item.id
+          );
+          let isSelected = false;
+
+          if (previousTaskIndex >= 0) {
+            isSelected = true;
+          }
+          return { ...item, isSelected };
+        });
+        if (newTaskType) {
+          //set all user to the user list
+          setTaskTypes(newTaskType);
+        }
       }
     },
     onError: (data) => {
@@ -34,15 +55,68 @@ const FilterTask = () => {
   // get all task status
   const taskStatusData = useQuery(GET_TASK_STATUS, {
     onCompleted: (data) => {
-      console.log('task status', data.taskStatus.items);
       if (data) {
+        console.log('task status', taskStatus);
         setTaskStatus(data.taskStatus.items);
+        newTaksStatus = data.taskStatus.items.map((item, index) => {
+          let previousTaskStatusIndex = taskStatusList?.findIndex(
+            (task) => task.id === item.id
+          );
+          let isSelected = false;
+
+          if (previousTaskStatusIndex >= 0) {
+            isSelected = true;
+          }
+          return { ...item, isSelected };
+        });
+        if (newTaksStatus) {
+          //set all user to the user list
+          setTaskStatus(newTaksStatus);
+        }
       }
     },
     onError: (data) => {
       console.log('get task status error', data);
     }
   });
+
+  const setOnTaskTypeClick = (item) => {
+    taskTypes?.map((task) => {
+      if (task.id === item.id) {
+        task.isSelected = !task.isSelected;
+      }
+    });
+    setTaskTypes([...taskTypes]);
+  };
+  const setOnTaskStatusClick = (item) => {
+    taskStatus?.map((task) => {
+      if (task.id === item.id) {
+        task.isSelected = !task.isSelected;
+      }
+    });
+    setTaskStatus([...taskStatus]);
+  };
+
+  const setSelectedFilterTaskInSelectedList = () => {
+    const selectTaskFilterValue = [];
+    const selectedTypes = [];
+    const selectedStatus = [];
+    taskTypes?.map((type) => {
+      if (type.isSelected) {
+        selectedTypes.push(type);
+      }
+    });
+
+    taskStatus?.map((status) => {
+      if (status.isSelected) {
+        selectedStatus.push(status);
+      }
+    });
+    // selectTaskFilterValue.push([...selectTaskFilterValue, onlyMyTasks]);
+    onUpdateFilter({ selectedTypes, selectedStatus, onlyMyTasks });
+
+    navigation.goBack();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -57,36 +131,11 @@ const FilterTask = () => {
           <Text style={styles.txtTitle}>Type</Text>
           {taskTypes.map((type, index) => {
             return (
-              <View key={index} style={styles.rowContainer}>
-                <CheckBox
-                  value={checkedTypes}
-                  onValueChange={(newValue) => {
-                    setCheckedTypes({ ...checkedTypes, [type.id]: newValue });
-                  }}
-                />
-                <View
-                  style={[
-                    styles.round,
-                    {
-                      backgroundColor:
-                        type.name == 'Subject approval'
-                          ? '#E6C54F'
-                          : type.name == 'Minutes of Meeting approval'
-                          ? '#C8ABCD'
-                          : type.name == 'Meeting task'
-                          ? '#81AB96'
-                          : type.name == 'Confirm attendance'
-                          ? '#E79D73'
-                          : type.name == 'Video Conference meeting'
-                          ? '#E79D73'
-                          : type.name == 'Schedule an appointment response'
-                          ? '#658EB4'
-                          : '#E6C54F'
-                    }
-                  ]}
-                />
-                <Text style={styles.txtDiscription}>{type.name}</Text>
-              </View>
+              <TaskTypeCard
+                type={type}
+                index={index}
+                onChecked={setOnTaskTypeClick}
+              />
             );
           })}
         </View>
@@ -96,29 +145,11 @@ const FilterTask = () => {
           <Text style={styles.txtTitle}>Status</Text>
           {taskStatus.map((status, index) => {
             return (
-              <View key={index} style={styles.rowContainer}>
-                <CheckBox />
-                <View
-                  style={[
-                    styles.round,
-                    {
-                      backgroundColor:
-                        status.name == 'Open'
-                          ? '#658EB4'
-                          : status.name == 'In progress'
-                          ? '#658EB4'
-                          : status.name == 'Completed'
-                          ? '#81AB96'
-                          : status.name == 'Closed'
-                          ? '#DD7878'
-                          : status.name == 'Deleted'
-                          ? '#DD7878'
-                          : '#658EB4'
-                    }
-                  ]}
-                />
-                <Text style={styles.txtDiscription}>{status.name}</Text>
-              </View>
+              <TaskStatusCard
+                status={status}
+                index={index}
+                onChecked={setOnTaskStatusClick}
+              />
             );
           })}
         </View>
@@ -150,15 +181,7 @@ const FilterTask = () => {
           />
           <Button
             title={'Save'}
-            onPress={() =>
-              navigation.navigate('AddAppointmentDateAndTime', {
-                attachFiles,
-                committee,
-                title,
-                discription,
-                users
-              })
-            }
+            onPress={() => setSelectedFilterTaskInSelectedList()}
             layoutStyle={[
               // {
               //     opacity: title === "" || discription === "" ? 0.5 : null,

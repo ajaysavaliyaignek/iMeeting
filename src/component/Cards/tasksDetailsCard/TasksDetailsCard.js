@@ -20,7 +20,10 @@ const TasksDetailsCard = ({
   onPressEdit,
   isDeleteable,
   onPressDelete,
-  isSubjectTask
+  isSubjectTask,
+  onPressView,
+  download,
+  onPressDownload
 }) => {
   const RowData = ({ name, discription, style, styleText, layoutStyle }) => {
     return (
@@ -172,10 +175,13 @@ const TasksDetailsCard = ({
       {visibleIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
+            download={download}
+            onPressDownload={onPressDownload}
             onPressDelete={() => {
               onPressDelete(item);
               setVisibleIndex(-1);
             }}
+            onPressView={onPressView}
             subjectStatus={'NoDeleted'}
             deleted={isDeleteable}
             editable={editable}

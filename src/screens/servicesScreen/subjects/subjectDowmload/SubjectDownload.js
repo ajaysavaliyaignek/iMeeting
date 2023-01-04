@@ -25,11 +25,10 @@ import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker'
 
 const SubjectDownload = () => {
   const route = useRoute();
-  const { item } = route?.params;
+  const { item, downloadType } = route?.params;
   console.log('subject from subject download', item);
 
   const navigation = useNavigation();
-  const [open, setOpen] = useState(false);
   const [valueType, setValueType] = useState(null);
   const [items, setItems] = useState([
     { label: 'PDF', value: 'pdf' },
@@ -45,7 +44,12 @@ const SubjectDownload = () => {
       attachFile: isAttachFileSwitchOn,
       comments: isCommentsSwitchOn,
       format: valueType,
-      id: +item?.subjectId,
+      id:
+        downloadType == 'Subject'
+          ? +item?.subjectId
+          : downloadType == 'Task'
+          ? +item?.taskId
+          : 0,
       type: 2
     });
     console.log('check permission');
@@ -55,8 +59,13 @@ const SubjectDownload = () => {
           attachFile: isAttachFileSwitchOn,
           comments: isCommentsSwitchOn,
           format: valueType,
-          id: +item?.subjectId,
-          type: 2
+          id:
+            downloadType == 'Subject'
+              ? +item?.subjectId
+              : downloadType == 'Task'
+              ? item?.taskId
+              : 0,
+          type: downloadType == 'Subject' ? 2 : downloadType == 'Task' ? 3 : 0
         }
       });
     } else {
@@ -83,8 +92,14 @@ const SubjectDownload = () => {
               attachFile: isAttachFileSwitchOn,
               comments: isCommentsSwitchOn,
               format: valueType,
-              id: +item?.subjectId,
-              type: 2
+              id:
+                downloadType == 'Subject'
+                  ? +item?.subjectId
+                  : downloadType == 'Task'
+                  ? item?.taskId
+                  : 0,
+              type:
+                downloadType == 'Subject' ? 2 : downloadType == 'Task' ? 3 : 0
             }
           });
         } else {
@@ -102,7 +117,7 @@ const SubjectDownload = () => {
     GET_ZIP_PDF_DOWNLOAD,
     {
       onCompleted: async (data, error) => {
-        console.log('subject download data', data);
+        console.log(' download data', data);
         let base64Str = data?.report?.fileData.base64;
 
         let fPath = Platform.select({

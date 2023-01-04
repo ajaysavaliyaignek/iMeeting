@@ -7,7 +7,7 @@ import {
   FlatList,
   Alert
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQuery } from '@apollo/client';
@@ -21,23 +21,58 @@ import Loader from '../../../../component/Loader/Loader';
 import { GET_ALL_TASKS } from '../../../../graphql/query';
 import TasksDetailsCard from '../../../../component/Cards/tasksDetailsCard/TasksDetailsCard';
 import { DELETE_TASK } from '../../../../graphql/mutation';
+import { UserContext } from '../../../../context';
 
 const TasksList = () => {
   const navigation = useNavigation();
+  const { user } = useContext(UserContext);
   const [search, setSearch] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [tasksData, setTasksData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
+  const [taskType, setTaskType] = useState([]);
+  const [taskStatusList, setTaskStatusList] = useState([]);
+  const [onlyMyTask, setOnlyMyTasks] = useState(false);
+  const [taskTypesIds, setTaskTypesIds] = useState([]);
+  const [taskTypesName, setTaskTypesName] = useState('');
+  const [taskStatusIds, setTaskStatusIds] = useState([]);
+  const [taskStatusName, setTaskStatusName] = useState('');
+
+  // useeffect for get task type id and name
+  useEffect(() => {
+    const typeId = taskType?.map((type) => {
+      return type?.id;
+    });
+    const typeName = taskType?.map((type) => {
+      return type?.name;
+    });
+    setTaskTypesIds(typeId?.join());
+    setTaskTypesName(typeName?.join());
+  }, [taskType]);
+
+  // useeffect for get task status id and name
+  useEffect(() => {
+    const statusId = taskStatusList?.map((status) => {
+      return status?.id;
+    });
+    const statusName = taskStatusList?.map((status) => {
+      return status?.name;
+    });
+    setTaskStatusIds(statusId?.join());
+    setTaskStatusName(statusName?.join());
+  }, [taskStatusList]);
+
   // get ALL appointment
   const Tasks = useQuery(GET_ALL_TASKS, {
     variables: {
       searchValue: searchText,
-      onlyMyTask: false
+      onlyMyTask: onlyMyTask,
+      taskStatusIds: taskStatusIds,
+      taskTypeIds: taskTypesIds
     },
 
     onCompleted: (data) => {
       console.log('all tasks', data?.tasks.items);
-
       setTasksData(data?.tasks.items);
     },
     onError: (data) => {
@@ -78,6 +113,12 @@ const TasksList = () => {
         style: 'cancel'
       }
     ]);
+  };
+
+  const onUpdateFilter = (item) => {
+    setTaskType(item?.selectedTypes);
+    setTaskStatusList(item?.selectedStatus);
+    setOnlyMyTasks(item?.onlyMyTasks);
   };
 
   return (
@@ -151,10 +192,28 @@ const TasksList = () => {
             <TouchableOpacity
               style={styles.committeeView}
               activeOpacity={0.5}
-              onPress={() => navigation.navigate('FilterTask')}
+              onPress={() => {
+                navigation.navigate('FilterTask', {
+                  taskType: taskType,
+                  taskStatusList: taskStatusList,
+                  onUpdateFilter: onUpdateFilter,
+                  onlyMyTask: onlyMyTask
+                });
+              }}
             >
-              <Text style={styles.txtCommittee}>Filter</Text>
-              <View style={styles.btnCommittees}>
+              <Text style={[styles.txtCommittee]}>Filter</Text>
+              <View style={[styles.btnCommittees, { flex: 1 }]}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    ...Fonts.PoppinsRegular[12],
+                    color: Colors.secondary
+                  }}
+                >
+                  {taskTypesName !== '' || taskStatusName !== ''
+                    ? `${taskTypesName},${taskStatusName} `
+                    : ''}
+                </Text>
                 <Icon
                   name={IconName.Arrow_Right}
                   height={SIZES[12]}
@@ -164,7 +223,11 @@ const TasksList = () => {
             </TouchableOpacity>
 
             <Divider style={styles.divider} />
-            <TouchableOpacity style={styles.committeeView} activeOpacity={0.5}>
+            <TouchableOpacity
+              style={styles.committeeView}
+              activeOpacity={0.5}
+              onPress={() => navigation.navigate('SecretaryPermission')}
+            >
               <Text style={styles.txtCommittee}>Secretary permission</Text>
               <View style={styles.btnCommittees}>
                 <Icon
@@ -191,9 +254,21 @@ const TasksList = () => {
                   item={item}
                   index={index}
                   visibleIndex={visibleIndex}
-                  editable={true}
+                  editable={
+                    item?.taskStatus == 'Deleted' || !item?.isHead
+                      ? false
+                      : true
+                  }
+                  onPressView={() => {
+                    setVisibleIndex(-1);
+                    navigation.navigate('TaskDetails', { item });
+                  }}
                   setVisibleIndex={setVisibleIndex}
-                  isDeleteable={true}
+                  isDeleteable={
+                    item?.taskStatus == 'Deleted' || !item?.isHead
+                      ? false
+                      : true
+                  }
                   onPressDelete={(items) => {
                     console.log('delete task item', items);
                     onDeleteHandler(items?.taskId);
@@ -207,6 +282,13 @@ const TasksList = () => {
                       isMeetingTask: false,
                       isEdit: true,
                       taskData: items
+                    });
+                  }}
+                  download={true}
+                  onPressDownload={() => {
+                    navigation.navigate('SubjectDownload', {
+                      item,
+                      downloadType: 'Task'
                     });
                   }}
                 />

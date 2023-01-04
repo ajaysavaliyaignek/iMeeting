@@ -17,30 +17,49 @@ const CalendarHeader = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.dateText}>
-          {moment(headerData).format('DD MMM, YYYY')}
-        </Text>
-        <TouchableOpacity
-          style={[styles.iconContainer, styles.leftIcon]}
-          onPress={onPressArrowLeft}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.dateText}>
+            {moment(headerData).format('MMM, YYYY')}
+          </Text>
+          <TouchableOpacity style={{ marginLeft: SIZES[8] }}>
+            <Icon
+              name={IconName.Arrow_Right_Black}
+              width={SIZES[10]}
+              height={SIZES[18]}
+            />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
         >
-          <Icon
-            name={IconName.Arrow_Right_Black}
-            width={SIZES[10]}
-            height={SIZES[18]}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.iconContainer}
-          onPress={onPressArrowRight}
-        >
-          <Icon
-            name={IconName.Arrow_Right_Black}
-            width={SIZES[10]}
-            height={SIZES[18]}
-          />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.iconContainer,
+              styles.leftIcon,
+              { marginRight: SIZES[32] }
+            ]}
+            onPress={onPressArrowLeft}
+          >
+            <Icon
+              name={IconName.Arrow_Right}
+              width={SIZES[10]}
+              height={SIZES[18]}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={onPressArrowRight}
+          >
+            <Icon
+              name={IconName.Arrow_Right}
+              width={SIZES[10]}
+              height={SIZES[18]}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

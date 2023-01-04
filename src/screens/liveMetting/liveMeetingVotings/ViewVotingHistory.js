@@ -9,6 +9,7 @@ import { GET_VOTING_HISTORY } from '../../../graphql/query';
 import { Colors } from '../../../themes/Colors';
 import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 import { Divider } from 'react-native-paper';
+import moment from 'moment';
 
 const ViewVotingHistory = () => {
   const navigation = useNavigation();
@@ -83,11 +84,16 @@ const ViewVotingHistory = () => {
             return index.toString();
           }}
           renderItem={({ item, index }) => {
+            {
+              var dateOfCreation = Date(item?.createDate);
+              var date = moment(dateOfCreation).format('DD MMM, YYYY, HH:MM:A');
+            }
             return (
               <View>
                 <View style={styles.renderContainer}>
                   <RowData name={'Name'} discription={item?.userName} />
-                  <RowData name={'Date & Time'} />
+                  <RowData name={'Date & Time'} discription={date} />
+
                   <RowData name={'Answer'} discription={item?.answers} />
                 </View>
                 <Divider style={styles.divider} />

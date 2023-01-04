@@ -31,7 +31,7 @@ const AddTask = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { meetingDetails, isEdit, taskData, isMeetingTask } = route?.params;
-  console.log('onpress edit task', taskData);
+  console.log('onpress edit task', meetingDetails);
   const [valueType, setValueType] = useState(
     isEdit ? (taskData?.subjectId == null ? 'Meeting' : 'Subject') : null
   );
@@ -271,7 +271,8 @@ const AddTask = () => {
                     title: titleTask,
                     taskTypeId: isEdit ? taskData?.taskTypeId : 0,
                     subjectId: valueSubject == null ? 0 : valueSubject,
-                    meetingId: meetingDetails?.meetingId
+                    meetingId:
+                      meetingDetails == null ? 0 : meetingDetails?.meetingId
                   }
                 }
               });

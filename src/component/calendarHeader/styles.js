@@ -4,20 +4,21 @@ import { SIZES } from '../../themes/Sizes';
 
 export const styles = StyleSheet.create({
   container: {
-    flex: 1
+    marginBottom: SIZES[16]
   },
   header: {
     flexDirection: 'row',
     paddingTop: SIZES[16],
-    backgroundColor: Colors.white
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
 
   dateText: {
-    flex: 6,
-    fontSize: SIZES[18]
+    fontSize: SIZES[18],
+    color: Colors.bold
   },
   iconContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },

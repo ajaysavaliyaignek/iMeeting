@@ -26,6 +26,7 @@ const ServicesScreen = ({ navigation }) => {
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
     onCompleted: (data) => {
+      console.log('userPayload', data.userPayload);
       setUser(data.userPayload);
     }
   });

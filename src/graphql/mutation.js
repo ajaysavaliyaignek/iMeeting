@@ -1,5 +1,16 @@
 import { gql } from '@apollo/client';
 
+export const UPDATE_SECRETARY_PERMISSION = gql`
+  mutation ($taskSecretaryPermission: InputTaskSecretaryPermission!) {
+    updateTaskSecretaryPermission(
+      taskSecretaryPermission: $taskSecretaryPermission
+    ) {
+      committeeId
+      status
+    }
+  }
+`;
+
 export const UPDATE_MEETING_STATUS = gql`
   mutation ($meeting: InputMeeting!) {
     updateMeetingStatus(meeting: $meeting) {
