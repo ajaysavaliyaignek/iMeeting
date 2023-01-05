@@ -52,18 +52,21 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
     console.log('status of isStartDate ', isStartDate);
     console.log('clock', moment(date).date(generaldData?.startDateTime.date));
     if (isStartDate) {
-      date = moment(date).date(generaldData?.startDateTime.date);
+      // date = moment(date).date(generaldData?.startDateTime.date);
 
       if (moment(date).isBefore(moment(new Date()))) {
         console.log('start date issue');
         Alert.alert('Invalid start date');
-        // setGeneralData({ ...generaldData, startDateTime: date });
 
         setOpenCalendar(false);
 
         return;
       }
-      setGeneralData({ ...generaldData, startDateTime: date });
+      setGeneralData({
+        ...generaldData,
+        startDateTime: date,
+        endDateTime: date
+      });
     } else {
       date = moment(date).date(generaldData?.endDateTime.date);
 

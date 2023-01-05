@@ -1,4 +1,10 @@
-import { View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  useWindowDimensions
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'react-native-big-calendar';
 import CalendarHeader from '../../component/calendarHeader/CalendarHeader';
@@ -9,12 +15,24 @@ import { SIZES } from '../../themes/Sizes';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '../../component/button/Button';
 import { Colors } from '../../themes/Colors';
+import {
+  selectColor,
+  selectColorAndIcon
+} from '../servicesScreen/addEditMeetingAppointmentVideoConference/screenRender';
+import { Fonts } from '../../themes';
+import { useQuery } from '@apollo/client';
+import { GET_CALENDER_EVENTS } from '../../graphql/query';
+import CalendarMonthViewComponent from '../../component/calendarMonthViewComponent/CalendarMonthViewComponent';
 
 let CalanderDate = moment();
 const CalenderScreen = () => {
   const navigation = useNavigation();
+  const { width, height } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState('0');
   const [monthCalenderView, setMonthCalenderView] = useState(CalanderDate);
+  const [calenderEventsList, setCalenderEventsList] = useState([]);
+  const [key, setKey] = useState([]);
+  const [Value, setValue] = useState([]);
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
   );
@@ -30,167 +48,6 @@ const CalenderScreen = () => {
       end: new Date(2022, 10, 15, 10, 30)
     }
   ]);
-
-  const onPressArrowLeft = () => {
-    const newDate = CalanderDate.add(-1, 'M');
-    console.log('newDate', newDate);
-    setCalendarDate(newDate.format('YYYY-MM-DD'));
-    setMonthCalenderView(newDate);
-
-    // calendarDate = calendarDate.add(-1, 'month');
-    // updateCalendarDate();
-  };
-
-  const onPressArrowRight = (addMonth) => {
-    const newDate = CalanderDate.add(1, 'month');
-    setCalendarDate(newDate.format('YYYY-MM-DD'));
-    setMonthCalenderView(newDate);
-  };
-
-  const sampleData = {
-    '2023-01-01': [
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1,
-        darkColor: '#658EB4',
-        lightColor: '#F0F4F8'
-      }
-    ],
-    '2023-01-02': [
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1,
-        darkColor: '#658EB4',
-        lightColor: '#F0F4F8'
-      },
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1,
-        darkColor: '#E79D73',
-        lightColor: '#FDF5F1'
-      },
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1,
-        darkColor: '#DD7878',
-        lightColor: '#FCF1F1'
-      },
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1,
-        darkColor: '#E79D73',
-        lightColor: '#FDF5F1'
-      }
-    ],
-    '2023-01-03': [
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1
-      }
-    ],
-    '2023-01-20': [
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1
-      },
-      {
-        title: 'new meeting',
-        startTime: '2023-01-01',
-        endTime: '2023-01-09',
-        location: 'block',
-        user_images: ['http://asasasaas', 'image2', 'image3', 'image4'],
-        attendance_count: 20,
-        total_users: 1,
-        item_id: 10120,
-        item_type: 1
-      }
-    ]
-  };
-
-  var key = Object.keys(sampleData);
-  var Value = Object.values(sampleData);
-
-  // useEffect(() => {
-  //   setEvenets(
-  //     Value?.map((data, index) => {
-  //       return {
-  //         title: data.map((val) => {
-  //           return val.title;
-  //         }),
-  //         start: new Date(key[index]),
-  //         end: new Date(key[index])
-  //       };
-  //     })
-  //   );
-  // }, []);
-
-  useEffect(() => {
-    Value?.map((data, index) => {
-      data.map((d) => {
-        events.push({
-          title: d.title,
-          start: new Date(key[index]),
-          end: new Date(key[index])
-        });
-        console.log('-----', {
-          title: d.title,
-          start: new Date(key[index]),
-          end: new Date(key[index])
-        });
-      });
-    });
-  }, []);
-
-  // console.log('----', events);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -260,8 +117,9 @@ const CalenderScreen = () => {
             onPress={() => setActiveTab('1')}
           />
         </View>
-        {activeTab == '1' && (
-          <View>
+        {activeTab == '1' && <CalendarMonthViewComponent />}
+      </View>
+      {/* <View>
             <CalendarHeader
               headerData={calendarDate}
               onPressArrowLeft={onPressArrowLeft}
@@ -269,32 +127,63 @@ const CalenderScreen = () => {
               horizontal={true}
             />
             <Calendar
+              renderEvent={(event) => {
+                return (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: event.color,
+                      borderRadius: SIZES[2],
+                      paddingLeft: SIZES[2]
+                    }}
+                    onPress={() => {
+                      let pressedDate = moment(event.start).format(
+                        'YYYY-MM-DD'
+                      );
+                      var field = key.filter(function (x) {
+                        return x === pressedDate;
+                      });
+                      var index = key.indexOf(field[0]);
+
+                      navigation.navigate('EventsViewByDayScreen', {
+                        events: eventDetails[index],
+                        date: event.start
+                      });
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.PoppinsRegular[10],
+                        color: Colors.white
+                      }}
+                    >
+                      {event.title}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
               events={events}
-              height={600}
+              height={height}
               mode="month"
               date={new Date(monthCalenderView)}
               swipeEnabled={true}
               onPressCell={(date) => {
-                console.log('date', date);
-
                 let pressedDate = moment(date).format('YYYY-MM-DD');
                 var field = key.filter(function (x) {
                   return x === pressedDate;
                 });
                 var index = key.indexOf(field[0]);
-                const setdate = Value.filter((k, index) => {
+                const setdate = eventDetails?.filter((k, index) => {
                   key[index] == pressedDate;
                 });
-                console.log('setdate', Value[index]);
+
                 navigation.navigate('EventsViewByDayScreen', {
-                  events: Value[index],
+                  events: eventDetails[index],
                   date: date
                 });
               }}
             />
-          </View>
-        )}
-      </View>
+          </View> */}
     </SafeAreaView>
   );
 };

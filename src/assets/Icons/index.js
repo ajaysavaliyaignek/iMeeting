@@ -69,3 +69,7 @@ export { default as LMVotings } from './LiveMeetingIcon/LMVotings';
 export { default as LMVotingsWhite } from './LiveMeetingIcon/LMVotingsWhite';
 export { default as AttachFile } from './AttachFile';
 export { default as Send_Gray } from './Send_Gray';
+export { default as CorrectIcon_Blue } from './CorrectIcon_Blue';
+export { default as CorrectIcon_Orange } from './CorrectIcon_Orange';
+export { default as CorrectIcon_Red } from './CorrectIcon_Red';
+export { default as CorrectIcon_Purple } from './CorrectIcon_Purple';

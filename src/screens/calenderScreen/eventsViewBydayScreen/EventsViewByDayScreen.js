@@ -5,17 +5,19 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { styles } from './styles';
 import { SIZES } from '../../../themes/Sizes';
 import { Icon, IconName } from '../../../component';
 import moment from 'moment';
+import EventDetailsCard from '../../../component/eventDetailsCard/EventDetailsCard';
 
 const EventsViewByDayScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { events, date } = route?.params;
+  const [eventDetails, setEventDetails] = useState(events);
   const weekday = [
     'Sunday',
     'Monday',
@@ -25,8 +27,23 @@ const EventsViewByDayScreen = () => {
     'Friday',
     'Saturday'
   ];
-  console.log('events', events);
+
   const Day = weekday[new Date(date).getDay()];
+
+  const searchFilterEvents = (text) => {
+    if (text) {
+      const newData = events?.filter((item) => {
+        const itemData = item.title ? item.title : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+      setSearchText(text);
+      setEventDetails(newData);
+    } else {
+      setSearchText(text);
+      setEventDetails(events);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -72,7 +89,9 @@ const EventsViewByDayScreen = () => {
         <FlatList
           data={events}
           keyExtractor={(index) => index.toString()}
-          renderItem={({ item, index }) => {}}
+          renderItem={({ item, index }) => {
+            return <EventDetailsCard item={item} index={index} />;
+          }}
         />
       </View>
     </SafeAreaView>

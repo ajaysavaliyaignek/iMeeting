@@ -1,5 +1,27 @@
 import { gql } from '@apollo/client';
 
+export const GET_CALENDER_EVENTS = gql`
+  query calendarEventsMobile(
+    $startDate: String
+    $endDate: String
+    $meeting: Boolean
+    $appointment: Boolean
+    $videoConferences: Boolean
+    $tasks: Boolean
+  ) {
+    calendarEventsMobile(
+      startDate: $startDate
+      endDate: $endDate
+      meeting: $meeting
+      appointment: $appointment
+      videoConferences: $videoConferences
+      tasks: $tasks
+    ) {
+      events
+    }
+  }
+`;
+
 export const GET_TASK_SECRETARY_PERMISSION = gql`
   query taskSecretaryPermission($committeeId: Long) {
     taskSecretaryPermission(committeeId: $committeeId) {
