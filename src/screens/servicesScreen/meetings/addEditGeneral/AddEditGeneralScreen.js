@@ -26,6 +26,7 @@ const AddEditGeneralScreen = ({
   details?.attachFileIds?.map((id) => {
     console.log('id', id);
     const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -53,6 +54,7 @@ const AddEditGeneralScreen = ({
     error: CommitteeError,
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
+    fetchPolicy: 'cache-and-network',
     variables: { head: true, secretary: true, member: false },
     onCompleted: (data) => {
       if (data) {

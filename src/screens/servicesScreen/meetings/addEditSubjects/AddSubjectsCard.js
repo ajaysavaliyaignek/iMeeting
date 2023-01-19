@@ -49,6 +49,7 @@ const AddSubjectsCard = ({
   const { selectedSubjects, setSelectedSubjects } = useContext(UserContext);
 
   const getSubjectStatus = useQuery(GET_ALL_SUBJECTS_STATUS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       subject: true,
       decision: false,

@@ -47,6 +47,7 @@ const SelectSubjects = () => {
     error: SubjectsError,
     data: SubjectsData
   } = useQuery(GET_All_SUBJECTS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       searchValue: searchText,
       screen: 1,

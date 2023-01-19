@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, FlatList } from 'react-native';
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_DECISIONS, GET_FILE } from '../../../graphql/query';
@@ -9,24 +9,29 @@ import { SIZES } from '../../../themes/Sizes';
 import { Button } from '../../../component/button/Button';
 import { Fonts } from '../../../themes';
 import { useNavigation } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
 
 const LiveMeetingSubjectDecision = ({ meetingData, item }) => {
   const navigation = useNavigation();
-  const [decisionData, setDecisionData] = useState(null);
+  const [decisionData, setDecisionData] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
 
   const getDecision = useQuery(GET_ALL_DECISIONS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       subjectId: item.subjectId,
       page: -1,
-      pageSize: -1
+      pageSize: -1,
+      meetingId: 0,
+      momDecision: false
     },
     onCompleted: (data, error) => {
       if (data) {
-        console.log('filterSubject', data.decisions.items[0]);
-        setDecisionData(data.decisions.items[0]);
+        console.log('decision', data.decisions.items);
+        setDecisionData(data.decisions.items);
         data.decisions.items[0]?.attachFileIds?.map((id) => {
           const getFile = useQuery(GET_FILE, {
+            fetchPolicy: 'cache-and-network',
             variables: {
               fileEntryId: id
             },
@@ -65,66 +70,87 @@ const LiveMeetingSubjectDecision = ({ meetingData, item }) => {
 
   return (
     <View style={styles.container}>
-      {decisionData ? (
-        <View>
-          <Text style={styles.txtDecisionTitle}>{`${
-            decisionData?.subjectTitle
-          }, ${moment(decisionData?.dateOfCreation).format(
-            'DD MMMM,YYYY'
-          )}`}</Text>
-          <Details
-            title={'Status'}
-            discription={decisionData?.statusTitle}
-            descriptionContainer={{
-              backgroundColor:
-                decisionData?.statusTitle == 'Approved'
-                  ? 'rgba(129, 171, 150,0.1)'
-                  : decisionData?.statusTitle == 'Approved with escalation'
-                  ? 'rgba(129, 171, 150,0.1)'
-                  : decisionData?.statusTitle == 'Rejected'
-                  ? 'rgba(231, 157, 115, 0.1)'
-                  : decisionData?.statusTitle == 'Rejected with escalation'
-                  ? ' rgba(231, 157, 115, 0.1)'
-                  : decisionData?.statusTitle == 'Withdraw'
-                  ? ' rgba(221, 120, 120, 0.1)'
-                  : Colors.white,
-              paddingVertical: SIZES[6],
-              alignItems: 'center',
-              marginTop: SIZES[10],
-              borderRadius: SIZES[8]
-            }}
-            txtDescriptionStyle={{
-              color:
-                decisionData?.statusTitle == 'Approved'
-                  ? 'rgba(129, 171, 150,1)'
-                  : decisionData?.statusTitle == 'Approved with escalation'
-                  ? 'rgba(129, 171, 150,1)'
-                  : decisionData?.statusTitle == 'Rejected'
-                  ? 'rgba(231, 157, 115, 1)'
-                  : decisionData?.statusTitle == 'Rejected with escalation'
-                  ? ' rgba(231, 157, 115, 1)'
-                  : decisionData?.statusTitle == 'Withdraw'
-                  ? ' rgba(221, 120, 120, 1)'
-                  : Colors.white
-            }}
-          />
-          <Details
-            title={'Committee'}
-            discription={decisionData?.committeeName}
-          />
-          <Details title={'Head/Secretary'} discription={'Esther Howard'} />
-          <Details title={'Comments'} discription={decisionData?.description} />
-          {fileResponse?.length > 0 && (
-            <AttachFiles
-              fileResponse={fileResponse}
-              setFileResponse={setFileResponse}
-              showAttachButton={false}
-              deleted={false}
-              download={true}
-              isShowAttchTitle={true}
-            />
-          )}
-        </View>
+      {decisionData.length > 0 ? (
+        <FlatList
+          data={decisionData}
+          keyExtractor={(index) => {
+            index.toString();
+          }}
+          renderItem={({ item, index }) => {
+            return (
+              <View style={{ paddingVertical: 16 }}>
+                <Text style={styles.txtDecisionTitle}>{`${
+                  item?.subjectTitle
+                }, ${moment(item?.dateOfCreation).format(
+                  'DD MMMM,YYYY'
+                )}`}</Text>
+                <Details
+                  title={'Status'}
+                  discription={item?.statusTitle}
+                  descriptionContainer={{
+                    backgroundColor:
+                      item?.statusTitle == 'Approved'
+                        ? 'rgba(129, 171, 150,0.1)'
+                        : item?.statusTitle == 'Approved with escalation'
+                        ? 'rgba(129, 171, 150,0.1)'
+                        : item?.statusTitle == 'Rejected'
+                        ? 'rgba(231, 157, 115, 0.1)'
+                        : item?.statusTitle == 'Rejected with escalation'
+                        ? ' rgba(231, 157, 115, 0.1)'
+                        : item?.statusTitle == 'Withdraw'
+                        ? ' rgba(221, 120, 120, 0.1)'
+                        : Colors.white,
+                    paddingVertical: SIZES[6],
+                    alignItems: 'center',
+                    marginTop: SIZES[10],
+                    borderRadius: SIZES[8]
+                  }}
+                  txtDescriptionStyle={{
+                    color:
+                      item?.statusTitle == 'Approved'
+                        ? 'rgba(129, 171, 150,1)'
+                        : item?.statusTitle == 'Approved with escalation'
+                        ? 'rgba(129, 171, 150,1)'
+                        : item?.statusTitle == 'Rejected'
+                        ? 'rgba(231, 157, 115, 1)'
+                        : item?.statusTitle == 'Rejected with escalation'
+                        ? ' rgba(231, 157, 115, 1)'
+                        : item?.statusTitle == 'Withdraw'
+                        ? ' rgba(221, 120, 120, 1)'
+                        : Colors.white
+                  }}
+                />
+                <Details
+                  title={'Committee'}
+                  discription={item?.committeeName}
+                />
+                <Details
+                  title={'Head/Secretary'}
+                  discription={'Esther Howard'}
+                />
+                <Details title={'Comments'} discription={item?.description} />
+                {fileResponse?.length > 0 && (
+                  <AttachFiles
+                    fileResponse={fileResponse}
+                    setFileResponse={setFileResponse}
+                    showAttachButton={false}
+                    deleted={false}
+                    download={true}
+                    isShowAttchTitle={true}
+                  />
+                )}
+                <Divider
+                  style={{
+                    width: '100%',
+                    height: 1,
+                    backgroundColor: Colors.line,
+                    marginTop: 16
+                  }}
+                />
+              </View>
+            );
+          }}
+        />
       ) : (
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}

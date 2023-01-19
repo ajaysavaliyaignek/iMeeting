@@ -1,6 +1,15 @@
-import { View, Text, Pressable, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ActivityIndicator,
+  TouchableOpacity,
+  StyleSheet
+} from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import DocumentPicker from 'react-native-document-picker';
+import MentionsTextInput from 'react-native-mentions';
 import { MentionInput } from '../mentionInput/MentionInput';
 import { Divider } from 'react-native-paper';
 import { Colors } from '../../themes/Colors';
@@ -24,6 +33,13 @@ const IMeetingChatTextInput = ({
   const [fileIds, setFileIds] = useState([]);
   const [token, setToken] = useState('');
   const [value, setValue] = useState('');
+  // const [state, setState] = useState({
+  //   value: '',
+  //   keyword: '',
+  //   data: []
+  // });
+
+  // let reqTimer = 0;
 
   useEffect(() => {
     getToken();
@@ -158,42 +174,66 @@ const IMeetingChatTextInput = ({
         </View>
       );
     };
-  let delimiter = /\s+/;
+  // function renderSuggestionsRow({ item }, hidePanel) {
+  //   return (
+  //     <TouchableOpacity
+  //       onPress={() => onSuggestionTap(item.userName, hidePanel)}
+  //     >
+  //       <View style={styles.suggestionsRowContainer}>
+  //         <View style={styles.userIconBox}>
+  //           <Text style={styles.usernameInitials}>
+  //             {!!item.userName && item.userName.substring(0, 2).toUpperCase()}
+  //           </Text>
+  //         </View>
+  //         <View style={styles.userDetailsBox}>
+  //           <Text style={styles.displayNameText}>{item.userName}</Text>
+  //           <Text style={styles.usernameText}>@{item.userName}</Text>
+  //         </View>
+  //       </View>
+  //     </TouchableOpacity>
+  //   );
+  // }
+  // function onSuggestionTap(username, hidePanel) {
+  //   hidePanel();
+  //   const comment = state.value.slice(0, state?.keyword?.length);
+  //   setState({
+  //     data: [],
+  //     value: comment  + username
+  //   });
+  // }
 
-  //split string
-  let _text = value;
-  let tokens,
-    index,
-    parts = [];
-  while (_text) {
-    delimiter.lastIndex = 0;
-    tokens = delimiter.exec(_text);
-    if (tokens === null) {
-      break;
-    }
-    index = tokens.index;
-    if (tokens[0].length === 0) {
-      index = 1;
-    }
-    parts.push(_text.substr(0, index));
-    parts.push(tokens[0]);
-    index = index + tokens[0].length;
-    _text = _text.slice(index);
-  }
-  parts.push(_text);
+  // function callback(keyword) {
+  //   if (reqTimer) {
+  //     clearTimeout(reqTimer);
+  //   }
 
-  //highlight hashtags
-  parts = parts.map((text) => {
-    if (/^#/.test(text)) {
-      return (
-        <Text key={text} style={styles.hashtag}>
-          {text}
-        </Text>
-      );
-    } else {
-      return text;
-    }
-  });
+  //   // reqTimer = setTimeout(() => {
+  //   //   getUserSuggestions(keyword)
+  //   //     .then((data) => {
+  //   //       setState({
+  //   //         keyword: keyword,
+  //   //         data: [...data]
+  //   //       });
+  //   //     })
+  //   //     .catch((err) => {
+  //   //       console.log(err);
+  //   //     });
+  //   // }, 200);
+  // }
+  // const getUserSuggestions = (displayName = '') => {
+  //   return fetch(`http://localhost:8080/?username=${displayName.slice(1)}`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-type': 'application/json'
+  //     }
+  //   }).then((res) => {
+  //     console.log(res);
+  //     if (!res.ok) {
+  //       throw new Error('Went wrong');
+  //     }
+  //     return res.json();
+  //   });
+  // };
 
   return (
     <MentionInput
@@ -214,6 +254,43 @@ const IMeetingChatTextInput = ({
       onBlur={onBlur}
       onFocus={onFocus}
     />
+
+    // <MentionsTextInput
+    //   textInputStyle={{
+    //     borderColor: '#ebebeb',
+    //     borderWidth: 1,
+    //     padding: 5,
+    //     fontSize: 15
+    //   }}
+    //   suggestionsPanelStyle={{ backgroundColor: 'rgba(100,100,100,0.1)' }}
+    //   loadingComponent={() => (
+    //     <View
+    //       style={{
+    //         flex: 1,
+    //         width: '100%',
+    //         justifyContent: 'center',
+    //         alignItems: 'center'
+    //       }}
+    //     >
+    //       <ActivityIndicator />
+    //     </View>
+    //   )}
+    //   textInputMinHeight={30}
+    //   textInputMaxHeight={80}
+    //   trigger={'@'}
+    //   triggerLocation={'new-word-only'} // 'new-word-only', 'anywhere'
+    //   value={state.value}
+    //   onChangeText={(val) => {
+    //     setState({ value: val });
+    //   }}
+    //   triggerCallback={callback}
+    //   renderSuggestionsRow={renderSuggestionsRow}
+    //   suggestionsData={users} // array of objects
+    //   keyExtractor={(item, index) => item.userName}
+    //   suggestionRowHeight={45}
+    //   horizontal={false} // default is true, change the orientation of the list
+    //   MaxVisibleRowCount={3} // this is required if horizontal={false}
+    // />
     // <TextInput
     //   multiline={true}
     //   // style={styles.multiline}
@@ -227,3 +304,44 @@ const IMeetingChatTextInput = ({
 };
 
 export default IMeetingChatTextInput;
+
+const styles = StyleSheet.create({
+  container: {
+    height: 300,
+    justifyContent: 'flex-end',
+    paddingTop: 100
+  },
+  suggestionsRowContainer: {
+    flexDirection: 'row'
+  },
+  userAvatarBox: {
+    width: 35,
+    paddingTop: 2
+  },
+  userIconBox: {
+    height: 45,
+    width: 45,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#54c19c'
+  },
+  usernameInitials: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 14
+  },
+  userDetailsBox: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: 10,
+    paddingRight: 15
+  },
+  displayNameText: {
+    fontSize: 13,
+    fontWeight: '500'
+  },
+  usernameText: {
+    fontSize: 12,
+    color: 'rgba(0,0,0,0.6)'
+  }
+});

@@ -139,11 +139,7 @@ const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
           color: Colors.bold
         }}
         placeholder={item.statusTitle}
-        // disable={
-        //   item.roleName == 'Head' || item.roleName == 'Secretary'
-        //     ? false
-        //     : true
-        // }
+        disable={!item.status.isDisable}
         placeholderStyle={{
           color:
             item.statusTitle == 'Deleted'

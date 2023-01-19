@@ -27,6 +27,7 @@ const FilterTask = () => {
 
   // get all task type
   const TaskType = useQuery(GET_TASK_TYPES, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data) {
         // setTaskTypes(data.taskType.items);
@@ -54,6 +55,7 @@ const FilterTask = () => {
 
   // get all task status
   const taskStatusData = useQuery(GET_TASK_STATUS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data) {
         console.log('task status', taskStatus);

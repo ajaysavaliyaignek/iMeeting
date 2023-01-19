@@ -48,6 +48,7 @@ const SubjectDetails = () => {
     error: SubjectError,
     data: SubjectsData
   } = useQuery(GET_SUBJECT_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: { subjectId: item.subjectId },
     onCompleted: (data) => {
       console.log('subject data', data);
@@ -72,6 +73,7 @@ const SubjectDetails = () => {
     error: CommentsError,
     data: CommentsData
   } = useQuery(GET_All_COMMENTS_THREAD, {
+    fetchPolicy: 'cache-and-network',
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
@@ -184,31 +186,33 @@ const SubjectDetails = () => {
         setComments={setComments}
       />
 
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Divider */}
-        <Divider style={styles.divider} />
-        <View style={styles.buttonContainer}>
-          <Button
-            title={'Edit'}
-            onPress={() => navigation.navigate('EditSubject', { item })}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Delete'}
-            onPress={() => {
-              onDeleteHandler(item.subjectId);
-            }}
-            layoutStyle={[styles.nextBtnLayout]}
-            textStyle={styles.txtNextBtn}
-          />
+      {item.status.isDisable && (
+        <View
+          style={{
+            backgroundColor: Colors.white,
+            justifyContent: 'flex-end'
+          }}
+        >
+          {/* Divider */}
+          <Divider style={styles.divider} />
+          <View style={styles.buttonContainer}>
+            <Button
+              title={'Edit'}
+              onPress={() => navigation.navigate('EditSubject', { item })}
+              layoutStyle={styles.cancelBtnLayout}
+              textStyle={styles.txtCancelButton}
+            />
+            <Button
+              title={'Delete'}
+              onPress={() => {
+                onDeleteHandler(item.subjectId);
+              }}
+              layoutStyle={[styles.nextBtnLayout]}
+              textStyle={styles.txtNextBtn}
+            />
+          </View>
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };

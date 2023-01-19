@@ -45,6 +45,7 @@ const TaskDetails = () => {
   //Get meeting attachments
   item?.attachFiles?.map((id) => {
     const getFile = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -60,6 +61,7 @@ const TaskDetails = () => {
   // get meeting by id
   if ((item?.meetingId !== 0) | (item?.meetingId !== null)) {
     const {} = useQuery(GET_MEETING_BY_ID, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         meetingId: item?.meetingId
       },
@@ -78,6 +80,7 @@ const TaskDetails = () => {
   if (item?.subjectId !== 0 || item?.subjectId !== null) {
     // get subject by id
     const {} = useQuery(GET_SUBJECT_BY_ID, {
+      fetchPolicy: 'cache-and-network',
       variables: { subjectId: item.subjectId },
       onCompleted: (data, error) => {
         if (data) {
@@ -121,6 +124,7 @@ const TaskDetails = () => {
     error: CommentsError,
     data: CommentsData
   } = useQuery(GET_All_COMMENTS_THREAD, {
+    fetchPolicy: 'cache-and-network',
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
@@ -248,93 +252,95 @@ const TaskDetails = () => {
           />
         )}
 
-        <View>
-          <Text style={styles.txtcommentsTitle}>Comments</Text>
-
+        {item?.taskStatus !== 'Deleted' && (
           <View>
-            <FlatList
-              data={comments?.childComment}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item, index) => {
-                return index.toString();
-              }}
-              renderItem={({ item, index }) => (
-                <CommentCard
-                  item={item}
-                  commentThreadId={commentThreadId}
-                  index={index}
-                  setComment={setCommentText}
-                  setCommentId={setCommentId}
-                  commenttext={commenttext}
-                />
-              )}
-            />
-          </View>
+            <Text style={styles.txtcommentsTitle}>Comments</Text>
 
-          {
-            <View
-              style={{
-                paddingVertical: SIZES[14],
-                paddingHorizontal: SIZES[16],
-                borderWidth: SIZES[1],
-                borderColor: Colors.line,
-                borderRadius: SIZES[8],
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: SIZES[32],
-                marginBottom: SIZES[24]
-              }}
-            >
-              <TextInput
-                style={{
-                  flex: 1,
-                  height: SIZES[30],
-                  backgroundColor: Colors.white
+            <View>
+              <FlatList
+                data={comments?.childComment}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item, index) => {
+                  return index.toString();
                 }}
-                value={commenttext}
-                underlineColor={Colors.white}
-                activeUnderlineColor={Colors.white}
-                placeholder={'Your comment'}
-                onChangeText={(text) => setCommentText(text)}
+                renderItem={({ item, index }) => (
+                  <CommentCard
+                    item={item}
+                    commentThreadId={commentThreadId}
+                    index={index}
+                    setComment={setCommentText}
+                    setCommentId={setCommentId}
+                    commenttext={commenttext}
+                  />
+                )}
               />
-              <TouchableOpacity
-                onPress={() => {
-                  console.log('commenttext', commenttext);
-                  console.log('parentCommentId', commentThreadId);
-                  console.log('commentId', commentId);
-                  if (commentId == null) {
-                    addComment({
-                      variables: {
-                        comment: {
-                          comment: commenttext,
-                          commentId: 0,
-                          parentCommentId: comments.commentId
-                        }
-                      }
-                    });
-                  } else {
-                    addComment({
-                      variables: {
-                        comment: {
-                          comment: commenttext,
-                          commentId: commentId
-                        }
-                      }
-                    });
-                  }
+            </View>
 
-                  setCommentText('');
+            {
+              <View
+                style={{
+                  paddingVertical: SIZES[14],
+                  paddingHorizontal: SIZES[16],
+                  borderWidth: SIZES[1],
+                  borderColor: Colors.line,
+                  borderRadius: SIZES[8],
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: SIZES[32],
+                  marginBottom: SIZES[24]
                 }}
               >
-                <Icon
-                  name={IconName.Send}
-                  height={SIZES[22]}
-                  width={SIZES[20]}
+                <TextInput
+                  style={{
+                    flex: 1,
+
+                    backgroundColor: Colors.white
+                  }}
+                  value={commenttext}
+                  underlineColor={Colors.white}
+                  activeUnderlineColor={Colors.white}
+                  placeholder={'Your comment'}
+                  onChangeText={(text) => setCommentText(text)}
                 />
-              </TouchableOpacity>
-            </View>
-          }
-        </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log('commenttext', commenttext);
+                    console.log('parentCommentId', commentThreadId);
+                    console.log('commentId', commentId);
+                    if (commentId == null) {
+                      addComment({
+                        variables: {
+                          comment: {
+                            comment: commenttext,
+                            commentId: 0,
+                            parentCommentId: comments.commentId
+                          }
+                        }
+                      });
+                    } else {
+                      addComment({
+                        variables: {
+                          comment: {
+                            comment: commenttext,
+                            commentId: commentId
+                          }
+                        }
+                      });
+                    }
+
+                    setCommentText('');
+                  }}
+                >
+                  <Icon
+                    name={IconName.Send}
+                    height={SIZES[22]}
+                    width={SIZES[20]}
+                  />
+                </TouchableOpacity>
+              </View>
+            }
+          </View>
+        )}
       </ScrollView>
       {item?.isHead && item?.taskStatus !== 'Deleted' && (
         <View

@@ -67,6 +67,7 @@ const LiveMeetingDetails = ({ item, meeting }) => {
 
   // get location
   const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       locationId: item.locationId
     },
@@ -83,6 +84,7 @@ const LiveMeetingDetails = ({ item, meeting }) => {
 
   // get link
   const Link = useQuery(GET_PLATFORMLINK, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       platformId: meeting?.platformId
     },
@@ -99,6 +101,7 @@ const LiveMeetingDetails = ({ item, meeting }) => {
 
   // get committee
   const Committee = useQuery(GET_COMMITTEE_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       organizationId: item.committeeId
     },
@@ -247,7 +250,10 @@ const LiveMeetingDetails = ({ item, meeting }) => {
             onPress={() =>
               navigation.navigate('LocationDetails', {
                 locationId: item.locationId,
-                platform: platform
+                platform: platform,
+                isLiveMeeting: true,
+                role: 'Member',
+                locationType: 2
               })
             }
           />

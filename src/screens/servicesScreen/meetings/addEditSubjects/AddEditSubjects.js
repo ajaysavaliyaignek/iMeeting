@@ -4,12 +4,14 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert
+  Alert,
+  Switch
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
 import { Divider } from 'react-native-paper';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import { Icon, IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
@@ -19,6 +21,7 @@ import { Button } from '../../../../component/button/Button';
 import AddSubjectsCard from './AddSubjectsCard';
 import { GET_All_SUBJECTS } from '../../../../graphql/query';
 import { Fonts } from '../../../../themes';
+import moment from 'moment';
 
 const AddEditSubjects = ({
   generaldData,
@@ -33,6 +36,10 @@ const AddEditSubjects = ({
   const [openIndex, setOpenIndex] = useState(-1);
   const [selectSubjects, setSelectedSubjects] = useState([]);
   const [previosSubjects, setPreviosSubjects] = useState([]);
+  const [isFeedback, setIsFeedback] = useState(false);
+  const [feedbackDate, setFeedDate] = useState('');
+  const [isSuggestion, setIsSuggestion] = useState(false);
+  const [openCalendar, setOpenCalendar] = useState(false);
   let subjects = [];
 
   let backUpUser = [];
@@ -53,6 +60,7 @@ const AddEditSubjects = ({
       error: SubjectsError,
       data: SubjectsData
     } = useQuery(GET_All_SUBJECTS, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         committeeIds: '',
         searchValue: searchText,
@@ -151,6 +159,14 @@ const AddEditSubjects = ({
     }
   };
 
+  const handleConfirmCalendar = (date) => {
+    setGeneralData({
+      ...generaldData,
+      attendanceFeedbackDate: moment(date).format('YYYY-MM-DD')
+    });
+    setOpenCalendar(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
@@ -163,7 +179,7 @@ const AddEditSubjects = ({
             placeholder={'Search'}
             onChangeText={(text) => searchFilterSubject(text)}
           />
-          <TouchableOpacity onPress={() => startRecording()}>
+          <TouchableOpacity>
             <Icon
               name={IconName.Speaker}
               height={SIZES[15]}
@@ -196,7 +212,8 @@ const AddEditSubjects = ({
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                flex: 1
+                flex: 1,
+                paddingVertical: SIZES[24]
               }}
             >
               <Text
@@ -206,26 +223,96 @@ const AddEditSubjects = ({
               </Text>
             </View>
           )}
-
-          <View style={styles.deadlineContainer}>
-            <Text style={styles.txtTitle}>RECIEVING SUBJECTS DEADLINE</Text>
-            <TouchableOpacity
-              style={styles.deadlineRowContainer}
-              onPress={() =>
-                navigation.navigate('DeadlineSuggestion', {
-                  setCalendarValue: setGeneralData
-                })
-              }
-            >
-              <TextInput value={generaldData?.calendarValue} editable={false} />
-              <Icon
-                name={IconName.Calendar}
-                width={SIZES[18]}
-                height={SIZES[20]}
+          <Divider style={styles.divider} />
+          <View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.txtLabel}>Attendance feedback</Text>
+              <Switch
+                value={generaldData.attendanceFeedback}
+                onValueChange={() =>
+                  setGeneralData({
+                    ...generaldData,
+                    attendanceFeedback: !generaldData.attendanceFeedback
+                  })
+                }
+                color={Colors.switch}
               />
-            </TouchableOpacity>
-
+            </View>
+            {generaldData.attendanceFeedback && (
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: SIZES[16]
+                }}
+                onPress={() => setOpenCalendar(true)}
+              >
+                <Text
+                  style={{
+                    marginRight: SIZES[8],
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.bold
+                  }}
+                >
+                  {generaldData?.attendanceFeedbackDate}
+                </Text>
+                <Icon
+                  name={IconName.Calendar}
+                  height={SIZES[20]}
+                  width={SIZES[20]}
+                />
+              </TouchableOpacity>
+            )}
             <Divider style={styles.divider} />
+          </View>
+
+          <View>
+            <View style={styles.rowContainer}>
+              <Text style={styles.txtLabel}>Subject suggestion</Text>
+              <Switch
+                value={generaldData.subjectSuggestion}
+                onValueChange={() =>
+                  setGeneralData({
+                    ...generaldData,
+                    subjectSuggestion: !generaldData.subjectSuggestion
+                  })
+                }
+                color={Colors.switch}
+              />
+            </View>
+            {generaldData.subjectSuggestion && (
+              <TouchableOpacity
+                style={styles.deadlineRowContainer}
+                onPress={() =>
+                  navigation.navigate('DeadlineSuggestion', {
+                    setCalendarValue: setGeneralData,
+                    generaldData: generaldData,
+                    isTaskdeadline: false
+                  })
+                }
+              >
+                <Text
+                  style={{
+                    marginRight: SIZES[8],
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.bold
+                  }}
+                >
+                  {generaldData?.calendarValue}
+                </Text>
+                <Icon
+                  name={IconName.Calendar}
+                  width={SIZES[18]}
+                  height={SIZES[20]}
+                />
+              </TouchableOpacity>
+            )}
+            <Divider style={styles.divider} />
+          </View>
+          <View style={styles.deadlineContainer}>
+            {/* <Text style={styles.txtTitle}>RECIEVING SUBJECTS DEADLINE</Text> */}
+
             <Button
               title={'Select subjects'}
               layoutStyle={styles.selectsubjectBtnLayout}
@@ -240,6 +327,18 @@ const AddEditSubjects = ({
               }
             />
           </View>
+          <DateTimePickerModal
+            isVisible={openCalendar}
+            mode="date"
+            onConfirm={handleConfirmCalendar}
+            onCancel={() => setOpenCalendar(false)}
+            // generaldData?.startDateTime != '' &&
+            //           generaldData?.endDateTime != ''
+            minimumDate={generaldData?.startDateTime}
+            maximumDate={generaldData?.endDateTime}
+            // date={new Date()}
+            // timePickerModeAndroid="spinner"
+          />
         </ScrollView>
       </View>
     </View>

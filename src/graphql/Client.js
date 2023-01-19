@@ -13,9 +13,9 @@ export const Client = () => {
   useEffect(() => {
     DeviceEventEmitter.addListener('urlChanged', getUrl);
 
-    // return () => {
-    //   DeviceEventEmitter.removeAllListeners('urlChanged');
-    // };
+    return () => {
+      DeviceEventEmitter.removeAllListeners('urlChanged');
+    };
   }, []);
   console.log('url from client', url);
 

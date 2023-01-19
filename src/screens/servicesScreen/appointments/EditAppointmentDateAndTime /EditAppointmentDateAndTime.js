@@ -204,6 +204,7 @@ const EditAppointmentDateAndTime = () => {
   };
 
   const TimeZone = useQuery(GET_TIMEZONE, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data) {
         setTimeZone(data.timeZone.items);

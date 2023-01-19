@@ -386,12 +386,11 @@ const DetailsScreen = () => {
               committeeIds={committeeId}
               searchText={searchText}
               setSearchText={setSearchText}
-              deleted={true}
               download={true}
-              editable={true}
               onPressView={(item) => {
                 navigation.navigate('SubjectDetails', { item });
               }}
+              isSubjectStatus={true}
             />
           )}
         </View>

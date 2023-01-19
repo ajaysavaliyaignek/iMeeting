@@ -21,7 +21,6 @@ import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
 import { styles } from './styles';
 import { UserContext } from '../../../../context';
-import { useQuery } from '@apollo/client';
 import { GET_APPOINTMENT_BY_ID } from '../../../../graphql/query';
 import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 

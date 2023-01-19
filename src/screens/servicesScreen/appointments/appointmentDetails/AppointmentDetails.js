@@ -55,6 +55,7 @@ const AppointmentsDetails = () => {
 
   // get mappointment by id
   const { data, error, loading } = useQuery(GET_APPOINTMENT_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       id: item.appointmentId
     },
@@ -78,6 +79,7 @@ const AppointmentsDetails = () => {
   });
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       console.log('user data', data.userPayload.userId);
       setUser(data.userPayload.userId);
@@ -93,6 +95,7 @@ const AppointmentsDetails = () => {
 
   fileId?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -256,25 +259,27 @@ const AppointmentsDetails = () => {
                     : `Your suggestion time - ${user?.suggestionTime}`
                 )
               )}
-              <TouchableOpacity
-                style={{
-                  marginLeft: SIZES[16],
-                  borderBottomWidth: 1,
-                  borderBottomColor: Colors.primary
-                }}
-                onPress={() =>
-                  navigation.navigate('YourAnswer', { item, userID: user })
-                }
-              >
-                <Text
+              {!item?.isDisable && (
+                <TouchableOpacity
                   style={{
-                    ...Fonts.PoppinsSemiBold[14],
-                    color: Colors.primary
+                    marginLeft: SIZES[16],
+                    borderBottomWidth: 1,
+                    borderBottomColor: Colors.primary
                   }}
+                  onPress={() =>
+                    navigation.navigate('YourAnswer', { item, userID: user })
+                  }
                 >
-                  Edit
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      ...Fonts.PoppinsSemiBold[14],
+                      color: Colors.primary
+                    }}
+                  >
+                    Edit
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
@@ -307,7 +312,7 @@ const AppointmentsDetails = () => {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-between' }}
           >
-            {details('Vi-nce platform', appointment?.platformName)}
+            {details('Platform', appointment?.platformName)}
 
             {appointment?.platformlink && (
               <View

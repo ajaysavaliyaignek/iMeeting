@@ -11,6 +11,7 @@ import { Button } from '../../../component/button/Button';
 import { Colors } from '../../../themes/Colors';
 import { SIZES } from '../../../themes/Sizes';
 import {
+  GET_All_COMMITTEE,
   GET_ALL_DECISION_BY_ID,
   GET_All_SUBJECTS,
   GET_ALL_SUBJECTS_STATUS,
@@ -26,9 +27,8 @@ const AddEditDecision = () => {
   const { meetingDetails, isEdit, decisionId, subjectId } = route?.params;
 
   const [valueDecision, setValueDecision] = useState(null);
-  const [valueCommittee, setValueCommiteee] = useState(
-    meetingDetails?.committeeId
-  );
+  const [valueDecisionName, setValueDecisionName] = useState('');
+  const [valueCommittee, setValueCommiteee] = useState(null);
   const [decisionDescription, setDecisionDescription] = useState('');
   const [fileResponse, setFileResponse] = useState([]);
   const [subjectList, setSubjectList] = useState([]);
@@ -41,6 +41,7 @@ const AddEditDecision = () => {
 
   if (isEdit) {
     const getDecionById = useQuery(GET_ALL_DECISION_BY_ID, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         decision: decisionId
       },
@@ -53,6 +54,7 @@ const AddEditDecision = () => {
         data?.decision?.attachFileIds?.map((id) => {
           console.log('id', id);
           const { loading, error } = useQuery(GET_FILE, {
+            fetchPolicy: 'cache-and-network',
             variables: {
               fileEntryId: id
             },
@@ -86,19 +88,20 @@ const AddEditDecision = () => {
   }, [fileResponse]);
 
   // fetch commitees
-  const {
-    loading: CommitteeLoading,
-    error: CommitteeError,
-    data: CommitteeData
-  } = useQuery(GET_COMMITTEES_BY_ROLE, {
-    variables: { head: true, secretary: true, member: false },
+  const Committes = useQuery(GET_All_COMMITTEE, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      page: -1,
+      pageSize: -1,
+      searchValue: '',
+      isDeleted: false
+    },
     onCompleted: (data) => {
-      if (data) {
-        setCommittee(data?.committeesByRole?.items);
-      }
+      console.log('all committes', data.committees.items.length);
+      setCommittee(data.committees.items);
     },
     onError: (data) => {
-      console.log('commitee error', data);
+      console.log('get all committees error', data.message);
     }
   });
 
@@ -108,10 +111,11 @@ const AddEditDecision = () => {
     error: SubjectsError,
     data: SubjectsData
   } = useQuery(GET_All_SUBJECTS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       committeeIds: '',
       searchValue: '',
-      screen: 0,
+      screen: 2,
       page: -1,
       pageSize: -1,
       meetingId: meetingDetails?.meetingId
@@ -133,6 +137,7 @@ const AddEditDecision = () => {
     error: decisionStatusLoadingError,
     data: decisionStatusLoadingData
   } = useQuery(GET_ALL_SUBJECTS_STATUS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       subject: false,
       decision: true,
@@ -167,7 +172,7 @@ const AddEditDecision = () => {
     }
   });
 
-  console.log('value decision', valueDecision);
+  console.log('value decision', valueDecisionName);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -204,20 +209,24 @@ const AddEditDecision = () => {
           }))}
           value={valueDecision}
           setData={setValueDecision}
+          setValueDecisionName={setValueDecisionName}
         />
 
         {/* committees dropdwon */}
-        <DropDownPicker
-          title={'CHOOSE COMMITTEE'}
-          placeholder={''}
-          data={committees?.map((comm) => ({
-            label: comm.committeeTitle,
-            value: comm.organizationId
-          }))}
-          value={valueCommittee}
-          setData={setValueCommiteee}
-          disable={true}
-        />
+        {valueDecisionName == 'Approved with escalation' ||
+        valueDecisionName == 'Rejected with escalation' ? (
+          <DropDownPicker
+            title={'CHOOSE COMMITTEE'}
+            placeholder={''}
+            data={committees?.map((comm) => ({
+              label: comm.committeeTitle,
+              value: comm.organizationId
+            }))}
+            value={valueCommittee}
+            setData={setValueCommiteee}
+            disable={false}
+          />
+        ) : null}
 
         <View style={styles.optionsContainer}>
           <Text style={styles.txtTitleVoting}>DESCRIPTION</Text>
@@ -262,12 +271,19 @@ const AddEditDecision = () => {
           />
           <Button
             title={'Save'}
+            disable={
+              decisionDescription === '' ||
+              decisionId === null ||
+              valueSubject == null
+                ? true
+                : false
+            }
             // isLoading={addVotingLoading}
             onPress={() => {
               console.log('update decision data ', {
                 decisionId: isEdit ? decisionId : 0,
                 subjectId: valueSubject,
-                committeeId: valueCommittee,
+                committeeId: valueCommittee ? valueCommittee : 0,
                 statusId: valueDecision,
                 description: decisionDescription,
                 attachFileIds: fileId,
@@ -281,7 +297,7 @@ const AddEditDecision = () => {
                   decision: {
                     decisionId: isEdit ? decisionId : 0,
                     subjectId: valueSubject,
-                    committeeId: valueCommittee,
+                    committeeId: valueCommittee ? valueCommittee : 0,
                     statusId: valueDecision,
                     description: decisionDescription,
                     attachFileIds: fileId,
@@ -294,9 +310,14 @@ const AddEditDecision = () => {
               });
             }}
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity:
+                  decisionDescription === '' ||
+                  decisionId === null ||
+                  valueSubject == null
+                    ? 0.5
+                    : null
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}

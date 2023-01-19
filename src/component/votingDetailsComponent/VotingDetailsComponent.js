@@ -108,16 +108,18 @@ const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
               <Text style={styles.txtEditBtn}>Edit</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            style={[styles.editBtn, { marginLeft: SIZES[12] }]}
-            onPress={() => {
-              navigation.navigate('ViewVotingHistory', {
-                votingId: item.votingId
-              });
-            }}
-          >
-            <Text style={styles.txtEditBtn}>View History</Text>
-          </TouchableOpacity>
+          {!item?.isPrivate && (
+            <TouchableOpacity
+              style={[styles.editBtn, { marginLeft: SIZES[12] }]}
+              onPress={() => {
+                navigation.navigate('ViewVotingHistory', {
+                  votingId: item.votingId
+                });
+              }}
+            >
+              <Text style={styles.txtEditBtn}>View History</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       {item?.subjectId !== 0 && (

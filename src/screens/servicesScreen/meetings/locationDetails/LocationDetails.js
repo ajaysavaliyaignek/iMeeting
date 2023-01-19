@@ -26,7 +26,9 @@ import { GET_ALL_LOCATION_BY_ID } from '../../../../graphql/query';
 const LocationDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { locationId, platform, locationType, role } = route?.params;
+  const { locationId, platform, locationType, role, isLiveMeeting } =
+    route?.params;
+  console.log({ locationId, platform, locationType, role, isLiveMeeting });
   const [location, setLocation] = useState({});
 
   // get location by id
@@ -36,6 +38,7 @@ const LocationDetails = () => {
     error: LocationError,
     data: LocationData
   } = useQuery(GET_ALL_LOCATION_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       locationId: locationId
     },
@@ -137,8 +140,9 @@ const LocationDetails = () => {
           <Divider style={styles.divider} />
         </View>
       </ScrollView>
-      {role == 'Head' || role == 'Secretary' ? (
+      {(role == 'Head' || role == 'Secretary') && !isLiveMeeting ? (
         <View
+          View
           style={{
             backgroundColor: Colors.white,
             justifyContent: 'flex-end'
@@ -155,6 +159,7 @@ const LocationDetails = () => {
               layoutStyle={styles.cancelBtnLayout}
               textStyle={styles.txtCancelButton}
             />
+
             <Button
               title={'Edit'}
               onPress={() =>

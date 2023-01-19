@@ -31,6 +31,7 @@ const AppointmentsList = () => {
   const [visibleIndex, setVisibleIndex] = useState(-1);
   // get ALL appointment
   const Appointment = useQuery(GET_All_APPOINTMENT, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       searchValue: searchText,
       page: -1,

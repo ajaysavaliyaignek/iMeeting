@@ -70,6 +70,7 @@ const TimelineScreen = () => {
   console.log('userIds', { userid: userIds });
 
   const { data, error, loading } = useQuery(GET_TIMELINE_REVIEW, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       startTime: `${moment(date).format('YYYY-MM-DD')} 00:00 AM `,
       endTime: `${moment(date).format('YYYY-MM-DD')} 11:59 PM `,
@@ -192,6 +193,8 @@ const TimelineScreen = () => {
       ]
     }
   ];
+
+  console.log(event);
 
   return (
     <SafeAreaView style={styles.container}>

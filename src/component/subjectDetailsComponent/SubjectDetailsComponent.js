@@ -47,6 +47,7 @@ const SubjectDetailsComponent = ({
 
   fileId?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -103,7 +104,7 @@ const SubjectDetailsComponent = ({
       )}
 
       {/* comments     */}
-      {item.statusTitle == 'Approved' && (
+      {item.statusTitle == 'Approved' && item.statusTitle !== 'Deleted' && (
         <View>
           <Text style={styles.txtcommentsTitle}>Comments</Text>
 

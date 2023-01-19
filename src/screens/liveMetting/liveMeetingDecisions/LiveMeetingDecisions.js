@@ -30,9 +30,9 @@ const LiveMeetingDecisions = ({
   };
 
   useEffect(() => {
-    if (socketEventUpdateMessage == 'Updated Decision') {
+    if (socketEventUpdateMessage == 'subjects') {
       client.refetchQueries({
-        include: ['decisions']
+        include: ['decisions', 'subjects']
       });
     }
   }, [socketEventUpdateMessage]);
@@ -55,6 +55,7 @@ const LiveMeetingDecisions = ({
         committeeIds={''}
         meetingId={meetingData.meetingId}
         meetingData={meetingData}
+        deleted={false}
         searchText={searchText}
         isSubjectStatus={false}
         editable={meetingData?.yourRoleName == 'Member' ? false : true}

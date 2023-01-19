@@ -30,6 +30,7 @@ const AddSubjectsCard = ({
   const [items, setItems] = useState([{ label: 'Design', value: 'design' }]);
 
   const getSubjectStatus = useQuery(GET_ALL_SUBJECTS_STATUS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       console.log('subject status', data.subjectStatus.items);
       if (data) {

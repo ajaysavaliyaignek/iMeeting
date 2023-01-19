@@ -76,6 +76,7 @@ const EditAppointmentLocation = () => {
     error: LocationError,
     data: LocationData
   } = useQuery(GET_ALL_LOCATION, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       locationType: 2
     },

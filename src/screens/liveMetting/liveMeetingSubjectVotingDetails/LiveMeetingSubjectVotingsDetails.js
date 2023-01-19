@@ -27,6 +27,7 @@ const LiveMeetingSubjectVotingsDetails = ({
   console.log('SubjectData', SubjectData);
 
   const getVotingDetails = useQuery(GET_VOTING_DETAILS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: meetingData?.meetingId,
       type: 2,

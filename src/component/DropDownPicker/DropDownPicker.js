@@ -13,7 +13,8 @@ const DropDownPicker = ({
   title,
   placeholder,
   disable,
-  styleContainer
+  styleContainer,
+  setValueDecisionName
 }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -40,6 +41,9 @@ const DropDownPicker = ({
         onChange={(item) => {
           setData(item.value);
           setIsFocus(false);
+          if (setValueDecisionName !== undefined) {
+            setValueDecisionName(item?.label);
+          }
         }}
       />
     </View>

@@ -9,6 +9,7 @@ export const fetchCommitteesByRole = (setCommittee) => {
     error: CommitteeError,
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
+    fetchPolicy: 'cache-and-network',
     variables: { head: true, secretary: true, member: false },
     onCompleted: (data) => {
       if (data) {

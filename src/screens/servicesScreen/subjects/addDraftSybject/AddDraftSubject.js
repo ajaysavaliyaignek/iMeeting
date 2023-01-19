@@ -7,7 +7,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,6 +24,7 @@ import {
   GET_All_MEETING,
   GET_All_SUBJECTS,
   GET_All_SUBJECTS_CATEGORY,
+  GET_COMMITTEES_BY_ROLE,
   GET_FILE
 } from '../../../../graphql/query';
 import { UPDATE_SUBJECTS } from '../../../../graphql/mutation';
@@ -33,11 +34,13 @@ import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 
 const AddDraftSubject = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { meetingId } = route?.params;
   const [title, setTitle] = useState('');
   const [discription, setDescription] = useState('');
   const [valueCategory, setValueCategory] = useState(null);
   const [valueCommittee, setValueCommittee] = useState(null);
-  const [valueMeeting, setValueMeeting] = useState();
+  const [valueMeeting, setValueMeeting] = useState(meetingId);
   const [fileResponse, setFileResponse] = useState([]);
   const [filesId, setFilesId] = useState([]);
   const [token, setToken] = useState('');
@@ -52,6 +55,7 @@ const AddDraftSubject = () => {
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =
     useQuery(GET_All_SUBJECTS_CATEGORY, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         if (data) {
           console.log('subject category', data.subjectCategories.items);
@@ -65,26 +69,37 @@ const AddDraftSubject = () => {
   }
 
   // fetch commitees
-  const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
-    GET_All_COMMITTEE,
-    {
-      variables: { isDeleted: true },
-      onCompleted: (data) => {
-        if (data) {
-          console.log('committees', data?.committees.items);
-          setCommittee(data.committees.items);
-        }
+  const {
+    loading: CommitteeLoading,
+    error: CommitteeError,
+    data: CommitteeData
+  } = useQuery(GET_COMMITTEES_BY_ROLE, {
+    fetchPolicy: 'cache-and-network',
+    variables: { head: true, secretary: true, member: false },
+    onCompleted: (data) => {
+      if (data) {
+        setCommittee(data?.committeesByRole?.items);
       }
+    },
+    onError: (data) => {
+      console.log('commitee error', data);
     }
-  );
-  if (CommitteeError) {
-    console.log('commitee error', CommitteeError);
-  }
+  });
 
   // fetch meetings
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,
+
     {
+      fetchPolicy: 'cache-and-network',
+      variables: {
+        onlyMyMeeting: false,
+        committeeIds: '',
+        screen: 0,
+        searchValue: '',
+        page: -1,
+        pageSize: -1
+      },
       onCompleted: (data) => {
         if (data) {
           console.log('meetings', data?.meetings.items);
@@ -111,7 +126,12 @@ const AddDraftSubject = () => {
 
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
     // export const GET_All_SUBJECTS = gql`
-    refetchQueries: [{ query: GET_All_SUBJECTS }]
+    refetchQueries: ['subjects'],
+    onCompleted: (data) => {
+      if (data?.updateSubject?.status[0]?.statusCode == '200') {
+        navigation.goBack();
+      }
+    }
   });
   if (data) {
     console.log(data);
@@ -136,7 +156,7 @@ const AddDraftSubject = () => {
         <Text style={styles.txtAddSubjectTitle}>Add draft subject</Text>
 
         {/* select committee */}
-        <DropDownPicker
+        {/* <DropDownPicker
           data={committees?.map((item) => ({
             label: item.committeeTitle,
             value: item.organizationId
@@ -146,20 +166,20 @@ const AddDraftSubject = () => {
           setData={setValueCommittee}
           title={'SELECT COMMITTEE'}
           value={valueCommittee}
-        />
+        /> */}
 
         {/* select meeting */}
-        <DropDownPicker
+        {/* <DropDownPicker
           data={meetings?.map((item) => ({
             label: item.meetingTitle,
             value: item.meetingId
           }))}
-          disable={false}
+          disable={true}
           placeholder={''}
           setData={setValueMeeting}
           title={'SELECT MEETING'}
           value={valueMeeting}
-        />
+        /> */}
 
         {/* title */}
         <View style={styles.titleContainer}>
@@ -190,15 +210,6 @@ const AddDraftSubject = () => {
             setData={setValueCategory}
             title={'SUBJECT CATEGORY'}
             value={valueCategory}
-          />
-          <Button
-            title={'Add category'}
-            textStyle={{ ...Fonts.PoppinsRegular[12] }}
-            layoutStyle={{
-              paddingHorizontal: SIZES[10],
-              marginTop: SIZES[10]
-            }}
-            onPress={() => navigation.navigate('AddSubjectCategory')}
           />
         </View>
 
@@ -240,30 +251,22 @@ const AddDraftSubject = () => {
               console.log('attachFileIds', filesId);
               console.log('valueCommittee', valueCommittee);
               console.log('valueCategory', valueCategory);
+              console.log('meetingId', meetingId);
               addSubject({
                 variables: {
                   subject: {
                     subjectId: 0,
-                    committeeId: valueCommittee,
+                    committeeId: 0,
                     subjectTitle: title,
                     description: discription,
                     subjectCategoryId: valueCategory,
                     draft: true,
-                    attachFileIds: filesId
+                    attachFileIds: filesId,
+                    meetingId: meetingId,
+                    id: 0
                   }
-                },
-                onCompleted: () => {
-                  navigation.navigate('Details', {
-                    title: 'Subjects',
-                    active: '1'
-                  });
                 }
               });
-
-              // navigation.navigate('Details', {
-              //   title: 'Subjects',
-              //   active: '1'
-              // });
             }}
             disable={title === '' || discription === '' ? true : false}
             layoutStyle={[

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import moment from 'moment';
+
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -28,6 +29,7 @@ import {
   GET_ANSWER,
   GET_COMMITTEE_BY_ID,
   GET_FILE,
+  GET_LIVE_MEETING_TAB_COUNT,
   GET_MEETING_BY_ID,
   GET_PLATFORMLINK,
   GET_USER_PAYLOAD
@@ -35,28 +37,28 @@ import {
 import { DELETE_MEETING } from '../../../graphql/mutation';
 import AttachFiles from '../../attachFiles/AttachFiles';
 import { dateTimeFormate } from '../../../Constans/data';
+import { confirmButtonStyles } from 'react-native-modal-datetime-picker';
 
 const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const navigation = useNavigation();
   momentDurationFormatSetup(moment);
   const route = useRoute();
   // const { item } = route?.params;
+  console.log(item);
 
   const [fileResponse, setFileResponse] = useState([]);
-  const [meeting, setMeeting] = useState(null);
   const [location, setLocation] = useState(null);
   const [committe, setCommittee] = useState(null);
-  const [platform, setPlatform] = useState(null);
   const [role, setRole] = useState(item?.yourRoleName);
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
-  const [subjects, setSubjects] = useState(null);
-  const [searchText, setSearchText] = useState('');
+  const [tabCounts, setTabCounts] = useState({});
   let file = [];
 
   //Get meeting attachments
   item?.attachFileIds?.map((id) => {
     const getFile = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -69,22 +71,6 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
     }
   });
 
-  // get meeting
-  const { data, error, loading } = useQuery(GET_MEETING_BY_ID, {
-    variables: {
-      meetingId: item.meetingId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setMeeting(data.meeting);
-        setRole(data.meeting.yourRoleName);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
     onCompleted: (data) => {
       setAnswer(data.answer);
@@ -92,6 +78,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   });
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       setUser(data.userPayload.userId);
       getAnswer({
@@ -116,6 +103,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
 
   // get location
   const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       locationId: item.locationId
     },
@@ -131,6 +119,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
 
   // get committee
   const Committee = useQuery(GET_COMMITTEE_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       organizationId: item.committeeId
     },
@@ -145,56 +134,46 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   });
 
   // delete meeting
-  const [deleteMeeting] = useMutation(DELETE_MEETING, {
-    // export const GET_All_SUBJECTS = gql`
-    refetchQueries: [
-      {
-        query: GET_All_MEETING,
-        variables: {
-          onlyMyMeeting: false,
-          committeeIds: '',
-          screen: 0,
-          searchValue: '',
-          page: -1,
-          pageSize: -1
-        }
-      }
-    ],
+  // const [deleteMeeting] = useMutation(DELETE_MEETING, {
+  //   // export const GET_All_SUBJECTS = gql`
+  //   refetchQueries: [
+  //     {
+  //       query: GET_All_MEETING,
+  //       variables: {
+  //         onlyMyMeeting: false,
+  //         committeeIds: '',
+  //         screen: 0,
+  //         searchValue: '',
+  //         page: -1,
+  //         pageSize: -1
+  //       }
+  //     }
+  //   ],
+  //   onCompleted: (data) => {
+  //     if (data.deleteMeeting.status[0].statusCode == '200') {
+  //       navigation.goBack();
+  //     }
+  //   },
+  //   onError: (data) => {
+  //     console.log('dele meeting error', data);
+  //   }
+  // });
+
+  const GetTabsCounts = useQuery(GET_LIVE_MEETING_TAB_COUNT, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      id: item.meetingId,
+      type: 1
+    },
     onCompleted: (data) => {
-      if (data.deleteMeeting.status[0].statusCode == '200') {
-        navigation.goBack();
+      if (data) {
+        setTabCounts(data.referencesCounts.referencesCounts);
       }
     },
     onError: (data) => {
-      console.log('dele meeting error', data);
+      console.log('error GetTabsCounts', data);
     }
   });
-
-  // get ALL SUBJECTS
-  const {
-    loading: SubjectsLoading,
-    error: SubjectsError,
-    data: SubjectsData
-  } = useQuery(GET_All_SUBJECTS, {
-    variables: {
-      committeeIds: '',
-      searchValue: searchText,
-      screen: 0,
-      page: -1,
-      pageSize: -1,
-      meetingId: item?.meetingId,
-      isDraft: false
-    },
-
-    onCompleted: (data) => {
-      setSubjects(data?.subjects.items);
-      console.log('subjects', data?.subjects.items);
-    }
-  });
-
-  if (SubjectsError) {
-    console.log('subjects error---', SubjectsError);
-  }
 
   const details = (title, discription) => {
     return (
@@ -204,6 +183,27 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       </View>
     );
   };
+  let date = new Date();
+  let newdate = moment(
+    date.toLocaleString('en-Us', { timeZone: 'ASIA/CALCUTTA' })
+  )
+    .add(15, 'm')
+    .format('YYYY-MM-DD hh:mm A');
+
+  let meetingDate = `${item.setDate} ${item.setTime}`;
+  console.log('newdate', { newdate });
+  console.log('meetingDate', { meetingDate });
+  console.log(
+    moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
+      moment(meetingDate, 'YYYY-MM-DD hh:mm A')
+    )
+  );
+  // console.log(
+  //   'new timezone',
+  //   moment(date.toLocaleString('en-Us', { timeZone: 'ASIA/CALCUTTA' }))
+  //     .add(15, 'm')
+  //     .format('YYYY-MM-DD hh:mm A')
+  // );
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -225,10 +225,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
             `${moment(item?.setDate).format('DD MMM, YYYY')}, ${item?.setTime}`
           )}
           <View>
-            <Text style={styles.txtDuration}>
-              {' '}
-              (Duration {durationHourMin})
-            </Text>
+            <Text style={styles.txtDuration}>(Duration {durationHourMin})</Text>
           </View>
         </View>
         {details('Timezone', item?.timeZone)}
@@ -278,25 +275,30 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
                   : `Your suggestion time - ${answer?.suggestionTime}`
               )
             )}
-            <TouchableOpacity
-              style={{
-                marginLeft: SIZES[16],
-                borderBottomWidth: 1,
-                borderBottomColor: Colors.primary
-              }}
-              onPress={() =>
-                navigation.navigate('YourAnswer', { item, userID: user })
-              }
-            >
-              <Text
-                style={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.primary
-                }}
-              >
-                Edit
-              </Text>
-            </TouchableOpacity>
+            {moment(item.attendanceFeedbackDate).isSameOrAfter(
+              moment(new Date()).format('YYYY-MM-DD')
+            ) &&
+              item.attendanceFeedback && (
+                <TouchableOpacity
+                  style={{
+                    marginLeft: SIZES[16],
+                    borderBottomWidth: 1,
+                    borderBottomColor: Colors.primary
+                  }}
+                  onPress={() =>
+                    navigation.navigate('YourAnswer', { item, userID: user })
+                  }
+                >
+                  <Text
+                    style={{
+                      ...Fonts.PoppinsSemiBold[14],
+                      color: Colors.primary
+                    }}
+                  >
+                    Edit
+                  </Text>
+                </TouchableOpacity>
+              )}
           </View>
         )}
       </View>
@@ -316,8 +318,8 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
               onPress={() =>
                 navigation.navigate('LocationDetails', {
                   locationId: item.locationId,
-
-                  locationType: 1,
+                  isLiveMeeting: true,
+                  locationType: 2,
                   role: item.yourRoleName
                 })
               }
@@ -333,7 +335,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
             marginBottom: fileResponse?.length > 0 ? 0 : SIZES[24]
           }}
         >
-          {details('Vi-nce platform', 'Google Meet')}
+          {details('Platform', 'Google Meet')}
 
           {item?.platformlink && (
             <View
@@ -434,18 +436,18 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
               activeOpacity={0.5}
               onPress={() =>
                 navigation.navigate('subjects', {
-                  subjects: subjects,
-                  role,
-                  deadlinedDate: meeting?.deadlineDate,
-                  setSearchText: setSearchText,
-                  searchText: searchText
+                  meetingData: item
                 })
               }
             >
               <Text style={styles.txtCommittee}>Subjects</Text>
               <View style={styles.btnCommittees}>
                 <Text style={styles.txtBtnCommittees}>
-                  {subjects?.length > 0 ? subjects?.length : 0}
+                  {item?.yourRoleName == 'Member'
+                    ? tabCounts?.Subject
+                    : item?.subjectIds?.length > 0
+                    ? item?.subjectIds?.length
+                    : 0}
                 </Text>
                 <Icon
                   name={IconName.Arrow_Right}

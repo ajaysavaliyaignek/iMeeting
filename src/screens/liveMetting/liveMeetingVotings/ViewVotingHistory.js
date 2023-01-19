@@ -20,6 +20,7 @@ const ViewVotingHistory = () => {
   const [searchText, setSearchText] = useState('');
 
   const getVotingHistory = useQuery(GET_VOTING_HISTORY, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       votingId: votingId
     },

@@ -43,6 +43,7 @@ const LiveMeetingSubjectDetails = () => {
     error: SubjectError,
     data: SubjectsData
   } = useQuery(GET_SUBJECT_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: { subjectId: item.subjectId },
     onCompleted: (data, error) => {
       console.log('subject data', data);
@@ -61,6 +62,7 @@ const LiveMeetingSubjectDetails = () => {
     error: CommentsError,
     data: CommentsData
   } = useQuery(GET_All_COMMENTS_THREAD, {
+    fetchPolicy: 'cache-and-network',
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
@@ -156,7 +158,11 @@ const LiveMeetingSubjectDetails = () => {
       ],
       onCompleted: (data, error) => {
         if (data) {
-          console.log('delete data', data.deleteSubject.status);
+          if (
+            data.deleteSubject.status.statusMessage === 'Deleted Successfully'
+          ) {
+            navigation.goBack();
+          }
         }
         if (error) {
           Alert.alert('Delete Subject Error', [
@@ -250,7 +256,14 @@ const LiveMeetingSubjectDetails = () => {
               layoutStyle={styles.cancelBtnLayout}
               textStyle={styles.txtCancelButton}
               onPress={() => {
-                navigation.navigate('EditSubject', { item });
+                navigation.navigate('AddSubject', {
+                  committee: item?.committeeId,
+                  isEdit: true,
+                  subjectDetails: item,
+                  screenName: 'Edit subject',
+                  meetingName: meetingData?.meetingTitle,
+                  meetingId: meetingData?.meetingId
+                });
               }}
             />
 

@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Pressable,
+  Platform
+} from 'react-native';
 import React, { useState } from 'react';
 import { Divider, Switch } from 'react-native-paper';
 
@@ -17,6 +23,7 @@ import { getHighlightedText } from '../../highlitedText/HighlitedText';
 import { Dropdown } from 'react-native-element-dropdown';
 import { UPDATE_SPEAKER } from '../../../graphql/mutation';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { SelectList } from 'react-native-dropdown-select-list';
 
 const UserDetailsCard = ({
   item,
@@ -39,37 +46,15 @@ const UserDetailsCard = ({
   visibleIndex,
   setVisibleIndex,
   isDeletable,
-  meetingId
+  meetingData
 }) => {
+  console.log('meeting', meetingData);
   const [userDetails, setUserDetails] = useState(null);
-  const [valueStatus, setValueStatus] = useState(item.status);
-  const [statusItems, setStatusItems] = useState([
-    {
-      label: 'Waiting',
-      value: 'Waiting',
-      disabled:
-        item.status == 'Waiting' ||
-        item.status == 'Speaking' ||
-        item.status == 'Completed'
-          ? true
-          : false
-    },
-    {
-      label: 'Speaking',
-      value: 'Speaking',
-      disabled:
-        item.status == 'Speaking' || item.status == 'Completed' ? true : false
-    },
-    {
-      label: 'Completed',
-      value: 'Completed',
-      disabled: item.status == 'Completed' ? true : false
-    }
-  ]);
 
   // get user by id
 
   const getUser = useQuery(GET_USER_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       userId: item.userId
     },
@@ -85,15 +70,7 @@ const UserDetailsCard = ({
   // update speaker
 
   const [updateSpeaker] = useMutation(UPDATE_SPEAKER, {
-    refetchQueries: [
-      {
-        query: GET_LIVE_MEETING_USERS,
-        variables: {
-          meetingId: meetingId,
-          isSpeaker: true
-        }
-      }
-    ],
+    refetchQueries: ['liveMeetingUsers'],
     onCompleted: (data) => {
       console.log('update speaker', data);
       // if (data.updateSpeaker.status == '200') {
@@ -102,34 +79,6 @@ const UserDetailsCard = ({
     },
     onError: (data) => console.log('update speaker error', data)
   });
-
-  const renderItem = (items) => {
-    return (
-      <TouchableOpacity
-        style={[styles.item, { opacity: items.disabled ? 0.1 : 1 }]}
-        disabled={items.disabled}
-        onPress={() => {
-          if (items.disabled) {
-            setValueStatus(item.status);
-          } else {
-            setValueStatus(items.value);
-            updateSpeaker({
-              variables: {
-                userDetail: {
-                  userId: item.userId,
-                  meetingId: meetingId,
-                  duration: item.duration,
-                  status: items.value
-                }
-              }
-            });
-          }
-        }}
-      >
-        <Text style={styles.textItem}>{items.label}</Text>
-      </TouchableOpacity>
-    );
-  };
 
   // committee row view
   const RowData = ({
@@ -160,73 +109,103 @@ const UserDetailsCard = ({
         ) : isDropDown ? (
           <View
             style={{
-              flex: 1,
-              paddingLeft: SIZES[4],
-              backgroundColor:
-                valueStatus == 'Waiting'
-                  ? 'rgba(230, 197, 79, 0.1)'
-                  : valueStatus == 'Speaking'
-                  ? 'rgba(129, 171, 150, 0.1)'
-                  : valueStatus == 'Completed'
-                  ? 'rgba(101, 142, 180, 0.1)'
-                  : Colors.white,
-              borderRadius: SIZES[4],
-              paddingBottom: SIZES[6],
-              borderBottomWidth: SIZES[1],
-              borderBottomColor:
-                valueStatus == 'Waiting'
-                  ? 'rgba(230, 197, 79, 1)'
-                  : valueStatus == 'Speaking'
-                  ? 'rgba(129, 171, 150, 1)'
-                  : valueStatus == 'Completed'
-                  ? 'rgba(101, 142, 180, 1)'
-                  : Colors.bold
+              flex: 1
             }}
           >
-            <Dropdown
-              style={{
-                flex: 1,
-                paddingLeft: '30%'
-              }}
-              itemTextStyle={{
-                ...Fonts.PoppinsRegular[14],
-                color: Colors.bold
-              }}
-              placeholder={item.status}
-              disable={
-                item.roleName == 'Head' || item.roleName == 'Secretary'
-                  ? false
-                  : true
-              }
-              data={statusItems}
-              valueField="value"
-              labelField="label"
-              value={item.status}
-              iconColor={
-                valueStatus == 'Waiting'
-                  ? 'rgba(230, 197, 79, 1)'
-                  : valueStatus == 'Speaking'
-                  ? 'rgba(129, 171, 150, 1)'
-                  : valueStatus == 'Completed'
-                  ? 'rgba(101, 142, 180, 1)'
-                  : Colors.bold
-              }
-              onChange={(items) => {
-                console.log('on change', items);
-              }}
-              selectedTextStyle={{
-                color:
-                  valueStatus == 'Waiting'
-                    ? 'rgba(230, 197, 79, 1)'
-                    : valueStatus == 'Speaking'
-                    ? 'rgba(129, 171, 150, 1)'
-                    : valueStatus == 'Completed'
-                    ? 'rgba(101, 142, 180, 1)'
-                    : Colors.bold
-              }}
-              renderItem={(item) => renderItem(item)}
-              // visibleSelectedItem={false}
-            />
+            {meetingData?.yourRoleName !== 'Member' ? (
+                <SelectList
+                  
+                setSelected={(val) => {
+                  updateSpeaker({
+                    variables: {
+                      userDetail: {
+                        userId: item.userId,
+                        meetingId: meetingData?.meetingId,
+                        duration: item.duration,
+                        status: val
+                      }
+                    }
+                  });
+                }}
+                inputStyles={{
+                  color:
+                    item.status == 'Waiting'
+                      ? 'rgba(230, 197, 79, 1)'
+                      : item.status == 'Speaking'
+                      ? 'rgba(129, 171, 150, 1)'
+                      : item.status == 'Completed'
+                      ? 'rgba(101, 142, 180, 1)'
+                      : Colors.bold,
+                  ...Fonts.PoppinsRegular[14]
+                }}
+                data={[
+                  {
+                    key: 'Waiting',
+                    value: 'Waiting',
+                    disabled:
+                      item.status == 'Waiting' ||
+                      item.status == 'Speaking' ||
+                      item.status == 'Completed'
+                        ? true
+                        : false
+                  },
+                  {
+                    key: 'Speaking',
+                    value: 'Speaking',
+                    disabled:
+                      item.status === 'Speaking' || item.status === 'Completed'
+                        ? true
+                        : false
+                  },
+                  {
+                    key: 'Completed',
+                    value: 'Completed',
+                    disabled: item.status === 'Completed' ? true : false
+                  }
+                ]}
+                save="key"
+                search={false}
+                placeholder={item.status}
+                boxStyles={{
+                  borderRadius: SIZES[8],
+                  borderColor:
+                    item.status == 'Waiting'
+                      ? 'rgba(230, 197, 79, 1)'
+                      : item.status == 'Speaking'
+                      ? 'rgba(129, 171, 150, 1)'
+                      : item.status == 'Completed'
+                      ? 'rgba(101, 142, 180, 1)'
+                      : Colors.white,
+                  alignItems: 'center',
+                  backgroundColor:
+                    item.status == 'Waiting'
+                      ? 'rgba(230, 197, 79, 0.1)'
+                      : item.status == 'Speaking'
+                      ? 'rgba(129, 171, 150, 0.1)'
+                      : item.status == 'Completed'
+                      ? 'rgba(101, 142, 180, 0.1)'
+                      : Colors.white
+                }}
+                dropdownTextStyles={{ ...Fonts.PoppinsRegular[14] }}
+                disabledTextStyles={{ ...Fonts.PoppinsRegular[14] }}
+              />
+            ) : (
+              <Text
+                style={{
+                  ...Fonts.PoppinsRegular[14],
+                  color:
+                    item.status == 'Waiting'
+                      ? 'rgba(230, 197, 79, 1)'
+                      : item.status == 'Speaking'
+                      ? 'rgba(129, 171, 150, 1)'
+                      : item.status == 'Completed'
+                      ? 'rgba(101, 142, 180, 1)'
+                      : Colors.bold
+                }}
+              >
+                {item.status}
+              </Text>
+            )}
           </View>
         ) : (
           <View
@@ -252,7 +231,10 @@ const UserDetailsCard = ({
   return (
     <Pressable
       // activeOpacity={0.8}
-
+      style={[
+        Platform.OS !== 'android' ? { zIndex: 1 } : null,
+        { elevation: 10 }
+      ]}
       onPress={() => {
         setVisibleIndex(-1);
         if (isCheckboxView) {

@@ -16,6 +16,7 @@ const SubjectDecisionDropDown = ({
 
   // get subject decision
   const getDecision = useQuery(GET_ALL_DECISIONS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       subjectId: subjectId,
       page: -1,

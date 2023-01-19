@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   TouchableOpacity
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import RenderHTML from 'react-native-render-html';
 import RNFetchBlob from 'rn-fetch-blob';
 import Avatar from '../Avatar/Avatar';
@@ -20,10 +20,13 @@ import ImagePreview from './imagePreview/ImagePreview';
 import Icon from '../Icon';
 import IconName from '../Icon/iconName';
 import { checkPermission } from '../downloadFile/DownloadFile';
+import { UserContext } from '../../context';
 
 const ChatListComponent = ({ chatData }) => {
   const { width } = useWindowDimensions();
+  const { user } = useContext(UserContext);
   let setIsDownloaded = () => {};
+  console.log('chat data', chatData);
 
   const scrollViewRef = useRef();
 
@@ -40,13 +43,14 @@ const ChatListComponent = ({ chatData }) => {
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: chat?.isOwner ? 'flex-end' : 'flex-start',
+              justifyContent:
+                chat?.userId == user?.userId ? 'flex-end' : 'flex-start',
               marginVertical: SIZES[16],
               marginHorizontal: SIZES[8]
             }}
           >
             <Avatar
-              name={chat?.userName}
+              // name={chat?.userName}
               source={chat?.profilePicture}
               size={SIZES[32]}
             />

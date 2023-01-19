@@ -4,7 +4,8 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -28,12 +29,14 @@ import LiveMeetingDecisions from '../liveMeetingDecisions/LiveMeetingDecisions';
 import LiveMeetingChats from '../liveMeetingChats/LiveMeetingChats';
 import { useQuery } from '@apollo/client';
 import {
+  GET_All_MEETING,
   GET_LIVE_MEETING_TAB_COUNT,
   GET_MEETING_BY_ID
 } from '../../../graphql/query';
 import DetailsComponent from '../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 import { UserContext } from '../../../context';
 import { UPDATE_MEETING_STATUS } from '../../../graphql/mutation';
+import { Fonts } from '../../../themes';
 
 const LiveMeetingMenu = () => {
   const navigation = useNavigation();
@@ -44,6 +47,7 @@ const LiveMeetingMenu = () => {
   const [meeting, setMeeting] = useState(null);
   const [onlyMyTasks, setOnlyMyTasks] = useState(false);
   const [socketEventUpdateMessage, setSocketEventUpdateMessage] = useState('');
+  const [openModal, setOpenModal] = useState(false);
   const [tabCounts, setTabCounts] = useState({});
   const client = useApolloClient();
   const socketEventUpdate = useRef(null);
@@ -73,17 +77,18 @@ const LiveMeetingMenu = () => {
 
   useEffect(() => {
     socketEventUpdate.current.onmessage = (e) => {
-      console.log('message----', e);
-      e && setSocketEventUpdateMessage(e.data);
+      console.log('message----', e.data);
+      setSocketEventUpdateMessage(e.data);
       e &&
         client.refetchQueries({
-          include: ['referencesCounts']
+          include: ['referencesCounts', e.data]
         });
     };
   }, []);
 
   // get meeting by iod
   const GetMeetingById = useQuery(GET_MEETING_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: item.meetingId
     },
@@ -100,6 +105,7 @@ const LiveMeetingMenu = () => {
 
   // get all tab's count
   const GetTabsCounts = useQuery(GET_LIVE_MEETING_TAB_COUNT, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       id: item.meetingId,
       type: 1
@@ -114,69 +120,137 @@ const LiveMeetingMenu = () => {
     }
   });
 
-  const menus = [
-    {
-      id: 0,
-      name: 'Details',
-      iconName: IconName.LMDetails,
-      iconNameWhite: IconName.LMDetailsWhite,
-      count: 0
-    },
-    {
-      id: 1,
-      name: 'Subjects',
-      iconName: IconName.LMSubjects,
-      iconNameWhite: IconName.LMSubjectsWhite,
-      count: tabCounts?.Subject
-    },
-    {
-      id: 2,
-      name: 'Users',
-      iconName: IconName.LMUsers,
-      iconNameWhite: IconName.LMUsersWhite,
-      count: tabCounts?.user
-    },
-    {
-      id: 3,
-      name: 'Votings',
-      iconName: IconName.LMVotings,
-      iconNameWhite: IconName.LMVotingsWhite,
-      count: tabCounts?.Voting
-    },
-    {
-      id: 4,
-      name: 'Tasks',
-      iconName: IconName.LMTasks,
-      iconNameWhite: IconName.LMTasksWhite,
-      count: tabCounts?.Task
-    },
-    {
-      id: 5,
-      name: 'Decisions',
-      iconName: IconName.LMDecisions,
-      iconNameWhite: IconName.LMDecisionsWhite,
-      count: tabCounts?.decision
-    },
-    {
-      id: 6,
-      name: 'Online',
-      iconName: IconName.LMOnline,
-      iconNameWhite: IconName.LMOnlineWhite
-    },
-    {
-      id: 7,
-      name: 'Chats',
-      iconName: IconName.LMChat,
-      iconNameWhite: IconName.LMChatWhite
-    }
-  ];
+  const menus =
+    item.yourRoleName !== 'Member'
+      ? [
+          {
+            id: 0,
+            name: 'Details',
+            iconName: IconName.LMDetails,
+            iconNameWhite: IconName.LMDetailsWhite,
+            count: 0
+          },
+          {
+            id: 1,
+            name: 'Subjects',
+            iconName: IconName.LMSubjects,
+            iconNameWhite: IconName.LMSubjectsWhite,
+            count: tabCounts?.Subject
+          },
+          {
+            id: 2,
+            name: 'Users',
+            iconName: IconName.LMUsers,
+            iconNameWhite: IconName.LMUsersWhite,
+            count: tabCounts?.user
+          },
+          {
+            id: 3,
+            name: 'Votings',
+            iconName: IconName.LMVotings,
+            iconNameWhite: IconName.LMVotingsWhite,
+            count: tabCounts?.Voting
+          },
+          {
+            id: 4,
+            name: 'Tasks',
+            iconName: IconName.LMTasks,
+            iconNameWhite: IconName.LMTasksWhite,
+            count: tabCounts?.Task
+          },
+          {
+            id: 5,
+            name: 'Decisions',
+            iconName: IconName.LMDecisions,
+            iconNameWhite: IconName.LMDecisionsWhite,
+            count: tabCounts?.decision
+          },
+          {
+            id: 6,
+            name: 'Online',
+            iconName: IconName.LMOnline,
+            iconNameWhite: IconName.LMOnlineWhite
+          },
+          {
+            id: 7,
+            name: 'Chats',
+            iconName: IconName.LMChat,
+            iconNameWhite: IconName.LMChatWhite
+          }
+        ]
+      : [
+          {
+            id: 0,
+            name: 'Details',
+            iconName: IconName.LMDetails,
+            iconNameWhite: IconName.LMDetailsWhite,
+            count: 0
+          },
+          {
+            id: 1,
+            name: 'Subjects',
+            iconName: IconName.LMSubjects,
+            iconNameWhite: IconName.LMSubjectsWhite,
+            count: tabCounts?.Subject
+          },
+          {
+            id: 2,
+            name: 'Users',
+            iconName: IconName.LMUsers,
+            iconNameWhite: IconName.LMUsersWhite,
+            count: tabCounts?.user
+          },
+          {
+            id: 3,
+            name: 'Votings',
+            iconName: IconName.LMVotings,
+            iconNameWhite: IconName.LMVotingsWhite,
+            count: tabCounts?.Voting
+          },
+          {
+            id: 4,
+            name: 'Tasks',
+            iconName: IconName.LMTasks,
+            iconNameWhite: IconName.LMTasksWhite,
+            count: tabCounts?.Task
+          },
+
+          {
+            id: 5,
+            name: 'Online',
+            iconName: IconName.LMOnline,
+            iconNameWhite: IconName.LMOnlineWhite
+          },
+          {
+            id: 6,
+            name: 'Chats',
+            iconName: IconName.LMChat,
+            iconNameWhite: IconName.LMChatWhite
+          }
+        ];
 
   const [updateMeetingStatus] = useMutation(UPDATE_MEETING_STATUS, {
-    refetchQueries: ['meeting'],
+    refetchQueries: [
+      GET_All_MEETING,
+      {
+        variables: {
+          onlyMyMeeting: false,
+          committeeIds: '',
+          screen: 0,
+          searchValue: '',
+          page: -1,
+          pageSize: -1
+        }
+      }
+    ],
     onCompleted: (data) => {
       console.log('updateMeetingSttaus', data.updateMeetingStatus.status[0]);
       if (data.updateMeetingStatus.status[0].statusCode == '200') {
-        navigation.goBack();
+        navigation.navigate('Details', {
+          title: 'Meetings',
+          active: '0'
+        });
+        setOpenModal(false);
       }
     },
     onError: (data) => {
@@ -184,86 +258,14 @@ const LiveMeetingMenu = () => {
     }
   });
 
-  const meetingCloseHandler = () => {
-    Alert.alert(
-      item.yourRoleName !== 'Member' ? 'Close' : 'Leave a meeting ?',
-      'The final closing of the meeting,all decisions and reports will be executed                                                                                Otherwise, use a soft close',
-      // '',
-      // 'Otherwise use a soft close',
-
-      item.yourRoleName !== 'Member'
-        ? [
-            {
-              text: 'Final close',
-              onPress: () => {
-                const filterStatus = meetingStatus?.filter((status) => {
-                  if (status.meetingStatusTitle == 'Closed') {
-                    return status;
-                  }
-                });
-                navigation.goBack();
-                console.log('filterstatus for final close', filterStatus);
-                // updateMeetingStatus({
-                //   variables: {
-                //     meeting: {
-                //       meetingId: item?.meetingId,
-                //       meetingStatusId: filterStatus[0].meetingStatusId
-                //     }
-                //   }
-                // });
-              },
-              style: 'destructive'
-            },
-            {
-              text: 'Soft close',
-              onPress: () => {
-                const filterStatus = meetingStatus?.filter((status) => {
-                  if (status.meetingStatusTitle == 'Soft-Closed') {
-                    return status;
-                  }
-                });
-                console.log('filterstatus for final close', filterStatus);
-                navigation.goBack();
-                // updateMeetingStatus({
-                //   variables: {
-                //     meeting: {
-                //       meetingId: item?.meetingId,
-                //       meetingStatusId: filterStatus[0].meetingStatusId
-                //     }
-                //   }
-                // });
-              },
-              style: 'destructive'
-            },
-            {
-              text: 'Cancel',
-              onPress: () => {},
-              style: 'cancel'
-            }
-          ]
-        : [
-            {
-              text: 'Cancel',
-              onPress: () => {},
-              style: 'cancel'
-            },
-            {
-              text: 'Yes',
-              onPress: () => {
-                navigation.goBack();
-              },
-              style: 'destructive'
-            }
-          ]
-    );
-  };
   return (
     <SafeAreaView style={styles.container}>
       <Header
         name={'Live meeting'}
         rightIconName={IconName.Close}
-        onRightPress={meetingCloseHandler}
+        onRightPress={() => setOpenModal(true)}
       />
+
       <View style={styles.subContainer}>
         {activeTab == 'Details' && (
           <DetailsComponent item={item} isLiveMeetingDetails={false} />
@@ -367,6 +369,142 @@ const LiveMeetingMenu = () => {
           })}
         </ScrollView>
       </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={openModal}
+        onRequestClose={() => {
+          setOpenModal(!openModal);
+        }}
+      >
+        <View style={styles.modal}>
+          <View
+            style={[
+              styles.mainBoxView,
+              { height: item.yourRoleName !== 'Member' ? 265 : 220 }
+            ]}
+          >
+            <View style={styles.textContainer}>
+              <Text style={styles.txtClose}>Close</Text>
+              <Text style={styles.txtWarn}>
+                The final closing of the meeting, all decisions and reports will
+                be executed.
+              </Text>
+              <Text style={[styles.txtWarn, { marginTop: 16 }]}>
+                Otherwise, use a soft close.
+              </Text>
+            </View>
+            <Divider style={styles.divider} />
+            {item.yourRoleName !== 'Member' ? (
+              <View>
+                <TouchableOpacity style={styles.alertBtn}>
+                  <Text
+                    style={styles.txtFinalCloseBtn}
+                    onPress={() => {
+                      const filterStatus = meetingStatus?.filter((status) => {
+                        if (status.meetingStatusTitle == 'Closed') {
+                          return status;
+                        }
+                      });
+                      // navigation.goBack();
+                      console.log('filterstatus for final close', filterStatus);
+                      updateMeetingStatus({
+                        variables: {
+                          meeting: {
+                            meetingId: item?.meetingId,
+                            meetingStatusId: filterStatus[0]?.meetingStatusId
+                          }
+                        }
+                      });
+                    }}
+                  >
+                    Final close
+                  </Text>
+                </TouchableOpacity>
+                <Divider style={styles.divider} />
+                <TouchableOpacity
+                  style={styles.alertBtn}
+                  onPress={() => {
+                    const filterStatus = meetingStatus?.filter((status) => {
+                      if (status.meetingStatusTitle == 'Soft-Closed') {
+                        return status;
+                      }
+                    });
+                    console.log('filterstatus for final close', filterStatus);
+                    // navigation.goBack();
+                    updateMeetingStatus({
+                      variables: {
+                        meeting: {
+                          meetingId: item?.meetingId,
+                          meetingStatusId: filterStatus[0]?.meetingStatusId
+                        }
+                      }
+                    });
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.txtFinalCloseBtn,
+                      { ...Fonts.PoppinsSemiBold[14] }
+                    ]}
+                  >
+                    Soft close
+                  </Text>
+                </TouchableOpacity>
+                <Divider style={styles.divider} />
+                <TouchableOpacity
+                  style={styles.alertBtn}
+                  onPress={() => setOpenModal(false)}
+                >
+                  <Text
+                    style={[
+                      styles.txtFinalCloseBtn,
+                      { ...Fonts.PoppinsSemiBold[14], color: Colors.primary }
+                    ]}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View>
+                <TouchableOpacity
+                  style={styles.alertBtn}
+                  onPress={() => {
+                    setOpenModal(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.txtFinalCloseBtn,
+                      { ...Fonts.PoppinsSemiBold[14], color: Colors.primary }
+                    ]}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <Divider style={styles.divider} />
+                <TouchableOpacity
+                  style={styles.alertBtn}
+                  onPress={() => {
+                    navigation.goBack();
+                    setOpenModal(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.txtFinalCloseBtn,
+                      { ...Fonts.PoppinsSemiBold[14] }
+                    ]}
+                  >
+                    Yes
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

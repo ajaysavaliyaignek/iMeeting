@@ -35,7 +35,8 @@ const Livemeetingsubjects = ({ item, socketEventUpdateMessage }) => {
             subjectDetails: null,
             screenName: 'Add subject',
             meetingName: item?.meetingTitle,
-            meetingId: item?.meetingId
+            meetingId: item?.meetingId,
+            isLiveMeetingSubject: true
           });
         }}
         setSearchText={setSearchText}
@@ -72,8 +73,10 @@ const Livemeetingsubjects = ({ item, socketEventUpdateMessage }) => {
       /> */}
       <Divider style={styles.divider} />
       <SubjectListComponent
+        isLiveMeetingSubject={true}
         isDecisionSubject={false}
         committeeIds={''}
+        deleted={false}
         meetingId={item.meetingId}
         searchText={searchText}
         isSubjectStatus={false}

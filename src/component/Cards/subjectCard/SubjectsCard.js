@@ -402,8 +402,14 @@ const SubjectsCard = ({
               setVisibleIndex(-1);
             }}
             download={download}
-            editable={editable}
-            deleted={deleted}
+            editable={
+              isDecisionSubject
+                ? decisionData?.statusTitle == null
+                  ? false
+                  : true
+                : item.status.isDisable
+            }
+            deleted={isDecisionSubject ? false : item.status.isDisable}
             isViewable={isDecisionSubject ? false : true}
           />
         </View>

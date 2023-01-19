@@ -12,10 +12,11 @@ const CalendarHeader = ({
   headerData,
   onPressArrowLeft,
   onPressArrowRight,
-  horizontal
+  horizontal,
+  isDeadlineSuggetion
 }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{flex:isDeadlineSuggetion?1:null}]}>
       <View style={styles.header}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={styles.dateText}>

@@ -57,9 +57,26 @@ const AddTask = () => {
       ? moment(taskData?.deadlineDate).format('DD MMM, YYYY')
       : new Date()
   });
+  let queryParams;
+
+  if (meetingDetails) {
+    queryParams = {
+      searchValue: '',
+      onlyMyTask: false,
+      meetingId: meetingDetails?.meetingId
+    };
+  } else {
+    queryParams = {
+      searchValue: '',
+      onlyMyTask: false,
+      taskStatusIds: '',
+      taskTypeIds: ''
+    };
+  }
 
   // get task executors
   const getTaskExecutor = useQuery(GET_TASK_EXECUTORS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data, error) => {
       if (data) {
         let executor = data?.taskExecutor?.executorIds?.map((exe, index) => {
@@ -76,6 +93,7 @@ const AddTask = () => {
 
   // get task priority
   const getTaskPriority = useQuery(GET_TASK_PRIORITY, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data, error) => {
       if (data) {
         setTaskPriority(data.taskPriority.items);
@@ -94,16 +112,7 @@ const AddTask = () => {
 
   const [updateTask, { data, loading: addTaskLoading, error: addTaskError }] =
     useMutation(UPDATE_TASK, {
-      refetchQueries: [
-        {
-          query: GET_ALL_TASKS,
-          variables: {
-            searchValue: '',
-            onlyMyTask: false,
-            meetingId: meetingDetails?.meetingId
-          }
-        }
-      ],
+      refetchQueries: ['tasks'],
       onCompleted: (data) => {
         if (data) {
           console.log('updateTask', data.updateTask.status[0]);
@@ -174,12 +183,13 @@ const AddTask = () => {
         </View>
 
         <View style={styles.optionsContainer}>
-          <Text style={styles.txtTitleVoting}>RECIEVING SUBJECTS DEADLINE</Text>
+          <Text style={styles.txtTitleVoting}>DEADLINE</Text>
           <TouchableOpacity
             style={styles.deadlineRowContainer}
             onPress={() =>
               navigation.navigate('DeadlineSuggestion', {
-                setCalendarValue: setCalendarValue
+                setCalendarValue: setCalendarValue,
+                isTaskdeadline: true
               })
             }
           >
@@ -245,6 +255,14 @@ const AddTask = () => {
           />
           <Button
             title={'Save'}
+            disable={
+              titleTask == '' ||
+              valueExecutor == null ||
+              taskDescription == '' ||
+              valuePriority == null
+                ? true
+                : false
+            }
             // isLoading={addVotingLoading}
             onPress={() => {
               console.log('updat task data', {
@@ -278,9 +296,15 @@ const AddTask = () => {
               });
             }}
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity:
+                  titleTask == '' ||
+                  valueExecutor == null ||
+                  taskDescription == '' ||
+                  valuePriority == null
+                    ? 0.5
+                    : 1
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}

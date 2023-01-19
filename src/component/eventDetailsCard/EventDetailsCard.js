@@ -8,7 +8,6 @@ import moment from 'moment';
 import { Colors } from '../../themes/Colors';
 
 const EventDetailsCard = ({ item, index }) => {
-  console.log('event detail', item);
   const dummyImageUrls = [
     'https://picsum.photos/200/300?grayscale',
     'https://picsum.photos/seed/picsum/200/300',
@@ -17,6 +16,7 @@ const EventDetailsCard = ({ item, index }) => {
   ];
   return (
     <TouchableOpacity
+      activeOpacity={1}
       style={[
         styles.container,
         { backgroundColor: item?.lightColor, borderLeftColor: item?.darkColor }
@@ -25,11 +25,6 @@ const EventDetailsCard = ({ item, index }) => {
       <Text style={styles.txtEventTitle}>{item?.title}</Text>
       <View style={styles.timeLocationContainer}>
         <Text style={styles.txtTimeLocation}>
-          {console.log('item?.startTime', item?.startTime)}
-          {console.log(
-            'item?.startTime',
-            moment(item?.startTime, 'YYYY-MM-DD HH:mm A').format('HH:mm')
-          )}
           {`${moment(item?.startTime, 'YYYY-MM-DD HH:mm A').format(
             'HH:mm'
           )} - ${moment(item?.endTime, 'YYYY-MM-DD HH:mm A').format('HH:mm')}`}

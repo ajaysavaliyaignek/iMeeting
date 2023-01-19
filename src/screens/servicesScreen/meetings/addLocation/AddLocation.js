@@ -224,7 +224,7 @@ const AddLocation = () => {
                 'title',
                 title,
                 'locationType',
-                2
+                locationType
               );
               addLocation({
                 variables: {

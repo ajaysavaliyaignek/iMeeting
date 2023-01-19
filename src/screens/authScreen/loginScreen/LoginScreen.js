@@ -45,6 +45,7 @@ const LoginScreen = ({ navigation }) => {
       // set Client secret
       setClientSecret(data.oAuth2Application.clientSecret);
       setError(data.error);
+      setError('');
       if (
         data.oAuth2Application.clientId == '' &&
         data.oAuth2Application.clientId == ''
@@ -132,6 +133,7 @@ const LoginScreen = ({ navigation }) => {
               console.log(user);
               storeToken(user);
               storeUserToken(dataToken);
+              setError('');
 
               // after login success it redirect to the services screen
               navigation.reset({
@@ -195,6 +197,7 @@ const LoginScreen = ({ navigation }) => {
               };
               console.log(user);
               storeToken(user);
+
               storeUserToken(dataToken);
             }
           });
@@ -204,6 +207,7 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  console.log('error', error);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -262,7 +266,12 @@ const LoginScreen = ({ navigation }) => {
 
         {/* username input */}
         <Input
-          onChangeText={(text) => setUserName(text)}
+          onChangeText={(text) => {
+            setUserName(text);
+            if (error !== '') {
+              setError('');
+            }
+          }}
           value={userName}
           label={'Username'}
           right={
@@ -285,7 +294,12 @@ const LoginScreen = ({ navigation }) => {
 
         {/* password input */}
         <Input
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={(text) => {
+            setPassword(text);
+            if (error !== '') {
+              setError('');
+            }
+          }}
           secureTextEntry={secureTextEntry}
           label={'Password'}
           value={password}
@@ -328,12 +342,17 @@ const LoginScreen = ({ navigation }) => {
               onPress={Login}
               title={'Log in'}
               disable={
-                url === '' || userName === '' || password === '' ? true : false
+                url === '' || userName === '' || password === '' || error !== ''
+                  ? true
+                  : false
               }
               layoutStyle={[
                 {
                   opacity:
-                    url === '' || userName === '' || password === ''
+                    url === '' ||
+                    userName === '' ||
+                    password === '' ||
+                    error !== ''
                       ? 0.5
                       : null
                 },

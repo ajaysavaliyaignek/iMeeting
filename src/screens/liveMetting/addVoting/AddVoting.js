@@ -26,7 +26,6 @@ const AddVoting = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { meetingDetails, isAddVotingScreen, votingDetails } = route?.params;
-  console.log('votingdetails', votingDetails);
   const [valueType, setValueType] = useState(
     !isAddVotingScreen
       ? votingDetails?.subjectId == 0
@@ -60,13 +59,10 @@ const AddVoting = () => {
   const answersIds = answerObject?.map((answer) => {
     return answer?.id;
   });
-  console.log('answersIds', answersIds);
 
   const answersText = answerObject?.map((answer) => {
     return answer?.text;
   });
-
-  console.log('answersText', answersText);
 
   const [
     addVoting,

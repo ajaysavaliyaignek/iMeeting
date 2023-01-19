@@ -43,7 +43,7 @@ const SubjectListComponent = ({
     queryParams = {
       committeeIds: committeeIds,
       searchValue: searchText,
-      screen: 0,
+      screen: 2,
       page: -1,
       pageSize: -1,
       meetingId: meetingId
@@ -77,6 +77,7 @@ const SubjectListComponent = ({
     error: SubjectsError,
     data: SubjectsData
   } = useQuery(GET_All_SUBJECTS, {
+    fetchPolicy: 'cache-and-network',
     variables: queryParams,
 
     onCompleted: (data) => {
@@ -91,7 +92,7 @@ const SubjectListComponent = ({
 
   // use effect for when socket is update subject
   useEffect(() => {
-    if (socketEventUpdateMessage == 'Updated Subject') {
+    if (socketEventUpdateMessage == 'subjects') {
       client.refetchQueries({
         include: ['subjects']
       });

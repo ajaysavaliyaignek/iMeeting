@@ -25,6 +25,7 @@ const ServicesScreen = ({ navigation }) => {
   const { companyUrl, setCompanyUrl, setUser } = useContext(UserContext);
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       console.log('userPayload', data.userPayload);
       setUser(data.userPayload);

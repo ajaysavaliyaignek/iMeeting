@@ -12,6 +12,8 @@ import { SIZES } from '../../../themes/Sizes';
 import { Icon, IconName } from '../../../component';
 import moment from 'moment';
 import EventDetailsCard from '../../../component/eventDetailsCard/EventDetailsCard';
+import CalenderdayEventsComponent from '../../../component/calenderDayEventsComponent/CalenderdayEventsComponent';
+import Header from '../../../component/header/Header';
 
 const EventsViewByDayScreen = () => {
   const navigation = useNavigation();
@@ -47,7 +49,12 @@ const EventsViewByDayScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
+      <Header
+        name={moment(date).format('DD MMMM')}
+        leftIconName={IconName.Arrow_Left}
+        onLeftPress={() => navigation.goBack()}
+      />
+      {/* <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={{
@@ -64,36 +71,8 @@ const EventsViewByDayScreen = () => {
           />
         </TouchableOpacity>
         <Text style={styles.txtHeader}>{moment(date).format('DD MMMM')}</Text>
-        <View style={styles.headeRightView}>
-          <TouchableOpacity style={styles.searchIconView} onPress={() => {}}>
-            <Icon name={IconName.Search} height={SIZES[18]} width={SIZES[18]} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {}}
-            activeOpacity={0.5}
-            style={{
-              height: SIZES[24],
-              width: SIZES[24],
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.subContainer}>
-        <Text style={styles.txtDateTitle}>{`${Day}, ${moment(date).format(
-          'DD MMMM'
-        )}`}</Text>
-        <FlatList
-          data={events}
-          keyExtractor={(index) => index.toString()}
-          renderItem={({ item, index }) => {
-            return <EventDetailsCard item={item} index={index} />;
-          }}
-        />
-      </View>
+      </View> */}
+      <CalenderdayEventsComponent date={date} events={events} />
     </SafeAreaView>
   );
 };

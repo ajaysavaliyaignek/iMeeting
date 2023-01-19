@@ -98,14 +98,14 @@ const SelectUsers = () => {
 
   const setSelectedUserInSelectedList = () => {
     const selectedUserList = [];
-    allUsers.map((user) => {
-      if (user.isSelected) {
+    allUsers?.map((user) => {
+      if (user?.isSelected) {
         selectedUserList.push(user);
       }
     });
 
-    externalUser.map((user) => {
-      if (user.isSelected) {
+    externalUser?.map((user) => {
+      if (user?.isSelected) {
         selectedUserList.push(user);
       }
     });
@@ -117,6 +117,7 @@ const SelectUsers = () => {
 
   // get users data from the server
   const { loading: UsersLoading, error: UsersError } = useQuery(GET_All_USERS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       isDeleted: true,
       externalUser: false,
@@ -147,6 +148,7 @@ const SelectUsers = () => {
   const { loading: externalUsersLoading, error: externalUsersError } = useQuery(
     GET_All_USERS,
     {
+      fetchPolicy: 'cache-and-network',
       variables: {
         isDeleted: true,
         externalUser: true,

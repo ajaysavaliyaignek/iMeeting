@@ -25,6 +25,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   const client = useApolloClient();
 
   const getMeetingUser = useQuery(GET_LIVE_MEETING_USERS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: item.meetingId,
       isSpeaker: true
@@ -51,7 +52,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   };
 
   useEffect(() => {
-    if (socketEventUpdateMessage == 'Updated Speaker') {
+    if (socketEventUpdateMessage == 'liveMeetingUsers') {
       client.refetchQueries({
         include: ['liveMeetingUsers']
       });
@@ -165,7 +166,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
             searchText={searchText}
             editable={true}
             onPressEdit={navigateToEditSpeaker}
-            meetingId={item.meetingId}
+            meetingData={item}
           />
           {liveSpeaker.length > 0 && (
             <View style={styles.activeSpeakerContainer}>

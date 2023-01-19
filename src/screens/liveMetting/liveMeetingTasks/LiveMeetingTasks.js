@@ -7,8 +7,13 @@ import {
   Alert
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { GET_ALL_TASKS } from '../../../graphql/query';
-import { useApolloClient, useMutation, useQuery } from '@apollo/client';
+import { GET_ALL_TASKS, GET_TASK_TYPES } from '../../../graphql/query';
+import {
+  useApolloClient,
+  useLazyQuery,
+  useMutation,
+  useQuery
+} from '@apollo/client';
 import { styles } from './styles';
 import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 import { useNavigation } from '@react-navigation/native';
@@ -27,15 +32,40 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
   const [onlyMyTasks, setOnlyMyTasks] = useState(false);
   const client = useApolloClient();
 
-  const Tasks = useQuery(GET_ALL_TASKS, {
-    variables: {
-      searchValue: searchText,
-      onlyMyTask: onlyMyTasks,
-      meetingId: meetingData?.meetingId,
-      subjectId: 0
+  const TaskType = useQuery(GET_TASK_TYPES, {
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data) => {
+      if (data) {
+        const filterTaskType = data.taskType.items?.filter((type) => {
+          if (type.name == 'Meeting task') {
+            return type;
+          }
+        });
+
+        TasksData({
+          variables: {
+            searchValue: searchText,
+            onlyMyTask: onlyMyTasks,
+            meetingId: meetingData?.meetingId,
+            subjectId: 0,
+            taskTypeIds: filterTaskType[0]?.id?.toString()
+          }
+        });
+
+        console.log('filterTaskType', filterTaskType);
+        // setTaskTypes(data.taskType.items);
+      }
     },
+    onError: (data) => {
+      console.log('get task type error', data);
+    }
+  });
+
+  const [TasksData, { Tasks }] = useLazyQuery(GET_ALL_TASKS, {
+    fetchPolicy: 'cache-and-network',
 
     onCompleted: (data) => {
+      console.log('TasksData', data?.tasks.items);
       setTasksData(data?.tasks.items);
     },
     onError: (data) => {
@@ -82,9 +112,13 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
   };
 
   useEffect(() => {
-    if (socketEventUpdateMessage == 'Updated Task') {
+    console.log(
+      'socketEventUpdateMessage from tasks',
+      socketEventUpdateMessage
+    );
+    if (socketEventUpdateMessage == 'tasks') {
       client.refetchQueries({
-        include: ['tasks']
+        include: [GET_ALL_TASKS]
       });
     }
   }, [socketEventUpdateMessage]);
@@ -119,7 +153,7 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
       </View>
       <Divider style={styles.divider} />
 
-      {tasksData.length > 0 ? (
+      {tasksData?.length > 0 ? (
         <FlatList
           data={tasksData}
           keyExtractor={(item, index) => {
@@ -133,7 +167,11 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
                 visibleIndex={visibleIndex}
                 setVisibleIndex={setVisibleIndex}
                 text={searchText}
-                editable={meetingData.yourRoleName == 'Member' ? false : true}
+                onPressView={() => {
+                  navigation.navigate('TaskDetails', { item });
+                  setVisibleIndex(-1);
+                }}
+                editable={false}
                 isDeleteable={false}
                 onPressDelete={(item) => {
                   setVisibleIndex(-1);
@@ -154,7 +192,7 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
           }}
           showsVerticalScrollIndicator={false}
         />
-      ) : Tasks.error ? (
+      ) : Tasks?.error ? (
         <View
           style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
         >
@@ -162,7 +200,7 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
             style={{ ...Fonts.PoppinsSemiBold[20], color: Colors.primary }}
           ></Text>
         </View>
-      ) : Tasks.loading ? (
+      ) : Tasks?.loading ? (
         <Loader color={Colors.primary} />
       ) : (
         <View

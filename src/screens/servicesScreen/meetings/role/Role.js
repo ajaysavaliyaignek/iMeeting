@@ -49,6 +49,7 @@ const Role = () => {
     error: rolesError,
     data: rolesData
   } = useQuery(GET_ROLES, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       taskRole: false
     },

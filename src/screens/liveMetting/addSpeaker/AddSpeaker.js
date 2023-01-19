@@ -39,6 +39,7 @@ const AddSpeaker = () => {
 
   // get live meeting users
   const getMeetingUser = useQuery(GET_LIVE_MEETING_USERS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: meetingId,
       isSpeaker: false

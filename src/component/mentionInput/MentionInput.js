@@ -19,20 +19,18 @@ import {
   generateValueWithAddedSuggestion,
   getMentionPartSuggestionKeywords,
   isMentionPartType,
-  parseValue
+  parseValue,
+  replaceMentionValues
 } from './utils';
 
 const MentionInput = ({
   value,
   onChange,
-  // message,
   fileIds,
   tagUser,
-
   partTypes,
   meetingId,
   setAttachDocument,
-
   inputRef: propInputRef,
   onFocus,
   containerStyle,
@@ -47,6 +45,7 @@ const MentionInput = ({
 }) => {
   const textInput = useRef(null);
   const [message, setMessage] = useState('');
+  const [messageValue, setValue] = useState('');
 
   const [selection, setSelection] = useState({ start: 0, end: 0 });
 
@@ -81,6 +80,7 @@ const MentionInput = ({
    * - Trigger onChange callback with new value
    */
   const onSuggestionPress = (mentionType) => (suggestion) => {
+    console.log('suggestion', suggestion);
     const newValue = generateValueWithAddedSuggestion(
       parts,
       mentionType,
@@ -92,8 +92,8 @@ const MentionInput = ({
     if (!newValue) {
       return;
     }
-    console.log('new value', newValue);
     setMessage(newValue);
+    setValue(newValue);
   };
 
   const handleTextInputRef = (ref) => {
@@ -123,9 +123,11 @@ const MentionInput = ({
    *
    * @param changedText
    */
+
   const onChangeInput = (changedText) => {
-    console.log('changedText====', changedText);
+    console.log('hello', changedText);
     setMessage(changedText);
+    setValue(changedText);
   };
 
   return (
@@ -141,16 +143,18 @@ const MentionInput = ({
 
       <View style={styles.containerStyle}>
         <TextInput
-          value={message}
+          value={replaceMentionValues(plainText, ({ name }) => `@${name}`)}
           multiline
-          {...textInputProps}
+          // {...textInputProps}
           ref={handleTextInputRef}
-          onChangeText={(text) => setMessage(text)}
+          onChangeText={onChangeInput}
           onSelectionChange={handleSelectionChange}
-          placeholder={'Text you message'}
-          style={styles.textInput}
+          placeholder={'Text your message'}
+          style={[styles.textInput]}
           onBlur={onBlur}
           onFocus={onFocus}
+
+          // value={message}
         >
           {/* <Text>
             {console.log('parts=========', parts)}
@@ -184,24 +188,22 @@ const MentionInput = ({
           <TouchableOpacity
             disabled={message == '' && fileIds?.length == 0 ? true : false}
             onPress={() => {
-              setMessage('');
               setAttachDocument(false);
               console.log('meeting chat', {
-                chatId: 0,
-                meetingId: meetingId,
-                message: message,
-                attachDocumentId: fileIds
+                message
               });
-              updateChat({
-                variables: {
-                  meetingChat: {
-                    chatId: 0,
-                    meetingId: meetingId,
-                    message: message,
-                    attachDocumentId: fileIds
-                  }
-                }
-              });
+              // setMessage('');
+
+              // updateChat({
+              //   variables: {
+              //     meetingChat: {
+              //       chatId: 0,
+              //       meetingId: meetingId,
+              //       message: messageValue,
+              //       attachDocumentId: fileIds
+              //     }
+              //   }
+              // });
             }}
           >
             <Icon

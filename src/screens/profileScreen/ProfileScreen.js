@@ -7,14 +7,17 @@ import { ApolloClient, resetCaches } from '@apollo/client';
 import { Client } from '../../graphql/Client';
 
 const ProfileScreen = ({ navigation }) => {
-  const Logout = () => {
+  const Logout = async () => {
     try {
-      AsyncStorage.getAllKeys()
-        .then((keys) => {
-          AsyncStorage.multiRemove(keys);
+      await AsyncStorage.getAllKeys()
+        .then(async (keys) => {
+          await AsyncStorage.multiRemove(keys);
         })
 
-        .then(() => Client().resetStore())
+        .then(async () => {
+          await Client().cache.reset();
+          Client().resetStore();
+        })
         .then(
           navigation.reset({
             index: 0,

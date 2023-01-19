@@ -117,20 +117,25 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
 
   useEffect(() => {
     socketLastMessage.current.onmessage = (e) => {
-      const newMessageObject = JSON.parse(e.data);
+      let newMessageObject = JSON.parse(e.data);
+      console.log('socketLastMessage', newMessageObject);
 
       setChatData([...chatData, newMessageObject]);
+      chatData.push(newMessageObject);
+      // setChatData(chatData);
     };
-  }, []);
+  }, [chatData]);
 
   // get all chat for meeting
   const getAllChats = useQuery(GET_ALL_CHATS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: meetingData.meetingId
     },
     onCompleted: (data) => {
       if (data) {
         setChatData(data.meetingChat.items);
+        console.log('data.meetingChat.items', data.meetingChat.items);
       }
     },
     onError: (data) => {
@@ -139,6 +144,7 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
   });
 
   const getLivemeetingUser = useQuery(GET_LIVE_MEETING_USERS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: meetingData.meetingId,
       isSpeaker: false
@@ -155,9 +161,10 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
   });
 
   useEffect(() => {
+    console.log('socketEventUpdateMessage------', socketEventUpdateMessage);
     if (socketEventUpdateMessage == 'meetingChat') {
       client.refetchQueries({
-        include: ['meetingChat']
+        include: [GET_ALL_CHATS]
       });
     }
   }, [socketEventUpdateMessage]);
@@ -241,6 +248,7 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
           onBlur={() => {
             socketStatusTyping.current.send(`${user?.userName}||NOT_TYPING`);
           }}
+          
         />
         {/* <iMeetingChatTextInput
           users={liveMeetingUser}

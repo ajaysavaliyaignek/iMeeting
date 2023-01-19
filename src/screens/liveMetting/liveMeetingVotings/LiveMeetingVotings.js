@@ -22,6 +22,7 @@ const LiveMeetingVotings = ({
 
   // get all votings details
   const getVotingDetails = useQuery(GET_VOTING_DETAILS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: meetingData?.meetingId,
 
@@ -39,9 +40,13 @@ const LiveMeetingVotings = ({
   });
 
   useEffect(() => {
-    if (socketEventUpdateMessage == 'Updated Voting Answer') {
+    console.log(
+      'socketEventUpdateMessage from voting details',
+      socketEventUpdateMessage
+    );
+    if (socketEventUpdateMessage == 'votingDetails') {
       client.refetchQueries({
-        include: ['votingDetails']
+        include: [GET_VOTING_DETAILS]
       });
     }
   }, [socketEventUpdateMessage]);

@@ -41,7 +41,10 @@ const AddEditMeetingAppointmentVideoConference = () => {
     valueLocation: null,
     valueVideoConference: null,
     calendarValue: moment(new Date()).format('YYYY-MM-DD'),
-    previousSubject: []
+    previousSubject: [],
+    attendanceFeedbackDate: moment(new Date()).format('YYYY-MM-DD'),
+    attendanceFeedback: false,
+    subjectSuggestion: false
   });
 
   console.log('previousSubject from add edit', generaldData.previousSubject);
@@ -86,7 +89,14 @@ const AddEditMeetingAppointmentVideoConference = () => {
       userIds: users,
       subjectStatusIds: [],
       meetingStatusId: 0,
-      deadlineDate: generaldData?.calendarValue
+      deadlineDate: generaldData?.subjectSuggestion
+        ? generaldData?.calendarValue
+        : '',
+      attendanceFeedbackDate: generaldData?.attendanceFeedback
+        ? generaldData?.attendanceFeedbackDate
+        : '',
+      attendanceFeedback: generaldData?.attendanceFeedback,
+      subjectSuggestion: generaldData?.subjectSuggestion
     };
   } else if (type == 'Appointment') {
     appointmentMutationParams = {
@@ -119,6 +129,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
       error: MeetingError,
       loading
     } = useQuery(GET_MEETING_BY_ID, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         meetingId: details?.meetingId
       },
@@ -149,7 +160,10 @@ const AddEditMeetingAppointmentVideoConference = () => {
               ? 1
               : 2,
             calendarValue: moment(meeting?.deadlineDate).format('YYYY-MM-DD'),
-            previousSubject: []
+            previousSubject: [],
+            attendanceFeedbackDate: moment(
+              meeting?.attendanceFeedbackDate
+            ).format('YYYY-MM-DD')
           });
         }
       },
@@ -159,6 +173,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
     });
   } else if (type == 'Appointment' && isEdit) {
     const GetAppointmentById = useQuery(GET_APPOINTMENT_BY_ID, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         id: details?.appointmentId
       },

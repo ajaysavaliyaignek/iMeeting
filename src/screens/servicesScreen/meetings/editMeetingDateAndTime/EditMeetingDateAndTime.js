@@ -77,6 +77,7 @@ const EditMeetingDateAndTime = () => {
   ]);
 
   const { data, error, loading } = useQuery(GET_MEETING_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: item.meetingId
     },
@@ -178,6 +179,7 @@ const EditMeetingDateAndTime = () => {
   };
 
   const TimeZone = useQuery(GET_TIMEZONE, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       console.log(data.timeZone.items);
       if (data) {

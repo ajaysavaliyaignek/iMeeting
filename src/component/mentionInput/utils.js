@@ -276,7 +276,6 @@ const generateValueWithAddedSuggestion = (
   selection,
   suggestion
 ) => {
-  console.log({ parts, mentionType, plainText, selection, suggestion });
   const currentPartIndex = parts.findIndex(
     (one) =>
       selection.end >= one.position.start && selection.end <= one.position.end
@@ -286,25 +285,17 @@ const generateValueWithAddedSuggestion = (
   if (!currentPart) {
     return;
   }
-  console.log('currentPart', currentPart);
 
   const triggerPartIndex = currentPart.text.lastIndexOf(
     mentionType.trigger,
     selection.end - currentPart.position.start
   );
 
-  console.log('triggerPartIndex', triggerPartIndex);
-
   const newMentionPartPosition = {
     start: triggerPartIndex,
     end: selection.end - currentPart.position.start
   };
-  console.log('newMentionPartPosition', newMentionPartPosition);
-  console.log('parts', parts);
-  console.log(
-    'mentionType.isInsertSpaceAfterMention',
-    mentionType.isInsertSpaceAfterMention
-  );
+
   const isInsertSpaceToNextPart =
     mentionType.isInsertSpaceAfterMention &&
     // Cursor is at the very end of parts or text row
@@ -313,7 +304,6 @@ const generateValueWithAddedSuggestion = (
         '\n',
         newMentionPartPosition.end
       ));
-  console.log('isInsertSpaceToNextPart', isInsertSpaceToNextPart);
 
   return getValueFromParts([
     ...parts.slice(0, currentPartIndex),
@@ -430,24 +420,19 @@ const parseValue = (value, partTypes, positionOffset = 0) => {
   let parts = [];
 
   // We don't have any part types so adding just plain text part
-  console.log('partTypes length', partTypes.length);
-  if (partTypes.length === 0) {
-    console.log('partTypes', partTypes);
+
+  if (partTypes?.length === 0) {
     plainText += value;
     parts.push(generatePlainTextPart(value, positionOffset));
   } else {
-    console.log('parttype');
     const [partType, ...restPartTypes] = partTypes;
 
     const regex = isMentionPartType(partType) ? mentionRegEx : partType.pattern;
 
     const matches = Array.from(matchAll(value ?? '', regex));
-    console.log('matches', matches);
 
     // In case when we didn't get any matches continue parsing value with rest part types
     if (matches.length === 0) {
-      console.log('matches 0');
-      console.log('restPartTypes', restPartTypes);
       return parseValue(value, restPartTypes, positionOffset);
     }
 
@@ -459,7 +444,6 @@ const parseValue = (value, partTypes, positionOffset = 0) => {
 
       parts = parts.concat(plainTextAndParts.parts);
       plainText += plainTextAndParts.plainText;
-      console.log('plainText', plainText);
     }
 
     // Iterating over all found pattern matches
@@ -467,13 +451,11 @@ const parseValue = (value, partTypes, positionOffset = 0) => {
       const result = matches[i];
 
       if (isMentionPartType(partType)) {
-        console.log('=======');
         const mentionData = getMentionDataFromRegExMatchResult(result);
 
         // Matched pattern is a mention and the mention doesn't match current mention type
         // We should parse the mention with rest part types
         if (mentionData.trigger !== partType.trigger) {
-          console.log('////////');
           const plainTextAndParts = parseValue(
             mentionData.original,
             restPartTypes,
@@ -482,7 +464,6 @@ const parseValue = (value, partTypes, positionOffset = 0) => {
           parts = parts.concat(plainTextAndParts.parts);
           plainText += plainTextAndParts.plainText;
         } else {
-          console.log('!!!!!!');
           const part = generateMentionPart(
             partType,
             mentionData,
@@ -492,10 +473,8 @@ const parseValue = (value, partTypes, positionOffset = 0) => {
           parts.push(part);
 
           plainText += part.text;
-          console.log('parts', parts);
         }
       } else {
-        console.log('++++++');
         const part = generateRegexResultPart(
           partType,
           result,

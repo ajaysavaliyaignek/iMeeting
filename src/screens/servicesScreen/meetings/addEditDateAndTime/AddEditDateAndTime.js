@@ -68,12 +68,12 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
         endDateTime: date
       });
     } else {
-      date = moment(date).date(generaldData?.endDateTime.date);
+      // date = moment(date).date(generaldData?.endDateTime.date);
 
       if (moment(date).isBefore(moment(generaldData?.startDateTime))) {
         console.log('end date issue');
-        Alert.alert('Invalid end date');
-
+        // Alert.alert('Invalid end date');
+        setGeneralData({ ...generaldData, endDateTime: date });
         setOpenCalendar(false);
         return;
       }
@@ -124,6 +124,7 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
 
   // get timezone dropdown list
   const TimeZone = useQuery(GET_TIMEZONE, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       console.log(data.timeZone.items);
       if (data) {

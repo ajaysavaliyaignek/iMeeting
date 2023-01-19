@@ -20,10 +20,11 @@ const MeetingSubjectTypeComponent = ({
     error: SubjectsError,
     data: SubjectsData
   } = useQuery(GET_All_SUBJECTS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       committeeIds: '',
       searchValue: '',
-      screen: 0,
+      screen: 2,
       page: -1,
       pageSize: -1,
       meetingId: meetingDetails?.meetingId

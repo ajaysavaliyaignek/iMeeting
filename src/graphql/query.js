@@ -196,7 +196,7 @@ export const GET_VOTING_DETAILS = gql`
 `;
 
 export const GET_LIVE_MEETING_USERS = gql`
-  query ($meetingId: Long, $isSpeaker: Boolean) {
+  query liveMeetingUsers($meetingId: Long, $isSpeaker: Boolean) {
     liveMeetingUsers(meetingId: $meetingId, isSpeaker: $isSpeaker) {
       userDetails {
         duration
@@ -266,6 +266,7 @@ export const GET_ALL_TASKS = gql`
     $date: String
     $subjectId: Long
     $meetingId: Long
+    $taskTypeIds: String
   ) {
     tasks(
       onlyMyTask: $onlyMyTask
@@ -278,6 +279,7 @@ export const GET_ALL_TASKS = gql`
       date: $date
       subjectId: $subjectId
       meetingId: $meetingId
+      taskTypeIds: $taskTypeIds
     ) {
       items {
         taskId
@@ -554,6 +556,7 @@ export const GET_All_SUBJECTS = gql`
         statusTitle
         statusId
         meetingId
+        status
       }
       pageSize
       pageSize
@@ -616,6 +619,7 @@ export const GET_SUBJECT_BY_ID = gql`
       userId
       statusTitle
       commentThreadId
+      status
     }
   }
 `;
@@ -758,7 +762,7 @@ export const GET_ZIP_PDF_DOWNLOAD = gql`
 `;
 
 export const GET_All_MEETING = gql`
-  query meeting(
+  query meetings(
     $committeeIds: String
     $date: String
     $onlyMyMeeting: Boolean
@@ -780,6 +784,8 @@ export const GET_All_MEETING = gql`
     ) {
       items {
         attachFileIds
+        attendanceFeedback
+        attendanceFeedbackDate
         committeeId
         creatorName
         description
@@ -801,6 +807,8 @@ export const GET_All_MEETING = gql`
         answers
         meetingStatusTitle
         yourRoleName
+        subjectSuggestion
+        deadlineDate
         platformlink
         userDetails {
           answer

@@ -13,6 +13,7 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
   const navigation = useNavigation();
   const [location, setLocation] = useState([]);
   const [error, setError] = useState(null);
+  console.log('screenName', screenName);
 
   // get all location for location dropdown
   const {
@@ -20,8 +21,9 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
     error: LocationError,
     data: LocationData
   } = useQuery(GET_ALL_LOCATION, {
+    fetchPolicy: 'cache-and-network',
     variables: {
-      locationType: screenName == 'Meeting' ? 1 : 4
+      locationType: screenName == 'Add meeting' ? 1 : 4
     },
 
     onCompleted: (data) => {
@@ -40,7 +42,8 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
       locationId: generaldData?.valueLocation,
 
       locationType: screenName == 'Meeting' ? 1 : 4,
-      role: 'Head' || 'Secretary'
+      role: 'Head',
+      isLiveMeeting: false
     });
   };
 
@@ -73,7 +76,7 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
             // disable={valueLocation == null}
             title={'View details'}
             onPress={() => {
-              valueLocation == null
+              generaldData?.valueLocation == null
                 ? setError('Please select location')
                 : handleViewDetails();
             }}
@@ -83,7 +86,9 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
           <Button
             title={'Add location'}
             onPress={() =>
-              navigation.navigate('AddLocation', { locationType: 1 })
+              navigation.navigate('AddLocation', {
+                locationType: screenName == 'Add meeting' ? 1 : 4
+              })
             }
             layoutStyle={[
               // {

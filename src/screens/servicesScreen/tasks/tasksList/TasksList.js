@@ -64,6 +64,7 @@ const TasksList = () => {
 
   // get ALL appointment
   const Tasks = useQuery(GET_ALL_TASKS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       searchValue: searchText,
       onlyMyTask: onlyMyTask,
@@ -286,6 +287,7 @@ const TasksList = () => {
                   }}
                   download={true}
                   onPressDownload={() => {
+                    setVisibleIndex(-1);
                     navigation.navigate('SubjectDownload', {
                       item,
                       downloadType: 'Task'

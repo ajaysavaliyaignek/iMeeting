@@ -51,7 +51,7 @@ const YourAnswer = () => {
       id: +item.appointmentId,
 
       userId: +userID,
-      type: 2
+      type: 4
     };
   } else {
     queryParams = {

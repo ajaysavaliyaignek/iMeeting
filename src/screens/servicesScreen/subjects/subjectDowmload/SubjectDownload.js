@@ -12,6 +12,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, Switch } from 'react-native-paper';
 import { useLazyQuery } from '@apollo/client';
 import RNFetchBlob from 'rn-fetch-blob';
+import { showToast, GToastContainer } from 'react-native-gtoast';
 
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
@@ -124,25 +125,33 @@ const SubjectDownload = () => {
           ios: RNFetchBlob.fs.dirs.DocumentDir,
           android: RNFetchBlob.fs.dirs.DownloadDir
         });
-
         fPath = `${fPath}/${Date.now()}.${valueType}`;
-
-        console.log('file path', fPath);
+        let options = {
+          fileCache: true,
+          addAndroidDownloads: {
+            path: fPath,
+            description: 'downloading file...',
+            notification: true,
+            // useDownloadManager works with Android only
+            useDownloadManager: true
+          }
+        };
+        RNFetchBlob.config(options);
 
         if (Platform.OS == 'ios') {
           await RNFetchBlob.fs.createFile(fPath, base64Str, 'base64');
         } else {
-          let options = {
-            fileCache: true,
-            addAndroidDownloads: {
-              path: fPath,
-              description: 'downloading file...',
-              notification: true,
-              // useDownloadManager works with Android only
-              useDownloadManager: true
-            }
-          };
-          RNFetchBlob.config(options);
+          // let options = {
+          //   fileCache: true,
+          //   addAndroidDownloads: {
+          //     path: fPath,
+          //     description: 'downloading file...',
+          //     notification: true,
+          //     // useDownloadManager works with Android only
+          //     useDownloadManager: true
+          //   }
+          // };
+          // RNFetchBlob.config(options);
 
           await RNFetchBlob.fs.writeFile(fPath, base64Str, 'base64');
         }
@@ -198,6 +207,7 @@ const SubjectDownload = () => {
             color={'#81AB96'}
           />
         </View>
+        <GToastContainer paddingBottom={30} />
       </View>
       <View
         style={{
@@ -218,6 +228,9 @@ const SubjectDownload = () => {
           <Button
             title={'Save'}
             onPress={() => {
+              showToast('Downloading file...', {
+                duration: 10
+              });
               checkPermission();
             }}
             layoutStyle={[styles.nextBtnLayout]}

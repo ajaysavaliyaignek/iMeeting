@@ -5,24 +5,17 @@ import {
   TouchableOpacity,
   useWindowDimensions
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { Calendar } from 'react-native-big-calendar';
-import CalendarHeader from '../../component/calendarHeader/CalendarHeader';
+import React, { useState } from 'react';
 import moment from 'moment';
+import { useNavigation } from '@react-navigation/native';
+
 import { styles } from './styles';
 import { Icon, IconName } from '../../component';
 import { SIZES } from '../../themes/Sizes';
-import { useNavigation } from '@react-navigation/native';
 import { Button } from '../../component/button/Button';
 import { Colors } from '../../themes/Colors';
-import {
-  selectColor,
-  selectColorAndIcon
-} from '../servicesScreen/addEditMeetingAppointmentVideoConference/screenRender';
-import { Fonts } from '../../themes';
-import { useQuery } from '@apollo/client';
-import { GET_CALENDER_EVENTS } from '../../graphql/query';
 import CalendarMonthViewComponent from '../../component/calendarMonthViewComponent/CalendarMonthViewComponent';
+import CalendarScheduleViewComponent from '../../component/calendarScheduleViewComponent/CalendarScheduleViewComponent';
 
 let CalanderDate = moment();
 const CalenderScreen = () => {
@@ -36,18 +29,6 @@ const CalenderScreen = () => {
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
   );
-  const [events, setEvenets] = useState([
-    {
-      title: 'Meeting...........',
-      start: new Date(2022, 10, 15, 10, 0),
-      end: new Date(2022, 10, 15, 10, 30)
-    },
-    {
-      title: 'Meeting',
-      start: new Date(2022, 10, 15, 10, 0),
-      end: new Date(2022, 10, 15, 10, 30)
-    }
-  ]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,7 +49,7 @@ const CalenderScreen = () => {
           />
         </TouchableOpacity>
         <Text style={styles.txtHeader}>Calender</Text>
-        <View style={styles.headeRightView}>
+        {/* <View style={styles.headeRightView}>
           <TouchableOpacity style={styles.searchIconView} onPress={() => {}}>
             <Icon name={IconName.Search} height={SIZES[18]} width={SIZES[18]} />
           </TouchableOpacity>
@@ -84,7 +65,7 @@ const CalenderScreen = () => {
           >
             <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
       <View style={styles.subContainer}>
         <View style={styles.btnContainer}>
@@ -117,73 +98,9 @@ const CalenderScreen = () => {
             onPress={() => setActiveTab('1')}
           />
         </View>
+        {activeTab == '0' && <CalendarScheduleViewComponent />}
         {activeTab == '1' && <CalendarMonthViewComponent />}
       </View>
-      {/* <View>
-            <CalendarHeader
-              headerData={calendarDate}
-              onPressArrowLeft={onPressArrowLeft}
-              onPressArrowRight={onPressArrowRight}
-              horizontal={true}
-            />
-            <Calendar
-              renderEvent={(event) => {
-                return (
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: event.color,
-                      borderRadius: SIZES[2],
-                      paddingLeft: SIZES[2]
-                    }}
-                    onPress={() => {
-                      let pressedDate = moment(event.start).format(
-                        'YYYY-MM-DD'
-                      );
-                      var field = key.filter(function (x) {
-                        return x === pressedDate;
-                      });
-                      var index = key.indexOf(field[0]);
-
-                      navigation.navigate('EventsViewByDayScreen', {
-                        events: eventDetails[index],
-                        date: event.start
-                      });
-                    }}
-                  >
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        ...Fonts.PoppinsRegular[10],
-                        color: Colors.white
-                      }}
-                    >
-                      {event.title}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
-              events={events}
-              height={height}
-              mode="month"
-              date={new Date(monthCalenderView)}
-              swipeEnabled={true}
-              onPressCell={(date) => {
-                let pressedDate = moment(date).format('YYYY-MM-DD');
-                var field = key.filter(function (x) {
-                  return x === pressedDate;
-                });
-                var index = key.indexOf(field[0]);
-                const setdate = eventDetails?.filter((k, index) => {
-                  key[index] == pressedDate;
-                });
-
-                navigation.navigate('EventsViewByDayScreen', {
-                  events: eventDetails[index],
-                  date: date
-                });
-              }}
-            />
-          </View> */}
     </SafeAreaView>
   );
 };

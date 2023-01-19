@@ -44,6 +44,7 @@ const EditAppointmentGeneral = () => {
 
   fileId?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -64,6 +65,7 @@ const EditAppointmentGeneral = () => {
   });
 
   const GetAppointmentById = useQuery(GET_APPOINTMENT_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       id: data?.appointmentId
     },
@@ -177,6 +179,7 @@ const EditAppointmentGeneral = () => {
   const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
     GET_COMMITTEES_BY_ROLE,
     {
+      fetchPolicy: 'cache-and-network',
       variables: { head: true, secretary: true, member: false },
       onCompleted: (data) => {
         if (data) {

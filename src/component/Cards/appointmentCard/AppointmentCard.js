@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Divider } from 'react-native-paper';
 
 import Icon from '../../Icon';
@@ -130,12 +130,14 @@ const AppoinmentCard = ({
       </View>
 
       {/* dotsView */}
+
       <TouchableOpacity
         onPress={() => setVisibleIndex(visibleIndex == -1 ? index : -1)}
         style={styles.dotsView}
       >
         <Icon name={IconName.Dots} height={16} width={6} />
       </TouchableOpacity>
+
       {visibleIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal

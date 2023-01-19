@@ -372,7 +372,7 @@ PODS:
     - React-Core
   - RNCPicker (2.4.8):
     - React-Core
-  - RNDateTimePicker (6.5.0):
+  - RNDateTimePicker (6.7.1):
     - React-Core
   - RNDeviceInfo (10.1.1):
     - React-Core
@@ -636,7 +636,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 0c357f3156fcb16c8589ede67cc036330b6698ca
   RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
   RNCPicker: 0bf8ef8f7800524f32d2bb2a8bcadd53eda0ecd1
-  RNDateTimePicker: 154f8246e9c32fd663995647a7f9f667a8c6b258
+  RNDateTimePicker: 0530a73a6f3a1a85814cbde0802736993b9e675e
   RNDeviceInfo: 89bc4fe36cf4c8955965609b140d29a335d5350d
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNGestureHandler: 920eb17f5b1e15dae6e5ed1904045f8f90e0b11e

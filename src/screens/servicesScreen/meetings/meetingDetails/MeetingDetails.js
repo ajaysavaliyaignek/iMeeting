@@ -13,24 +13,21 @@ import { Colors } from '../../../../themes/Colors';
 import { Button } from '../../../../component/button/Button';
 import { Fonts } from '../../../../themes';
 import {
-  GET_ALL_LOCATION_BY_ID,
   GET_All_MEETING,
-  GET_ANSWER,
-  GET_COMMITTEE_BY_ID,
-  GET_FILE,
-  GET_MEETING_BY_ID,
-  GET_MEETING_STATUS,
-  GET_PLATFORMLINK,
-  GET_USER_PAYLOAD
+  GET_LIVE_MEETING_TAB_COUNT,
+  GET_MEETING_STATUS
 } from '../../../../graphql/query';
-import { DELETE_MEETING } from '../../../../graphql/mutation';
+import {
+  DELETE_MEETING,
+  UPDATE_MEETING_STATUS
+} from '../../../../graphql/mutation';
 import DetailsComponent from '../../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 import { UserContext } from '../../../../context';
-import Loader from '../../../../component/Loader/Loader';
 import { SIZES } from '../../../../themes/Sizes';
 
 const MeetingDetails = () => {
   const navigation = useNavigation();
+
   const {
     setMeetingsData
     // setSelectedSubjects
@@ -91,6 +88,7 @@ const MeetingDetails = () => {
 
   // getMeetingSubjects for meeting
   const getMeetingSubjects = useQuery(GET_MEETING_STATUS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data) {
         setMeetingStatus(data.meetingStatus.items);
@@ -100,6 +98,31 @@ const MeetingDetails = () => {
       console.log('error getMeetingSubjects ', data.message);
     }
   });
+
+  const [updateMeetingStatus] = useMutation(UPDATE_MEETING_STATUS, {
+    refetchQueries: ['meetings'],
+    onCompleted: (data) => {
+      console.log('updateMeetingSttaus', data.updateMeetingStatus.status[0]);
+      if (data.updateMeetingStatus.status[0].statusCode == '200') {
+        navigation.navigate('LiveMeetingMenu', {
+          item,
+          meetingStatus: meetingStatus
+        });
+      }
+    },
+    onError: (data) => {
+      console.log('updateMeetingSttaus', data.message);
+    }
+  });
+
+  let date = new Date();
+  let newdate = moment(
+    date.toLocaleString('en-Us', { timeZone: item.timeZone })
+  )
+    .add(15, 'm')
+    .format('YYYY-MM-DD hh:mm A');
+
+  let meetingDate = `${item.setDate} ${item.setTime}`;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -121,69 +144,106 @@ const MeetingDetails = () => {
             <Divider style={styles.divider} />
             {item.meetingStatusTitle !== 'Deleted' && (
               <View style={styles.btnContainer}>
-                <Button
-                  title={'Edit'}
-                  layoutStyle={[
-                    styles.btnLayout,
-                    { backgroundColor: '#F3F6F9' }
-                  ]}
-                  textStyle={{
-                    ...Fonts.PoppinsSemiBold[14],
-                    color: Colors.primary
-                  }}
-                  onPress={() => {
-                    navigation.navigate(
-                      'AddEditMeetingAppointmentVideoConference',
-                      {
-                        screenName: 'Edit meeting',
-                        type: 'Meeting',
-                        screensArray: [
-                          'general',
-                          'users',
-                          'dateandtime',
-                          'location',
-                          'subjects'
-                        ],
-                        isEdit: true,
-                        details: item
-                      }
-                    );
-                    setMeetingsData([]);
-                  }}
-                />
+                {item.meetingStatusTitle !== 'Closed' && (
+                  <Button
+                    title={'Edit'}
+                    layoutStyle={[
+                      styles.btnLayout,
+                      { backgroundColor: '#F3F6F9' }
+                    ]}
+                    textStyle={{
+                      ...Fonts.PoppinsSemiBold[14],
+                      color: Colors.primary
+                    }}
+                    onPress={() => {
+                      navigation.navigate(
+                        'AddEditMeetingAppointmentVideoConference',
+                        {
+                          screenName: 'Edit meeting',
+                          type: 'Meeting',
+                          screensArray: [
+                            'general',
+                            'users',
+                            'dateandtime',
+                            'location',
+                            'subjects'
+                          ],
+                          isEdit: true,
+                          details: item
+                        }
+                      );
+                      setMeetingsData([]);
+                    }}
+                  />
+                )}
                 <Button
                   title={'Delete'}
                   layoutStyle={[
                     styles.btnLayout,
-                    { backgroundColor: '#DD7878' }
+                    {
+                      backgroundColor: '#DD7878',
+                      width:
+                        item.meetingStatusTitle == 'Closed' ? '100%' : '30%'
+                    }
                   ]}
                   onPress={onDeleteHandler}
                 />
-                <Button
-                  title={'Start'}
-                  layoutStyle={[styles.btnLayout]}
-                  onPress={() => {
-                    navigation.navigate('LiveMeetingMenu', {
-                      item,
-                      meetingStatus: meetingStatus
-                    });
-                  }}
-                />
+                {item.status.canStart &&
+                  moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
+                    moment(meetingDate, 'YYYY-MM-DD hh:mm A')
+                  ) && (
+                    <Button
+                      title={'Start'}
+                      layoutStyle={[styles.btnLayout]}
+                      onPress={() => {
+                        if (item.meetingStatusTitle !== 'Soft-Closed') {
+                          const filterStatus = meetingStatus?.filter(
+                            (status) => {
+                              if (status.meetingStatusTitle == 'Live') {
+                                return status;
+                              }
+                            }
+                          );
+
+                          console.log(
+                            'filterstatus for live meeting',
+                            filterStatus
+                          );
+                          updateMeetingStatus({
+                            variables: {
+                              meeting: {
+                                meetingId: item?.meetingId,
+                                meetingStatusId:
+                                  filterStatus[0]?.meetingStatusId
+                              }
+                            }
+                          });
+                        } else {
+                          navigation.navigate('LiveMeetingMenu', {
+                            item,
+                            meetingStatus: meetingStatus
+                          });
+                        }
+                      }}
+                    />
+                  )}
               </View>
             )}
           </View>
         ) : (
           <View style={{ padding: SIZES[16] }}>
-            <Button
-              title={'Start'}
-              layoutStyle={[styles.btnLayout, { width: '100%' }]}
-              onPress={() => {
-                navigation.navigate('LiveMeetingMenu', {
-                  item,
-                  meetingStatus: meetingStatus
-                });
-              }}
-            />
+            {item.meetingStatusTitle == 'Live' && (
+              <Button
+                title={'Start'}
+                layoutStyle={[styles.btnLayout, { width: '100%' }]}
+                onPress={() => {
+                  navigation.navigate('LiveMeetingMenu', {
+                    item,
+                    meetingStatus: meetingStatus
+                  });
+                }}
+              />
+            )}
           </View>
         )}
       </View>

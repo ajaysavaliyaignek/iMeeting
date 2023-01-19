@@ -60,8 +60,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: SIZES[4],
-    paddingVertical: SIZES[10]
+
+    padding: SIZES[16]
   },
   deadlineContainer: {
     marginTop: SIZES[40],
@@ -125,5 +125,15 @@ export const styles = StyleSheet.create({
     height: 24,
     alignItems: 'center',
     justifyContent: 'center'
-  }
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // borderBottomWidth: SIZES[1],
+    // borderBottomColor: Colors.line,
+    paddingVertical: SIZES[8],
+    paddingHorizontal: SIZES[16]
+  },
+  txtLabel: { ...Fonts.PoppinsRegular[14], color: Colors.bold }
 });

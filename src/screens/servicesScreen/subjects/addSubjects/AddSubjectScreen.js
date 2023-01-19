@@ -16,6 +16,7 @@ import {
   GET_All_MEETING,
   GET_All_SUBJECTS,
   GET_All_SUBJECTS_CATEGORY,
+  GET_COMMITTEES_BY_ROLE,
   GET_COMMITTEE_BY_ID,
   GET_FILE
 } from '../../../../graphql/query';
@@ -33,7 +34,8 @@ const AddSubjectScreen = () => {
     subjectDetails,
     screenName,
     meetingName,
-    meetingId
+    meetingId,
+    isLiveMeetingSubject
   } = route?.params;
 
   const [token, setToken] = useState('');
@@ -88,6 +90,7 @@ const AddSubjectScreen = () => {
 
   subjectDetails?.attachFileIds?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -110,6 +113,7 @@ const AddSubjectScreen = () => {
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =
     useQuery(GET_All_SUBJECTS_CATEGORY, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         if (data) {
           setCategory(data.subjectCategories.items);
@@ -122,25 +126,28 @@ const AddSubjectScreen = () => {
   }
 
   // fetch commitees
-  const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
-    GET_All_COMMITTEE,
-    {
-      variables: { isDeleted: true },
-      onCompleted: (data) => {
-        if (data) {
-          setCommittee(data.committees.items);
-        }
+  // fetch commitees
+  const {
+    loading: CommitteeLoading,
+    error: CommitteeError,
+    data: CommitteeData
+  } = useQuery(GET_COMMITTEES_BY_ROLE, {
+    fetchPolicy: 'cache-and-network',
+    variables: { head: true, secretary: true, member: false },
+    onCompleted: (data) => {
+      if (data) {
+        setCommittee(data?.committeesByRole?.items);
       }
+    },
+    onError: (data) => {
+      console.log('commitee error', data);
     }
-  );
-  if (CommitteeError) {
-    console.log('commitee error', CommitteeError);
-  }
-
+  });
   // fetch meetings
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,
     {
+      fetchPolicy: 'cache-and-network',
       variables: { onlyMyMeeting: false, screen: 1 },
       onCompleted: (data) => {
         if (data) {
@@ -346,7 +353,7 @@ const AddSubjectScreen = () => {
                       subjectData.valueMeeting == null
                         ? 0
                         : subjectData.valueMeeting,
-                    id: 0
+                    id: isLiveMeetingSubject ? 1 : 0
                   }
                 }
               });
@@ -354,7 +361,8 @@ const AddSubjectScreen = () => {
             disable={
               subjectData.title === '' ||
               subjectData.discription === '' ||
-              subjectData.valueCommittee == null
+              subjectData.valueCommittee == null ||
+              subjectData.valueCategory == null
                 ? true
                 : false
             }
@@ -363,7 +371,8 @@ const AddSubjectScreen = () => {
                 opacity:
                   subjectData.title === '' ||
                   subjectData.discription === '' ||
-                  subjectData.valueCommittee == null
+                  subjectData.valueCommittee == null ||
+                  subjectData.valueCategory == null
                     ? 0.5
                     : null
               },

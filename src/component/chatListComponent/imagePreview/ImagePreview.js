@@ -6,11 +6,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '../../Icon';
 import IconName from '../../Icon/iconName';
 import { checkPermission } from '../../downloadFile/DownloadFile';
+import { Colors } from '../../../themes/Colors';
 
 const ImagePreview = ({ file, index, isOwner }) => {
+  console.log('file', file);
   const [uri, setUri] = useState('');
   const [token, setToken] = useState('');
   const [isDownloaded, setIsDownloaded] = useState(false);
+  const [previewError, setPreviewError] = useState(null);
 
   useEffect(() => {
     const getToken = () => {
@@ -25,52 +28,56 @@ const ImagePreview = ({ file, index, isOwner }) => {
     getToken();
   }, []);
 
-  //   const fs = RNFetchBlob.fs;
+  const fs = RNFetchBlob.fs;
 
-  //   RNFetchBlob.config({
-  //     fileCache: true
-  //   })
-  //     .fetch('GET', file.contentUrl)
-  //     // the image is now dowloaded to device's storage
-  //     .then((resp) => {
-  //       // the image path you can use it directly with Image component
-  //       console.log('resp', resp);
-  //       imagePath = resp.path();
-  //       return resp.readFile('base64');
-  //     })
-  //     .then((base64Data) => {
-  //       // here's base64 encoded image
-  //       console.log(
-  //         'base64Data-----',
-  //         `data:image/${file.type};base64,${base64Data}`
-  //       );
-  //       setUri(`data:image/${file.type};base64,${base64Data}`);
-  //       // remove the file from storage
-  //       return fs.unlink(imagePath);
-  //     });
+  RNFetchBlob.config({
+    fileCache: true
+  })
+    .fetch('GET', encodeURI(file.contentUrl), {
+      Authorization: `Bearer ${token}`
+    })
+    .then(async (res) => {
+      // Alert after successful downloading
+      let base64 = await res.base64();
+      // console.log('res --------> ', base64);
+      setUri(`data:image/${file.type};base64,${base64}`);
+    });
+
+  // `data:image/${file.type};base64,${base64Data}`
   return (
-    <View>
-      <Image
-        resizeMode="cover"
-        source={{
-          uri: file.contentUrl,
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }}
-        style={{
-          height: 100,
-          width: 100,
-          marginTop: SIZES[4],
-          borderRadius: SIZES[8],
-          opacity: isDownloaded || isOwner ? 1 : 0.5
-        }}
-        key={index}
-        onError={(e) => console.log('image preview error', e.nativeEvent.error)}
-      />
-      {isDownloaded == false && !isOwner && (
+    <View
+      style={{
+        height: 100,
+        width: 100,
+        borderRadius: 8,
+        borderColor: Colors.line,
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      {uri !== '' && (
+        <Image
+          resizeMode="cover"
+          source={{
+            uri: encodeURI(uri)
+          }}
+          style={{
+            height: 100,
+            width: 100,
+            marginTop: SIZES[4],
+            borderRadius: SIZES[8],
+            opacity: isDownloaded || isOwner ? 1 : 0.5
+          }}
+          key={index}
+          onError={(e) => {
+            console.log('image preview error', e.nativeEvent.error);
+            setPreviewError(e.nativeEvent.error);
+          }}
+        />
+      )}
+      {isDownloaded == false && (
         <TouchableOpacity
-          style={{ position: 'absolute', top: '40%', left: '20%' }}
+          style={{ position: 'absolute', top: '40%', left: '40%' }}
           onPress={() => {
             checkPermission(file.downloadUrl, setIsDownloaded);
           }}

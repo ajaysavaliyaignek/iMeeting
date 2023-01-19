@@ -9,20 +9,21 @@ export const styles = StyleSheet.create({
   },
   subContainer: {
     flex: 1,
-    padding: SIZES[16],
+    paddingVertical: SIZES[16],
     backgroundColor: Colors.white
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     paddingHorizontal: SIZES[16],
     paddingVertical: SIZES[10]
   },
   txtHeader: {
     ...Fonts.PoppinsSemiBold[14],
     color: Colors.bold,
-    marginLeft: SIZES[24]
+
+    marginLeft: '30%'
   },
   headeRightView: { flexDirection: 'row', alignItems: 'center' },
   searchIconView: { marginRight: SIZES[24] },
@@ -31,7 +32,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(118, 118, 128, 0.12)',
     borderRadius: SIZES[10],
-
+    marginHorizontal: SIZES[16],
     padding: SIZES[2],
     justifyContent: 'space-between'
   },
