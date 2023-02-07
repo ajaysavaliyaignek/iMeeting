@@ -4,7 +4,8 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  FlatList
+  FlatList,
+  SafeAreaView
 } from 'react-native';
 import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
@@ -90,7 +91,7 @@ const DashboardScreen = () => {
   });
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       {/* header */}
       <Header name={'Dashboard'} />
 
@@ -156,39 +157,11 @@ const DashboardScreen = () => {
           data={committeeData}
           keyExtractor={(index) => index.toString()}
           renderItem={({ item, index }) => {
-            return <CommitteesCard item={item} index={index} />;
+            return <CommitteesCard item={item} index={index} searchText={''} />;
           }}
         />
-        {/* <CommitteesCard
-          committeesTitle={'Sports committee'}
-          committeeIdNumber={'983 317'}
-          committeeCategoryName={'Sport'}
-          committeeRoleName={'Secretary'}
-          committeeDate={'27 oct 2021'}
-        />
-        <CommitteesCard
-          committeesTitle={'Sports committee'}
-          committeeIdNumber={'983 317'}
-          committeeCategoryName={'Sport'}
-          committeeRoleName={'Secretary'}
-          committeeDate={'27 oct 2021'}
-        />
-        <CommitteesCard
-          committeesTitle={'Sports committee'}
-          committeeIdNumber={'983 317'}
-          committeeCategoryName={'Sport'}
-          committeeRoleName={'Secretary'}
-          committeeDate={'27 oct 2021'}
-        />
-        <CommitteesCard
-          committeesTitle={'Sports committee'}
-          committeeIdNumber={'983 317'}
-          committeeCategoryName={'Sport'}
-          committeeRoleName={'Secretary'}
-          committeeDate={'27 oct 2021'}
-        /> */}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

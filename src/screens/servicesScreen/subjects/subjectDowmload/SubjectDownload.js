@@ -28,12 +28,13 @@ const SubjectDownload = () => {
   const route = useRoute();
   const { item, downloadType } = route?.params;
   console.log('subject from subject download', item);
+  console.log('downloadType', downloadType);
 
   const navigation = useNavigation();
   const [valueType, setValueType] = useState(null);
   const [items, setItems] = useState([
-    { label: 'PDF', value: 'pdf' },
-    { label: 'ZIP', value: 'zip' }
+    { label: 'PDF', value: 'PDF' },
+    { label: 'ZIP', value: 'ZIP' }
   ]);
   const [isAttachFileSwitchOn, setIsAttachFileSwitchOn] = useState(false);
   const [isCommentsSwitchOn, setIsCommentsSwitchOn] = useState(false);
@@ -51,7 +52,7 @@ const SubjectDownload = () => {
           : downloadType == 'Task'
           ? +item?.taskId
           : 0,
-      type: 2
+      type: downloadType == 'Subject' ? 2 : downloadType == 'Task' ? 3 : 0
     });
     console.log('check permission');
     if (Platform.OS === 'ios') {
@@ -119,7 +120,7 @@ const SubjectDownload = () => {
     {
       onCompleted: async (data, error) => {
         console.log(' download data', data);
-        let base64Str = data?.report?.fileData.base64;
+        let base64Str = data?.report?.fileData?.base64;
 
         let fPath = Platform.select({
           ios: RNFetchBlob.fs.dirs.DocumentDir,
@@ -226,6 +227,7 @@ const SubjectDownload = () => {
             textStyle={styles.txtCancelButton}
           />
           <Button
+            disable={valueType ? false : true}
             title={'Save'}
             onPress={() => {
               showToast('Downloading file...', {
@@ -233,7 +235,10 @@ const SubjectDownload = () => {
               });
               checkPermission();
             }}
-            layoutStyle={[styles.nextBtnLayout]}
+            layoutStyle={[
+              styles.nextBtnLayout,
+              { opacity: valueType ? 1 : 0.5 }
+            ]}
             textStyle={styles.txtNextBtn}
           />
         </View>

@@ -21,7 +21,9 @@ const SubjectListComponent = ({
   isDecisionSubject,
   onPressEdit,
   meetingData,
-  setSearchText
+  setSearchText,
+  isLiveMeetingSubject,
+  isApproveMeetingSubject
 }) => {
   const [filterData, setFilterData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
@@ -81,6 +83,7 @@ const SubjectListComponent = ({
     variables: queryParams,
 
     onCompleted: (data) => {
+      console.log('subjects', data?.subjects.items);
       setFilterData(data?.subjects.items);
 
       setSubjectData(data?.subjects.items);
@@ -142,6 +145,8 @@ const SubjectListComponent = ({
               isDecisionSubject={isDecisionSubject}
               onPressEdit={onPressEdit}
               meetingData={meetingData}
+              isLiveMeetingSubject={isLiveMeetingSubject}
+              isApproveMeetingSubject={isApproveMeetingSubject}
             />
           )}
         />

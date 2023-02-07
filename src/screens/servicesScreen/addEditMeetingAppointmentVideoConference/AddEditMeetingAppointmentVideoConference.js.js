@@ -2,16 +2,17 @@ import { View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
-import { IconName } from '../../../component';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+import { useMutation, useQuery } from '@apollo/client';
+import moment from 'moment';
+
+import { IconName } from '../../../component';
 import { styles } from './styles';
 import Header from '../../../component/header/Header';
 import { Colors } from '../../../themes/Colors';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../component/button/Button';
-import { useMutation, useQuery } from '@apollo/client';
 import { UPDATE_APPOINTMENT, UPDATE_MEETING } from '../../../graphql/mutation';
-import moment from 'moment';
 import {
   GET_All_APPOINTMENT,
   GET_All_MEETING,

@@ -47,7 +47,7 @@ const Avatar = (props) => {
           style={[
             styles.initialsText,
             fontSize ? { fontSize: fontSize } : null,
-            textColor ? { color: textColor } : { color: 'white' }
+            textColor ? { color: textColor } : { color: Colors.primary }
           ]}
         >
           {getInitials(name)}

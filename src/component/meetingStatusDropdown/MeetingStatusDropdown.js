@@ -7,6 +7,7 @@ import { Fonts } from '../../themes';
 import { useMutation, useQuery } from '@apollo/client';
 import { Dropdown } from 'react-native-element-dropdown';
 import { UPDATE_MEETING_STATUS } from '../../graphql/mutation';
+import { SelectList } from 'react-native-dropdown-select-list';
 
 const MeetingStatusDropdown = ({ item, statusId }) => {
   const [meetingStatusOption, setmeetingStatusOption] = useState([]);
@@ -278,6 +279,87 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
             : Colors.bold
       }}
     >
+      {/* <SelectList
+        setSelected={(val) => {
+          updateSpeaker({
+            variables: {
+              userDetail: {
+                userId: item.userId,
+                meetingId: meetingData?.meetingId,
+                duration: item.duration,
+                status: val
+              }
+            }
+          });
+        }}
+        inputStyles={{
+          color:
+            item.meetingStatusTitle == 'Deleted'
+              ? '#ff6347'
+              : item.meetingStatusTitle == 'Live'
+              ? '#008000'
+              : item.meetingStatusTitle == 'Tentative'
+              ? '#89530d'
+              : item.meetingStatusTitle == 'Cancelled'
+              ? '#ff6347'
+              : item.meetingStatusTitle == 'Closed'
+              ? '#ff6347'
+              : item.meetingStatusTitle == 'Pre-Scheduled'
+              ? '#337ab7'
+              : item.meetingStatusTitle == 'Scheduled'
+              ? '#5f9ea0'
+              : item.meetingStatusTitle == 'Soft-Closed'
+              ? '#87ceeb'
+              : Colors.bold,
+          ...Fonts.PoppinsRegular[14]
+        }}
+        data={meetingStatusOption}
+        save="value"
+        search={false}
+        placeholder={item.status}
+        boxStyles={{
+          borderRadius: SIZES[8],
+          borderColor:
+            item.meetingStatusTitle == 'Deleted'
+              ? '#ff6347'
+              : item.meetingStatusTitle == 'Live'
+              ? '#008000'
+              : item.meetingStatusTitle == 'Tentative'
+              ? '#89530d'
+              : item.meetingStatusTitle == 'Cancelled'
+              ? '#ff6347'
+              : item.meetingStatusTitle == 'Closed'
+              ? '#ff6347'
+              : item.meetingStatusTitle == 'Pre-Scheduled'
+              ? '#337ab7'
+              : item.meetingStatusTitle == 'Scheduled'
+              ? '#5f9ea0'
+              : item.meetingStatusTitle == 'Soft-Closed'
+              ? '#87ceeb'
+              : Colors.bold,
+          alignItems: 'center',
+          backgroundColor:
+            item.meetingStatusTitle == 'Deleted'
+              ? '#ffc8be'
+              : item.meetingStatusTitle == 'Live'
+              ? '#5fda5f80'
+              : item.meetingStatusTitle == 'Tentative'
+              ? '#deb887'
+              : item.meetingStatusTitle == 'Cancelled'
+              ? '#ffcac1'
+              : item.meetingStatusTitle == 'Closed'
+              ? '#ffc8be'
+              : item.meetingStatusTitle == 'Pre-Scheduled'
+              ? '#b4dcff'
+              : item.meetingStatusTitle == 'Scheduled'
+              ? '#bff5f7'
+              : item.meetingStatusTitle == 'Soft-Closed'
+              ? '#4f7585'
+              : Colors.white
+        }}
+        dropdownTextStyles={{ ...Fonts.PoppinsRegular[14] }}
+        disabledTextStyles={{ ...Fonts.PoppinsRegular[14] }}
+      /> */}
       <Dropdown
         style={{
           flex: 1,

@@ -45,7 +45,7 @@ const CalenderdayEventsComponent = ({ events, date, day, isSchedulerView }) => {
               color: Colors.secondary
             }}
           >
-            {`${day}`}
+            {day}
           </Text>
         )}
       </View>
@@ -53,8 +53,7 @@ const CalenderdayEventsComponent = ({ events, date, day, isSchedulerView }) => {
       {events?.length > 0 ? (
         <FlatList
           data={events}
-          keyExtractor={(item, index) => `${index}${item.title} `}
-          // keyExtractor={(item, index) => `${date} ${day} ${item.title} ${index}`}
+          keyExtractor={(item, index) => item.item_id}
           renderItem={({ item, index }) => {
             return <EventDetailsCard item={item} index={index} />;
           }}

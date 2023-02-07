@@ -37,6 +37,7 @@ import { UserContext } from '../../../context';
 import { MentionInput } from '../../../component/mentionInput/MentionInput';
 import { Divider } from 'react-native-paper';
 import IMeetingChatTextInput from '../../../component/iMeetingChatTextInput/IMeetingChatTextInput';
+import MentionInputText from '../../../component/MentionInputText/MentionInputText';
 
 const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
   const { user, setUser, companyUrl } = useContext(UserContext);
@@ -235,6 +236,9 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
             </Text>
           </View>
         )}
+        {/* <View style={{ flex: 1, marginBottom: 50 }}>
+          <MentionInputText />
+        </View> */}
         <IMeetingChatTextInput
           users={liveMeetingUser}
           meetingId={meetingData?.meetingId}
@@ -248,12 +252,7 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
           onBlur={() => {
             socketStatusTyping.current.send(`${user?.userName}||NOT_TYPING`);
           }}
-          
         />
-        {/* <iMeetingChatTextInput
-          users={liveMeetingUser}
-          meetingId={meetingData?.meetingId}
-        /> */}
       </View>
     </KeyboardAvoidingView>
   );

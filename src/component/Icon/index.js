@@ -243,6 +243,15 @@ const Icon = ({ name, height = SIZES[24], width = SIZES[24], fill }) => {
           />
         );
 
+      case IconName.GoogleCalendar:
+        return (
+          <SVGImage.GoogleCalendar height={height} width={width} fill={fill} />
+        );
+      case IconName.OutlookCalendar:
+        return (
+          <SVGImage.OutlookCalendar height={height} width={width} fill={fill} />
+        );
+
       default:
         return null;
     }

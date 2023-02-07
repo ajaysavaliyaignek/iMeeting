@@ -70,7 +70,7 @@ export const styles = StyleSheet.create({
     marginVertical: SIZES[12]
   },
   btnLayout: {
-    width: '30%'
+    width: '23%'
   },
   bottomContainer: {
     paddingHorizontal: SIZES[16],

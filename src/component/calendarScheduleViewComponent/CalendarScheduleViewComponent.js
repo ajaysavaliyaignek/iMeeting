@@ -1,13 +1,5 @@
 import { View, FlatList, useWindowDimensions } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Agenda,
-  calendarTheme,
-  WeekCalendar,
-  CalendarProvider
-} from 'react-native-calendars';
-// import CalendarStrip from 'react-native-calendar-strip';
-// import CalendarStrip from 'react-native-slideable-calendar-strip';
 import moment from 'moment';
 import { useLazyQuery } from '@apollo/client';
 
@@ -19,7 +11,6 @@ import { SIZES } from '../../themes/Sizes';
 import CalenderdayEventsComponent from '../calenderDayEventsComponent/CalenderdayEventsComponent';
 import Loader from '../Loader/Loader';
 import CalendarStrip from '../calendarStripLib/CalendarStrip';
-import { now } from 'moment/moment';
 
 var dataInList = [];
 var curruntItemDateInView = '';
@@ -27,22 +18,22 @@ var eventsOnDate = [];
 var firstScrollDone = false;
 var isNextPage = true;
 var calDateList = [];
-var scrollIndex;
+var scrollIndex = parseInt(moment(new Date()).format('DD')) - 1;
 let CalanderDate = moment();
 let recentUsedMonth = CalanderDate.format('YYYY-MM-01');
 
 const CalendarScheduleViewComponent = () => {
-  const { width } = useWindowDimensions();
-
-  const [a, sA] = useState(true);
   const [eventDetails, setEventDetails] = useState(calDateList);
   const flatListRef = useRef(null);
   const [date, setDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
-  // const [isNextPage, setIsNextPage] = useState(true);
-  const { height } = useWindowDimensions();
-  var previousList = [];
+  const today = parseInt(moment(new Date()).format('DD'));
+  // const [scrollIndex, setScrollIndex] = useState(
+  //   parseInt(moment(new Date()).format('DD')) - 1
+  // );
 
-  // var isNextPage = true;
+  // const [isNextPage, setIsNextPage] = useState(true);
+  console.log('today', { today });
+  var previousList = [];
   var setDateOnScroll = false;
 
   const weekday = [
@@ -72,9 +63,9 @@ const CalendarScheduleViewComponent = () => {
         }
       });
     }
-    if (eventDetails?.length > 0) {
-      scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
-    }
+    // if (eventDetails?.length > 0) {
+    //   scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
+    // }
   }, []);
 
   const [getCalenderEvents, { loading }] = useLazyQuery(GET_CALENDER_EVENTS, {
@@ -121,10 +112,14 @@ const CalendarScheduleViewComponent = () => {
             let darkColor = selectColorAndIcon(event.item_type).darkColor;
             let lightColor = selectColorAndIcon(event.item_type).lightColor;
             let tickIcon = selectColorAndIcon(event.item_type).tickIcon;
-            dateEventList.push({ ...event, darkColor, lightColor, tickIcon });
+            dateEventList.push({
+              ...event,
+              darkColor,
+              lightColor,
+              tickIcon
+            });
           });
 
-          // console.log('isNextPage-----', isNextPage);
           if (isNextPage) {
             calDateList.push({
               date: element,
@@ -148,38 +143,70 @@ const CalendarScheduleViewComponent = () => {
 
         setEventDetails(previousList.concat(calDateList));
 
-        if (!firstScrollDone) {
-          scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
-        } else {
-          console.log('curruntItemDateInView', curruntItemDateInView);
-          scrollToDate(curruntItemDateInView);
-        }
+        // if (!firstScrollDone) {
+        //   scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
+        // } else {
+        //   console.log('curruntItemDateInView', curruntItemDateInView);
+        //   scrollToDate(curruntItemDateInView);
+        // }
       }
     },
     onError: (data) => {
       console.log('getCalenderEvents error', data.message);
     }
   });
+  useEffect(() => {
+    if (eventDetails.length > 0) {
+      console.log('eventDetails.length', eventDetails.length);
+      // const scrollingNumber = Math.floor(
+      //   Math.random() * eventDetails.length - 1
+      // );
+      // console.log('item to be Scoll', eventDetails[scrollingNumber]);
 
-  const scrollToDate = async (date) => {
+      if (!firstScrollDone) {
+        scrollList(parseInt(moment(new Date()).format('DD')) - 1);
+      }
+      if (!isNextPage) {
+        let index = eventDetails?.findIndex(
+          (data) => data?.date === curruntItemDateInView
+        );
+        console.log('index', index);
+        scrollList(index);
+      }
+    }
+  }, [eventDetails]);
+
+  const scrollList = (index) => {
     firstScrollDone = true;
-    console.log('date===>', date);
-    console.log('calDatelist======>', previousList.concat(calDateList).length);
-    let index = previousList
-      .concat(calDateList)
-      .findIndex((data) => data?.date == date);
-    console.log('index', index);
-    scrollIndex = index;
-    if (index >= 0) {
+    if (index < 0) return;
+    if (eventDetails.length !== 0 && flatListRef !== null) {
       setTimeout(() => {
         flatListRef?.current?.scrollToIndex({
           animation: true,
-          index: index,
-          viewPosition: 0
+          index: index
         });
       }, 500);
     }
   };
+  // const scrollToDate = (date) => {
+  //   firstScrollDone = true;
+  //   console.log('date===>', date);
+  //   console.log('calDatelist======>', eventDetails.length);
+
+  //   let index = eventDetails?.findIndex((data) => data?.date === date);
+  //   console.log('index', index);
+  //   scrollIndex = index;
+  //   if (index > 0 && eventDetails?.length > 0) {
+  //     setTimeout(() => {
+  //       console.log('index:::::', index);
+
+  //       flatListRef?.current?.scrollToIndex({
+  //         animation: true,
+  //         index: index
+  //       });
+  //     }, 500);
+  //   }
+  // };
 
   const renderNextMonthEvents = () => {
     isNextPage = true;
@@ -237,7 +264,7 @@ const CalendarScheduleViewComponent = () => {
   const onViewCallBack = useRef(({ changed, viewableItems }) => {
     curruntItemDateInView = viewableItems[0]?.item?.date;
     scrollIndex = viewableItems[0]?.index;
-
+    // setDate(curruntItemDateInView);
     console.log('Current displaying data of the ', curruntItemDateInView);
   });
 
@@ -246,66 +273,81 @@ const CalendarScheduleViewComponent = () => {
     minimumViewTime: 100,
     viewAreaCoveragePercentThreshold: 50
   });
-  const ITEM_HEIGHT = 100;
-
-  // useEffect(() => {
-  //   setEventDetails([...eventDetails]);
-  // }, []);
 
   return (
     <View style={{ flex: 1 }}>
-      <View>
-        {date != null && (
-          <CalendarStrip
-            selectedDate={date}
-            onPressDate={(date) => {
-              setDate(moment(new Date(date)).format('YYYY-MM-DD'));
-              scrollToDate(moment(new Date(date)).format('YYYY-MM-DD'));
-            }}
-            onPressGoToday={(today) => {
-              setDate(today);
-            }}
-            onSwipeDown={() => {
-              alert('onSwipeDown');
-            }}
-            markedDate={eventsOnDate}
-            weekStartsOn={0} // 0,1,2,3,4,5,6 for S M T W T F S, defaults to 0
-          />
-        )}
+      <CalendarStrip
+        selectedDate={date}
+        onPressDate={(date) => {
+          setDate(moment(new Date(date)).format('YYYY-MM-DD'));
 
-        {previousList?.concat(calDateList)?.length > 0 && (
+          // scrollToDate(moment(new Date(date)).format('YYYY-MM-DD'));
+          const index = eventDetails?.findIndex(
+            (data) => data?.date === moment(new Date(date)).format('YYYY-MM-DD')
+          );
+
+          scrollList(index);
+        }}
+        markedDate={eventsOnDate}
+        weekStartsOn={0} // 0,1,2,3,4,5,6 for S M T W T F S, defaults to 0
+      />
+
+      {loading && !firstScrollDone ? (
+        <Loader color={Colors.primary} />
+      ) : (
+        eventDetails?.length > 0 && (
           <FlatList
-            // maintainVisibleContentPosition={{
-            //   minIndexForVisible: 1
-            // }}
-            extraData={eventDetails}
             ref={flatListRef}
-            initialScrollIndex={moment(new Date()).format('DD') - 1}
+            initialNumToRender={eventDetails?.length ?? 0}
             onScrollToIndexFailed={(info) => {
-              const wait = new Promise((resolve) => setTimeout(resolve, 700));
-              wait.then(() => {
-                flatListRef.current?.scrollToIndex({
-                  index: info.index,
-                  animated: true / false
-                });
+              flatListRef.current.scrollToOffset({
+                offset: error.averageItemLength * error.index,
+                animated: true
               });
+              setTimeout(() => {
+                if (eventDetails.length !== 0 && flatListRef !== null) {
+                  flatListRef.current.scrollToIndex({
+                    index: error.index,
+                    animated: true
+                  });
+                }
+              }, 100);
+              console.log('scrolling faid::::', info);
+              // const wait = new Promise((resolve) => setTimeout(resolve, 500));
+              // wait.then(() => {
+              //   flatListRef.current?.scrollToIndex({
+              //     index: info.index,
+              //     animated: true
+              //   });
+              // });
             }}
             data={eventDetails}
             style={{ paddingHorizontal: SIZES[16] }}
             onViewableItemsChanged={onViewCallBack.current}
             viewabilityConfig={viewabilityConfig.current}
-            keyExtractor={(item, index) => `${item.date} ${index}`}
+            keyExtractor={(item, index) => item.date}
             onEndReached={() => {
               renderNextMonthEvents();
             }}
             onEndReachedThreshold={0.5}
             onScrollBeginDrag={(e) => {
-              console.log('onScrollBeginDrag', e);
-              if (!firstScrollDone) {
-                scrollToDate(moment(new Date(date)).format('YYYY-MM-DD'));
-              }
+              console.log('onScrollBeginDrag');
 
               setDateOnScroll = true;
+            }}
+            onScrollEndDrag={() => {
+              if (setDateOnScroll) {
+                if (scrollIndex == 0 && eventDetails.length > 0) {
+                  renderPreviousMonthEvents();
+                }
+                if (
+                  curruntItemDateInView !== undefined &&
+                  curruntItemDateInView !== ''
+                ) {
+                  setDate(curruntItemDateInView);
+                }
+              }
+              setDateOnScroll = false;
             }}
             onMomentumScrollEnd={(e) => {
               console.log(
@@ -313,11 +355,16 @@ const CalendarScheduleViewComponent = () => {
                 curruntItemDateInView
               );
 
-              if (setDateOnScroll) {
+              if (setDateOnScroll && eventDetails.length > 0) {
                 if (scrollIndex == 0) {
                   renderPreviousMonthEvents();
                 }
-                setDate(curruntItemDateInView);
+                if (
+                  curruntItemDateInView !== undefined &&
+                  curruntItemDateInView !== ''
+                ) {
+                  setDate(curruntItemDateInView);
+                }
               }
               setDateOnScroll = false;
             }}
@@ -334,9 +381,9 @@ const CalendarScheduleViewComponent = () => {
               );
             }}
           />
-        )}
-        {loading && <Loader color={'red'} />}
-      </View>
+        )
+      )}
+      {/* {loading && <Loader color={Colors.primary} />} */}
     </View>
   );
 };

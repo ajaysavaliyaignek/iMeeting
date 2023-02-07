@@ -1,9 +1,10 @@
 import React from 'react';
-import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, View, Image } from 'react-native';
 
 import { Fonts } from '../../themes';
 import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
+import Icon from '../Icon';
 import Loader from '../Loader/Loader';
 
 const _Button = ({
@@ -13,7 +14,8 @@ const _Button = ({
   layoutStyle,
   icon,
   disable,
-  isLoading
+  isLoading,
+  iconName
 }) => {
   return (
     <TouchableOpacity
@@ -24,10 +26,21 @@ const _Button = ({
       {isLoading ? (
         <Loader color={Colors.white} />
       ) : (
-        <Text style={[style.text, { color: Colors.white }, textStyle]}>
-          {icon}
-          {title}
-        </Text>
+        <View style={{ flexDirection: 'row' }}>
+          {iconName && (
+            <Image style={{ height: 24, width: 24 }} source={iconName} />
+          )}
+          <Text
+            style={[
+              style.text,
+              { color: Colors.white, marginLeft: iconName ? SIZES[16] : null },
+              textStyle
+            ]}
+          >
+            {icon}
+            {title}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );

@@ -33,13 +33,13 @@ const IMeetingChatTextInput = ({
   const [fileIds, setFileIds] = useState([]);
   const [token, setToken] = useState('');
   const [value, setValue] = useState('');
-  // const [state, setState] = useState({
-  //   value: '',
-  //   keyword: '',
-  //   data: []
-  // });
+  const [state, setState] = useState({
+    value: '',
+    keyword: '',
+    data: []
+  });
 
-  // let reqTimer = 0;
+  let reqTimer = 0;
 
   useEffect(() => {
     getToken();
@@ -174,66 +174,66 @@ const IMeetingChatTextInput = ({
         </View>
       );
     };
-  // function renderSuggestionsRow({ item }, hidePanel) {
-  //   return (
-  //     <TouchableOpacity
-  //       onPress={() => onSuggestionTap(item.userName, hidePanel)}
-  //     >
-  //       <View style={styles.suggestionsRowContainer}>
-  //         <View style={styles.userIconBox}>
-  //           <Text style={styles.usernameInitials}>
-  //             {!!item.userName && item.userName.substring(0, 2).toUpperCase()}
-  //           </Text>
-  //         </View>
-  //         <View style={styles.userDetailsBox}>
-  //           <Text style={styles.displayNameText}>{item.userName}</Text>
-  //           <Text style={styles.usernameText}>@{item.userName}</Text>
-  //         </View>
-  //       </View>
-  //     </TouchableOpacity>
-  //   );
-  // }
-  // function onSuggestionTap(username, hidePanel) {
-  //   hidePanel();
-  //   const comment = state.value.slice(0, state?.keyword?.length);
-  //   setState({
-  //     data: [],
-  //     value: comment  + username
-  //   });
-  // }
+  function renderSuggestionsRow({ item }, hidePanel) {
+    return (
+      <TouchableOpacity
+        onPress={() => onSuggestionTap(item.userName, hidePanel)}
+      >
+        <View style={styles.suggestionsRowContainer}>
+          <View style={styles.userIconBox}>
+            <Text style={styles.usernameInitials}>
+              {!!item.userName && item.userName.substring(0, 2).toUpperCase()}
+            </Text>
+          </View>
+          <View style={styles.userDetailsBox}>
+            <Text style={styles.displayNameText}>{item.userName}</Text>
+            <Text style={styles.usernameText}>@{item.userName}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+  function onSuggestionTap(username, hidePanel) {
+    hidePanel();
+    const comment = state.value.slice(0, state?.keyword?.length);
+    setState({
+      data: [],
+      value: comment + username
+    });
+  }
 
-  // function callback(keyword) {
-  //   if (reqTimer) {
-  //     clearTimeout(reqTimer);
-  //   }
+  function callback(keyword) {
+    if (reqTimer) {
+      clearTimeout(reqTimer);
+    }
 
-  //   // reqTimer = setTimeout(() => {
-  //   //   getUserSuggestions(keyword)
-  //   //     .then((data) => {
-  //   //       setState({
-  //   //         keyword: keyword,
-  //   //         data: [...data]
-  //   //       });
-  //   //     })
-  //   //     .catch((err) => {
-  //   //       console.log(err);
-  //   //     });
-  //   // }, 200);
-  // }
-  // const getUserSuggestions = (displayName = '') => {
-  //   return fetch(`http://localhost:8080/?username=${displayName.slice(1)}`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-type': 'application/json'
-  //     }
-  //   }).then((res) => {
-  //     console.log(res);
-  //     if (!res.ok) {
-  //       throw new Error('Went wrong');
-  //     }
-  //     return res.json();
-  //   });
-  // };
+    // reqTimer = setTimeout(() => {
+    //   getUserSuggestions(keyword)
+    //     .then((data) => {
+    //       setState({
+    //         keyword: keyword,
+    //         data: [...data]
+    //       });
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    // }, 200);
+  }
+  const getUserSuggestions = (displayName = '') => {
+    return fetch(`http://localhost:8080/?username=${displayName.slice(1)}`, {
+      method: 'GET',
+      headers: {
+        'Content-type': 'application/json'
+      }
+    }).then((res) => {
+      console.log(res);
+      if (!res.ok) {
+        throw new Error('Went wrong');
+      }
+      return res.json();
+    });
+  };
 
   return (
     <MentionInput

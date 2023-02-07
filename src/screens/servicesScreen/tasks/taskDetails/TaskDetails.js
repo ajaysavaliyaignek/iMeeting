@@ -13,12 +13,13 @@ import { styles } from './styles';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import {
   GET_All_COMMENTS_THREAD,
   GET_FILE,
   GET_MEETING_BY_ID,
-  GET_SUBJECT_BY_ID
+  GET_SUBJECT_BY_ID,
+  GET_TASK_BY_ID
 } from '../../../../graphql/query';
 import { SIZES } from '../../../../themes/Sizes';
 import moment from 'moment';
@@ -28,6 +29,7 @@ import { Colors } from '../../../../themes/Colors';
 import { DELETE_TASK, UPDATE_COMMENT } from '../../../../graphql/mutation';
 import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
+import Loader from '../../../../component/Loader/Loader';
 
 const TaskDetails = () => {
   const navigation = useNavigation();
@@ -40,7 +42,7 @@ const TaskDetails = () => {
   const [commentThreadId, setCommentThreadId] = useState(item?.commentThreadId);
   const [comments, setComments] = useState([]);
   const [commenttext, setCommentText] = useState('');
-  console.log('task details', item);
+  const [taskDetails, setTaskDetails] = useState(null);
 
   //Get meeting attachments
   item?.attachFiles?.map((id) => {
@@ -49,7 +51,12 @@ const TaskDetails = () => {
       variables: {
         fileEntryId: id
       },
+
       onCompleted: (data) => {
+        console.log('get file ', data);
+        // setFileResponse((pre) => {
+        //   return [...pre, data.uploadedFile];
+        // });
         fileResponse.push(data.uploadedFile);
       }
     });
@@ -94,6 +101,26 @@ const TaskDetails = () => {
     });
   }
 
+  const getTaskById = useQuery(GET_TASK_BY_ID, {
+    variables: { id: item.taskId },
+    onCompleted: (data) => {
+      if (data) {
+        setTaskDetails(data.task);
+        // data?.task?.attachFiles?.map((id) => {
+        //   console
+        //   getFile({
+        //     variables: {
+        //       fileEntryId: id
+        //     }
+        //   });
+        // });
+      }
+    },
+    onError: (data) => {
+      console.log('get task by id error', data.message);
+    }
+  });
+
   // addComment
   const [
     addComment,
@@ -108,7 +135,6 @@ const TaskDetails = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('add comment data', data.addComment.status[0].statusCode);
       if (data.addComment.status[0].statusCode == 200) {
         setCommentId(null);
       }
@@ -128,11 +154,7 @@ const TaskDetails = () => {
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
-        // console.log('comments data', data.comments);
-        console.log('items data', data.comments.items[0].childComment[0]);
-
-        // console.log('commentsChild data', data.comments.items[0].childComment);
-
+        console.log('comments', data.comments.items);
         setComments(data.comments.items[0]);
       } else {
         console.log('no comments');
@@ -163,8 +185,6 @@ const TaskDetails = () => {
   });
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
@@ -198,150 +218,165 @@ const TaskDetails = () => {
           navigation.goBack();
         }}
       />
-      <ScrollView style={styles.subContainer}>
-        <View style={{ marginTop: SIZES[24], marginBottom: SIZES[16] }}>
-          <Text style={styles.txtTitle}>General</Text>
-          <GeneralDetails title={'Title'} discription={item?.title} />
-          <GeneralDetails
-            title={'Description'}
-            discription={item?.description}
-          />
-          <GeneralDetails
-            title={'Committee'}
-            discription={
-              item?.committeeName !== '' && item?.committeeName !== null
-                ? item?.committeeName
-                : '-'
-            }
-          />
-          <GeneralDetails
-            title={'Meeting'}
-            discription={
-              meetingName !== '' && meetingName !== null ? meetingName : '-'
-            }
-          />
-          <GeneralDetails
-            title={'Subject'}
-            discription={
-              subjectName !== '' && subjectName !== null ? subjectName : '-'
-            }
-          />
-        </View>
-        <View style={{ marginTop: SIZES[24], marginBottom: SIZES[16] }}>
-          <Text style={styles.txtTitle}>User name & time</Text>
-          <GeneralDetails title={'Executor'} discription={item?.executorName} />
-          <GeneralDetails
-            title={'Deadline'}
-            discription={moment(item?.deadlineDate).format('DD MMM, YYYY')}
-          />
-          <GeneralDetails title={'Priority'} discription={item?.priority} />
-          <GeneralDetails title={'Creator'} discription={item?.userName} />
-          <GeneralDetails
-            title={'Date of creation'}
-            discription={moment(item?.dateOfCreation).format('DD MMM, YYYY')}
-          />
-        </View>
-        {fileResponse?.length > 0 && (
-          <AttachFiles
-            showAttachButton={false}
-            isShowAttchTitle={true}
-            download={true}
-            deleted={false}
-            fileResponse={fileResponse}
-            setFileResponse={setFileResponse}
-          />
-        )}
+      {getTaskById.loading ? (
+        <Loader color={Colors.primary} />
+      ) : taskDetails ? (
+        <ScrollView style={styles.subContainer}>
+          <View style={{ marginTop: SIZES[24], marginBottom: SIZES[16] }}>
+            <Text style={styles.txtTitle}>General</Text>
+            <GeneralDetails title={'Title'} discription={taskDetails?.title} />
+            <GeneralDetails
+              title={'Description'}
+              discription={taskDetails?.description}
+            />
+            <GeneralDetails
+              title={'Committee'}
+              discription={
+                taskDetails?.committeeName !== '' &&
+                taskDetails?.committeeName !== null
+                  ? taskDetails?.committeeName
+                  : '-'
+              }
+            />
+            <GeneralDetails
+              title={'Meeting'}
+              discription={
+                meetingName !== '' && meetingName !== null ? meetingName : '-'
+              }
+            />
+            <GeneralDetails
+              title={'Subject'}
+              discription={
+                subjectName !== '' && subjectName !== null ? subjectName : '-'
+              }
+            />
+          </View>
+          <View style={{ marginTop: SIZES[24], marginBottom: SIZES[16] }}>
+            <Text style={styles.txtTitle}>User name & time</Text>
+            <GeneralDetails
+              title={'Executor'}
+              discription={taskDetails?.executorName}
+            />
+            <GeneralDetails
+              title={'Deadline'}
+              discription={moment(taskDetails?.deadlineDate).format(
+                'DD MMM, YYYY'
+              )}
+            />
+            <GeneralDetails
+              title={'Priority'}
+              discription={taskDetails?.priority}
+            />
+            <GeneralDetails
+              title={'Creator'}
+              discription={taskDetails?.userName}
+            />
+            <GeneralDetails
+              title={'Date of creation'}
+              discription={moment(taskDetails?.dateOfCreation).format(
+                'DD MMM, YYYY'
+              )}
+            />
+          </View>
+          {fileResponse?.length > 0 && (
+            <AttachFiles
+              showAttachButton={false}
+              isShowAttchTitle={true}
+              download={true}
+              deleted={false}
+              fileResponse={fileResponse}
+              setFileResponse={setFileResponse}
+            />
+          )}
 
-        {item?.taskStatus !== 'Deleted' && (
-          <View>
-            <Text style={styles.txtcommentsTitle}>Comments</Text>
-
+          {taskDetails?.taskStatus !== 'Deleted' && (
             <View>
-              <FlatList
-                data={comments?.childComment}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={(item, index) => {
-                  return index.toString();
-                }}
-                renderItem={({ item, index }) => (
-                  <CommentCard
-                    item={item}
-                    commentThreadId={commentThreadId}
-                    index={index}
-                    setComment={setCommentText}
-                    setCommentId={setCommentId}
-                    commenttext={commenttext}
-                  />
-                )}
-              />
-            </View>
+              <Text style={styles.txtcommentsTitle}>Comments</Text>
 
-            {
-              <View
-                style={{
-                  paddingVertical: SIZES[14],
-                  paddingHorizontal: SIZES[16],
-                  borderWidth: SIZES[1],
-                  borderColor: Colors.line,
-                  borderRadius: SIZES[8],
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: SIZES[32],
-                  marginBottom: SIZES[24]
-                }}
-              >
-                <TextInput
-                  style={{
-                    flex: 1,
-
-                    backgroundColor: Colors.white
+              <View>
+                <FlatList
+                  data={comments?.childComment}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={(item, index) => {
+                    return index.toString();
                   }}
-                  value={commenttext}
-                  underlineColor={Colors.white}
-                  activeUnderlineColor={Colors.white}
-                  placeholder={'Your comment'}
-                  onChangeText={(text) => setCommentText(text)}
+                  renderItem={({ item, index }) => (
+                    <CommentCard
+                      item={item}
+                      commentThreadId={commentThreadId}
+                      index={index}
+                      setComment={setCommentText}
+                      setCommentId={setCommentId}
+                      commenttext={commenttext}
+                    />
+                  )}
                 />
-                <TouchableOpacity
-                  onPress={() => {
-                    console.log('commenttext', commenttext);
-                    console.log('parentCommentId', commentThreadId);
-                    console.log('commentId', commentId);
-                    if (commentId == null) {
-                      addComment({
-                        variables: {
-                          comment: {
-                            comment: commenttext,
-                            commentId: 0,
-                            parentCommentId: comments.commentId
-                          }
-                        }
-                      });
-                    } else {
-                      addComment({
-                        variables: {
-                          comment: {
-                            comment: commenttext,
-                            commentId: commentId
-                          }
-                        }
-                      });
-                    }
+              </View>
 
-                    setCommentText('');
+              {
+                <View
+                  style={{
+                    paddingVertical: SIZES[14],
+                    paddingHorizontal: SIZES[16],
+                    borderWidth: SIZES[1],
+                    borderColor: Colors.line,
+                    borderRadius: SIZES[8],
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginTop: SIZES[32],
+                    marginBottom: SIZES[24]
                   }}
                 >
-                  <Icon
-                    name={IconName.Send}
-                    height={SIZES[22]}
-                    width={SIZES[20]}
+                  <TextInput
+                    style={{
+                      flex: 1,
+
+                      backgroundColor: Colors.white
+                    }}
+                    value={commenttext}
+                    underlineColor={Colors.white}
+                    activeUnderlineColor={Colors.white}
+                    placeholder={'Your comment'}
+                    onChangeText={(text) => setCommentText(text)}
                   />
-                </TouchableOpacity>
-              </View>
-            }
-          </View>
-        )}
-      </ScrollView>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (commentId == null) {
+                        addComment({
+                          variables: {
+                            comment: {
+                              comment: commenttext,
+                              commentId: 0,
+                              parentCommentId: comments.commentId
+                            }
+                          }
+                        });
+                      } else {
+                        addComment({
+                          variables: {
+                            comment: {
+                              comment: commenttext,
+                              commentId: commentId
+                            }
+                          }
+                        });
+                      }
+
+                      setCommentText('');
+                    }}
+                  >
+                    <Icon
+                      name={IconName.Send}
+                      height={SIZES[22]}
+                      width={SIZES[20]}
+                    />
+                  </TouchableOpacity>
+                </View>
+              }
+            </View>
+          )}
+        </ScrollView>
+      ) : null}
       {item?.isHead && item?.taskStatus !== 'Deleted' && (
         <View
           style={{

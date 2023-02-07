@@ -46,6 +46,8 @@ const MentionInput = ({
   const textInput = useRef(null);
   const [message, setMessage] = useState('');
   const [messageValue, setValue] = useState('');
+  const [userName, setUserName] = useState([]);
+  const [userId, setUserId] = useState([]);
 
   const [selection, setSelection] = useState({ start: 0, end: 0 });
 
@@ -92,8 +94,14 @@ const MentionInput = ({
     if (!newValue) {
       return;
     }
+
+    console.log('newValue', suggestion.name);
+    userName.push(`@${suggestion.name}`);
+    userId.push(`@[${suggestion.name}](${suggestion.id})`);
+    // setUserName(suggestion.name);
+    // setUserId(suggestion.id);
     setMessage(newValue);
-    setValue(newValue);
+    // setValue(newValue);
   };
 
   const handleTextInputRef = (ref) => {
@@ -127,7 +135,7 @@ const MentionInput = ({
   const onChangeInput = (changedText) => {
     console.log('hello', changedText);
     setMessage(changedText);
-    setValue(changedText);
+    // setValue(changedText);
   };
 
   return (
@@ -143,7 +151,7 @@ const MentionInput = ({
 
       <View style={styles.containerStyle}>
         <TextInput
-          value={replaceMentionValues(plainText, ({ name }) => `@${name}`)}
+          value={replaceMentionValues(message, ({ name }) => `@${name}`)}
           multiline
           // {...textInputProps}
           ref={handleTextInputRef}
@@ -153,8 +161,6 @@ const MentionInput = ({
           style={[styles.textInput]}
           onBlur={onBlur}
           onFocus={onFocus}
-
-          // value={message}
         >
           {/* <Text>
             {console.log('parts=========', parts)}
@@ -189,21 +195,28 @@ const MentionInput = ({
             disabled={message == '' && fileIds?.length == 0 ? true : false}
             onPress={() => {
               setAttachDocument(false);
-              console.log('meeting chat', {
-                message
-              });
-              // setMessage('');
 
-              // updateChat({
-              //   variables: {
-              //     meetingChat: {
-              //       chatId: 0,
-              //       meetingId: meetingId,
-              //       message: messageValue,
-              //       attachDocumentId: fileIds
-              //     }
-              //   }
-              // });
+              var string = '';
+
+              for (var i = userName.length - 1; i >= 0; i--) {
+                var finalAns = message.replace(userName[i], userId[i]);
+
+                string = finalAns;
+              }
+
+              console.log('final ans', { string: string });
+              setMessage('');
+
+              updateChat({
+                variables: {
+                  meetingChat: {
+                    chatId: 0,
+                    meetingId: meetingId,
+                    message: string,
+                    attachDocumentId: fileIds
+                  }
+                }
+              });
             }}
           >
             <Icon

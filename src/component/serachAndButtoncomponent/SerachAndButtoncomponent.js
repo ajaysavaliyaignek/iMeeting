@@ -12,11 +12,13 @@ const SerachAndButtoncomponent = ({
   role,
   buttonText,
   onPress,
-  value
+  value,
+  isButtonShow,
+  containerStyle
 }) => {
   return (
     <View>
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, containerStyle]}>
         <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
         <TextInput
           value={value}
@@ -28,7 +30,7 @@ const SerachAndButtoncomponent = ({
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
         </TouchableOpacity>
       </View>
-      {role !== 'Member' && (
+      {(role !== 'Member' || isButtonShow) && (
         <Button
           title={buttonText}
           layoutStyle={styles.cancelBtnLayout}

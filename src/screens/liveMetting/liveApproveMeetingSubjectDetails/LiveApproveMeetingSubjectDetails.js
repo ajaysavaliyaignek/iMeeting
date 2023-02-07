@@ -1,36 +1,32 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Alert
-} from 'react-native';
+import { View, SafeAreaView, Alert } from 'react-native';
 import React, { useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useMutation, useQuery } from '@apollo/client';
+import { Divider } from 'react-native-paper';
+
 import { styles } from './styles';
 import Header from '../../../component/header/Header';
-import { Icon, IconName } from '../../../component';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { IconName } from '../../../component';
 import { Colors } from '../../../themes/Colors';
 import SubjectDetailsComponent from '../../../component/subjectDetailsComponent/SubjectDetailsComponent';
 import { DELETE_SUBJECTS, UPDATE_COMMENT } from '../../../graphql/mutation';
-import { useMutation, useQuery } from '@apollo/client';
 import {
   GET_All_COMMENTS_THREAD,
   GET_All_SUBJECTS,
   GET_SUBJECT_BY_ID
 } from '../../../graphql/query';
-import LiveMeetingSubjectVotingsDetails from '../liveMeetingSubjectVotingDetails/LiveMeetingSubjectVotingsDetails';
-import LiveMeetingSubjectTaskDetails from '../liveMeetingSubjectTaskDetails/LiveMeetingSubjectTaskDetails';
 import LiveMeetingSubjectDecision from '../liveMeetingSubjectDecision/LiveMeetingSubjectDecision';
 import { Button } from '../../../component/button/Button';
-import { Divider } from 'react-native-paper';
+import NavigationMenuForApproveSubjectsMeeting from '../../../component/navigationMenuForMeetingSubjects/NavigationMenuForApproveSubjectsMeeting';
+import DetailsComponent from '../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
+import LiveApproveMeetingSubjectVotingsDetails from '../liveApproveMeetingSubjectVotingDetails/LiveApproveMeetingSubjectVotingsDetails';
+import LiveApproveMeetingSubjectTaskDetails from '../liveApproveMeetingSubjectTaskDetails/LiveApproveMeetingSubjectTaskDetails';
+import ApproveMeetingSubjectDetails from '../../approveMeetingSubjectDetails/ApproveMeetingSubjectDetails';
 
-const LiveMeetingSubjectDetails = () => {
+const LiveApproveMeetingSubjectDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { item, meetingData } = route?.params;
+  const { item, meetingData, isMeeting, isMom } = route?.params;
   const [activeTab, setActiveTab] = useState('Details');
   const [commentThreadId, setCommentThreadId] = useState(null);
   const [comments, setComments] = useState([]);
@@ -44,7 +40,7 @@ const LiveMeetingSubjectDetails = () => {
     data: SubjectsData
   } = useQuery(GET_SUBJECT_BY_ID, {
     fetchPolicy: 'cache-and-network',
-    variables: { subjectId: item.subjectId },
+    variables: { subjectId: item?.subjectId },
     onCompleted: (data, error) => {
       console.log('subject data', data);
       if (data) {
@@ -66,12 +62,8 @@ const LiveMeetingSubjectDetails = () => {
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
-        // console.log('comments data', data.comments);
         console.log('items data', data.comments.items[0].childComment[0]);
-
-        // console.log('commentsChild data', data.comments.items[0].childComment);
-
-        setComments(data.comments.items[0]);
+setComments(data.comments.items[0]);
       } else {
         console.log('no comments');
       }
@@ -105,13 +97,6 @@ const LiveMeetingSubjectDetails = () => {
     }
   });
 
-  const navigationMenu = [
-    { id: '0', name: 'Details' },
-    { id: '1', name: 'Votings' },
-    { id: '2', name: 'Tasks' },
-    { id: '3', name: 'Decisions' }
-  ];
-
   // alert for delete subject
   const onDeleteHandler = (id) => {
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
@@ -127,13 +112,6 @@ const LiveMeetingSubjectDetails = () => {
       },
       {
         text: 'Cancel',
-        // onPress: () => {
-        //   deleteSubject({
-        //     variables: {
-        //       subjectId: id
-        //     }
-        //   });
-        // },
         style: 'cancel'
       }
     ]);
@@ -143,7 +121,6 @@ const LiveMeetingSubjectDetails = () => {
   const [deleteSubject, { data, loading, error }] = useMutation(
     DELETE_SUBJECTS,
     {
-      // export const GET_All_SUBJECTS = gql`
       refetchQueries: [
         {
           query: GET_All_SUBJECTS,
@@ -180,62 +157,58 @@ const LiveMeetingSubjectDetails = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        name={'Subject details'}
+        name={isMeeting ? 'Minutes of meeting' : 'Subject details'}
         leftIconName={IconName.Arrow_Left}
         onLeftPress={() => navigation.goBack()}
       />
       <View style={styles.subContainer}>
-        <View style={styles.menuContainer}>
-          {navigationMenu.map((menu) => {
-            return (
-              <TouchableOpacity
-                key={menu.id}
-                style={[
-                  styles.btnContainer,
-                  {
-                    backgroundColor:
-                      activeTab == menu.name ? Colors.white : 'transparent'
-                  }
-                ]}
-                onPress={() => {
-                  setActiveTab(menu.name);
-                }}
-              >
-                <Text style={styles.txtMenu}>{menu.name}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-        {activeTab == 'Details' && (
-          <SubjectDetailsComponent
-            item={item}
-            addComment={addComment}
-            commentId={commentId}
-            setCommentId={setCommentId}
-            commenttext={commenttext}
-            setCommentText={setCommentText}
-            commentThreadId={commentThreadId}
-            comments={comments}
-            setComments={setComments}
-          />
+        <NavigationMenuForApproveSubjectsMeeting
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          isMeeting={isMeeting}
+        />
+        {activeTab == 'Details' &&
+          (isMeeting ? (
+            <DetailsComponent item={meetingData} isLiveMeetingDetails={false} />
+          ) : (
+            <SubjectDetailsComponent
+              item={item}
+              addComment={addComment}
+              commentId={commentId}
+              setCommentId={setCommentId}
+              commenttext={commenttext}
+              setCommentText={setCommentText}
+              commentThreadId={commentThreadId}
+              comments={comments}
+              setComments={setComments}
+            />
+          ))}
+        {activeTab == 'Subjects' && isMeeting && (
+          <ApproveMeetingSubjectDetails meetingData={meetingData} />
         )}
         {activeTab == 'Votings' && (
-          <LiveMeetingSubjectVotingsDetails
+          <LiveApproveMeetingSubjectVotingsDetails
             meetingData={meetingData}
             item={item}
+            isMeeting={isMeeting}
           />
         )}
         {activeTab == 'Tasks' && (
-          <LiveMeetingSubjectTaskDetails
+          <LiveApproveMeetingSubjectTaskDetails
             meetingData={meetingData}
             item={item}
+            isMeeting={isMeeting}
           />
         )}
         {activeTab == 'Decisions' && (
-          <LiveMeetingSubjectDecision meetingData={meetingData} item={item} />
+          <LiveMeetingSubjectDecision
+            meetingData={meetingData}
+            item={item}
+            isMom={isMom}
+          />
         )}
       </View>
-      {meetingData?.yourRoleName !== 'Member' && (
+      {meetingData?.yourRoleName !== 'Member' && !isMom && (
         <View
           style={{
             backgroundColor: Colors.white,
@@ -282,4 +255,4 @@ const LiveMeetingSubjectDetails = () => {
   );
 };
 
-export default LiveMeetingSubjectDetails;
+export default LiveApproveMeetingSubjectDetails;

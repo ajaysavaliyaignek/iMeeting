@@ -73,3 +73,5 @@ export { default as CorrectIcon_Blue } from './CorrectIcon_Blue';
 export { default as CorrectIcon_Orange } from './CorrectIcon_Orange';
 export { default as CorrectIcon_Red } from './CorrectIcon_Red';
 export { default as CorrectIcon_Purple } from './CorrectIcon_Purple';
+export { default as GoogleCalendar } from './GoogleCalendar';
+export { default as OutlookCalendar } from './OutlookCalendar';

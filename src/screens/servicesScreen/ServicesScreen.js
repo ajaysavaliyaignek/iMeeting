@@ -27,7 +27,6 @@ const ServicesScreen = ({ navigation }) => {
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      console.log('userPayload', data.userPayload);
       setUser(data.userPayload);
     }
   });
@@ -110,6 +109,7 @@ const ServicesScreen = ({ navigation }) => {
             width={SIZES[22]}
             title={`      Video\nconferences`}
             textStyle={{ marginTop: SIZES[18] }}
+            onPress={() => navigation.navigate('VideoConferenceList')}
           />
           <DashboardCard
             backgroundColor={Colors.BG_Tasks}

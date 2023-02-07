@@ -116,13 +116,21 @@ const MeetingDetails = () => {
   });
 
   let date = new Date();
-  let newdate = moment(
-    date.toLocaleString('en-Us', { timeZone: item.timeZone })
-  )
+  let newdate = moment()
+    // date.toLocaleString('en-Us', { timeZone: item.timeZone })
+    .utcOffset(item.timeZone)
     .add(15, 'm')
     .format('YYYY-MM-DD hh:mm A');
 
   let meetingDate = `${item.setDate} ${item.setTime}`;
+
+  console.log('newdate', newdate);
+
+  console.log(
+    moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
+      moment(meetingDate, 'YYYY-MM-DD hh:mm A')
+    )
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,7 +157,15 @@ const MeetingDetails = () => {
                     title={'Edit'}
                     layoutStyle={[
                       styles.btnLayout,
-                      { backgroundColor: '#F3F6F9' }
+                      {
+                        backgroundColor: '#F3F6F9',
+                        width:
+                          item.meetingStatusTitle == 'Closed'
+                            ? '100%'
+                            : !item.status.canStart
+                            ? '30%'
+                            : '23%'
+                      }
                     ]}
                     textStyle={{
                       ...Fonts.PoppinsSemiBold[14],
@@ -183,7 +199,11 @@ const MeetingDetails = () => {
                     {
                       backgroundColor: '#DD7878',
                       width:
-                        item.meetingStatusTitle == 'Closed' ? '100%' : '30%'
+                        item.meetingStatusTitle == 'Closed'
+                          ? '100%'
+                          : !item.status.canStart
+                          ? '30%'
+                          : '23%'
                     }
                   ]}
                   onPress={onDeleteHandler}
@@ -224,6 +244,28 @@ const MeetingDetails = () => {
                             meetingStatus: meetingStatus
                           });
                         }
+                      }}
+                    />
+                  )}
+                {item.yourRoleName == 'Head' &&
+                  item.meetingStatusTitle !== 'Closed' && (
+                    <Button
+                      title={'Approve meeting'}
+                      layoutStyle={[
+                        styles.btnLayout,
+                        {
+                          width:
+                            item.meetingStatusTitle == 'Closed'
+                              ? '100%'
+                              : !item.status.canStart
+                              ? '30%'
+                              : '23%'
+                        }
+                      ]}
+                      onPress={() => {
+                        navigation.navigate('ApproveMeeting', {
+                          meetingData: item
+                        });
                       }}
                     />
                   )}

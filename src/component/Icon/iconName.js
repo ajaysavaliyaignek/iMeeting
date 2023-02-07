@@ -56,7 +56,9 @@ const IconName = {
   CorrectIcon_Blue: 'CorrectIcon_Blue',
   CorrectIcon_Orange: 'CorrectIcon_Orange',
   CorrectIcon_Red: 'CorrectIcon_Red',
-  CorrectIcon_Purple: 'CorrectIcon_Purple'
+  CorrectIcon_Purple: 'CorrectIcon_Purple',
+  GoogleCalendar: 'GoogleCalendar',
+  OutlookCalendar: 'OutlookCalendar'
 };
 
 export default IconName;

@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Text, useWindowDimensions, View } from 'react-native';
 import React from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -51,16 +51,21 @@ import YourAnswer from './src/screens/servicesScreen/meetings/yourAnswer/YourAns
 import Users from './src/screens/servicesScreen/meetings/users/Users';
 import AddTask from './src/screens/liveMetting/addTask/AddTask';
 import AddEditDecision from './src/screens/liveMetting/addEditDecision/AddEditDecision';
-import LiveMeetingSubjectDetails from './src/screens/liveMetting/liveMeetingSubjectDetails/LiveMeetingSubjectDetails';
 import ViewVotingHistory from './src/screens/liveMetting/liveMeetingVotings/ViewVotingHistory';
 import TaskDetails from './src/screens/servicesScreen/tasks/taskDetails/TaskDetails';
 import SecretaryPermission from './src/screens/servicesScreen/tasks/secretaryPermission/SecretaryPermission';
 import EventsViewByDayScreen from './src/screens/calenderScreen/eventsViewBydayScreen/EventsViewByDayScreen';
+import LiveApproveMeetingSubjectDetails from './src/screens/liveMetting/liveApproveMeetingSubjectDetails/LiveApproveMeetingSubjectDetails';
+import AddApproveDecision from './src/screens/addApproveMeetingDecision/AddApproveDecision';
+import ApproveMeeting from './src/screens/approveMeeting/ApproveMeeting';
+import AddMinutesOfMeetingDecision from './src/screens/addApproveMeetingDecision/addMinutesOfMeetingDecision/AddMinutesOfMeetingDecision';
+import VideoConferenceList from './src/screens/videoConference/videoConferenceList/VideoConferenceList';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainBottomTab = () => {
+  const { height, width } = useWindowDimensions();
   return (
     <bottomTab.Navigator
       screenOptions={{
@@ -84,13 +89,16 @@ const MainBottomTab = () => {
                 style={{
                   borderTopColor: focused ? Colors.primary : null,
                   borderTopWidth: focused ? SIZES[1] : 0,
-                  width: DeviceInfo.isTablet() ? '400%' : '90%',
+                  width:
+                    DeviceInfo.isTablet() || width > height ? '400%' : '90%',
                   alignItems: 'center',
-                  justifyContent: DeviceInfo.isTablet()
-                    ? 'space-between'
-                    : 'center',
+                  justifyContent:
+                    DeviceInfo.isTablet() || width > height
+                      ? 'space-between'
+                      : 'center',
                   height: '100%',
-                  flexDirection: DeviceInfo.isTablet() ? 'row' : null
+                  flexDirection:
+                    DeviceInfo.isTablet() || width > height ? 'row' : null
                 }}
               >
                 <Icon
@@ -124,13 +132,16 @@ const MainBottomTab = () => {
                 style={{
                   borderTopColor: focused ? Colors.primary : null,
                   borderTopWidth: focused ? SIZES[1] : 0,
-                  width: DeviceInfo.isTablet() ? '400%' : '90%',
+                  width:
+                    DeviceInfo.isTablet() || width > height ? '400%' : '90%',
                   alignItems: 'center',
-                  justifyContent: DeviceInfo.isTablet()
-                    ? 'space-between'
-                    : 'center',
+                  justifyContent:
+                    DeviceInfo.isTablet() || width > height
+                      ? 'space-between'
+                      : 'center',
                   height: '100%',
-                  flexDirection: DeviceInfo.isTablet() ? 'row' : null
+                  flexDirection:
+                    DeviceInfo.isTablet() || width > height ? 'row' : null
                 }}
               >
                 <Icon
@@ -163,13 +174,16 @@ const MainBottomTab = () => {
                 style={{
                   borderTopColor: focused ? Colors.primary : null,
                   borderTopWidth: focused ? SIZES[1] : 0,
-                  width: DeviceInfo.isTablet() ? '400%' : '90%',
+                  width:
+                    DeviceInfo.isTablet() || width > height ? '400%' : '90%',
                   alignItems: 'center',
-                  justifyContent: DeviceInfo.isTablet()
-                    ? 'space-between'
-                    : 'center',
+                  justifyContent:
+                    DeviceInfo.isTablet() || width > height
+                      ? 'space-between'
+                      : 'center',
                   height: '100%',
-                  flexDirection: DeviceInfo.isTablet() ? 'row' : null
+                  flexDirection:
+                    DeviceInfo.isTablet() || width > height ? 'row' : null
                 }}
               >
                 <Icon
@@ -202,13 +216,16 @@ const MainBottomTab = () => {
                 style={{
                   borderTopColor: focused ? Colors.primary : null,
                   borderTopWidth: focused ? SIZES[1] : 0,
-                  width: DeviceInfo.isTablet() ? '350%' : '90%',
+                  width:
+                    DeviceInfo.isTablet() || width > height ? '350%' : '90%',
                   alignItems: 'center',
-                  justifyContent: DeviceInfo.isTablet()
-                    ? 'space-between'
-                    : 'center',
+                  justifyContent:
+                    DeviceInfo.isTablet() || width > height
+                      ? 'space-between'
+                      : 'center',
                   height: '100%',
-                  flexDirection: DeviceInfo.isTablet() ? 'row' : null
+                  flexDirection:
+                    DeviceInfo.isTablet() || width > height ? 'row' : null
                 }}
               >
                 <Icon
@@ -288,9 +305,10 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="AddTask" component={AddTask} />
       <Stack.Screen name="AddEditDecision" component={AddEditDecision} />
       <Stack.Screen
-        name="LiveMeetingSubjectDetails"
-        component={LiveMeetingSubjectDetails}
+        name="LiveApproveMeetingSubjectDetails"
+        component={LiveApproveMeetingSubjectDetails}
       />
+      <Stack.Screen name="ApproveMeeting" component={ApproveMeeting} />
       <Stack.Screen name="ViewVotingHistory" component={ViewVotingHistory} />
       <Stack.Screen name="TaskDetails" component={TaskDetails} />
       <Stack.Screen
@@ -300,6 +318,15 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen
         name="EventsViewByDayScreen"
         component={EventsViewByDayScreen}
+      />
+      <Stack.Screen name="AddApproveDecision" component={AddApproveDecision} />
+      <Stack.Screen
+        name="AddMinutesOfMeetingDecision"
+        component={AddMinutesOfMeetingDecision}
+      />
+      <Stack.Screen
+        name="VideoConferenceList"
+        component={VideoConferenceList}
       />
     </Stack.Navigator>
   );

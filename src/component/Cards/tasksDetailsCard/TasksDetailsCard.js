@@ -60,17 +60,17 @@ const TasksDetailsCard = ({
               borderRadius: SIZES[4],
               backgroundColor:
                 item.taskType == 'Subject approval'
-                  ? '#E6C54F'
-                  : item.taskType == 'Minutes of Meeting approval'
                   ? '#C8ABCD'
+                  : item.taskType == 'Minutes of Meeting approval'
+                  ? '#E6C54F'
                   : item.taskType == 'Meeting task'
-                  ? '#81AB96'
-                  : item.taskType == 'Confirm attendance'
-                  ? '#E79D73'
-                  : item.taskType == 'Video Conference meeting'
-                  ? '#E79D73'
-                  : item.taskType == 'Schedule an appointment response'
                   ? '#658EB4'
+                  : item.taskType == 'Confirm approval'
+                  ? '#DD7878'
+                  : item.taskType == 'Video conference'
+                  ? '#E79D73'
+                  : item.taskType == 'User task'
+                  ? '#81AB96'
                   : '#E6C54F',
               marginRight: SIZES[8]
             }}

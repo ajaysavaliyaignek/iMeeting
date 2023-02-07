@@ -11,7 +11,6 @@ import { Divider, Switch } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
 
-import SubjectsCard from '../../../component/Cards/subjectCard/SubjectsCard';
 import { SIZES } from '../../../themes/Sizes';
 import { Button } from '../../../component/button/Button';
 import { GET_All_MEETING, GET_All_SUBJECTS } from '../../../graphql/query';
@@ -63,7 +62,7 @@ const DetailsScreen = () => {
     error: errorGetMeetings,
     data: dataGetMeetings
   } = useQuery(GET_All_MEETING, {
-    // fetchPolicy: 'no-cache',
+    fetchPolicy: 'cache-and-network',
     variables: {
       onlyMyMeeting: onlyMyMeetings,
       committeeIds: committeeId,
@@ -348,7 +347,7 @@ const DetailsScreen = () => {
                     filterMeetingData
                   }
                   keyExtractor={(item, index) => {
-                    return index.toString();
+                    `${item.meetingId} ${index}`;
                   }}
                   renderItem={({ item, index }) => (
                     <MeetingsCard
@@ -390,6 +389,7 @@ const DetailsScreen = () => {
               onPressView={(item) => {
                 navigation.navigate('SubjectDetails', { item });
               }}
+              isDecisionSubject={false}
               isSubjectStatus={true}
             />
           )}

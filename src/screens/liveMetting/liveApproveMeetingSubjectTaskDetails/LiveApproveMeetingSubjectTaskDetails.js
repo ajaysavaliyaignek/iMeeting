@@ -6,19 +6,23 @@ import {
   FlatList
 } from 'react-native';
 import React, { useState } from 'react';
+import { Divider } from 'react-native-paper';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { useNavigation } from '@react-navigation/native';
+
 import { styles } from './styles';
 import { Icon, IconName } from '../../../component';
 import { SIZES } from '../../../themes/Sizes';
-import { Divider } from 'react-native-paper';
 import { GET_ALL_TASKS, GET_TASK_TYPES } from '../../../graphql/query';
-import { useLazyQuery, useQuery } from '@apollo/client';
 import TasksDetailsCard from '../../../component/Cards/tasksDetailsCard/TasksDetailsCard';
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
 import Loader from '../../../component/Loader/Loader';
-import { useNavigation } from '@react-navigation/native';
 
-const LiveMeetingSubjectTaskDetails = ({ meetingData, item: subjectData }) => {
+const LiveApproveMeetingSubjectTaskDetails = ({
+  meetingData,
+  item: subjectData
+}) => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [tasksData, setTasksData] = useState([]);
@@ -94,7 +98,7 @@ const LiveMeetingSubjectTaskDetails = ({ meetingData, item: subjectData }) => {
                 text={searchText}
                 editable={false}
                 isDeleteable={false}
-                isSubjectTask={true}
+                isSubjectTask={false}
                 onPressView={() => {
                   navigation.navigate('TaskDetails', { item });
                   setVisibleIndex(-1);
@@ -127,4 +131,4 @@ const LiveMeetingSubjectTaskDetails = ({ meetingData, item: subjectData }) => {
   );
 };
 
-export default LiveMeetingSubjectTaskDetails;
+export default LiveApproveMeetingSubjectTaskDetails;

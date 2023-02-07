@@ -34,7 +34,15 @@ const Header = ({
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={onLeftPress}
-            style={[{}, style]}
+            style={[
+              {
+                height: SIZES[24],
+                width: SIZES[24],
+                alignItems: 'center',
+                justifyContent: 'center'
+              },
+              style
+            ]}
           >
             <Icon
               name={leftIconName}

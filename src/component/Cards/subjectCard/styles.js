@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: SIZES[12],
-    zIndex: 10
+    zIndex: 10,
+    flex: 1
   },
   divider: {
     width: '100%',

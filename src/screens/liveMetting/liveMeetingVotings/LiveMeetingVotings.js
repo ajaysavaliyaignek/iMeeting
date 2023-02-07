@@ -55,6 +55,7 @@ const LiveMeetingVotings = ({
     <View style={styles.container}>
       <SerachAndButtoncomponent
         role={meetingData?.yourRoleName}
+        isButtonShow={meetingData?.yourRoleName != 'Member' ? true : false}
         buttonText={'Add voting'}
         onPress={() => {
           navigation.navigate('AddVoting', {

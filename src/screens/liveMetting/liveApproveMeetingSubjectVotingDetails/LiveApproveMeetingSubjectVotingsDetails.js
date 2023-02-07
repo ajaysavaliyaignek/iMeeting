@@ -6,34 +6,45 @@ import {
   FlatList
 } from 'react-native';
 import React, { useState } from 'react';
+import { useQuery } from '@apollo/client';
+import { Divider } from 'react-native-paper';
+
 import { styles } from './styles';
 import { Icon, IconName } from '../../../component';
 import { SIZES } from '../../../themes/Sizes';
 import { GET_VOTING_DETAILS } from '../../../graphql/query';
-import { useQuery } from '@apollo/client';
 import VotingQueAnsComponent from '../../../component/votingQueAnsComponent/VotingQueAnsComponent';
 import { Colors } from '../../../themes/Colors';
 import Loader from '../../../component/Loader/Loader';
 import { Fonts } from '../../../themes';
-import { Divider } from 'react-native-paper';
 
-const LiveMeetingSubjectVotingsDetails = ({
+const LiveApproveMeetingSubjectVotingsDetails = ({
   meetingData,
-  item: SubjectData
+  item: SubjectData,
+  isMeeting
 }) => {
   const [searchText, setSearchText] = useState('');
   const [votingDetails, setVotingDetails] = useState([]);
-  console.log('meetingData', meetingData);
-  console.log('SubjectData', SubjectData);
+  let queryParams;
 
-  const getVotingDetails = useQuery(GET_VOTING_DETAILS, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
+  if (isMeeting) {
+    queryParams = {
+      meetingId: meetingData?.meetingId,
+      screen: 0,
+      committeeIds: ''
+    };
+  } else {
+    queryParams = {
       meetingId: meetingData?.meetingId,
       type: 2,
       searchValue: searchText,
       subjectId: SubjectData?.subjectId
-    },
+    };
+  }
+
+  const getVotingDetails = useQuery(GET_VOTING_DETAILS, {
+    fetchPolicy: 'cache-and-network',
+    variables: queryParams,
     onCompleted: (data, error) => {
       if (data) {
         console.log('get voting details', data?.votingDetails?.items);
@@ -117,4 +128,4 @@ const LiveMeetingSubjectVotingsDetails = ({
   );
 };
 
-export default LiveMeetingSubjectVotingsDetails;
+export default LiveApproveMeetingSubjectVotingsDetails;

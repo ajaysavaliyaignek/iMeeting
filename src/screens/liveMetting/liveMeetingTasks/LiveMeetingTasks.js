@@ -131,6 +131,7 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
     >
       <SerachAndButtoncomponent
         buttonText={'Add task'}
+        isButtonShow={meetingData?.yourRoleName != 'Member' ? true : false}
         role={meetingData?.yourRoleName}
         onPress={() =>
           navigation.navigate('AddTask', {

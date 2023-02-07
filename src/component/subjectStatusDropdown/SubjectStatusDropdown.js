@@ -7,8 +7,12 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { UPDATE_SUBJECT_STATUS } from '../../graphql/mutation';
 import { useMutation } from '@apollo/client';
 import { GET_All_SUBJECTS, GET_ALL_SUBJECTS_STATUS } from '../../graphql/query';
+import { SelectList } from 'react-native-dropdown-select-list';
+import Icon from '../Icon';
+import IconName from '../Icon/iconName';
 
 const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
+  console.log('item of subject', item);
   const [updateSubjectStatus] = useMutation(UPDATE_SUBJECT_STATUS, {
     refetchQueries: [
       {
@@ -92,44 +96,120 @@ const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
       style={{
         flex: 1,
         paddingLeft: SIZES[4],
-        backgroundColor:
-          item.statusTitle == 'Deleted'
-            ? '#ffc8be'
-            : item.statusTitle == 'Pre-Proposed'
-            ? '#b4dcff'
-            : item.statusTitle == 'Tentative'
-            ? '#deb887'
-            : item.statusTitle == 'Approved'
-            ? 'rgba(129, 171, 150, 0.1)'
-            : item.statusTitle == 'Transferred'
-            ? 'rgba(231, 157, 115, 0.1)'
-            : item.statusTitle == 'Proposed'
-            ? 'rgb(101, 142, 180, 0.1)'
-            : item.statusTitle == 'Unassigned'
-            ? 'rgb(101, 142, 180, 0.1)'
-            : Colors.white,
+
         borderRadius: SIZES[4],
-        paddingBottom: SIZES[6],
-        borderBottomWidth: SIZES[1],
-        borderBottomColor:
-          item.statusTitle == 'Deleted'
-            ? '#ff6347'
-            : item.statusTitle == 'Pre-Proposed'
-            ? '#337ab7'
-            : item.statusTitle == 'Tentative'
-            ? ' #89530d;'
-            : item.statusTitle == 'Approved'
-            ? 'rgba(129, 171, 150, 1)'
-            : item.statusTitle == 'Transferred'
-            ? 'rgba(231, 157, 115, 1)'
-            : item.statusTitle == 'Proposed'
-            ? 'rgb(101, 142, 180, 1)'
-            : item.statusTitle == 'Unassigned'
-            ? 'rgb(101, 142, 180, 1)'
-            : Colors.bold
+        paddingBottom: SIZES[6]
       }}
     >
-      <Dropdown
+      {item.status.isDisable ? (
+        <SelectList
+          // arrowicon={() => {
+          //   return <Icon name={IconName.Arrow_Down} />;
+          // }}
+          maxHeight={100}
+          setSelected={(val) => {
+            console.log('val', val);
+            updateSubjectStatus({
+              variables: {
+                subject: {
+                  subjectId: item.subjectId,
+                  statusId: val
+                }
+              }
+            });
+          }}
+          inputStyles={{
+            color:
+              item.statusTitle == 'Deleted'
+                ? '#ff6347'
+                : item.statusTitle == 'Pre-Proposed'
+                ? '#337ab7'
+                : item.statusTitle == 'Tentative'
+                ? ' #89530d;'
+                : item.statusTitle == 'Approved'
+                ? 'rgba(129, 171, 150, 1)'
+                : item.statusTitle == 'Transferred'
+                ? 'rgba(231, 157, 115, 1)'
+                : item.statusTitle == 'Proposed'
+                ? 'rgb(101, 142, 180, 1)'
+                : item.statusTitle == 'Unassigned'
+                ? 'rgb(101, 142, 180, 1)'
+                : Colors.bold,
+            ...Fonts.PoppinsRegular[14]
+          }}
+          data={statusTitleOption}
+          save="key"
+          search={false}
+          placeholder={item.statusTitle}
+          boxStyles={{
+            borderRadius: SIZES[8],
+            borderColor:
+              item.statusTitle == 'Deleted'
+                ? '#ff6347'
+                : item.statusTitle == 'Pre-Proposed'
+                ? '#337ab7'
+                : item.statusTitle == 'Tentative'
+                ? ' #89530d;'
+                : item.statusTitle == 'Approved'
+                ? 'rgba(129, 171, 150, 1)'
+                : item.statusTitle == 'Transferred'
+                ? 'rgba(231, 157, 115, 1)'
+                : item.statusTitle == 'Proposed'
+                ? 'rgb(101, 142, 180, 1)'
+                : item.statusTitle == 'Unassigned'
+                ? 'rgb(101, 142, 180, 1)'
+                : Colors.bold,
+            alignItems: 'center',
+            backgroundColor:
+              item.statusTitle == 'Deleted'
+                ? '#ffc8be'
+                : item.statusTitle == 'Pre-Proposed'
+                ? '#b4dcff'
+                : item.statusTitle == 'Tentative'
+                ? '#deb887'
+                : item.statusTitle == 'Approved'
+                ? 'rgba(129, 171, 150, 0.1)'
+                : item.statusTitle == 'Transferred'
+                ? 'rgba(231, 157, 115, 0.1)'
+                : item.statusTitle == 'Proposed'
+                ? 'rgb(101, 142, 180, 0.1)'
+                : item.statusTitle == 'Unassigned'
+                ? 'rgb(101, 142, 180, 0.1)'
+                : Colors.white
+          }}
+          dropdownTextStyles={{
+            ...Fonts.PoppinsRegular[14],
+            color: Colors.bold
+          }}
+          disabledTextStyles={{ ...Fonts.PoppinsRegular[14] }}
+        />
+      ) : (
+        <Text
+          style={{
+            color:
+              item.statusTitle == 'Deleted'
+                ? '#ff6347'
+                : item.statusTitle == 'Pre-Proposed'
+                ? '#337ab7'
+                : item.statusTitle == 'Tentative'
+                ? ' #89530d;'
+                : item.statusTitle == 'Approved'
+                ? 'rgba(129, 171, 150, 1)'
+                : item.statusTitle == 'Transferred'
+                ? 'rgba(231, 157, 115, 1)'
+                : item.statusTitle == 'Proposed'
+                ? 'rgb(101, 142, 180, 1)'
+                : item.statusTitle == 'Unassigned'
+                ? 'rgb(101, 142, 180, 1)'
+                : Colors.bold,
+            ...Fonts.PoppinsRegular[14],
+            marginLeft: SIZES[18]
+          }}
+        >
+          {item.statusTitle}
+        </Text>
+      )}
+      {/* <Dropdown
         style={{
           flex: 1,
           paddingLeft: '30%'
@@ -202,7 +282,7 @@ const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
         }}
         renderItem={(item) => renderItem(item)}
         // visibleSelectedItem={false}
-      />
+      /> */}
     </View>
   );
 };

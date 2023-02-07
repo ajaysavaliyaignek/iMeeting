@@ -376,7 +376,7 @@ CalendarStrip.defaultProps = {
 
 const styles = StyleSheet.create({
   container: {
-    width: width,
+    width: '100%',
     height: 30 + 30 + 50 + 15,
     paddingVertical: 16,
     paddingLeft: 0

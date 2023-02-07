@@ -16,7 +16,7 @@ let CalanderDate = moment();
 const DeadlineSuggestion = () => {
   const calendarRef = React.useRef();
   const route = useRoute();
-  const { setCalendarValue, generaldData,isTaskdeadline } = route?.params;
+  const { setCalendarValue, generaldData, isTaskdeadline } = route?.params;
   const navigation = useNavigation();
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
@@ -46,14 +46,12 @@ const DeadlineSuggestion = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        name={'Recieving subjects deadline'}
+        name={'Deadline date'}
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
       <View style={styles.subContainer}>
-        <Text style={styles.txtAddSubjectTitle}>
-          Recieving subjects deadline
-        </Text>
+        <Text style={styles.txtAddSubjectTitle}>Deadline date</Text>
         <Calendar
           markingType="custom"
           hideArrows={true}
@@ -68,12 +66,18 @@ const DeadlineSuggestion = () => {
             });
             navigation.goBack();
           }}
-          minDate={!isTaskdeadline?new Date(generaldData?.startDateTime):new Date()}
-          maxDate={!isTaskdeadline?new Date(generaldData?.endDateTime).setDate(
-            generaldData?.endDateTime.getDate() - 1
-          ):null}
+          minDate={
+            !isTaskdeadline ? new Date(generaldData?.startDateTime) : new Date()
+          }
+          maxDate={
+            !isTaskdeadline
+              ? new Date(generaldData?.endDateTime).setDate(
+                  generaldData?.endDateTime.getDate() - 1
+                )
+              : null
+          }
           // monthFormat={'YYYY-MM-DD'}
-          enableSwipeMonths={true}
+          enableSwipeMonths={false}
           theme={{
             backgroundColor: 'red',
             calendarBackground: '#ffffff',
@@ -103,7 +107,7 @@ const DeadlineSuggestion = () => {
             );
           }}
         />
-        <View style={styles.upcomingContainer}>
+        {/* <View style={styles.upcomingContainer}>
           <Button
             title={'Tommorow'}
             layoutStyle={[
@@ -146,7 +150,7 @@ const DeadlineSuggestion = () => {
             ]}
             onPress={() => setActiveTab('3')}
           />
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );

@@ -1,14 +1,9 @@
-import { View, TextInput, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import Voice from '@react-native-community/voice';
-
-import { Icon, IconName } from '../../../component';
-import { styles } from './styles';
-import { SIZES } from '../../../themes/Sizes';
-import { Button } from '../../../component/button/Button';
-import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
-import { GET_SUBJECT_BY_ID } from '../../../graphql/query';
+import { useNavigation } from '@react-navigation/native';
+
+import { styles } from './styles';
 import SubjectListComponent from '../../../component/detailsComponent/subjectsListComponent/SubjectListComponent';
 import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
@@ -28,6 +23,7 @@ const Livemeetingsubjects = ({ item, socketEventUpdateMessage }) => {
     >
       <SerachAndButtoncomponent
         buttonText={'Add subject'}
+        isButtonShow={item?.yourRoleName != 'Member' ? true : false}
         onPress={() => {
           navigation.navigate('AddSubject', {
             committee: item?.committeeId,
@@ -45,32 +41,7 @@ const Livemeetingsubjects = ({ item, socketEventUpdateMessage }) => {
           setSearchText(text);
         }}
       />
-      {/* <View style={styles.searchContainer}>
-        <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-        <TextInput
-          style={styles.textInput}
-          placeholder={'Search subjects'}
-          onChangeText={(text) => searchFilterSubject(text)}
-        />
-        <TouchableOpacity onPress={() => {}}>
-          <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
-        </TouchableOpacity>
-      </View> */}
-      {/* <Button
-        title={'Add subject'}
-        onPress={() =>
-          navigation.navigate('AddSubject', {
-            committee: item?.committeeId,
-            isEdit: false,
-            subjectDetails: null,
-            screenName: 'Add subject',
-            meetingName: item?.meetingTitle,
-            meetingId: item?.meetingId
-          })
-        }
-        layoutStyle={styles.cancelBtnLayout}
-        textStyle={styles.txtCancelButton}
-      /> */}
+
       <Divider style={styles.divider} />
       <SubjectListComponent
         isLiveMeetingSubject={true}
@@ -83,9 +54,11 @@ const Livemeetingsubjects = ({ item, socketEventUpdateMessage }) => {
         editable={false}
         setSearchText={setSearchText}
         onPressView={(items) => {
-          navigation.navigate('LiveMeetingSubjectDetails', {
+          navigation.navigate('LiveApproveMeetingSubjectDetails', {
             item: items,
-            meetingData: item
+            meetingData: item,
+            isMeeting: false,
+            isMom: false
           });
         }}
         socketEventUpdateMessage={socketEventUpdateMessage}

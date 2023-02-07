@@ -126,7 +126,15 @@ const TasksList = () => {
     <SafeAreaView style={styles.container}>
       {/* header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            height: SIZES[24],
+            width: SIZES[24],
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
           <Icon
             name={IconName.Arrow_Left}
             height={SIZES[14]}
@@ -296,7 +304,7 @@ const TasksList = () => {
                 />
               );
             }}
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
           />
         ) : Tasks.error ? (
           <View

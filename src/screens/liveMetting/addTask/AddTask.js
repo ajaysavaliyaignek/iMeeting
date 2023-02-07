@@ -22,6 +22,7 @@ import AttachFiles from '../../../component/attachFiles/AttachFiles';
 import { useMutation, useQuery } from '@apollo/client';
 import {
   GET_ALL_TASKS,
+  GET_FILE,
   GET_TASK_EXECUTORS,
   GET_TASK_PRIORITY
 } from '../../../graphql/query';
@@ -53,9 +54,7 @@ const AddTask = () => {
     isEdit ? taskData?.executorId : null
   );
   const [calendarValue, setCalendarValue] = useState({
-    calendarValue: isEdit
-      ? moment(taskData?.deadlineDate).format('DD MMM, YYYY')
-      : new Date()
+    calendarValue: isEdit ? taskData?.deadlineDate : new Date()
   });
   let queryParams;
 
@@ -72,6 +71,23 @@ const AddTask = () => {
       taskStatusIds: '',
       taskTypeIds: ''
     };
+  }
+
+  if (isEdit) {
+    taskData?.attachFiles?.map((id) => {
+      const getFile = useQuery(GET_FILE, {
+        fetchPolicy: 'cache-and-network',
+        variables: {
+          fileEntryId: id
+        },
+        onCompleted: (data) => {
+          fileResponse.push(data.uploadedFile);
+        }
+      });
+      if (getFile.error) {
+        console.log('File error', getFile.error);
+      }
+    });
   }
 
   // get task executors
@@ -112,7 +128,7 @@ const AddTask = () => {
 
   const [updateTask, { data, loading: addTaskLoading, error: addTaskError }] =
     useMutation(UPDATE_TASK, {
-      refetchQueries: ['tasks'],
+      refetchQueries: ['tasks', 'task'],
       onCompleted: (data) => {
         if (data) {
           console.log('updateTask', data.updateTask.status[0]);
@@ -193,12 +209,15 @@ const AddTask = () => {
               })
             }
           >
-            <TextInput
+            <Text>
+              {moment(calendarValue?.calendarValue).format('DD MMM, YYYY')}
+            </Text>
+            {/* <TextInput
               value={moment(calendarValue?.calendarValue).format(
                 'DD MMM, YYYY'
               )}
               editable={false}
-            />
+            /> */}
             <Icon
               name={IconName.Calendar}
               width={SIZES[18]}

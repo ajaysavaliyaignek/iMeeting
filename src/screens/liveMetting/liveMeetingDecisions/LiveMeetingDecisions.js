@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { useApolloClient } from '@apollo/client';
+import { useNavigation } from '@react-navigation/native';
+
 import { styles } from './styles';
 import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
-import { useNavigation } from '@react-navigation/native';
 import SubjectListComponent from '../../../component/detailsComponent/subjectsListComponent/SubjectListComponent';
-import { useApolloClient } from '@apollo/client';
 
 const LiveMeetingDecisions = ({
   item: meetingData,
@@ -41,6 +42,7 @@ const LiveMeetingDecisions = ({
     <View style={styles.container}>
       <SerachAndButtoncomponent
         buttonText={'Add decision'}
+        isButtonShow={meetingData?.yourRoleName != 'Member' ? false : true}
         role={meetingData?.yourRoleName}
         onPress={() =>
           navigation.navigate('AddEditDecision', {
@@ -63,6 +65,7 @@ const LiveMeetingDecisions = ({
         setSearchText={setSearchText}
         socketEventUpdateMessage={socketEventUpdateMessage}
         isDecisionSubject={true}
+        isApproveMeetingSubject={false}
       />
     </View>
   );

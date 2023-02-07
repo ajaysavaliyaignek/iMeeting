@@ -155,7 +155,7 @@ const SecretaryPermission = () => {
         }}
       />
       <View style={styles.subContainer}>
-        <Text style={styles.txtAddSubjectTitle}>General</Text>
+        <Text style={styles.txtAddSubjectTitle}>Secretary permission</Text>
         <DropDownPicker
           data={committees?.map((comm) => ({
             label: comm.committeeTitle,

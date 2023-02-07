@@ -75,6 +75,7 @@ const ViewVotingHistory = () => {
       />
       <View style={{ backgroundColor: Colors.white, flex: 1 }}>
         <SerachAndButtoncomponent
+          isButtonShow={false}
           role={'Member'}
           onChangeText={(text) => searchFilterUsers(text)}
           value={searchText}

@@ -95,6 +95,7 @@ export const GET_ALL_DECISIONS = gql`
       items {
         decisionId
         committeeId
+        createrName
         committeeName
         dateOfCreation
         subjectId
@@ -143,6 +144,37 @@ export const GET_ALL_CHATS = gql`
   }
 `;
 
+export const GET_TASK_BY_ID = gql`
+  query task($id: Long) {
+    task(id: $id) {
+      taskId
+      attachFiles
+      committeeId
+      committeeName
+      userName
+      createBy
+      deadlineDate
+      description
+      executorId
+      executorName
+      meetingId
+      priority
+      priorityId
+      subjectId
+      taskStatusId
+      taskStatus
+      taskType
+      taskTypeId
+      isHead
+      isExecutor
+      isTaskApproval
+      isMeetingApproval
+      isSubjectApproval
+      title
+      userId
+    }
+  }
+`;
 export const GET_TASK_PRIORITY = gql`
   query {
     taskPriority {
@@ -667,6 +699,7 @@ export const GET_All_COMMITTEE = gql`
         userIds
         status
         categoryTitle
+        roleIds
       }
       pageSize
       pageSize
@@ -690,6 +723,30 @@ export const GET_COMMITTEE_BY_ID = gql`
       roleIds
       setUpDate
       userIds
+    }
+  }
+`;
+
+export const GET_COMMITTEE_MEMBER_BY_ID = gql`
+  query committeeMemberById($userId: Long) {
+    committeeMemberById(userId: $userId) {
+      title
+      attachFiles
+      emails
+      externalUser
+      familyName
+      firstName
+      googleCalendarSync
+      organizations
+      outlookCalendarSync
+      phoneNumber
+      privateDetails
+      profilePicture
+      roles
+      secondName
+      sendSMS
+      thirdName
+      userId
     }
   }
 `;
@@ -787,6 +844,7 @@ export const GET_All_MEETING = gql`
         attendanceFeedback
         attendanceFeedbackDate
         committeeId
+        committeeTitle
         creatorName
         description
         endDate
@@ -835,6 +893,7 @@ export const GET_MEETING_BY_ID = gql`
       attachFileIds
       availableId
       committeeId
+
       creatorName
       description
       endDate

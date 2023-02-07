@@ -6,10 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../../themes/Colors';
 import Normalize from '../../themes/mixins';
 import { Fonts } from '../../themes';
-import Icon from '../Icon';
-import IconName from '../Icon/iconName';
+import { getHighlightedText } from '../highlitedText/HighlitedText';
 
-const CommitteesCard = ({ item, index }) => {
+const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
   const navigation = useNavigation();
 
   // committee row view
@@ -28,20 +27,21 @@ const CommitteesCard = ({ item, index }) => {
       // onPress={() => setEditModal(false)}
       key={index}
     >
-      <Divider style={styles.divider} />
-
       {/* committee details */}
       <TouchableOpacity
         style={styles.committeeDetailView}
-        onPress={() => navigation.navigate('CommitteeDetails')}
+        // onPress={() => navigation.navigate('CommitteeDetails')}
         activeOpacity={0.5}
       >
-        <Text style={styles.txtCommitteeTitle}>{item?.committeeTitle}</Text>
+        {getHighlightedText(item?.committeeTitle, searchText)}
+        {/* <Text style={styles.txtCommitteeTitle}>{item?.committeeTitle}</Text> */}
 
         <RowData name={'ID'} discription={item?.organizationId} />
         <RowData name={'Category'} discription={item.categoryTitle} />
         <RowData name={'Your role'} discription={item.yourRoleName} />
-        <RowData name={'Date'} discription={item.setUpDate} />
+        {!isProfileCommittee && (
+          <RowData name={'Date'} discription={item.setUpDate} />
+        )}
       </TouchableOpacity>
 
       {/* dotsView */}
@@ -73,6 +73,7 @@ const CommitteesCard = ({ item, index }) => {
           </TouchableOpacity>
         </View>
       )} */}
+      <Divider style={styles.divider} />
     </TouchableOpacity>
   );
 };

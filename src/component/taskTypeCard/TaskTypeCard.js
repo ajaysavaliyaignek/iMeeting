@@ -25,17 +25,17 @@ const TaskTypeCard = ({ type, index, onChecked }) => {
           {
             backgroundColor:
               type.name == 'Subject approval'
-                ? '#E6C54F'
-                : type.name == 'Minutes of Meeting approval'
                 ? '#C8ABCD'
+                : type.name == 'Minutes of Meeting approval'
+                ? '#E6C54F'
                 : type.name == 'Meeting task'
-                ? '#81AB96'
-                : type.name == 'Confirm attendance'
-                ? '#E79D73'
-                : type.name == 'Video Conference meeting'
-                ? '#E79D73'
-                : type.name == 'Schedule an appointment response'
                 ? '#658EB4'
+                : type.name == 'Confirm approval'
+                ? '#DD7878'
+                : type.name == 'Video conference'
+                ? '#E79D73'
+                : type.name == 'User task'
+                ? '#81AB96'
                 : '#E6C54F'
           }
         ]}

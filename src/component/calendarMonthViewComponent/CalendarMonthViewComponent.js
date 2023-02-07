@@ -2,7 +2,8 @@ import {
   View,
   Text,
   useWindowDimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'react-native-big-calendar';
@@ -20,7 +21,7 @@ let CalanderDate = moment();
 
 const CalendarMonthViewComponent = () => {
   const navigation = useNavigation();
-  const { width, height } = useWindowDimensions();
+  const { width, height } = Dimensions.get('window');
 
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
@@ -167,10 +168,10 @@ const CalendarMonthViewComponent = () => {
           );
         }}
         events={events}
-        height={height}
+        height={height - 170}
         mode="month"
         date={new Date(monthCalenderView)}
-        swipeEnabled={true}
+        swipeEnabled={false}
         onPressCell={(date) => {
           let pressedDate = moment(date).format('YYYY-MM-DD');
           var field = key.filter(function (x) {

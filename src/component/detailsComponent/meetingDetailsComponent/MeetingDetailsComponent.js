@@ -10,9 +10,8 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import moment from 'moment';
-
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import momentDurationFormatSetup from 'moment-duration-format';
 import { Divider } from 'react-native-paper';
@@ -24,27 +23,20 @@ import { Colors } from '../../../themes/Colors';
 import { Fonts } from '../../../themes';
 import {
   GET_ALL_LOCATION_BY_ID,
-  GET_All_MEETING,
-  GET_All_SUBJECTS,
   GET_ANSWER,
   GET_COMMITTEE_BY_ID,
   GET_FILE,
   GET_LIVE_MEETING_TAB_COUNT,
-  GET_MEETING_BY_ID,
-  GET_PLATFORMLINK,
   GET_USER_PAYLOAD
 } from '../../../graphql/query';
-import { DELETE_MEETING } from '../../../graphql/mutation';
 import AttachFiles from '../../attachFiles/AttachFiles';
 import { dateTimeFormate } from '../../../Constans/data';
-import { confirmButtonStyles } from 'react-native-modal-datetime-picker';
 
 const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const navigation = useNavigation();
   momentDurationFormatSetup(moment);
   const route = useRoute();
   // const { item } = route?.params;
-  console.log(item);
 
   const [fileResponse, setFileResponse] = useState([]);
   const [location, setLocation] = useState(null);
@@ -183,27 +175,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
       </View>
     );
   };
-  let date = new Date();
-  let newdate = moment(
-    date.toLocaleString('en-Us', { timeZone: 'ASIA/CALCUTTA' })
-  )
-    .add(15, 'm')
-    .format('YYYY-MM-DD hh:mm A');
 
-  let meetingDate = `${item.setDate} ${item.setTime}`;
-  console.log('newdate', { newdate });
-  console.log('meetingDate', { meetingDate });
-  console.log(
-    moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
-      moment(meetingDate, 'YYYY-MM-DD hh:mm A')
-    )
-  );
-  // console.log(
-  //   'new timezone',
-  //   moment(date.toLocaleString('en-Us', { timeZone: 'ASIA/CALCUTTA' }))
-  //     .add(15, 'm')
-  //     .format('YYYY-MM-DD hh:mm A')
-  // );
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}

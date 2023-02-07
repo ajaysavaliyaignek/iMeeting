@@ -1,11 +1,13 @@
 import { View, Text, ScrollView, SafeAreaView, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import Header from '../../../component/header/Header';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+import { useMutation, useQuery } from '@apollo/client';
+
+import Header from '../../../component/header/Header';
 import { IconName } from '../../../component';
 import { styles } from './styles';
 import DropDownPicker from '../../../component/DropDownPicker/DropDownPicker';
-import { Divider } from 'react-native-paper';
 import AttachFiles from '../../../component/attachFiles/AttachFiles';
 import { Button } from '../../../component/button/Button';
 import { Colors } from '../../../themes/Colors';
@@ -18,7 +20,6 @@ import {
   GET_COMMITTEES_BY_ROLE,
   GET_FILE
 } from '../../../graphql/query';
-import { useMutation, useQuery } from '@apollo/client';
 import { UPDATE_DECISION } from '../../../graphql/mutation';
 
 const AddEditDecision = () => {
