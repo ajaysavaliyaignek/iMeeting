@@ -6,7 +6,11 @@ import { SIZES } from '../../themes/Sizes';
 export const getHighlightedText = (txt, searchText, styleTitle) => {
   const parts = txt?.split(new RegExp(`(${searchText})`, 'gi'));
   return (
-    <Text style={[{ width: '80%' }, styleTitle]} numberOfLines={1}>
+    <Text
+      style={[{ width: '80%' }, styleTitle]}
+      numberOfLines={1}
+      ellipsizeMode="tail"
+    >
       {parts.map((part) =>
         part.toUpperCase() === searchText.toUpperCase() ? (
           <Text

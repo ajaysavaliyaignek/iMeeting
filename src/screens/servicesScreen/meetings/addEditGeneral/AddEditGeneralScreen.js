@@ -89,7 +89,7 @@ const AddEditGeneralScreen = ({
       nestedScrollEnabled={true}
     >
       <Text style={styles.txtAddSubjectTitle}>General</Text>
-      <View showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         {CommitteeLoading && <Loader color={Colors.primary} />}
 
         {/* choose committe */}

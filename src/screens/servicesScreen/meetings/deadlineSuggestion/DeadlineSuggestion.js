@@ -15,12 +15,14 @@ import { SIZES } from '../../../../themes/Sizes';
 let CalanderDate = moment();
 const DeadlineSuggestion = () => {
   const calendarRef = React.useRef();
+
   const route = useRoute();
   const { setCalendarValue, generaldData, isTaskdeadline } = route?.params;
   const navigation = useNavigation();
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
   );
+  console.log('generak data', generaldData);
   const [horizontal, setHorizontal] = useState(false);
   const [activeTab, setActiveTab] = useState('1');
   console.log(calendarDate);
@@ -71,8 +73,8 @@ const DeadlineSuggestion = () => {
           }
           maxDate={
             !isTaskdeadline
-              ? new Date(generaldData?.endDateTime).setDate(
-                  generaldData?.endDateTime.getDate() - 1
+              ? new Date(generaldData?.endDateTime)?.setDate(
+                  new Date(generaldData?.endDateTime)?.getDate() - 1
                 )
               : null
           }

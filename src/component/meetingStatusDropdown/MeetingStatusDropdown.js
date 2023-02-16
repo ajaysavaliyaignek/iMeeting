@@ -1,13 +1,14 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { Dropdown } from 'react-native-element-dropdown';
+import { SelectList } from 'react-native-dropdown-select-list';
+
 import { GET_MEETING_STATUS } from '../../graphql/query';
 import { SIZES } from '../../themes/Sizes';
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
-import { useMutation, useQuery } from '@apollo/client';
-import { Dropdown } from 'react-native-element-dropdown';
 import { UPDATE_MEETING_STATUS } from '../../graphql/mutation';
-import { SelectList } from 'react-native-dropdown-select-list';
 
 const MeetingStatusDropdown = ({ item, statusId }) => {
   const [meetingStatusOption, setmeetingStatusOption] = useState([]);
@@ -370,7 +371,11 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
           color: Colors.bold
         }}
         placeholder={valueStatus}
-        disable={item.yourRoleName !== 'Member' ? false : true}
+        disable={
+          item.yourRoleName !== 'Member' && item.meetingStatusTitle !== 'Closed'
+            ? false
+            : true
+        }
         placeholderStyle={{
           color:
             item.meetingStatusTitle == 'Deleted'

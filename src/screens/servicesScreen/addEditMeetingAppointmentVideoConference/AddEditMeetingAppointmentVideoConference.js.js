@@ -381,7 +381,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                   styles.nextBtnLayout,
                   {
                     opacity:
-                      curentPosition == 0
+                      type !== 'VideoConference' && curentPosition == 0
                         ? generaldData?.title !== '' &&
                           generaldData?.discription !== '' &&
                           generaldData?.valueCommitee != null
@@ -414,7 +414,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                 ]}
                 textStyle={styles.txtNextBtn}
                 disable={
-                  curentPosition == 0
+                  type !== 'VideoConference' && curentPosition == 0
                     ? generaldData?.title !== '' &&
                       generaldData?.discription !== '' &&
                       generaldData?.valueCommitee != null

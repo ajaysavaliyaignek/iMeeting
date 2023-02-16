@@ -1,10 +1,225 @@
-import { View, Text, SafeAreaView } from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  TextInput,
+  FlatList
+} from 'react-native';
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { useQuery } from '@apollo/client';
+
+import Header from '../../../component/header/Header';
+import { styles } from './styles';
+import { SIZES } from '../../../themes/Sizes';
+import { Icon, IconName } from '../../../component';
+import { Fonts } from '../../../themes';
+import { Colors } from '../../../themes/Colors';
+import { Divider } from 'react-native-paper';
+import { GET_ALL_VIDEO_CONFERENCES } from '../../../graphql/query';
+import VideoConferenceCard from '../../../component/Cards/videoConferenceCard/VideoConferenceCard';
 
 const VideoConferenceList = () => {
+  const navigation = useNavigation();
+  const [search, setSearch] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [visibleIndex, setVisibleIndex] = useState(-1);
+
+  const getAllVideoConferences = useQuery(GET_ALL_VIDEO_CONFERENCES, {
+    variables: {
+      date: '',
+      page: -1,
+      pageSize: -1,
+      searchValue: searchText,
+      sort: ''
+    },
+    onCompleted: (data) => {
+      console.log('getAllVideoConferences', data);
+    },
+    onError: (data) => {
+      console.log('getAllVideoConferences error', data.message);
+    }
+  });
+
+  const data = [
+    {
+      title: 'Advisory Committee on Fina...',
+      committee: 'iMeeting',
+      yourRoleName: 'Head',
+      dateAndTime: '13 Aug 2021, 08:00 AM',
+      platform: 'Google Meet',
+      link: 'fjdf-fsgl-fds'
+    },
+    {
+      title: 'Advisory Committee on Fina...',
+      committee: 'iMeeting',
+      yourRoleName: 'Head',
+      dateAndTime: '13 Aug 2021, 08:00 AM',
+      platform: 'Google Meet',
+      link: 'fjdf-fsgl-fds'
+    },
+    {
+      title: 'Advisory Committee on Fina...',
+      committee: 'iMeeting',
+      yourRoleName: 'Head',
+      dateAndTime: '13 Aug 2021, 08:00 AM',
+      platform: 'Google Meet',
+      link: 'fjdf-fsgl-fds'
+    },
+    {
+      title: 'Advisory Committee on Fina...',
+      committee: 'iMeeting',
+      yourRoleName: 'Head',
+      dateAndTime: '13 Aug 2021, 08:00 AM',
+      platform: 'Google Meet',
+      link: 'fjdf-fsgl-fds'
+    }
+  ];
   return (
-    <SafeAreaView>
-      <Text>VideoConferenceList</Text>
+    <SafeAreaView style={styles.conatiner}>
+      {/* header */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            height: SIZES[24],
+            width: SIZES[24],
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <Icon
+            name={IconName.Arrow_Left}
+            height={SIZES[14]}
+            width={SIZES[14]}
+          />
+        </TouchableOpacity>
+        <Text style={styles.txtHeader}>Video conference</Text>
+        <View style={styles.headeRightView}>
+          <TouchableOpacity
+            style={styles.searchIconView}
+            onPress={() => setSearch(!search)}
+          >
+            <Icon name={IconName.Search} height={SIZES[18]} width={SIZES[18]} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Add video conference',
+                type: 'VideoConference',
+                screensArray: [
+                  'generalVideoConference',
+                  'users',
+                  'dateandtime'
+                ],
+                isEdit: false,
+                details: null
+              });
+            }}
+          >
+            <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.subContainer}>
+        {search ? (
+          <View>
+            <View style={styles.searchRowContainer}>
+              <Icon
+                name={IconName.Search}
+                height={SIZES[12]}
+                width={SIZES[12]}
+              />
+              <TextInput
+                style={{ flex: 1, marginLeft: SIZES[6] }}
+                onChangeText={(text) => {
+                  setSearchText(text);
+                }}
+                value={searchText}
+                placeholder={'Search video conference'}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setSearchText('');
+                }}
+              >
+                <Icon
+                  name={IconName.Close}
+                  height={SIZES[8]}
+                  width={SIZES[8]}
+                />
+              </TouchableOpacity>
+            </View>
+            <Divider style={styles.divider} />
+          </View>
+        ) : (
+          <View>
+            {/* filter */}
+            <TouchableOpacity
+              style={styles.committeeView}
+              activeOpacity={0.5}
+              onPress={() => {
+                // navigation.navigate('FilterTask', {
+                //   taskType: taskType,
+                //   taskStatusList: taskStatusList,
+                //   onUpdateFilter: onUpdateFilter,
+                //   onlyMyTask: onlyMyTask
+                // });
+              }}
+            >
+              <Text style={[styles.txtCommittee]}>Filter</Text>
+              <View style={[styles.btnCommittees, { flex: 1 }]}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    ...Fonts.PoppinsRegular[12],
+                    color: Colors.secondary
+                  }}
+                >
+                  {/* {taskTypesName !== '' || taskStatusName !== ''
+                    ? `${taskTypesName},${taskStatusName} `
+                    : ''} */}
+                </Text>
+                <Icon
+                  name={IconName.Arrow_Right}
+                  height={SIZES[12]}
+                  width={SIZES[6]}
+                />
+              </View>
+            </TouchableOpacity>
+
+            <Divider style={styles.divider} />
+            <TouchableOpacity style={styles.committeeView} activeOpacity={0.5}>
+              <Text style={styles.txtCommittee}>Secretary permission</Text>
+              <View style={styles.btnCommittees}>
+                <Icon
+                  name={IconName.Arrow_Right}
+                  height={SIZES[12]}
+                  width={SIZES[6]}
+                />
+              </View>
+            </TouchableOpacity>
+
+            <Divider style={styles.divider} />
+          </View>
+        )}
+        <FlatList
+          data={data}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => {
+            return (
+              <VideoConferenceCard
+                item={item}
+                index={index}
+                visibleIndex={visibleIndex}
+                setVisibleIndex={setVisibleIndex}
+                searchText={searchText}
+              />
+            );
+          }}
+        />
+      </View>
     </SafeAreaView>
   );
 };

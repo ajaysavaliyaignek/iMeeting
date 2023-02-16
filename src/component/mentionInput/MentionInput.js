@@ -199,24 +199,24 @@ const MentionInput = ({
               var string = '';
 
               for (var i = userName.length - 1; i >= 0; i--) {
-                var finalAns = message.replace(userName[i], userId[i]);
+                var finalAns = message.replaceAll(userName[i], userId[i]);
 
                 string = finalAns;
               }
 
               console.log('final ans', { string: string });
-              setMessage('');
 
               updateChat({
                 variables: {
                   meetingChat: {
                     chatId: 0,
                     meetingId: meetingId,
-                    message: string,
+                    message: string !== '' ? string : message,
                     attachDocumentId: fileIds
                   }
                 }
               });
+              setMessage('');
             }}
           >
             <Icon

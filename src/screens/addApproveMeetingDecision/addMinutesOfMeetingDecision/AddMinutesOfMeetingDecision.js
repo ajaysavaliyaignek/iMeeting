@@ -65,20 +65,14 @@ const AddMinutesOfMeetingDecision = () => {
       if (data) {
         console.log('update Decision', data?.updateDecision?.status);
         if (data?.updateDecision?.status[0]?.statusCode == '200') {
-          if (decision == 'Send') {
+          if (decision == 'Send' || decision == 'Approve') {
             navigation.navigate('Details', {
               title: 'Meetings',
               active: '0'
             });
           } else {
-            let statusDecision =
-              decision == 'Approve'
-                ? 'Soft-Closed'
-                : decision == 'Final approve'
-                ? 'Closed'
-                : null;
             const filterStatus = meetingStatus?.filter((status) => {
-              if (status.meetingStatusTitle == statusDecision) {
+              if (status.meetingStatusTitle == 'Closed') {
                 return status;
               }
             });

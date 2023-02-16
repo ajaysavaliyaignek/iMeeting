@@ -112,7 +112,7 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
               label: 'Microsoft Teams'
             }
           ]}
-          disable={generaldData?.valueVideoConference == null ? false : true}
+          disable={false}
           placeholder={''}
           setData={(item) =>
             setGeneralData({ ...generaldData, valueVideoConference: item })

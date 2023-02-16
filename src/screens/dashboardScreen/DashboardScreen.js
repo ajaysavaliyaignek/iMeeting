@@ -24,6 +24,7 @@ import {
   GET_All_MEETING
 } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
+import CommitteeList from './committeeList/CommitteeList';
 
 const DashboardScreen = () => {
   const navigation = useNavigation();
@@ -153,13 +154,14 @@ const DashboardScreen = () => {
 
         {/* committes  */}
         <Text style={styles.txtCommittees}>Committees</Text>
-        <FlatList
+        <CommitteeList />
+        {/* <FlatList
           data={committeeData}
           keyExtractor={(index) => index.toString()}
           renderItem={({ item, index }) => {
             return <CommitteesCard item={item} index={index} searchText={''} />;
           }}
-        />
+        /> */}
       </ScrollView>
     </SafeAreaView>
   );

@@ -4,6 +4,7 @@ import AddMeetingSubjects from '../meetings/addEditSubjects/AddEditSubjects';
 import AddMeetingUser from '../meetings/addEditUser/AddEditUser';
 import AddEditGeneralScreen from '../meetings/addEditGeneral/AddEditGeneralScreen';
 import { IconName } from '../../../component';
+import AddGeneralVideoConference from '../../videoConference/addGeneralVideoConference/AddGeneralVideoConference';
 
 export const screenRender = (
   screen,
@@ -25,6 +26,14 @@ export const screenRender = (
           details={details}
           fileResponse={fileResponse}
           setFileResponse={setFileResponse}
+        />
+      );
+      break;
+    case 'generalVideoConference':
+      return (
+        <AddGeneralVideoConference
+          generaldData={generaldData}
+          setGeneralData={setGeneralData}
         />
       );
       break;

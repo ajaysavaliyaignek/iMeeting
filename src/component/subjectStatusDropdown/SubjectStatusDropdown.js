@@ -12,7 +12,6 @@ import Icon from '../Icon';
 import IconName from '../Icon/iconName';
 
 const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
-  console.log('item of subject', item);
   const [updateSubjectStatus] = useMutation(UPDATE_SUBJECT_STATUS, {
     refetchQueries: [
       {
@@ -34,7 +33,8 @@ const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
           momDecision: false
         }
       },
-      'subjects'
+      'subjects',
+      'meetings'
     ],
     onCompleted: (data) => {
       console.log('update subject status', data.updateSubjectStatus.status);

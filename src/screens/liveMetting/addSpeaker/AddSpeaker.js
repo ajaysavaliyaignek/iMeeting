@@ -8,15 +8,15 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { useMutation, useQuery } from '@apollo/client';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
 
 // import DropDownPicker from '../../../component/DropDownPicker/DropDownPicker';
-import { useMutation, useQuery } from '@apollo/client';
 import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import Header from '../../../component/header/Header';
 import { IconName } from '../../../component';
 import { styles } from './styles';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../component/button/Button';
 import { Colors } from '../../../themes/Colors';
 import { UPDATE_SPEAKER } from '../../../graphql/mutation';
@@ -93,8 +93,8 @@ const AddSpeaker = () => {
               disabled={activeScreen == 'AddSpeaker' ? false : true}
               items={users?.map((item) => ({
                 label: item.userName,
-                value: item.userId,
-                disabled: activeScreen == 'AddSpeaker' ? item.isSpeaker : false
+                value: item.userId
+                // disabled: activeScreen == 'AddSpeaker' ? item.isSpeaker : false
               }))}
               value={valueUser}
               setValue={setValueUser}
@@ -105,17 +105,7 @@ const AddSpeaker = () => {
               disabledItemLabelStyle={{ color: Colors.line }}
             />
             <Divider style={styles.divider} />
-            {/* <DropDownPicker
-          title={'SELECT USER'}
-          data={users?.map((item) => ({
-            label: item.userName,
-            value: item.userId,
-            disabled: item.isSpeaker
-          }))}
-          placeholder={''}
-          setData={setValueUser}
-          value={valueUser}
-        /> */}
+
             <View style={styles.timeContainer}>
               <Text style={styles.txtTitle}>TIME - IN - MINUTES</Text>
               <TextInput

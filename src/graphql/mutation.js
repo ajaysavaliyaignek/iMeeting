@@ -1,5 +1,27 @@
 import { gql } from '@apollo/client';
 
+export const UPDATE_VIDEO_CONFERENCE = gql`
+  mutation ($videoConference: InputVideoConference!) {
+    updateVideoConference(videoConference: $videoConference) {
+      videoConferenceId
+      status
+    }
+  }
+`;
+
+export const DELETE_VIDEO_CONFERENCE = gql`
+  mutation deleteVideoConference($id: Long) {
+    deleteVideoConference(id: $id) {
+      videoConferenceId
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
+    }
+  }
+`;
+
 export const UPDATE_SECRETARY_PERMISSION = gql`
   mutation ($taskSecretaryPermission: InputTaskSecretaryPermission!) {
     updateTaskSecretaryPermission(

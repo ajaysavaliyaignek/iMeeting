@@ -244,7 +244,7 @@ const LiveMeetingSubjectDecision = ({
           >
             There is no decision yet{' '}
           </Text>
-          {meetingData?.yourRoleName !== 'Member' && (
+          {meetingData?.yourRoleName == 'Head' && (
             <Button
               title={
                 isMom

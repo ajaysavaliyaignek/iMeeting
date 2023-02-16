@@ -1,5 +1,119 @@
 import { gql } from '@apollo/client';
 
+export const GET_ALL_VIDEO_CONFERENCES = gql`
+  query videoConferences(
+    $date: String
+    $page: Int
+    $pageSize: Int
+    $searchValue: String
+    $sort: String
+  ) {
+    videoConferences(
+      date: $date
+      page: $page
+      pageSize: $pageSize
+      searchValue: $searchValue
+      sort: $sort
+    ) {
+      items {
+        committeeId
+        committeeName
+        creatorId
+        creatorName
+        endDate
+        endTime
+        isDisable
+        platformId
+        platformName
+        platformlink
+        repeat
+        repeatName
+        setDate
+        setTime
+        timeZone
+        videoConferenceDescription
+        videoConferenceId
+        videoConferenceTitle
+        yourRoleId
+        yourRoleName
+        attachFileIds
+        answers
+        required
+        userDetails {
+          answer
+          appointmentId
+          duration
+          email
+          isAvailable
+          isRequired
+          isSpeaker
+          meetingId
+          roleId
+          roleName
+          speakingDuration
+          status
+          suggestedTime
+          userId
+          userName
+          videoConferenceId
+        }
+        userIds
+        yourRole
+      }
+    }
+  }
+`;
+
+export const GET_ALL_VIDEO_CONFERENCES_BY_ID = gql`
+  query videoConference($id: Long) {
+    videoConference(id: $id) {
+      committeeId
+      committeeName
+      creatorId
+      creatorName
+      endDate
+      endTime
+      isDisable
+      platformId
+      platformName
+      platformlink
+      repeat
+      repeatName
+      setDate
+      setTime
+      timeZone
+      videoConferenceDescription
+      videoConferenceId
+      videoConferenceTitle
+      yourRoleId
+      yourRoleName
+      attachFileIds
+      answers
+      required
+      userDetails {
+        answer
+        appointmentId
+        duration
+        email
+        isAvailable
+        isRequired
+        isSpeaker
+        meetingId
+        roleId
+        roleName
+        speakingDuration
+        status
+        suggestedTime
+        userId
+        userName
+        videoConferenceId
+      }
+      userIds
+      yourRole
+    }
+  }
+`;
+
 export const GET_CALENDER_EVENTS = gql`
   query calendarEventsMobile(
     $startDate: String

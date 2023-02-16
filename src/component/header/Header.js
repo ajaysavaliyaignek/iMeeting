@@ -57,9 +57,9 @@ const Header = ({
               styles.txtHeader,
               {
                 marginLeft: Platform.isPad
-                  ? rightIconName
+                  ? leftIconName
                     ? '10%'
-                    : '40%'
+                    : '45%'
                   : rightIconName
                   ? '8%'
                   : '30%',

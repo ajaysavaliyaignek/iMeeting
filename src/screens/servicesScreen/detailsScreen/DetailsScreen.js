@@ -43,7 +43,6 @@ const DetailsScreen = () => {
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const { setSelectedUsers, setMeetingsData, setSelectedSubjects } =
     useContext(UserContext);
-  console.log('commiteee', committee);
 
   useEffect(() => {
     const committeeId = committee?.map((com) => {

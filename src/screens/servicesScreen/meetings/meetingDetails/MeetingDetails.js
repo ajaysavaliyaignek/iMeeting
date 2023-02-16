@@ -216,7 +216,10 @@ const MeetingDetails = () => {
                       title={'Start'}
                       layoutStyle={[styles.btnLayout]}
                       onPress={() => {
-                        if (item.meetingStatusTitle !== 'Soft-Closed') {
+                        if (
+                          item.meetingStatusTitle !== 'Soft-Closed' ||
+                          item.meetingStatusTitle !== 'Live'
+                        ) {
                           const filterStatus = meetingStatus?.filter(
                             (status) => {
                               if (status.meetingStatusTitle == 'Live') {
@@ -248,7 +251,7 @@ const MeetingDetails = () => {
                     />
                   )}
                 {item.yourRoleName == 'Head' &&
-                  item.meetingStatusTitle !== 'Closed' && (
+                  item.meetingStatusTitle == 'Soft-Closed' && (
                     <Button
                       title={'Approve meeting'}
                       layoutStyle={[

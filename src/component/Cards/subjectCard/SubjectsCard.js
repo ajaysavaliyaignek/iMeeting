@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 import Icon from '../../Icon';
@@ -7,7 +7,7 @@ import IconName from '../../Icon/iconName';
 import { Divider } from 'react-native-paper';
 import EditDeleteModal from '../../EditDeleteModal';
 import { SIZES } from '../../../themes/Sizes';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import {
   GET_All_SUBJECTS,
   GET_ALL_SUBJECTS_STATUS,
@@ -35,7 +35,7 @@ const SubjectsCard = ({
 }) => {
   const navigation = useNavigation();
   const [statusTitleOption, setstatusTitleOption] = useState([]);
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState({});
   const [decisionData, setDecisionData] = useState([]);
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
@@ -50,13 +50,24 @@ const SubjectsCard = ({
     }
   });
 
-  const {} = useQuery(GET_ALL_SUBJECTS_STATUS, {
-    variables: {
-      decision: false,
-      subject: true,
-      approveDecision: false,
-      momDecision: false
-    },
+  useEffect(() => {
+    getAllSubjectStatus({
+      variables: {
+        decision: false,
+        subject: true,
+        approveDecision: false,
+        momDecision: false
+      }
+    });
+  }, [user]);
+
+  const [getAllSubjectStatus] = useLazyQuery(GET_ALL_SUBJECTS_STATUS, {
+    // variables: {
+    //   decision: false,
+    //   subject: true,
+    //   approveDecision: false,
+    //   momDecision: false
+    // },
     fetchPolicy: 'cache-and-network',
     onCompleted: (data, error) => {
       if (error) {
@@ -70,6 +81,7 @@ const SubjectsCard = ({
                 return e.statusTitle === 'Pre-Proposed';
               })[0].statusId === item.statusId
             ) {
+              console.log('role name=====>', user[0]?.roleName);
               if (user[0]?.roleName == 'Head') {
                 return {
                   key: status.statusId,

@@ -29,6 +29,7 @@ const SubjectListComponent = ({
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [userData, setUserData] = useState([]);
   const [Subjects, setSubjectData] = useState([]);
+  const [user, setUser] = useState(null);
   const client = useApolloClient();
   const AllTypesSubjects = 0;
   let queryParams = {};
@@ -83,7 +84,6 @@ const SubjectListComponent = ({
     variables: queryParams,
 
     onCompleted: (data) => {
-      console.log('subjects', data?.subjects.items);
       setFilterData(data?.subjects.items);
 
       setSubjectData(data?.subjects.items);

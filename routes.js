@@ -60,6 +60,8 @@ import AddApproveDecision from './src/screens/addApproveMeetingDecision/AddAppro
 import ApproveMeeting from './src/screens/approveMeeting/ApproveMeeting';
 import AddMinutesOfMeetingDecision from './src/screens/addApproveMeetingDecision/addMinutesOfMeetingDecision/AddMinutesOfMeetingDecision';
 import VideoConferenceList from './src/screens/videoConference/videoConferenceList/VideoConferenceList';
+import AddGeneralVideoConference from './src/screens/videoConference/addGeneralVideoConference/AddGeneralVideoConference';
+import VideoConferenceDetails from './src/screens/videoConference/videoConferenceDetails/VideoConferenceDetails';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -327,6 +329,10 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen
         name="VideoConferenceList"
         component={VideoConferenceList}
+      />
+      <Stack.Screen
+        name="VideoConferenceDetails"
+        component={VideoConferenceDetails}
       />
     </Stack.Navigator>
   );

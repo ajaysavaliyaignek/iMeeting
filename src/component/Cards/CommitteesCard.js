@@ -27,13 +27,18 @@ const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
       // onPress={() => setEditModal(false)}
       key={index}
     >
+      {!isProfileCommittee && <Divider style={styles.divider} />}
       {/* committee details */}
       <TouchableOpacity
         style={styles.committeeDetailView}
         // onPress={() => navigation.navigate('CommitteeDetails')}
         activeOpacity={0.5}
       >
-        {getHighlightedText(item?.committeeTitle, searchText)}
+        {getHighlightedText(
+          item?.committeeTitle,
+          searchText,
+          (styleTitle = { width: '100%' })
+        )}
         {/* <Text style={styles.txtCommitteeTitle}>{item?.committeeTitle}</Text> */}
 
         <RowData name={'ID'} discription={item?.organizationId} />

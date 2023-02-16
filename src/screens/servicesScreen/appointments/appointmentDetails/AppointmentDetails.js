@@ -81,7 +81,6 @@ const AppointmentsDetails = () => {
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      console.log('user data', data.userPayload.userId);
       setUser(data.userPayload.userId);
       getAnswer({
         variables: {

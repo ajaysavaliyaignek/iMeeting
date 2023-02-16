@@ -28,10 +28,10 @@ const CalenderScreen = () => {
     <SafeAreaView style={styles.container}>
       <Header
         name={'Calendar'}
-        leftIconName={IconName.Arrow_Left}
-        onLeftPress={() => {
-          navigation.goBack();
-        }}
+        // leftIconName={IconName.Arrow_Left}
+        // onLeftPress={() => {
+        //   navigation.goBack();
+        // }}
       />
       <View style={styles.subContainer}>
         <View style={styles.btnContainer}>

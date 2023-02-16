@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import DocumentPicker from 'react-native-document-picker';
-import MentionsTextInput from 'react-native-mentions';
 import { MentionInput } from '../mentionInput/MentionInput';
 import { Divider } from 'react-native-paper';
 import { Colors } from '../../themes/Colors';

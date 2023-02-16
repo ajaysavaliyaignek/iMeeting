@@ -5,10 +5,8 @@ import {
   Animated,
   TextInput,
   FlatList,
-  ViewPropTypes,
   Platform
 } from 'react-native';
-import PropTypes from 'prop-types';
 import { Fonts } from '../../themes';
 import { Colors } from '../../themes/Colors';
 
