@@ -107,8 +107,8 @@ const SubjectDetails = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('add comment data', data.addComment.status[0].statusCode);
-      if (data.addComment.status[0].statusCode == 200) {
+      console.log('add comment data', data.addComment.status.statusCode);
+      if (data.addComment.status.statusCode == 200) {
         setCommentId(null);
       }
     }
@@ -186,7 +186,7 @@ const SubjectDetails = () => {
         setComments={setComments}
       />
 
-      {item.status.isDisable && (
+      {item.status.entitys.isDisable && (
         <View
           style={{
             backgroundColor: Colors.white,

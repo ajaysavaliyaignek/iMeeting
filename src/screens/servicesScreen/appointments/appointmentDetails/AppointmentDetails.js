@@ -141,7 +141,7 @@ const AppointmentsDetails = () => {
       }
     ],
     onCompleted: (data) => {
-      if (data.deleteAppointment.status[0].statusCode == '200') {
+      if (data.deleteAppointment.status.statusCode == '200') {
         navigation.goBack();
       }
     },
@@ -208,7 +208,7 @@ const AppointmentsDetails = () => {
               }`
             )}
             <View>
-              <Text style={styles.txtDuration}>{durationHourMin}</Text>
+              <Text style={styles.txtDuration}>{`(${durationHourMin})`}</Text>
             </View>
           </View>
           {details('Timezone', appointment?.timeZone)}

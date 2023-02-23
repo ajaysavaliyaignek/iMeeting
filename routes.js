@@ -62,6 +62,9 @@ import AddMinutesOfMeetingDecision from './src/screens/addApproveMeetingDecision
 import VideoConferenceList from './src/screens/videoConference/videoConferenceList/VideoConferenceList';
 import AddGeneralVideoConference from './src/screens/videoConference/addGeneralVideoConference/AddGeneralVideoConference';
 import VideoConferenceDetails from './src/screens/videoConference/videoConferenceDetails/VideoConferenceDetails';
+import DelegationList from './src/screens/delegation/delegationList/DelegationList';
+import AddEditDelegation from './src/screens/delegation/addEditDelegation/AddEditDelegation';
+import DelegationDetails from './src/screens/delegation/delegationDetails/DelegationDetails';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -334,6 +337,9 @@ const MainStack = ({ initialRouteName }) => {
         name="VideoConferenceDetails"
         component={VideoConferenceDetails}
       />
+      <Stack.Screen name="DelegationList" component={DelegationList} />
+      <Stack.Screen name="AddEditDelegation" component={AddEditDelegation} />
+      <Stack.Screen name="DelegationDetails" component={DelegationDetails} />
     </Stack.Navigator>
   );
 };

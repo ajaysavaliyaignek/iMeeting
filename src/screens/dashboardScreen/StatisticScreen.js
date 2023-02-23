@@ -385,6 +385,7 @@ const StatisticScreen = () => {
                 marginVertical: Normalize(16),
                 backgroundColor: '#f8f8f8',
                 borderRadius: Normalize(12),
+
                 flex: 1
               }}
             >

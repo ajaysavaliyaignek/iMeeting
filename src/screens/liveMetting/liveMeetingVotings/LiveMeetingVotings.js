@@ -25,7 +25,8 @@ const LiveMeetingVotings = ({
     fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: meetingData?.meetingId,
-
+      subjectId: 0,
+      type: 1,
       searchValue: searchText
     },
     onCompleted: (data, error) => {

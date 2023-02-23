@@ -50,6 +50,9 @@ const AddSpeaker = () => {
         data.liveMeetingUsers.userDetails
       );
       setUsers(data.liveMeetingUsers.userDetails);
+    },
+    onError: (data) => {
+      console.log('GET_LIVE_MEETING_USERS error', data.message);
     }
   });
 

@@ -101,7 +101,7 @@ const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
         paddingBottom: SIZES[6]
       }}
     >
-      {item.status.isDisable ? (
+      {item.status.entitys.isDisable ? (
         <SelectList
           // arrowicon={() => {
           //   return <Icon name={IconName.Arrow_Down} />;
@@ -219,7 +219,7 @@ const SubjectStatusDropdown = ({ statusTitleOption, item, setValueStatus }) => {
           color: Colors.bold
         }}
         placeholder={item.statusTitle}
-        disable={!item.status.isDisable}
+        disable={!item.status.entitys.isDisable}
         placeholderStyle={{
           color:
             item.statusTitle == 'Deleted'

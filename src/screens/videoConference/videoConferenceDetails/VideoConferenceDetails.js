@@ -14,7 +14,7 @@ import moment from 'moment';
 import { Divider } from 'react-native-paper';
 import momentDurationFormatSetup from 'moment-duration-format';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 
 import Header from '../../../component/header/Header';
 import { Icon, IconName } from '../../../component';
@@ -25,14 +25,14 @@ import { Button } from '../../../component/button/Button';
 import { Fonts } from '../../../themes';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
 import { GET_ANSWER, GET_USER_PAYLOAD } from '../../../graphql/query';
+import { DELETE_VIDEO_CONFERENCE } from '../../../graphql/mutation';
 
 const VideoConferenceDetails = () => {
   const navigation = useNavigation();
   momentDurationFormatSetup(moment);
   const route = useRoute();
-  const { item, isDisable } = route?.params;
+  const { item } = route?.params;
   console.log('item from video conference details', item);
-  const [appointment, setAppointment] = useState(null);
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
   const [role, setRole] = useState(item.yourRoleName);
@@ -40,7 +40,7 @@ const VideoConferenceDetails = () => {
   // get answer
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
     onCompleted: (data) => {
-      console.log('answer data', data.answer);
+      // console.log('answer data', data.answer);
       setAnswer(data.answer);
     },
     onError: (data) => {
@@ -54,22 +54,19 @@ const VideoConferenceDetails = () => {
       setUser(data.userPayload.userId);
       getAnswer({
         variables: {
-          id: +item?.appointmentId,
+          id: +item?.videoConferenceId,
           userId: +data.userPayload.userId,
-          type: 4
+          type: 5
         }
       });
     }
   });
 
   // time duration
-  const DurationTime = moment(
-    `${appointment?.endDate} ${appointment?.endTime}`,
-    ['YYYY-MM-DD hh:mm A']
-  ).diff(
-    moment(`${appointment?.setDate} ${appointment?.setTime}`, [
-      'YYYY-MM-DD hh:mm A'
-    ]),
+  const DurationTime = moment(`${item?.endDate} ${item?.endTime}`, [
+    'YYYY-MM-DD hh:mm A'
+  ]).diff(
+    moment(`${item?.setDate} ${item?.setTime}`, ['YYYY-MM-DD hh:mm A']),
     'minutes'
   );
   const durationHourMin = moment
@@ -78,27 +75,43 @@ const VideoConferenceDetails = () => {
 
   // delete appointment
 
-  const onDeleteHandler = () => {
-    Alert.alert('Delete meeting', 'Are you sure you want to delete this?', [
-      {
-        text: 'Delete',
-        onPress: () =>
-          deleteAppointment({
-            variables: {
-              id: item.appointmentId
-            }
-          }),
-        style: 'destructive'
-      },
-      {
-        text: 'Cancel',
-        // onPress: () => navigation.navigate("Login"),
-        style: 'cancel'
-      }
-    ]);
+  const [deleteVideoConference] = useMutation(DELETE_VIDEO_CONFERENCE, {
+    refetchQueries: ['videoConferences', 'videoConference'],
+    onCompleted: (data) => {
+      console.log('delete appointment', data.deleteVideoConference.status);
+      navigation.navigate('VideoConferenceList');
+    },
+    onError: (data) => {
+      console.log('deleteVideoConference error', data.message);
+    }
+  });
+
+  const onDeleteHandler = (id) => {
+    console.log(id);
+
+    Alert.alert(
+      'Delete video conference',
+      'Are you sure you want to delete this?',
+      [
+        {
+          text: 'Delete',
+          onPress: () =>
+            deleteVideoConference({
+              variables: {
+                id: id
+              }
+            }),
+          style: 'destructive'
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        }
+      ]
+    );
   };
 
-  const details = (title, discription, isLink) => {
+  const details = (title, discription, isLink, platformlink) => {
     return (
       <View style={{ marginTop: SIZES[24] }}>
         <Text style={styles.txtDetailTitle}>{title}</Text>
@@ -117,28 +130,31 @@ const VideoConferenceDetails = () => {
                 marginLeft: SIZES[16],
                 borderBottomColor: Colors.primary,
                 borderBottomWidth: 1,
-                paddingBottom: 4
+                paddingBottom: 4,
+                width: '60%'
               }}
             >
               <Text
-                style={{ ...Fonts.PoppinsSemiBold[14], color: Colors.primary }}
+                style={{
+                  ...Fonts.PoppinsSemiBold[14],
+                  color: Colors.primary
+                }}
+                numberOfLines={1}
               >
-                {'meet.goo/fjdf-fsgl-fds'}
+                {platformlink}
               </Text>
               <TouchableOpacity
                 style={{ marginLeft: SIZES[12] }}
                 onPress={() => {
-                  Clipboard.setString('meet.goo/fjdf-fsgl-fds');
+                  Clipboard.setString(platformlink);
                   if (discription !== '' || discription !== null) {
                     if (Platform.OS == 'android') {
                       ToastAndroid.show(
-                        `Copied Text :-  ${'meet.goo/fjdf-fsgl-fds'}`,
+                        `Copied Text :-  ${platformlink}`,
                         ToastAndroid.SHORT
                       );
                     } else {
-                      Alert.alert(
-                        `Copied Text :-  ${'meet.goo/fjdf-fsgl-fds'}`
-                      );
+                      Alert.alert(`Copied Text :-  ${platformlink}`);
                     }
                   }
                 }}
@@ -169,39 +185,46 @@ const VideoConferenceDetails = () => {
         <View style={styles.detailsContainer}>
           {/* general details */}
           <Text style={styles.txtTitle}>General</Text>
-          {details('Vi-nce platform', 'Google Meet', true)}
-          {details('Your role', 'Head')}
-          {details('Title', 'Meeting for main design page')}
           {details(
-            'Description',
-            'We need to discuss what should be the main page and we have more question'
+            'Vi-nce platform',
+            item.platformName,
+            true,
+            item.platformlink
           )}
-          {details('Creator', 'Esther Howard')}
+          {details('Your role', item.yourRoleName)}
+          {details('Title', item.videoConferenceTitle)}
+          {details('Description', item.videoConferenceDescription)}
+          {details('Creator', item.creatorName)}
         </View>
 
         {/* date and time details */}
         <View style={styles.detailsContainer}>
           <Text style={styles.txtTitle}>Date & Time</Text>
           <View>
-            {details('Start date', '17 Feb, 2022, 08:00 PM')}
+            {details(
+              'Start date',
+              `${moment(item?.setDate).format('DD MMM, YYYY')}, ${
+                item?.setTime
+              }`
+            )}
             <View>
-              <Text style={styles.txtDuration}>{'20 minutes'}</Text>
+              <Text style={styles.txtDuration}>{`(${durationHourMin})`}</Text>
             </View>
           </View>
-          {details('Timezone', 'GMT-8 (USA)')}
+          {details('Timezone', item.timeZone)}
 
           {details(
             'Repeat',
-            'No repeat'
-            /* appointment?.repeat == 0
+
+            item?.repeat == 0
               ? "Dosen't repeat"
-              : appointment?.repeat == 1
+              : item?.repeat == 1
               ? 'Repeat daily'
-              : appointment?.repeat == 2
+              : item?.repeat == 2
               ? 'Repeat weekly'
-              : appointment?.repeat == 3
+              : item?.repeat == 3
               ? 'Repeat monthly'
-              : 'Repeat yearly' */
+              : 'Repeat yearly'
           )}
           {role == 'Member' && (
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -231,7 +254,7 @@ const VideoConferenceDetails = () => {
                   'Your answer',
                   answer?.suggestionTime == ''
                     ? answer?.answer
-                    : `Your suggestion time - ${user?.suggestionTime}`
+                    : `Your suggestion time - ${answer?.suggestionTime}`
                 )
               )}
               {!item?.isDisable && (
@@ -265,7 +288,7 @@ const VideoConferenceDetails = () => {
         </View>
         <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
         <UserDetailsComponent
-          users={appointment?.userDetails}
+          users={item?.userDetails}
           isUserRequired={true}
           isSwitchOnRow={true}
           isSwichDisabled={true}
@@ -279,7 +302,7 @@ const VideoConferenceDetails = () => {
       {role == 'Head' || role == 'Secretary' ? (
         <View style={styles.bottomContainer}>
           <Divider style={styles.divider} />
-          {!isDisable && (
+          {!item.isDisable && (
             <View style={styles.btnContainer}>
               <Button
                 title={'Edit'}
@@ -292,13 +315,12 @@ const VideoConferenceDetails = () => {
                   navigation.navigate(
                     'AddEditMeetingAppointmentVideoConference',
                     {
-                      screenName: 'Edit appointment',
-                      type: 'Appointment',
+                      screenName: 'Edit video conference',
+                      type: 'VideoConference',
                       screensArray: [
-                        'general',
+                        'generalVideoConference',
                         'users',
-                        'dateandtime',
-                        'location'
+                        'dateandtime'
                       ],
                       isEdit: true,
                       details: item
@@ -309,7 +331,7 @@ const VideoConferenceDetails = () => {
               <Button
                 title={'Delete'}
                 layoutStyle={[styles.btnLayout, { backgroundColor: '#DD7878' }]}
-                onPress={onDeleteHandler}
+                onPress={() => onDeleteHandler(item.videoConferenceId)}
               />
               <Button title={'Start'} layoutStyle={[styles.btnLayout]} />
             </View>

@@ -49,8 +49,8 @@ const AddLocation = () => {
       ],
       onCompleted: (data) => {
         if (data) {
-          console.log(data.updateLocation.status[0]);
-          if (data.updateLocation.status[0].statusCode == '200') {
+          console.log(data.updateLocation.status);
+          if (data.updateLocation.status.statusCode == '200') {
             navigation.goBack();
           }
           // navigation.goBack();

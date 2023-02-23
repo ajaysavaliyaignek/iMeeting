@@ -73,7 +73,7 @@ const RNPoll: React.FC<IRNPollProps> = ({
           style={[styles.pollContainer, pollContainerStyle]}
           {...rest}
         >
-          {choices.map((eachChoice: IChoice) => {
+          {choices?.map((eachChoice: IChoice) => {
             const { choice, id, votes, percentage } = eachChoice;
        
             // const percentage = _hasBeenVoted

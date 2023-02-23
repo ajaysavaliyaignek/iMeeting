@@ -34,6 +34,7 @@ export const screenRender = (
         <AddGeneralVideoConference
           generaldData={generaldData}
           setGeneralData={setGeneralData}
+          details={details}
         />
       );
       break;

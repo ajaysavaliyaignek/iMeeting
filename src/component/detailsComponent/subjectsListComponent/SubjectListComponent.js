@@ -34,13 +34,24 @@ const SubjectListComponent = ({
   const AllTypesSubjects = 0;
   let queryParams = {};
 
+  // page: $page;
+  // pageSize: $pageSize;
+  // searchValue: $searchValue;
+  // sort: $sort;
+  // committeeIds: $committeeIds;
+  // isDraft: $isDraft;
+  // screen: $screen;
+  // meetingId: $meetingId;
   if (meetingId == null) {
     queryParams = {
       committeeIds: committeeIds,
       searchValue: searchText,
       screen: AllTypesSubjects,
       page: -1,
-      pageSize: -1
+      pageSize: -1,
+      meetingId: 0,
+      isDraft: false,
+      sort: ''
     };
   } else {
     queryParams = {
@@ -49,7 +60,9 @@ const SubjectListComponent = ({
       screen: 2,
       page: -1,
       pageSize: -1,
-      meetingId: meetingId
+      meetingId: meetingId,
+      isDraft: false,
+      sort: ''
     };
   }
 

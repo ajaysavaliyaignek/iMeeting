@@ -98,7 +98,6 @@ const AddEditDecision = () => {
       isDeleted: false
     },
     onCompleted: (data) => {
-      console.log('all committes', data.committees.items.length);
       setCommittee(data.committees.items);
     },
     onError: (data) => {
@@ -166,7 +165,7 @@ const AddEditDecision = () => {
     onCompleted: (data) => {
       if (data) {
         console.log('update Decision', data?.updateDecision?.status);
-        if (data.updateDecision.status[0].statusCode == '200') {
+        if (data.updateDecision.status.statusCode == '200') {
           navigation.goBack();
         }
       }

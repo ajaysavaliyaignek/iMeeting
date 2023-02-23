@@ -47,7 +47,7 @@ const AppoinmentCard = ({
   const onDeleteHandler = (id) => {
     console.log(id);
 
-    Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
+    Alert.alert('Delete appointment', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
         onPress: () =>
@@ -122,7 +122,7 @@ const AppoinmentCard = ({
         <RowData name={'Your role'} discription={item.yourRoleName} />
         <RowData
           name={'Date & Time'}
-          discription={`${moment(item.setDate).format('DD MMM YYYY')},${
+          discription={`${moment(item.setDate).format('DD MMM YYYY')}, ${
             item.setTime
           }`}
         />

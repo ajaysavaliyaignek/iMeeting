@@ -20,6 +20,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [activeTab, setActiveTab] = useState('AllUsers');
   const [userData, setUserData] = useState(item.userDetails);
+  const [filterUserData, setFilterUserData] = useState(item.userDetails);
   const [speakerData, setSpeekerData] = useState([]);
   const [filterSpeakerData, setFilterSpeakerData] = useState([]);
   const client = useApolloClient();
@@ -33,21 +34,26 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
     onCompleted: (data) => {
       setSpeekerData(data.liveMeetingUsers.userDetails);
       setFilterSpeakerData(data.liveMeetingUsers.userDetails);
+    },
+    onError: (data) => {
+      console.log('GET_LIVE_MEETING_USERS error', data.message);
     }
   });
 
   const searchFilterUsers = (text) => {
     if (text) {
-      const newData = filterSpeakerData?.filter((item) => {
+      const newData = (filterSpeakerData || filterUserData)?.filter((item) => {
         const itemData = item.userName ? item.userName : '';
         const textData = text;
         return itemData.indexOf(textData) > -1;
       });
       setSearchText(text);
       setSpeekerData(newData);
+      setUserData(newData);
     } else {
       setSearchText(text);
       setSpeekerData(filterSpeakerData);
+      setUserData(filterUserData);
     }
   };
 

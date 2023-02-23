@@ -48,7 +48,6 @@ const UserDetailsCard = ({
   isDeletable,
   meetingData
 }) => {
-  console.log('meeting', meetingData);
   const [userDetails, setUserDetails] = useState(null);
 
   // get user by id
@@ -59,7 +58,6 @@ const UserDetailsCard = ({
       userId: item.userId
     },
     onCompleted: (data) => {
-      console.log('user details', data);
       setUserDetails(data.committeeMemberById);
     },
     onError: (data) => {
@@ -113,8 +111,7 @@ const UserDetailsCard = ({
             }}
           >
             {meetingData?.yourRoleName !== 'Member' ? (
-                <SelectList
-                  
+              <SelectList
                 setSelected={(val) => {
                   updateSpeaker({
                     variables: {

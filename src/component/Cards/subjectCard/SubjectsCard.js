@@ -33,6 +33,7 @@ const SubjectsCard = ({
   isLiveMeetingSubject,
   isApproveMeetingSubject
 }) => {
+  console.log('subject', item);
   const navigation = useNavigation();
   const [statusTitleOption, setstatusTitleOption] = useState([]);
   const [user, setUser] = useState({});
@@ -448,14 +449,14 @@ const SubjectsCard = ({
                   decisionData?.statusTitle == ''
                   ? false
                   : true
-                : item.status.isDisable
+                : item.status.entitys.isDisable
             }
             deleted={
               isLiveMeetingSubject || isApproveMeetingSubject
                 ? false
                 : isDecisionSubject
                 ? false
-                : item.status.isDisable
+                : item.status.entitys.isDisable
             }
             isViewable={
               isDecisionSubject && isApproveMeetingSubject

@@ -72,10 +72,13 @@ const AddVoting = () => {
     onCompleted: (data) => {
       if (data) {
         console.log(data.addVotingQuestion.status);
-        if (data.addVotingQuestion.status[0].statusCode == '200') {
+        if (data.addVotingQuestion.status.statusCode == '200') {
           navigation.goBack();
         }
       }
+    },
+    onError: (data) => {
+      console.log('addVoting error', data.message);
     }
   });
 

@@ -92,9 +92,9 @@ export const styles = StyleSheet.create({
 
     // marginTop: 160
     position: 'absolute',
-    bottom: '35%',
-    height: 265,
-    width: 280
+    bottom: '30%',
+    height: SIZES[265],
+    width: SIZES[280]
   },
   txtClose: {
     alignSelf: 'center',

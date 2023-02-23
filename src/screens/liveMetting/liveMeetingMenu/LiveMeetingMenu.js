@@ -5,7 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Modal
+  Modal,
+  Platform
 } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -244,8 +245,8 @@ const LiveMeetingMenu = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('updateMeetingSttaus', data.updateMeetingStatus.status[0]);
-      if (data.updateMeetingStatus.status[0].statusCode == '200') {
+      console.log('updateMeetingSttaus', data.updateMeetingStatus.status);
+      if (data.updateMeetingStatus.status.statusCode == '200') {
         navigation.navigate('Details', {
           title: 'Meetings',
           active: '0'
@@ -381,7 +382,14 @@ const LiveMeetingMenu = () => {
           <View
             style={[
               styles.mainBoxView,
-              { height: item.yourRoleName !== 'Member' ? 265 : 220 }
+              {
+                height:
+                  item.yourRoleName !== 'Member'
+                    ? Platform.OS == 'ios'
+                      ? 265
+                      : 320
+                    : SIZES[220]
+              }
             ]}
           >
             <View style={styles.textContainer}>

@@ -83,7 +83,6 @@ const DashboardScreen = () => {
       isDeleted: true
     },
     onCompleted: (data) => {
-      console.log('all committes', data.committees.items);
       setCommitteeData(data.committees.items);
     },
     onError: (data) => {

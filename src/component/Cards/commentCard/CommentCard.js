@@ -39,7 +39,7 @@ const CommentCard = ({
       }
     ],
     onCompleted: (data) => {
-      if (data.addComment.status[0].statusCode == 200) {
+      if (data.addComment.status.statusCode == 200) {
         setChildCommentId(null);
       }
     }

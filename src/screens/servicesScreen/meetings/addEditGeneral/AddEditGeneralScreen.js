@@ -21,8 +21,6 @@ const AddEditGeneralScreen = ({
   const [committee, setCommittee] = useState(null);
   const [token, setToken] = useState('');
 
-  console.log('generaldData', generaldData);
-
   details?.attachFileIds?.map((id) => {
     console.log('id', id);
     const { loading, error } = useQuery(GET_FILE, {

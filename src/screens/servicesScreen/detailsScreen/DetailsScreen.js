@@ -22,6 +22,7 @@ import { Fonts } from '../../../themes';
 import { UserContext } from '../../../context';
 import MeetingsCard from '../../../component/Cards/meetingCard/MeetingdCard';
 import SubjectListComponent from '../../../component/detailsComponent/subjectsListComponent/SubjectListComponent';
+import DelegationList from '../../delegation/delegationList/DelegationList';
 
 const DetailsScreen = () => {
   const route = useRoute();
@@ -56,6 +57,14 @@ const DetailsScreen = () => {
   }, [committee]);
 
   // get ALL MEETINGS
+  // committeeIds: $committeeIds
+  // date: $date
+  // onlyMyMeeting: $onlyMyMeeting
+  // page: $page
+  // pageSize: $pageSize
+  // searchValue: $searchValue
+  // sort: $sort
+  // screen: $screen
   const {
     loading: loadingGetMeetings,
     error: errorGetMeetings,
@@ -68,7 +77,9 @@ const DetailsScreen = () => {
       screen: 0,
       searchValue: searchText,
       page: -1,
-      pageSize: -1
+      pageSize: -1,
+      sort: '',
+      date: ''
     },
     onCompleted: (data) => {
       if (data) {
@@ -87,7 +98,9 @@ const DetailsScreen = () => {
       {/* header */}
       <TouchableOpacity
         style={{ flex: 1 }}
-        onPress={() => setVisibleIndex(-1)}
+        onPress={() => {
+          setVisibleIndex(-1), setSearch(false);
+        }}
         activeOpacity={1}
       >
         <View style={styles.headerContainer}>
@@ -147,6 +160,11 @@ const DetailsScreen = () => {
                     subjectDetails: null,
                     screenName: 'Add subject'
                   });
+                } else {
+                  navigation.navigate('AddEditDelegation', {
+                    isEdit: false,
+                    delegationData: null
+                  });
                 }
               }}
               activeOpacity={0.5}
@@ -178,7 +196,7 @@ const DetailsScreen = () => {
                       ? setSearchText(text)
                       : activeTab === '1'
                       ? setSearchText(text)
-                      : null;
+                      : setSearchText(text);
                   }}
                   value={searchText}
                   placeholder={
@@ -186,7 +204,7 @@ const DetailsScreen = () => {
                       ? 'Search meeting'
                       : activeTab === '1'
                       ? 'Search subject'
-                      : ''
+                      : 'Search delegation'
                   }
                 />
                 <TouchableOpacity
@@ -255,7 +273,7 @@ const DetailsScreen = () => {
                 </View>
               </TouchableOpacity>
 
-              <Divider style={[styles.divider, { marginLeft: SIZES[16] }]} />
+              <Divider style={[styles.divider]} />
               <View style={styles.btnContainer}>
                 <Button
                   title={'Meetings'}
@@ -390,6 +408,13 @@ const DetailsScreen = () => {
               }}
               isDecisionSubject={false}
               isSubjectStatus={true}
+            />
+          )}
+          {activeTab === '2' && (
+            <DelegationList
+              visibleIndex={visibleIndex}
+              setVisibleIndex={setVisibleIndex}
+              searchText={searchText}
             />
           )}
         </View>

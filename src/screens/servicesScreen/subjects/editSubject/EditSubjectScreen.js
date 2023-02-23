@@ -297,7 +297,7 @@ const EditSubjectScreen = () => {
                     }
                   },
                   onCompleted: (data) => {
-                    if (data.updateSubject.status[0].statusCode == '200') {
+                    if (data.updateSubject.status.statusCode == '200') {
                       navigation.navigate('Details', {
                         title: 'Subjects',
                         active: '1'

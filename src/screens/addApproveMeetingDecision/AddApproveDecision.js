@@ -62,7 +62,7 @@ const AddApproveDecision = () => {
     onCompleted: (data) => {
       if (data) {
         console.log('update Decision', data?.updateDecision?.status);
-        if (data.updateDecision.status[0].statusCode == '200') {
+        if (data.updateDecision.status.statusCode == '200') {
           navigation.goBack();
         }
       }

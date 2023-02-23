@@ -30,8 +30,10 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
   if (isMeeting) {
     queryParams = {
       meetingId: meetingData?.meetingId,
-      screen: 0,
-      committeeIds: ''
+
+      searchValue: searchText,
+      type: 2,
+      subjectId: 0
     };
   } else {
     queryParams = {

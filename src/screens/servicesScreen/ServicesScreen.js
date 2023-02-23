@@ -157,6 +157,12 @@ const ServicesScreen = ({ navigation }) => {
             width={SIZES[18]}
             textStyle={{ marginTop: SIZES[25] }}
             title={'Delegation'}
+            onPress={() => {
+              navigation.navigate('Details', {
+                title: 'Delegations',
+                active: '2'
+              });
+            }}
           />
           <DashboardCard
             backgroundColor={Colors.gray}
@@ -165,6 +171,9 @@ const ServicesScreen = ({ navigation }) => {
             width={SIZES[20]}
             textStyle={{ marginTop: SIZES[25] }}
             title={'Statistics'}
+            onPress={() => {
+              navigation.navigate('Statistic');
+            }}
           />
         </View>
       </ScrollView>

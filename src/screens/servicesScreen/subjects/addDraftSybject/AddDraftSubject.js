@@ -128,7 +128,7 @@ const AddDraftSubject = () => {
     // export const GET_All_SUBJECTS = gql`
     refetchQueries: ['subjects'],
     onCompleted: (data) => {
-      if (data?.updateSubject?.status[0]?.statusCode == '200') {
+      if (data?.updateSubject?.status?.statusCode == '200') {
         navigation.goBack();
       }
     }

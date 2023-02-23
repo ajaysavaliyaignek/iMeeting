@@ -138,8 +138,8 @@ const SecretaryPermission = () => {
         'updateSecretaryPermission',
         data.updateTaskSecretaryPermission
       );
-      if (data.updateTaskSecretaryPermission.status[0].statusCode == '200') {
-        alert(data.updateTaskSecretaryPermission.status[0].statusMessage);
+      if (data.updateTaskSecretaryPermission.status.statusCode == '200') {
+        alert(data.updateTaskSecretaryPermission.status.statusMessage);
       }
     },
     onError: (data) =>

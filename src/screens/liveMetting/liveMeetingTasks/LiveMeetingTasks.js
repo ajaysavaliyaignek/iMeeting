@@ -41,14 +41,25 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
             return type;
           }
         });
-
+        // onlyMyTask: $onlyMyTask
+        // page: $page
+        // pageSize: $pageSize
+        // searchValue: $searchValue
+        // sort: $sort
+        // taskStatusIds: $taskStatusIds
+        // taskTypeIds: $taskTypeIds
+        // date: $date
+        // subjectId: $subjectId
+        // meetingId: $meetingId
         TasksData({
           variables: {
             searchValue: searchText,
             onlyMyTask: onlyMyTasks,
             meetingId: meetingData?.meetingId,
             subjectId: 0,
-            taskTypeIds: filterTaskType[0]?.id?.toString()
+            taskTypeIds: filterTaskType[0]?.id?.toString(),
+            page: -1,
+            pageSize:-1
           }
         });
 

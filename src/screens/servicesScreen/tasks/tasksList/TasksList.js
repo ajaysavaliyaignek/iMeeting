@@ -69,11 +69,14 @@ const TasksList = () => {
       searchValue: searchText,
       onlyMyTask: onlyMyTask,
       taskStatusIds: taskStatusIds,
-      taskTypeIds: taskTypesIds
+      taskTypeIds: taskTypesIds,
+      page: -1,
+      pageSize: -1,
+      meetingId: 0,
+      subjectId: 0
     },
 
     onCompleted: (data) => {
-      console.log('all tasks', data?.tasks.items);
       setTasksData(data?.tasks.items);
     },
     onError: (data) => {
@@ -104,13 +107,6 @@ const TasksList = () => {
       },
       {
         text: 'Cancel',
-        // onPress: () => {
-        //   deleteSubject({
-        //     variables: {
-        //       subjectId: id
-        //     }
-        //   });
-        // },
         style: 'cancel'
       }
     ]);
@@ -313,7 +309,7 @@ const TasksList = () => {
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
               {Tasks?.error?.message == 'Network request failed'
                 ? 'No Internet connection'
-                : Tasks?.error?.message}
+                : 'Something went wrong...'}
             </Text>
           </View>
         ) : Tasks.loading ? (

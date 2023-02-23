@@ -19,12 +19,14 @@ import { Colors } from '../../../themes/Colors';
 import { Divider } from 'react-native-paper';
 import { GET_ALL_VIDEO_CONFERENCES } from '../../../graphql/query';
 import VideoConferenceCard from '../../../component/Cards/videoConferenceCard/VideoConferenceCard';
+import Loader from '../../../component/Loader/Loader';
 
 const VideoConferenceList = () => {
   const navigation = useNavigation();
   const [search, setSearch] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
+  const [videoConferences, setVideoConferences] = useState([]);
 
   const getAllVideoConferences = useQuery(GET_ALL_VIDEO_CONFERENCES, {
     variables: {
@@ -35,47 +37,15 @@ const VideoConferenceList = () => {
       sort: ''
     },
     onCompleted: (data) => {
-      console.log('getAllVideoConferences', data);
+      console.log('getAllVideoConferences', data.videoConferences.items);
+      setVideoConferences(data.videoConferences.items);
     },
     onError: (data) => {
       console.log('getAllVideoConferences error', data.message);
     }
   });
 
-  const data = [
-    {
-      title: 'Advisory Committee on Fina...',
-      committee: 'iMeeting',
-      yourRoleName: 'Head',
-      dateAndTime: '13 Aug 2021, 08:00 AM',
-      platform: 'Google Meet',
-      link: 'fjdf-fsgl-fds'
-    },
-    {
-      title: 'Advisory Committee on Fina...',
-      committee: 'iMeeting',
-      yourRoleName: 'Head',
-      dateAndTime: '13 Aug 2021, 08:00 AM',
-      platform: 'Google Meet',
-      link: 'fjdf-fsgl-fds'
-    },
-    {
-      title: 'Advisory Committee on Fina...',
-      committee: 'iMeeting',
-      yourRoleName: 'Head',
-      dateAndTime: '13 Aug 2021, 08:00 AM',
-      platform: 'Google Meet',
-      link: 'fjdf-fsgl-fds'
-    },
-    {
-      title: 'Advisory Committee on Fina...',
-      committee: 'iMeeting',
-      yourRoleName: 'Head',
-      dateAndTime: '13 Aug 2021, 08:00 AM',
-      platform: 'Google Meet',
-      link: 'fjdf-fsgl-fds'
-    }
-  ];
+
   return (
     <SafeAreaView style={styles.conatiner}>
       {/* header */}
@@ -204,8 +174,51 @@ const VideoConferenceList = () => {
             <Divider style={styles.divider} />
           </View>
         )}
-        <FlatList
-          data={data}
+        {getAllVideoConferences.loading ? (
+          <Loader />
+        ) : videoConferences.length > 0 ? (
+          <FlatList
+            data={videoConferences}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => {
+              return (
+                <VideoConferenceCard
+                  item={item}
+                  index={index}
+                  visibleIndex={visibleIndex}
+                  setVisibleIndex={setVisibleIndex}
+                  searchText={searchText}
+                />
+              );
+            }}
+          />
+        ) : videoConferences.length == 0 ? (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+              No video conferences found.
+            </Text>
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.Rejected }}>
+              Something went wrong.....
+            </Text>
+          </View>
+        )}
+        {/* <FlatList
+          data={videoConferences}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => {
             return (
@@ -218,7 +231,7 @@ const VideoConferenceList = () => {
               />
             );
           }}
-        />
+        /> */}
       </View>
     </SafeAreaView>
   );

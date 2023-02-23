@@ -57,7 +57,7 @@ const MeetingDetails = () => {
       }
     ],
     onCompleted: (data) => {
-      if (data.deleteMeeting.status[0].statusCode == '200') {
+      if (data.deleteMeeting.status.statusCode == '200') {
         navigation.goBack();
       }
     },
@@ -102,8 +102,8 @@ const MeetingDetails = () => {
   const [updateMeetingStatus] = useMutation(UPDATE_MEETING_STATUS, {
     refetchQueries: ['meetings'],
     onCompleted: (data) => {
-      console.log('updateMeetingSttaus', data.updateMeetingStatus.status[0]);
-      if (data.updateMeetingStatus.status[0].statusCode == '200') {
+      console.log('updateMeetingSttaus', data.updateMeetingStatus.status);
+      if (data.updateMeetingStatus.status.statusCode == '200') {
         navigation.navigate('LiveMeetingMenu', {
           item,
           meetingStatus: meetingStatus
@@ -162,7 +162,7 @@ const MeetingDetails = () => {
                         width:
                           item.meetingStatusTitle == 'Closed'
                             ? '100%'
-                            : !item.status.canStart
+                            : !item.status.entitys.canStart
                             ? '30%'
                             : '23%'
                       }
@@ -201,14 +201,14 @@ const MeetingDetails = () => {
                       width:
                         item.meetingStatusTitle == 'Closed'
                           ? '100%'
-                          : !item.status.canStart
+                          : !item.status.entitys.canStart
                           ? '30%'
                           : '23%'
                     }
                   ]}
                   onPress={onDeleteHandler}
                 />
-                {item.status.canStart &&
+                {item.status.entitys.canStart &&
                   moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
                     moment(meetingDate, 'YYYY-MM-DD hh:mm A')
                   ) && (
@@ -217,12 +217,15 @@ const MeetingDetails = () => {
                       layoutStyle={[styles.btnLayout]}
                       onPress={() => {
                         if (
-                          item.meetingStatusTitle !== 'Soft-Closed' ||
+                          item.meetingStatusTitle !== 'Soft-Closed' &&
                           item.meetingStatusTitle !== 'Live'
                         ) {
                           const filterStatus = meetingStatus?.filter(
                             (status) => {
-                              if (status.meetingStatusTitle == 'Live') {
+                              if (
+                                status.meetingStatusTitle == 'Live' ||
+                                status.meetingStatusTitle == 'Live'
+                              ) {
                                 return status;
                               }
                             }
@@ -260,7 +263,7 @@ const MeetingDetails = () => {
                           width:
                             item.meetingStatusTitle == 'Closed'
                               ? '100%'
-                              : !item.status.canStart
+                              : !item.status.entitys.canStart
                               ? '30%'
                               : '23%'
                         }

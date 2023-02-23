@@ -96,7 +96,7 @@ const SubjectDecisionDropDown = ({
       ) : (
         isMomDecision && (
           <Button
-            title={'Add-approve-decision'}
+            title={'Add approve decision'}
             layoutStyle={{ backgroundColor: Colors.white }}
             textStyle={{ color: Colors.primary }}
             onPress={() => {

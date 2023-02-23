@@ -161,7 +161,7 @@ const EditMeetingSubjects = () => {
       }
     ],
     onCompleted: (data) => {
-      if (data.updateMeeting.status[0].statusCode == '200') {
+      if (data.updateMeeting.status.statusCode == '200') {
         setSelectedUsers([]);
         setMeetingsData([]);
 

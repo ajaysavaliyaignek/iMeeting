@@ -23,6 +23,7 @@ import { UPDATE_ANSWER } from '../../../../graphql/mutation';
 import {
   GET_All_APPOINTMENT,
   GET_All_MEETING,
+  GET_ALL_VIDEO_CONFERENCES,
   GET_ANSWER,
   GET_USER_PAYLOAD
 } from '../../../../graphql/query';
@@ -32,7 +33,12 @@ const YourAnswer = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { item, userID } = route?.params;
-  console.log('item from your answer', item.meetingId, userID);
+  console.log(
+    'item from your answer',
+    item.meetingId,
+    item.appointmentId,
+    userID
+  );
   const [open, setOpen] = useState(false);
   const [valueAnswer, setValue] = useState(null);
   const [suggestedTime, setSuggestedTime] = useState('');
@@ -52,6 +58,13 @@ const YourAnswer = () => {
 
       userId: +userID,
       type: 4
+    };
+  } else if (item.meetingId == undefined && item.appointmentId == undefined) {
+    queryParams = {
+      id: +item.videoConferenceId,
+
+      userId: +userID,
+      type: 5
     };
   } else {
     queryParams = {
@@ -89,11 +102,21 @@ const YourAnswer = () => {
       },
       {
         query: GET_USER_PAYLOAD
+      },
+      {
+        query: GET_ALL_VIDEO_CONFERENCES,
+        variables: {
+          date: '',
+          page: -1,
+          pageSize: -1,
+          searchValue: '',
+          sort: ''
+        }
       }
     ],
     onCompleted: (data) => {
       console.log('add answer status', data.updateAnswer);
-      if (data.updateAnswer.status[0].statusCode == 200) {
+      if (data.updateAnswer.status.statusCode == 200) {
         navigation.goBack();
       }
     },
@@ -179,7 +202,11 @@ const YourAnswer = () => {
                 suggestionTime:
                   valueAnswer == 'Suggest time' ? suggestedTime : '',
                 meetingId: item?.meetingId == undefined ? 0 : item?.meetingId,
-                videoConferenceId: 0
+                videoConferenceId:
+                  item?.meetingId == undefined &&
+                  item?.appointmentId == undefined
+                    ? item.videoConferenceId
+                    : 0
               });
               updateAnswer({
                 variables: {
@@ -193,7 +220,11 @@ const YourAnswer = () => {
                       valueAnswer == 'Suggest time' ? suggestedTime : '',
                     meetingId:
                       item?.meetingId == undefined ? 0 : item?.meetingId,
-                    videoConferenceId: 0
+                    videoConferenceId:
+                      item?.meetingId == undefined &&
+                      item?.appointmentId == undefined
+                        ? item.videoConferenceId
+                        : 0
                   }
                 }
               });

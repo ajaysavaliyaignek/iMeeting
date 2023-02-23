@@ -128,7 +128,7 @@ const LiveMeetingDetails = ({ item, meeting }) => {
       }
     ],
     onCompleted: (data) => {
-      if (data.deleteMeeting.status[0].statusCode == '200') {
+      if (data.deleteMeeting.status.statusCode == '200') {
         navigation.goBack();
       }
     },

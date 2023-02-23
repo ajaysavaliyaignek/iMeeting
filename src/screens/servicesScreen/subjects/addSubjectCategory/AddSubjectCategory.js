@@ -23,7 +23,7 @@ const AddSubjectCategory = () => {
       refetchQueries: [{ query: GET_All_SUBJECTS_CATEGORY }],
       onCompleted: (data) => {
         console.log(data.updateSubjectCategory.status);
-        if (data.updateSubjectCategory.status[0].statusCode == '200') {
+        if (data.updateSubjectCategory.status.statusCode == '200') {
           navigation.goBack();
           setTitle('');
           setDescription('');

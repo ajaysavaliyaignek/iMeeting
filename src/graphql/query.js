@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GET_ALL_VIDEO_CONFERENCES = gql`
-  query videoConferences(
+  query (
     $date: String
     $page: Int
     $pageSize: Int
@@ -31,6 +31,11 @@ export const GET_ALL_VIDEO_CONFERENCES = gql`
         setDate
         setTime
         timeZone
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
         videoConferenceDescription
         videoConferenceId
         videoConferenceTitle
@@ -51,7 +56,7 @@ export const GET_ALL_VIDEO_CONFERENCES = gql`
           roleId
           roleName
           speakingDuration
-          status
+
           suggestedTime
           userId
           userName
@@ -90,6 +95,11 @@ export const GET_ALL_VIDEO_CONFERENCES_BY_ID = gql`
       attachFileIds
       answers
       required
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
       userDetails {
         answer
         appointmentId
@@ -102,7 +112,7 @@ export const GET_ALL_VIDEO_CONFERENCES_BY_ID = gql`
         roleId
         roleName
         speakingDuration
-        status
+
         suggestedTime
         userId
         userName
@@ -241,7 +251,12 @@ export const GET_ALL_CHATS = gql`
         meetingId
         message
         profilePicture
-        status
+
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
         userId
         userName
         fileUploads {
@@ -350,6 +365,7 @@ export const GET_LIVE_MEETING_USERS = gql`
         isSpeaker
         roleId
         roleName
+
         status
         userId
         userName
@@ -412,7 +428,6 @@ export const GET_ALL_TASKS = gql`
     $date: String
     $subjectId: Long
     $meetingId: Long
-    $taskTypeIds: String
   ) {
     tasks(
       onlyMyTask: $onlyMyTask
@@ -425,7 +440,6 @@ export const GET_ALL_TASKS = gql`
       date: $date
       subjectId: $subjectId
       meetingId: $meetingId
-      taskTypeIds: $taskTypeIds
     ) {
       items {
         taskId
@@ -455,6 +469,12 @@ export const GET_ALL_TASKS = gql`
         userName
         dateOfCreation
         commentThreadId
+
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
       }
       totalCount
       pageSize
@@ -623,7 +643,12 @@ export const GET_All_USERS = gql`
         privateDetails
         externalUser
         organizationIds
-        status
+
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
       }
       page
       pageSize
@@ -702,7 +727,12 @@ export const GET_All_SUBJECTS = gql`
         statusTitle
         statusId
         meetingId
-        status
+
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
       }
       pageSize
       pageSize
@@ -744,7 +774,12 @@ export const GET_SUBJECTS_CATEGORY_BY_ID = gql`
       id
       isDisable
       modifiedBy
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -765,7 +800,12 @@ export const GET_SUBJECT_BY_ID = gql`
       userId
       statusTitle
       commentThreadId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -811,7 +851,12 @@ export const GET_All_COMMITTEE = gql`
         isDisable
         setUpDate
         userIds
-        status
+
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
         categoryTitle
         roleIds
       }
@@ -884,7 +929,12 @@ export const GET_COMMITTEES_BY_ROLE = gql`
         organizationId
         parentCommitteeId
         setUpDate
-        status
+
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
         title
         userIds
         attachDocumentIds
@@ -973,7 +1023,11 @@ export const GET_All_MEETING = gql`
         setDate
         setTime
         endTime
-        status
+        status {
+          entitys
+          statusCode
+          statusMessage
+        }
         timeZone
         workHours
         answers
@@ -1007,7 +1061,9 @@ export const GET_MEETING_BY_ID = gql`
       attachFileIds
       availableId
       committeeId
-
+      attendanceFeedback
+      attendanceFeedbackDate
+      subjectSuggestion
       creatorName
       description
       endDate
@@ -1021,7 +1077,12 @@ export const GET_MEETING_BY_ID = gql`
       repeat
       required
       setDate
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
       subjectIds
       subjectStatusIds
       timeZone

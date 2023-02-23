@@ -19,6 +19,9 @@ import { SIZES } from '../../../themes/Sizes';
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
+import { DELETE_VIDEO_CONFERENCE } from '../../../graphql/mutation';
+import { useMutation } from '@apollo/client';
 
 const VideoConferenceCard = ({
   item,
@@ -29,25 +32,39 @@ const VideoConferenceCard = ({
 }) => {
   const navigation = useNavigation();
 
+  const [deleteVideoConference] = useMutation(DELETE_VIDEO_CONFERENCE, {
+    refetchQueries: ['videoConferences', 'videoConference'],
+    onCompleted: (data) => {
+      console.log('delete appointment', data.deleteVideoConference.status);
+    },
+    onError: (data) => {
+      console.log('deleteVideoConference error', data.message);
+    }
+  });
+
   const onDeleteHandler = (id) => {
     console.log(id);
 
-    Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
-      {
-        text: 'Delete',
-        onPress: () =>
-          deleteAppointment({
-            variables: {
-              id: id
-            }
-          }),
-        style: 'destructive'
-      },
-      {
-        text: 'Cancel',
-        style: 'cancel'
-      }
-    ]);
+    Alert.alert(
+      'Delete video conference',
+      'Are you sure you want to delete this?',
+      [
+        {
+          text: 'Delete',
+          onPress: () =>
+            deleteVideoConference({
+              variables: {
+                id: id
+              }
+            }),
+          style: 'destructive'
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        }
+      ]
+    );
   };
 
   const RowData = ({
@@ -71,7 +88,9 @@ const VideoConferenceCard = ({
             }
           ]}
         >
-          <Text style={[styles.discription, style]}>{discription}</Text>
+          <Text style={[styles.discription, style]} numberOfLines={1}>
+            {discription}
+          </Text>
           {isLink && (
             <TouchableOpacity
               style={{ marginLeft: SIZES[12] }}
@@ -104,7 +123,7 @@ const VideoConferenceCard = ({
     <TouchableOpacity
       activeOpacity={1}
       onPress={() => setVisibleIndex(-1)}
-      key={item.appointmentId}
+      key={item.videoConferenceId}
       // style={{ opacity: item.isDisable && 0.5 }}
     >
       {index !== 0 && <Divider style={styles.divider} />}
@@ -118,21 +137,34 @@ const VideoConferenceCard = ({
         activeOpacity={0.5}
       >
         {getHighlightedText(
-          item.title,
+          item.videoConferenceTitle,
           searchText,
           (styleTitle = { width: '100%' })
         )}
 
         {/* subject details */}
-        <RowData name={'Committee'} discription={item.committee} />
+        <RowData
+          name={'Committee'}
+          discription={item.committeeName}
+          style={{ width: '80%' }}
+        />
         <RowData name={'Your role'} discription={item.yourRoleName} />
-        <RowData name={'Date & Time'} discription={item.dateAndTime} />
-        <RowData name={'Platform'} discription={item.platform} />
+        <RowData
+          name={'Date & Time'}
+          discription={`${moment(item.setDate).format('DD MMM YYYY')}, ${
+            item.setTime
+          }`}
+        />
+        <RowData name={'Platform'} discription={item.platformName} />
         <RowData
           name={'Link'}
-          discription={item.link}
+          discription={item.platformlink}
           isLink={true}
-          style={{ ...Fonts.PoppinsSemiBold[14], color: Colors.primary }}
+          style={{
+            ...Fonts.PoppinsSemiBold[14],
+            color: Colors.primary,
+            width: '80%'
+          }}
         />
       </View>
 
@@ -151,7 +183,7 @@ const VideoConferenceCard = ({
             onPressDownload={() => navigation.navigate('SubjectDownload')}
             subjectStatus={item.isDisable && 'Deleted'}
             onPressDelete={() => {
-              onDeleteHandler(item.appointmentId);
+              onDeleteHandler(item.videoConferenceId);
               setVisibleIndex(-1);
             }}
             onPressEdit={() => {

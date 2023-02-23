@@ -9,11 +9,13 @@ import {
   Alert
 } from 'react-native';
 import React, { useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { Divider } from 'react-native-paper';
+
 import { styles } from './styles';
 import Header from '../../../../component/header/Header';
 import { Icon, IconName } from '../../../../component';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import {
   GET_All_COMMENTS_THREAD,
   GET_FILE,
@@ -27,7 +29,6 @@ import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 import CommentCard from '../../../../component/Cards/commentCard/CommentCard';
 import { Colors } from '../../../../themes/Colors';
 import { DELETE_TASK, UPDATE_COMMENT } from '../../../../graphql/mutation';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 import Loader from '../../../../component/Loader/Loader';
 
@@ -135,7 +136,7 @@ const TaskDetails = () => {
       }
     ],
     onCompleted: (data) => {
-      if (data.addComment.status[0].statusCode == 200) {
+      if (data.addComment.status.statusCode == 200) {
         setCommentId(null);
       }
     }
@@ -178,7 +179,7 @@ const TaskDetails = () => {
     refetchQueries: ['tasks'],
     onCompleted: (data) => {
       console.log('delete tasks', data.deleteTask.status);
-      if (data.deleteTask.status[0].statusCode == '200') {
+      if (data.deleteTask.status.statusCode == '200') {
         navigation.goBack();
       }
     }

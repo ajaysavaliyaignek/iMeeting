@@ -30,7 +30,8 @@ const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
           voting: {
             answerIds: answerIds,
             votingId: item?.votingId,
-            isMultipleSelect: item?.isMultipleSelect
+            isMultipleSelect: item?.isMultipleSelect,
+            isPrivate: item?.isPrivate
           }
         }
       });
@@ -46,7 +47,8 @@ const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
         query: GET_VOTING_DETAILS,
         variables: {
           meetingId: meetingData?.meetingId,
-
+          subjectId: 0,
+          type: 1,
           searchValue: ''
         }
       }
@@ -54,7 +56,7 @@ const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
     onCompleted: (data) => {
       if (data) {
         console.log('add voting answer', data.addUserAnswer);
-        // if (data.addVotingQuestion.status[0].statusCode == '200') {
+        // if (data.addVotingQuestion.status.statusCode == '200') {
         //   navigation.goBack();
         // }
       }
@@ -72,7 +74,8 @@ const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
           voting: {
             answerIds: [data?.id],
             votingId: item?.votingId,
-            isMultipleSelect: item?.isMultipleSelect
+            isMultipleSelect: item?.isMultipleSelect,
+            isPrivate: item?.isPrivate
           }
         }
       });

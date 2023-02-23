@@ -57,7 +57,7 @@ const AddExternalUser = () => {
     ],
     onCompleted: (data) => {
       console.log(data.updateCommitteeMember.status);
-      if (data.updateCommitteeMember.status[0].statusCode == '200') {
+      if (data.updateCommitteeMember.status.statusCode == '200') {
         navigation.goBack();
         setEmail('');
         setFirstName('');

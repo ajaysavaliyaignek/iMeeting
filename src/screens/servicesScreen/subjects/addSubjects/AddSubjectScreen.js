@@ -67,13 +67,23 @@ const AddSubjectScreen = () => {
       committeeIds: `${committee}`
     };
   } else if (meetingId) {
+    // committeeIds: committeeIds,
+    // searchValue: searchText,
+    // screen: 2,
+    // page: -1,
+    // pageSize: -1,
+    // meetingId: meetingId,
+    // isDraft: false,
+    // sort: ''
     queryParams = {
       committeeIds: '',
       searchValue: '',
-      screen: 0,
+      screen: 2,
       page: -1,
       pageSize: -1,
-      meetingId: meetingId
+      meetingId: meetingId,
+      isDraft: false,
+      sort: ''
     };
   } else {
     queryParams = {
@@ -81,7 +91,8 @@ const AddSubjectScreen = () => {
       screen: 0,
       committeeIds: '',
       page: -1,
-      pageSize: -1
+      pageSize: -1,
+      meetingId: 0
     };
   }
 
@@ -148,17 +159,26 @@ const AddSubjectScreen = () => {
     GET_All_MEETING,
     {
       fetchPolicy: 'cache-and-network',
-      variables: { onlyMyMeeting: false, screen: 1 },
+      variables: {
+        onlyMyMeeting: false,
+        committeeIds: '',
+        screen: 1,
+        searchValue: '',
+        page: -1,
+        pageSize: -1,
+        sort: '',
+        date: ''
+      },
       onCompleted: (data) => {
         if (data) {
           setMeetings(data.meetings.items);
         }
+      },
+      onError: (data) => {
+        console.log('MeetingError', data.message);
       }
     }
   );
-  if (MeetingError) {
-    console.log('MeetingError', MeetingError);
-  }
 
   useEffect(() => {
     getToken();
@@ -187,7 +207,7 @@ const AddSubjectScreen = () => {
     ],
     onCompleted: (data) => {
       console.log('update subject', data.updateSubject?.status);
-      if (data?.updateSubject?.status[0]?.statusCode == '200') {
+      if (data?.updateSubject?.status?.statusCode == '200') {
         if (committee) {
           navigation.goBack();
         } else {
@@ -336,8 +356,11 @@ const AddSubjectScreen = () => {
                 subjectCategoryId: subjectData.valueCategory,
                 draft: false,
                 attachFileIds: subjectData.filesId,
-                meetingId: subjectData.valueMeeting,
-                id: 0
+                meetingId:
+                  subjectData.valueMeeting == null
+                    ? 0
+                    : subjectData.valueMeeting,
+                id: isLiveMeetingSubject ? 1 : 0
               });
               addSubject({
                 variables: {

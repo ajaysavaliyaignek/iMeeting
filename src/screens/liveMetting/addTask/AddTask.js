@@ -32,7 +32,7 @@ const AddTask = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { meetingDetails, isEdit, taskData, isMeetingTask } = route?.params;
-  console.log('onpress edit task', meetingDetails);
+
   const [valueType, setValueType] = useState(
     isEdit ? (taskData?.subjectId == null ? 'Meeting' : 'Subject') : null
   );
@@ -93,7 +93,8 @@ const AddTask = () => {
   // get task executors
   const getTaskExecutor = useQuery(GET_TASK_EXECUTORS, {
     fetchPolicy: 'cache-and-network',
-    onCompleted: (data, error) => {
+    onCompleted: (data) => {
+      console.log('getTaskExecutor data', data);
       if (data) {
         let executor = data?.taskExecutor?.executorIds?.map((exe, index) => {
           return { value: exe, label: data.taskExecutor?.executorNames[index] };
@@ -101,22 +102,22 @@ const AddTask = () => {
 
         setTaskExecutors(executor);
       }
-      if (error) {
-        console.log('getTaskExecutor error', error);
-      }
+    },
+    onError: (data) => {
+      console.log('getTaskExecutor error', data.message);
     }
   });
 
   // get task priority
   const getTaskPriority = useQuery(GET_TASK_PRIORITY, {
     fetchPolicy: 'cache-and-network',
-    onCompleted: (data, error) => {
+    onCompleted: (data) => {
       if (data) {
         setTaskPriority(data.taskPriority.items);
       }
-      if (error) {
-        console.log('gettask priority error', error);
-      }
+    },
+    onError: (data) => {
+      console.log('gettask priority error', data.message);
     }
   });
 
@@ -131,8 +132,8 @@ const AddTask = () => {
       refetchQueries: ['tasks', 'task'],
       onCompleted: (data) => {
         if (data) {
-          console.log('updateTask', data.updateTask.status[0]);
-          if (data.updateTask.status[0].statusCode == '200') {
+          console.log('updateTask', data.updateTask.status.statusCode);
+          if (data.updateTask.status.statusCode == '200') {
             navigation.goBack();
           }
         }
@@ -286,27 +287,34 @@ const AddTask = () => {
             onPress={() => {
               console.log('updat task data', {
                 attachFiles: fileId,
-                deadlineDate: new Date(calendarValue.calendarValue),
+                deadlineDate: moment(calendarValue.calendarValue).format(
+                  'YYYY-MM-DD'
+                ),
                 description: taskDescription,
                 executorId: valueExecutor,
                 priorityId: valuePriority,
-                taskStatusId: isEdit ? taskData?.taskStatusId : 0,
+                // taskStatusId: isEdit ? taskData?.taskStatusId : 0,
                 taskId: isEdit ? taskData?.taskId : 0,
                 title: titleTask,
-                taskTypeId: isEdit ? taskData?.taskTypeId : 607
+                taskTypeId: isEdit ? taskData?.taskTypeId : 0,
+                subjectId: valueSubject == null ? 0 : valueSubject,
+                meetingId:
+                  meetingDetails == null ? 0 : meetingDetails?.meetingId
               });
               updateTask({
                 variables: {
                   task: {
                     attachFiles: fileId,
-                    deadlineDate: new Date(calendarValue.calendarValue),
+                    deadlineDate: moment(calendarValue.calendarValue).format(
+                      'YYYY-MM-DD'
+                    ),
                     description: taskDescription,
                     executorId: valueExecutor,
                     priorityId: valuePriority,
                     taskStatusId: isEdit ? taskData?.taskStatusId : 0,
                     taskId: isEdit ? taskData?.taskId : 0,
                     title: titleTask,
-                    taskTypeId: isEdit ? taskData?.taskTypeId : 0,
+                    taskType: isEdit ? taskData?.taskTypeId : 0,
                     subjectId: valueSubject == null ? 0 : valueSubject,
                     meetingId:
                       meetingDetails == null ? 0 : meetingDetails?.meetingId

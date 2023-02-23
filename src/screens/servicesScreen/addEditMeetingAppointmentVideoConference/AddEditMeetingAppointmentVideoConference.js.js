@@ -12,10 +12,16 @@ import { styles } from './styles';
 import Header from '../../../component/header/Header';
 import { Colors } from '../../../themes/Colors';
 import { Button } from '../../../component/button/Button';
-import { UPDATE_APPOINTMENT, UPDATE_MEETING } from '../../../graphql/mutation';
+import {
+  UPDATE_APPOINTMENT,
+  UPDATE_MEETING,
+  UPDATE_VIDEO_CONFERENCE
+} from '../../../graphql/mutation';
 import {
   GET_All_APPOINTMENT,
   GET_All_MEETING,
+  GET_ALL_VIDEO_CONFERENCES,
+  GET_ALL_VIDEO_CONFERENCES_BY_ID,
   GET_APPOINTMENT_BY_ID,
   GET_MEETING_BY_ID
 } from '../../../graphql/query';
@@ -33,7 +39,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
     title: '',
     discription: '',
     valueCommitee: null,
-    filesId: null,
+    filesId: [],
     previousUser: [],
     startDateTime: new Date(),
     endDateTime: new Date(),
@@ -45,16 +51,16 @@ const AddEditMeetingAppointmentVideoConference = () => {
     previousSubject: [],
     attendanceFeedbackDate: moment(new Date()).format('YYYY-MM-DD'),
     attendanceFeedback: false,
-    subjectSuggestion: false
+    subjectSuggestion: false,
+    platformlink: null
   });
-
-  console.log('previousSubject from add edit', generaldData.previousSubject);
 
   let users = [];
   let requiredUsers = [];
   let subjects = [];
   let mutationParams = {};
   let appointmentMutationParams = {};
+  let videoConferenceParams = {};
 
   // get user ids
   users = generaldData?.previousUser?.map((item) => item.userId);
@@ -120,6 +126,28 @@ const AddEditMeetingAppointmentVideoConference = () => {
       timeZone: generaldData?.valueTimeZone,
       userIds: users
     };
+  } else if (type == 'VideoConference') {
+    videoConferenceParams = {
+      videoConferenceId: isEdit ? details?.videoConferenceId : 0,
+      videoConferenceTitle: generaldData?.title,
+      videoConferenceDescription: generaldData?.discription,
+      committeeId:
+        generaldData?.valueCommitee == null ? 0 : generaldData?.valueCommitee,
+      attachFileIds: generaldData?.filesId,
+      repeat: generaldData?.valueRepeat,
+      setDate: moment(generaldData?.startDateTime).format('YYYY-MM-DD'),
+      setTime: moment(generaldData?.startDateTime).format('LT'),
+      endDate: moment(generaldData?.endDateTime).format('YYYY-MM-DD'),
+      endTime: moment(generaldData?.endDateTime).format('LT'),
+      timeZone: generaldData?.valueTimeZone,
+      userIds: users,
+      required: requiredUsers,
+
+      platformId:
+        generaldData?.valueVideoConference == null
+          ? 0
+          : generaldData?.valueVideoConference
+    };
   }
 
   // for get meeting and appointment data by id
@@ -162,6 +190,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
               : 2,
             calendarValue: moment(meeting?.deadlineDate).format('YYYY-MM-DD'),
             previousSubject: [],
+            subjectSuggestion: meeting.subjectSuggestion,
+            attendanceFeedback: meeting.attendanceFeedback,
             attendanceFeedbackDate: moment(
               meeting?.attendanceFeedbackDate
             ).format('YYYY-MM-DD')
@@ -216,6 +246,53 @@ const AddEditMeetingAppointmentVideoConference = () => {
       },
       onError: (data) => console.log('error from get appointment by id', data)
     });
+  } else if (type == 'VideoConference' && isEdit) {
+    const GetVideoConferenceById = useQuery(GET_ALL_VIDEO_CONFERENCES_BY_ID, {
+      fetchPolicy: 'cache-and-network',
+      variables: {
+        id: details?.videoConferenceId
+      },
+      onCompleted: (data) => {
+        console.log(
+          'videoConference by id from edit videoConference general',
+          data.videoConference
+        );
+        if (data) {
+          // setAppointment(data.appointment);
+          let videoConference = data.videoConference;
+          setGeneralData({
+            title: videoConference.videoConferenceTitle,
+            discription: videoConference.videoConferenceDescription,
+            valueCommitee: videoConference.committeeId,
+            filesId: [],
+            fileResponse: [],
+            previousUser: videoConference.userDetails,
+            startDateTime: moment(
+              `${videoConference.setDate}, ${videoConference.setTime}`,
+              'YYYY-MM-DD, hh:mm a'
+            ).format(),
+            endDateTime: moment(
+              `${videoConference.endDate}, ${videoConference.endTime}`,
+              'YYYY-MM-DD, hh:mm a'
+            ).format(),
+            valueRepeat: videoConference.repeat,
+            valueTimeZone: videoConference.timeZone,
+            valueLocation: videoConference.locationId,
+            valueVideoConference: videoConference.platformlink?.includes(
+              'google'
+            )
+              ? 1
+              : 2,
+            calendarValue: moment(videoConference.deadlineDate).format(
+              'YYYY-MM-DD'
+            ),
+            previousSubject: [],
+            platformlink: videoConference.platformlink
+          });
+        }
+      },
+      onError: (data) => console.log('error from get appointment by id', data)
+    });
   }
   // mutation for add and edit meeting
   const [addMeeting, { data, loading: addMeetingLoading, error }] = useMutation(
@@ -237,7 +314,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
       ],
       onCompleted: (data) => {
         console.log('add meeting', data.updateMeeting);
-        if (data.updateMeeting.status[0].statusCode == '200') {
+        if (data.updateMeeting.status.statusCode == '200') {
           navigation.navigate('Details', {
             title: 'Meetings',
             active: '0'
@@ -263,7 +340,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
       ],
       onCompleted: (data) => {
         console.log('add appointment', data.updateAppointment);
-        if (data.updateAppointment.status[0].statusCode == '200') {
+        if (data.updateAppointment.status.statusCode == '200') {
           navigation.navigate('AppointmentsList');
           setSelectedUsers([]);
           setAppointmentsData([]);
@@ -271,6 +348,35 @@ const AddEditMeetingAppointmentVideoConference = () => {
       },
       onError: (data) => {
         console.log('add appointment error', data);
+      }
+    }
+  );
+
+  // function for add and edit video conference
+  const [addVideoConference, { loading: updateVideoConference }] = useMutation(
+    UPDATE_VIDEO_CONFERENCE,
+    {
+      // export const GET_All_SUBJECTS = gql`
+      refetchQueries: [
+        {
+          query: GET_ALL_VIDEO_CONFERENCES,
+          variables: {
+            date: '',
+            page: -1,
+            pageSize: -1,
+            searchValue: '',
+            sort: ''
+          }
+        }
+      ],
+      onCompleted: (data) => {
+        console.log('add videoconference', data.updateVideoConference);
+        if (data.updateVideoConference.status.statusCode == '200') {
+          navigation.navigate('VideoConferenceList');
+        }
+      },
+      onError: (data) => {
+        console.log('add videoconference error', data.message);
       }
     }
   );
@@ -365,6 +471,16 @@ const AddEditMeetingAppointmentVideoConference = () => {
                       addAppointment({
                         variables: {
                           appointment: appointmentMutationParams
+                        }
+                      });
+                    } else if (type == 'VideoConference') {
+                      console.log(
+                        'videoConferenceParams',
+                        videoConferenceParams
+                      );
+                      addVideoConference({
+                        variables: {
+                          videoConference: videoConferenceParams
                         }
                       });
                     }

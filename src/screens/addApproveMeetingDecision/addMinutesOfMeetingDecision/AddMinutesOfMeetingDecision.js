@@ -43,8 +43,8 @@ const AddMinutesOfMeetingDecision = () => {
   const [updateMeetingStatus] = useMutation(UPDATE_MEETING_STATUS, {
     refetchQueries: ['meetings'],
     onCompleted: (data) => {
-      console.log('updateMeetingSttaus', data.updateMeetingStatus.status[0]);
-      if (data?.updateMeetingStatus?.status[0]?.statusCode == '200') {
+      console.log('updateMeetingSttaus', data.updateMeetingStatus.status);
+      if (data?.updateMeetingStatus?.status?.statusCode == '200') {
         navigation.navigate('Details', {
           title: 'Meetings',
           active: '0'
@@ -64,7 +64,7 @@ const AddMinutesOfMeetingDecision = () => {
     onCompleted: (data) => {
       if (data) {
         console.log('update Decision', data?.updateDecision?.status);
-        if (data?.updateDecision?.status[0]?.statusCode == '200') {
+        if (data?.updateDecision?.status?.statusCode == '200') {
           if (decision == 'Send' || decision == 'Approve') {
             navigation.navigate('Details', {
               title: 'Meetings',

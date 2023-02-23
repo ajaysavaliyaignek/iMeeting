@@ -102,7 +102,7 @@ const EditAppointmentLocation = () => {
       }
     ],
     onCompleted: (data) => {
-      if (data.updateAppointment.status[0].statusCode == '200') {
+      if (data.updateAppointment.status.statusCode == '200') {
         navigation.navigate('AppointmentsList');
       }
     },

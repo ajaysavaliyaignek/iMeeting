@@ -4,7 +4,12 @@ export const UPDATE_VIDEO_CONFERENCE = gql`
   mutation ($videoConference: InputVideoConference!) {
     updateVideoConference(videoConference: $videoConference) {
       videoConferenceId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -28,7 +33,12 @@ export const UPDATE_SECRETARY_PERMISSION = gql`
       taskSecretaryPermission: $taskSecretaryPermission
     ) {
       committeeId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -37,7 +47,12 @@ export const UPDATE_MEETING_STATUS = gql`
   mutation ($meeting: InputMeeting!) {
     updateMeetingStatus(meeting: $meeting) {
       meetingId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -46,7 +61,12 @@ export const UPDATE_DECISION = gql`
   mutation updateDecision($decision: InputSubject!) {
     updateDecision(subject: $decision) {
       id
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -55,7 +75,12 @@ export const UPDATE_CHAT = gql`
   mutation updateMeetingChat($meetingChat: InputMeetingChat!) {
     updateMeetingChat(meetingChat: $meetingChat) {
       chatId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -63,7 +88,11 @@ export const UPDATE_CHAT = gql`
 export const DELETE_TASK = gql`
   mutation deleteTask($id: Long!) {
     deleteTask(id: $id) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -72,7 +101,12 @@ export const UPDATE_TASK = gql`
   mutation updateTask($task: InputTask!) {
     updateTask(task: $task) {
       taskId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -80,7 +114,11 @@ export const UPDATE_TASK = gql`
 export const UPDATE_USER_ANSWER = gql`
   mutation addUserAnswer($voting: InputVoting!) {
     addUserAnswer(voting: $voting) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -88,7 +126,12 @@ export const UPDATE_VOTING = gql`
   mutation addVotingQuestion($voting: InputVoting!) {
     addVotingQuestion(voting: $voting) {
       votingId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -97,6 +140,7 @@ export const UPDATE_SPEAKER = gql`
   mutation updateSpeaker($userDetail: InputUserDetail!) {
     updateSpeaker(userDetail: $userDetail) {
       userId
+
       status
     }
   }
@@ -106,7 +150,12 @@ export const UPDATE_SUBJECT_STATUS = gql`
   mutation updateSubjectStatus($subject: InputSubject!) {
     updateSubjectStatus(subject: $subject) {
       subjectId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -114,7 +163,11 @@ export const UPDATE_SUBJECT_STATUS = gql`
 export const UPDATE_APPOINTMENT = gql`
   mutation updateAppointment($appointment: InputAppointment!) {
     updateAppointment(appointment: $appointment) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
       appointmentId
     }
   }
@@ -123,7 +176,11 @@ export const UPDATE_APPOINTMENT = gql`
 export const DELETE_APPOINTMENT = gql`
   mutation deleteAppointment($id: Long!) {
     deleteAppointment(id: $id) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -131,7 +188,11 @@ export const DELETE_APPOINTMENT = gql`
 export const UPDATE_ANSWER = gql`
   mutation updateAnswer($answer: InputAnswer!) {
     updateAnswer(answer: $answer) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -140,7 +201,12 @@ export const UPDATE_MEETING = gql`
   mutation updateMeeting($meeting: InputMeeting!) {
     updateMeeting(meeting: $meeting) {
       meetingId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -149,7 +215,12 @@ export const DELETE_MEETING = gql`
   mutation deleteMeeting($meetingId: Long) {
     deleteMeeting(meetingId: $meetingId) {
       meetingId
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -159,7 +230,11 @@ export const UPDATE_LOCATION = gql`
     $location: Inputcom_imeeting_portal_rest_dto_v1_0_Location!
   ) {
     updateLocation(location: $location) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
       locationId
     }
   }
@@ -169,7 +244,12 @@ export const UPDATE_COMMITTEE_USER = gql`
   mutation updateCommitteeMember($committeeMember: InputCommitteeMember!) {
     updateCommitteeMember(committeeMember: $committeeMember) {
       id
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -177,7 +257,11 @@ export const UPDATE_COMMITTEE_USER = gql`
 export const DELETE_USER = gql`
   mutation deleteCommitteeMember($userId: Long) {
     deleteCommitteeMember(userId: $userId) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -186,7 +270,12 @@ export const UPDATE_SUBJECT_CATEGORY = gql`
   mutation updateSubjectCategory($subjectCategory: InputSubjectCategory!) {
     updateSubjectCategory(subjectCategory: $subjectCategory) {
       id
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -195,7 +284,12 @@ export const UPDATE_SUBJECTS = gql`
   mutation updateSubject($subject: InputSubject!) {
     updateSubject(subject: $subject) {
       id
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -203,7 +297,12 @@ export const DELETE_SUBJECTS = gql`
   mutation deleteSubject($subjectId: Long) {
     deleteSubject(subjectId: $subjectId) {
       id
-      status
+
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -213,7 +312,11 @@ export const UPDATE_COMMENT = gql`
     $comment: Inputcom_imeeting_portal_rest_dto_v1_0_Comment!
   ) {
     addComment(comment: $comment) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
@@ -221,7 +324,11 @@ export const UPDATE_COMMENT = gql`
 export const DELETE_COMMENT_THREAD = gql`
   mutation removeComment($commentId: Long!) {
     removeComment(commentId: $commentId) {
-      status
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
     }
   }
 `;
