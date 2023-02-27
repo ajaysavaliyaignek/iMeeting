@@ -228,34 +228,16 @@ const VideoConferenceDetails = () => {
           )}
           {role == 'Member' && (
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {item.answers == 'Suggest time' ? (
-                <View>
-                  {details('Your answer', 'Your suggestion time')}
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginTop: 48,
-                      marginLeft: SIZES[8]
-                    }}
-                  >
-                    <Text
-                      style={{
-                        ...Fonts.PoppinsSemiBold[14],
-                        color: Colors.bold
-                      }}
-                    >
-                      03:00 PM
-                    </Text>
-                  </View>
-                </View>
-              ) : (
-                details(
-                  'Your answer',
-                  answer?.suggestionTime == ''
-                    ? answer?.answer
-                    : `Your suggestion time - ${answer?.suggestionTime}`
-                )
+              {details(
+                'Your answer',
+                answer?.suggestionTime == ''
+                  ? answer?.answer
+                  : `Your suggestion time - ${
+                      answer?.suggestionTime == null ||
+                      answer?.suggestionTime == undefined
+                        ? '-'
+                        : answer?.suggestionTime
+                    }`
               )}
               {!item?.isDisable && (
                 <TouchableOpacity

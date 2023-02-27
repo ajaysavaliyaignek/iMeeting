@@ -58,18 +58,18 @@ const DelegationCard = ({
         activeOpacity={0.5}
       >
         {getHighlightedText(
-          item.title,
+          item.committeeName,
           searchText,
           (styleTitle = { width: '100%' })
         )}
 
         <RowData
           name={'Start date'}
-          discription={`${moment(item.startDate).format('DD MMM YYYY')},${
-            item.startDate
-          }`}
+          discription={`${moment(item.startDate, 'YYYY-MM-DD hh:mm A').format(
+            'DD MMM YYYY'
+          )}`}
         />
-        <RowData name={'Executor'} discription={item.executor} />
+        <RowData name={'Executor'} discription={item.transferredUserName} />
       </View>
 
       {/* dotsView */}
@@ -84,12 +84,12 @@ const DelegationCard = ({
       {visibleIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
-            editable={true}
-            deleted={true}
+            editable={item.isDisable ? false : true}
+            deleted={item.isDisable ? false : true}
             isViewable={true}
             onPressView={onPressView}
             onPressEdit={onPressEdit}
-            onPressDelete={onPressDelete}
+            onPressDelete={() => onPressDelete(item)}
           />
         </View>
       )}

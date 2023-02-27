@@ -12,12 +12,10 @@ import { Fonts } from '../../../../themes';
 import { Button } from '../../../../component/button/Button';
 import Header from '../../../../component/header/Header';
 import {
-  GET_All_COMMITTEE,
   GET_All_MEETING,
   GET_All_SUBJECTS,
   GET_All_SUBJECTS_CATEGORY,
   GET_COMMITTEES_BY_ROLE,
-  GET_COMMITTEE_BY_ID,
   GET_FILE
 } from '../../../../graphql/query';
 import { UPDATE_SUBJECTS } from '../../../../graphql/mutation';
@@ -67,14 +65,6 @@ const AddSubjectScreen = () => {
       committeeIds: `${committee}`
     };
   } else if (meetingId) {
-    // committeeIds: committeeIds,
-    // searchValue: searchText,
-    // screen: 2,
-    // page: -1,
-    // pageSize: -1,
-    // meetingId: meetingId,
-    // isDraft: false,
-    // sort: ''
     queryParams = {
       committeeIds: '',
       searchValue: '',
@@ -95,9 +85,6 @@ const AddSubjectScreen = () => {
       meetingId: 0
     };
   }
-
-  // fetch file
-  const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
   subjectDetails?.attachFileIds?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
@@ -154,6 +141,7 @@ const AddSubjectScreen = () => {
       console.log('commitee error', data);
     }
   });
+  
   // fetch meetings
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,

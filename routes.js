@@ -60,7 +60,6 @@ import AddApproveDecision from './src/screens/addApproveMeetingDecision/AddAppro
 import ApproveMeeting from './src/screens/approveMeeting/ApproveMeeting';
 import AddMinutesOfMeetingDecision from './src/screens/addApproveMeetingDecision/addMinutesOfMeetingDecision/AddMinutesOfMeetingDecision';
 import VideoConferenceList from './src/screens/videoConference/videoConferenceList/VideoConferenceList';
-import AddGeneralVideoConference from './src/screens/videoConference/addGeneralVideoConference/AddGeneralVideoConference';
 import VideoConferenceDetails from './src/screens/videoConference/videoConferenceDetails/VideoConferenceDetails';
 import DelegationList from './src/screens/delegation/delegationList/DelegationList';
 import AddEditDelegation from './src/screens/delegation/addEditDelegation/AddEditDelegation';

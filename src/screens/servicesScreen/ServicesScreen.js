@@ -171,9 +171,7 @@ const ServicesScreen = ({ navigation }) => {
             width={SIZES[20]}
             textStyle={{ marginTop: SIZES[25] }}
             title={'Statistics'}
-            onPress={() => {
-              navigation.navigate('Statistic');
-            }}
+            onPress={() => {}}
           />
         </View>
       </ScrollView>

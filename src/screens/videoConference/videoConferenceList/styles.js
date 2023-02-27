@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     margin: SIZES[16],
-    height: SIZES[36],
+    // height: SIZES[36],
     backgroundColor: Colors.gray,
     paddingHorizontal: SIZES[16],
     borderRadius: SIZES[10]

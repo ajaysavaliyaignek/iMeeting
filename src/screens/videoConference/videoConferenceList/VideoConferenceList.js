@@ -4,19 +4,19 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
-  FlatList
+  FlatList,
+  Platform
 } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
+import { Divider } from 'react-native-paper';
 
-import Header from '../../../component/header/Header';
 import { styles } from './styles';
 import { SIZES } from '../../../themes/Sizes';
 import { Icon, IconName } from '../../../component';
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
-import { Divider } from 'react-native-paper';
 import { GET_ALL_VIDEO_CONFERENCES } from '../../../graphql/query';
 import VideoConferenceCard from '../../../component/Cards/videoConferenceCard/VideoConferenceCard';
 import Loader from '../../../component/Loader/Loader';
@@ -44,7 +44,6 @@ const VideoConferenceList = () => {
       console.log('getAllVideoConferences error', data.message);
     }
   });
-
 
   return (
     <SafeAreaView style={styles.conatiner}>
@@ -102,7 +101,11 @@ const VideoConferenceList = () => {
                 width={SIZES[12]}
               />
               <TextInput
-                style={{ flex: 1, marginLeft: SIZES[6] }}
+                style={{
+                  flex: 1,
+                  marginLeft: SIZES[6],
+                  height: Platform.OS == 'android' ? null : SIZES[36]
+                }}
                 onChangeText={(text) => {
                   setSearchText(text);
                 }}
@@ -124,55 +127,7 @@ const VideoConferenceList = () => {
             <Divider style={styles.divider} />
           </View>
         ) : (
-          <View>
-            {/* filter */}
-            <TouchableOpacity
-              style={styles.committeeView}
-              activeOpacity={0.5}
-              onPress={() => {
-                // navigation.navigate('FilterTask', {
-                //   taskType: taskType,
-                //   taskStatusList: taskStatusList,
-                //   onUpdateFilter: onUpdateFilter,
-                //   onlyMyTask: onlyMyTask
-                // });
-              }}
-            >
-              <Text style={[styles.txtCommittee]}>Filter</Text>
-              <View style={[styles.btnCommittees, { flex: 1 }]}>
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    ...Fonts.PoppinsRegular[12],
-                    color: Colors.secondary
-                  }}
-                >
-                  {/* {taskTypesName !== '' || taskStatusName !== ''
-                    ? `${taskTypesName},${taskStatusName} `
-                    : ''} */}
-                </Text>
-                <Icon
-                  name={IconName.Arrow_Right}
-                  height={SIZES[12]}
-                  width={SIZES[6]}
-                />
-              </View>
-            </TouchableOpacity>
-
-            <Divider style={styles.divider} />
-            <TouchableOpacity style={styles.committeeView} activeOpacity={0.5}>
-              <Text style={styles.txtCommittee}>Secretary permission</Text>
-              <View style={styles.btnCommittees}>
-                <Icon
-                  name={IconName.Arrow_Right}
-                  height={SIZES[12]}
-                  width={SIZES[6]}
-                />
-              </View>
-            </TouchableOpacity>
-
-            <Divider style={styles.divider} />
-          </View>
+          <View></View>
         )}
         {getAllVideoConferences.loading ? (
           <Loader />
@@ -217,21 +172,6 @@ const VideoConferenceList = () => {
             </Text>
           </View>
         )}
-        {/* <FlatList
-          data={videoConferences}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => {
-            return (
-              <VideoConferenceCard
-                item={item}
-                index={index}
-                visibleIndex={visibleIndex}
-                setVisibleIndex={setVisibleIndex}
-                searchText={searchText}
-              />
-            );
-          }}
-        /> */}
       </View>
     </SafeAreaView>
   );

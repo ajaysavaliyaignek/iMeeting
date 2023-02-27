@@ -77,7 +77,9 @@ const VideoConferenceCard = ({
   }) => {
     return (
       <View style={styles.container}>
-        <Text style={styles.txtCommitteeName}>{name}</Text>
+        <Text style={styles.txtCommitteeName} numberOfLines={1}>
+          {name}
+        </Text>
         <View
           style={[
             styles.discriptionView,

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Divider } from 'react-native-paper';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import moment from 'moment';
 
 import { styles } from './styles';
@@ -12,22 +12,48 @@ import { Icon, IconName } from '../../../component';
 import { Colors } from '../../../themes/Colors';
 import { SIZES } from '../../../themes/Sizes';
 import { Button } from '../../../component/button/Button';
-import { GET_COMMITTEES_BY_ROLE } from '../../../graphql/query';
+import { GET_All_USERS, GET_COMMITTEES_BY_ROLE } from '../../../graphql/query';
 import DropDownPicker from '../../../component/DropDownPicker/DropDownPicker';
 import Loader from '../../../component/Loader/Loader';
+import { UPDATE_DELEGETION } from '../../../graphql/mutation';
 
 const AddEditDelegation = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { isEdit, delegationData } = route?.params;
   const [committees, setCommittee] = useState([]);
+  const [users, setUsers] = useState([]);
   const [isStartDate, setIsStartDate] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [generaldData, setGeneralData] = useState({
-    valueCommitee: null,
-    startDate: new Date(),
-    endDate: generaldData?.startDate,
-    whoReplaces: null
+    valueCommitee: isEdit ? delegationData.committeeId : null,
+    startDate: isEdit
+      ? `${moment(delegationData.startDate, 'YYYY-MM-DD hh:mm A').format(
+          'DD MMM YYYY'
+        )}`
+      : new Date(),
+    endDate: isEdit
+      ? `${moment(delegationData.endDate, 'YYYY-MM-DD hh:mm A').format(
+          'DD MMM YYYY'
+        )}`
+      : generaldData?.startDate,
+    whoReplaces: isEdit ? delegationData.transferredUserId : null
+  });
+  // get users data from the server
+  const { loading: UsersLoading, error: UsersError } = useQuery(GET_All_USERS, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      isDeleted: true,
+      externalUser: false,
+      searchValue: ''
+    },
+    onCompleted: (data) => {
+      // console.log('get all user data', data.committeeMembersList.items);
+      setUsers(data?.committeeMembersList.items);
+    },
+    onError: (data) => {
+      console.log('get all user error', data.message);
+    }
   });
 
   // fetch commitees
@@ -58,6 +84,21 @@ const AddEditDelegation = () => {
 
     setOpenCalendar(false);
   };
+
+  // update delegation
+  const [updateDelegation, { loading: UpdateDelegationLoading }] = useMutation(
+    UPDATE_DELEGETION,
+    {
+      refetchQueries: ['delegations'],
+      onCompleted: (data) => {
+        console.log('update delegation', data);
+        if (data.updateDelegation.status.statusCode == '200') {
+          navigation.goBack();
+        }
+      },
+      onError: (data) => console.log('update delegation error', data)
+    }
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,19 +175,18 @@ const AddEditDelegation = () => {
 
         {/* who replaces */}
         <DropDownPicker
-          data={committees?.map((comm) => ({
-            label: comm.committeeTitle,
-            value: comm.organizationId
+          data={users?.map((user) => ({
+            label: `${user.firstName} ${user.secondName}`,
+            value: user.userId
           }))}
-          disable={delegationData == null ? false : true}
           placeholder={''}
           setData={(item) => {
             setGeneralData((prev) => {
-              return { ...prev, valueCommitee: item };
+              return { ...prev, whoReplaces: item };
             });
           }}
           title={'WHO REPLACES'}
-          value={generaldData?.valueCommitee}
+          value={generaldData?.whoReplaces}
           styleContainer={{ marginTop: SIZES[24] }}
         />
         {/* date  picker modal */}
@@ -187,12 +227,53 @@ const AddEditDelegation = () => {
           />
           <Button
             title={'Save'}
-            // isLoading={addVotingLoading}
-
+            onPress={() => {
+              console.log('update delegation', {
+                delegation: {
+                  delegationId: isEdit ? delegationData.delegationId : 0,
+                  committeeId: generaldData.valueCommitee,
+                  startDate: moment(generaldData?.startDate).format(
+                    'YYYY-MM-DD hh:mm A'
+                  ),
+                  endDate: moment(generaldData?.endDate).format(
+                    'YYYY-MM-DD hh:mm A'
+                  ),
+                  transferredUserId: generaldData.whoReplaces
+                }
+              });
+              updateDelegation({
+                variables: {
+                  delegation: {
+                    delegationId: isEdit ? delegationData.delegationId : 0,
+                    committeeId: generaldData.valueCommitee,
+                    startDate: moment(generaldData?.startDate).format(
+                      'YYYY-MM-DD hh:mm A'
+                    ),
+                    endDate: moment(generaldData?.endDate).format(
+                      'YYYY-MM-DD hh:mm A'
+                    ),
+                    transferredUserId: generaldData.whoReplaces
+                  }
+                }
+              });
+            }}
+            isLoading={UpdateDelegationLoading}
+            disable={
+              generaldData.valueCommitee == null ||
+              generaldData.startDate === '' ||
+              generaldData.whoReplaces == null
+                ? true
+                : false
+            }
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity:
+                  generaldData.valueCommitee == null ||
+                  generaldData.startDate === '' ||
+                  generaldData.whoReplaces == null
+                    ? 0.5
+                    : null
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}

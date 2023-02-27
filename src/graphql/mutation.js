@@ -1,5 +1,31 @@
 import { gql } from '@apollo/client';
 
+export const UPDATE_DELEGETION = gql`
+  mutation updateDelegation($delegation: InputDelegation!) {
+    updateDelegation(delegation: $delegation) {
+      delegationId
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
+    }
+  }
+`;
+
+export const DELETE_DELEGATION = gql`
+  mutation deleteDelegation($id: Long) {
+    deleteDelegation(id: $id) {
+      delegationId
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
+    }
+  }
+`;
+
 export const UPDATE_VIDEO_CONFERENCE = gql`
   mutation ($videoConference: InputVideoConference!) {
     updateVideoConference(videoConference: $videoConference) {

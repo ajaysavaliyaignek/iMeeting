@@ -36,6 +36,7 @@ const _Button = ({
               { color: Colors.white, marginLeft: iconName ? SIZES[16] : null },
               textStyle
             ]}
+            numberOfLines={2}
           >
             {icon}
             {title}

@@ -6,7 +6,7 @@ import Loader from '../../Loader/Loader';
 import SubjectsCard from '../../Cards/subjectCard/SubjectsCard';
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
-import { GET_All_SUBJECTS, GET_USER_PAYLOAD } from '../../../graphql/query';
+import { GET_All_SUBJECTS } from '../../../graphql/query';
 
 const SubjectListComponent = ({
   meetingId,
@@ -29,19 +29,10 @@ const SubjectListComponent = ({
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [userData, setUserData] = useState([]);
   const [Subjects, setSubjectData] = useState([]);
-  const [user, setUser] = useState(null);
   const client = useApolloClient();
   const AllTypesSubjects = 0;
   let queryParams = {};
 
-  // page: $page;
-  // pageSize: $pageSize;
-  // searchValue: $searchValue;
-  // sort: $sort;
-  // committeeIds: $committeeIds;
-  // isDraft: $isDraft;
-  // screen: $screen;
-  // meetingId: $meetingId;
   if (meetingId == null) {
     queryParams = {
       committeeIds: committeeIds,

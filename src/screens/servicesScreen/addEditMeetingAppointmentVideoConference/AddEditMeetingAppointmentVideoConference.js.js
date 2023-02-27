@@ -26,6 +26,7 @@ import {
   GET_MEETING_BY_ID
 } from '../../../graphql/query';
 import { screenRender } from './screenRender';
+import { SIZES } from '../../../themes/Sizes';
 
 const AddEditMeetingAppointmentVideoConference = () => {
   const route = useRoute();
@@ -405,7 +406,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
               progress={(curentPosition + 1) / screensArray?.length}
               borderColor={Colors.white}
               unfilledColor={'#e6e7e9'}
-              width={DeviceInfo.isTablet() ? 800 : 264}
+              width={DeviceInfo.isTablet() ? 800 : SIZES[250]}
             />
             <Text style={styles.txtProgress}>
               Step {`${curentPosition + 1} / ${screensArray?.length}`}

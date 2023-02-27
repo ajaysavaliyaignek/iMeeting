@@ -37,7 +37,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: SIZES[16],
-    paddingHorizontal: SIZES[16]
+    paddingHorizontal: SIZES[16],
+    width: '100%'
   },
   txtProgress: {
     ...Fonts.PoppinsRegular[14],

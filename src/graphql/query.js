@@ -1,7 +1,59 @@
 import { gql } from '@apollo/client';
 
+export const GET_ALL_DELEGATIONS = gql`
+  query delegations(
+    $date: String
+    $page: Int
+    $pageSize: Int
+    $searchValue: String
+    $sort: String
+  ) {
+    delegations(
+      date: $date
+      page: $page
+      pageSize: $pageSize
+      searchValue: $searchValue
+      sort: $sort
+    ) {
+      items {
+        committeeId
+        committeeName
+        creatorId
+        creatorName
+        delegationId
+        endDate
+        isDisable
+        startDate
+        transferredUserId
+        transferredUserName
+      }
+    }
+  }
+`;
+
+export const GET_DELEGATION_BY_ID = gql`
+  query delegation($id: Long) {
+    delegation(id: $id) {
+      committeeId
+      committeeName
+      creatorId
+      creatorName
+      delegationId
+      endDate
+      isDisable
+      startDate
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
+      transferredUserId
+      transferredUserName
+    }
+  }
+`;
 export const GET_ALL_VIDEO_CONFERENCES = gql`
-  query (
+  query videoConferences(
     $date: String
     $page: Int
     $pageSize: Int

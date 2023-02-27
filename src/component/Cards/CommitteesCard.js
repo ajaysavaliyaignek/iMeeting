@@ -16,7 +16,9 @@ const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
     return (
       <View style={styles.container}>
         <Text style={styles.txtCommitteeName}>{name}</Text>
-        <Text style={styles.discription}>{discription}</Text>
+        <Text style={styles.discription} numberOfLines={1}>
+          {discription}
+        </Text>
       </View>
     );
   };

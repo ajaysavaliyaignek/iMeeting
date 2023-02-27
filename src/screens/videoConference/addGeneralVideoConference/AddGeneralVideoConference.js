@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   ToastAndroid,
   TextInput,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
 import React, { useState } from 'react';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -43,7 +44,7 @@ const AddGeneralVideoConference = ({
     }
   });
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.txtAddSubjectTitle}>General</Text>
       {/* choose committe */}
       <DropDownPicker
@@ -173,7 +174,7 @@ const AddGeneralVideoConference = ({
           value={generaldData?.discription}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
