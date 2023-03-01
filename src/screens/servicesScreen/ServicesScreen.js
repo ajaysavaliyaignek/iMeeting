@@ -43,27 +43,6 @@ const ServicesScreen = ({ navigation }) => {
     getUrl();
   }, []);
 
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     Alert.alert('Hold on!', 'Are you sure you want to exit app?', [
-  //       {
-  //         text: 'Cancel',
-  //         onPress: () => null,
-  //         style: 'cancel'
-  //       },
-  //       { text: 'YES', onPress: () => BackHandler.exitApp() }
-  //     ]);
-  //     return true;
-  //   };
-
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     backAction
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, []);
-
   return (
     <SafeAreaView style={styles.container}>
       {/* header */}
@@ -107,7 +86,7 @@ const ServicesScreen = ({ navigation }) => {
             name={IconName.Video_Conferences}
             height={SIZES[14]}
             width={SIZES[22]}
-            title={`      Video\nconferences`}
+            title={`Video conferences`}
             textStyle={{ marginTop: SIZES[18] }}
             onPress={() => navigation.navigate('VideoConferenceList')}
           />
@@ -171,7 +150,9 @@ const ServicesScreen = ({ navigation }) => {
             width={SIZES[20]}
             textStyle={{ marginTop: SIZES[25] }}
             title={'Statistics'}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate('Statistic');
+            }}
           />
         </View>
       </ScrollView>

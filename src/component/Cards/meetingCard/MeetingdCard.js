@@ -27,6 +27,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
     useContext(UserContext);
 
   const [location, setLocation] = useState('');
+  const [openIndex, setOpenIndex] = useState(-1);
   const [role, setRole] = useState(item.yourRoleName);
   const [showModal, setShowModal] = useState(false);
 
@@ -108,7 +109,12 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
       <View style={styles.container}>
         <Text style={styles.txtCommitteeName}>{name}</Text>
         {isDropDown ? (
-          <MeetingStatusDropdown item={item} statusId={item.meetingStatusId} />
+          <MeetingStatusDropdown
+            item={item}
+            statusId={item.meetingStatusId}
+            openIndex={openIndex}
+            index={index}
+          />
         ) : (
           <View style={[styles.discriptionView, btnStyle]}>
             <Text style={[styles.discription, style]}>{discription}</Text>

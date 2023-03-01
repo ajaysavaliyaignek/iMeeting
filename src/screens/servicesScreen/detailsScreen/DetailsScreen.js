@@ -56,15 +56,6 @@ const DetailsScreen = () => {
     setCommitteeName(committeeName?.join());
   }, [committee]);
 
-  // get ALL MEETINGS
-  // committeeIds: $committeeIds
-  // date: $date
-  // onlyMyMeeting: $onlyMyMeeting
-  // page: $page
-  // pageSize: $pageSize
-  // searchValue: $searchValue
-  // sort: $sort
-  // screen: $screen
   const {
     loading: loadingGetMeetings,
     error: errorGetMeetings,
@@ -244,6 +235,13 @@ const DetailsScreen = () => {
                       setCommittee: setCommittee,
                       committee: committee
                     });
+                  } else if (activeTab === '2') {
+                    navigation.navigate('Committee', {
+                      Data: filterData,
+                      activeTab: '2',
+                      setCommittee: setCommittee,
+                      committee: committee
+                    });
                   }
                   // navigation.navigate('Committee');
                 }}
@@ -288,6 +286,8 @@ const DetailsScreen = () => {
                   onPress={() => {
                     setActiveTab('0');
                     setHeaderTitle('Meetings');
+                    setCommitteeName('');
+                    setCommittee([]);
                   }}
                 />
 
@@ -304,6 +304,8 @@ const DetailsScreen = () => {
                   onPress={() => {
                     setActiveTab('1');
                     setHeaderTitle('Subjects');
+                    setCommitteeName('');
+                    setCommittee([]);
                   }}
                 />
                 <Button
@@ -319,6 +321,8 @@ const DetailsScreen = () => {
                   onPress={() => {
                     setActiveTab('2');
                     setHeaderTitle('Delegations');
+                    setCommitteeName('');
+                    setCommittee([]);
                   }}
                 />
               </View>
@@ -415,6 +419,7 @@ const DetailsScreen = () => {
               visibleIndex={visibleIndex}
               setVisibleIndex={setVisibleIndex}
               searchText={searchText}
+              committeeIds={committeeId}
             />
           )}
         </View>

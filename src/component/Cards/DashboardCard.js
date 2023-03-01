@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react';
 
 import Icon from '../Icon';
@@ -14,23 +14,29 @@ const DashboardCard = ({
   title,
   cardBackgroundColor,
   count,
-  addBackgroundColor
+  addBackgroundColor,
+  onPressAdd
 }) => {
   return (
     <View style={[styles.container, { backgroundColor: cardBackgroundColor }]}>
       <View style={styles.leftView}>
         <Icon name={name} height={height} width={width} />
-        <Text style={styles.txtTitle}>{title}</Text>
+        <Text style={styles.txtTitle} numberOfLines={1}>
+          {title}
+        </Text>
       </View>
       <View style={styles.rightView}>
         <Text style={styles.txtCount}>{count}</Text>
-        <View style={[styles.addView, { backgroundColor: addBackgroundColor }]}>
+        <TouchableOpacity
+          onPress={onPressAdd}
+          style={[styles.addView, { backgroundColor: addBackgroundColor }]}
+        >
           <Icon
             name={IconName.Add_White}
             height={SIZES[14]}
             width={SIZES[14]}
           />
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -46,16 +52,19 @@ const styles = StyleSheet.create({
     paddingVertical: SIZES[26],
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: SIZES[16]
+    marginBottom: SIZES[16],
+    alignItems: 'center'
   },
   leftView: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: '60%'
   },
   txtTitle: {
     ...Fonts.PoppinsRegular[14],
     color: Colors.bold,
-    marginLeft: SIZES[26]
+    marginLeft: SIZES[26],
+    width: '80%'
   },
   rightView: {
     flexDirection: 'row',

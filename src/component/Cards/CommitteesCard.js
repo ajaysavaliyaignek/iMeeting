@@ -1,16 +1,14 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
 import { Divider } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
 
 import { Colors } from '../../themes/Colors';
 import Normalize from '../../themes/mixins';
 import { Fonts } from '../../themes';
 import { getHighlightedText } from '../highlitedText/HighlitedText';
+import moment from 'moment';
 
 const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
-  const navigation = useNavigation();
-
   // committee row view
   const RowData = ({ name, discription }) => {
     return (
@@ -45,9 +43,17 @@ const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
 
         <RowData name={'ID'} discription={item?.organizationId} />
         <RowData name={'Category'} discription={item.categoryTitle} />
-        <RowData name={'Your role'} discription={item.yourRoleName} />
+        <RowData
+          name={'Your role'}
+          discription={item.status.entitys.yourRoleName}
+        />
         {!isProfileCommittee && (
-          <RowData name={'Date'} discription={item.setUpDate} />
+          <RowData
+            name={'Date'}
+            discription={moment(item.setUpDate, 'YYYY-MM-DD').format(
+              'DD MMM YYYY'
+            )}
+          />
         )}
       </TouchableOpacity>
 

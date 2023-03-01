@@ -20,6 +20,10 @@ import { Icon, IconName } from '../../component';
 import Normalize from '../../themes/mixins';
 import { Fonts } from '../../themes';
 import PieChart from '../../component/pieCharts/PieChart';
+import { SIZES } from '../../themes/Sizes';
+import StatisticSubjectComponent from '../../component/statisticComponents/statisticSubjectComponent/StatisticSubjectComponent';
+import StatisticUserComponent from '../../component/statisticComponents/statisticUserComponent/StatisticUserComponent';
+import StatisticMeetingStatusComponent from '../../component/statisticComponents/statisticMeetingStatusComponent/StatisticMeetingStatusComponent';
 
 const StatisticScreen = () => {
   const navigation = useNavigation();
@@ -51,10 +55,7 @@ const StatisticScreen = () => {
     { y: 8, x: `8%\nClosed` },
     { y: 5, x: `5%\nLive` }
   ];
-  const chartDataUsers = [
-    { y: 36, x: `36%\nDarlene Robertson` },
-    { y: 64, x: `64%\nEleanor Pena` }
-  ];
+
   const chartDataAttendance = [
     { y: 71, x: `71%\nAttend` },
     { y: 29, x: `29%\nAbsent` }
@@ -68,8 +69,6 @@ const StatisticScreen = () => {
     '#81AB96'
   ];
   const chartColorAttendance = ['#81AB96', '#E6C54F'];
-  const chartColorUsers = ['#144B8D', '#5A81AF'];
-  const chartColorSubject = ['#81AB96', '#DD7878', '#E6C54F'];
 
   return (
     <SafeAreaView style={{ flex: 1, paddingBottom: 16 }}>
@@ -83,7 +82,14 @@ const StatisticScreen = () => {
         <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('Committee')}
+          // onPress={() =>
+          //   navigation.navigate('Committee', {
+          //     Data: null,
+          //     activeTab: null,
+          //     setCommittee: null,
+          //     committee: null
+          //   })
+          // }
         >
           <Text style={styles.txtCommittee}>Committee</Text>
           <Icon
@@ -208,224 +214,14 @@ const StatisticScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-        {valueType == 'subject' && (
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ paddingBottom: 16, flex: 1 }}
-          >
-            {/* <View
-              style={{
-                marginTop: Normalize(16),
-                backgroundColor: "#f8f8f8",
-                borderRadius: Normalize(12),
-              }}
-            >
-              <PieChart
-                chartColor={chartColorAttendance}
-                chartData={chartDataAttendance}
-                title={"Attendance"}
-              />
-              <ChartLegends
-                backgroundColor={"#81AB96"}
-                name={"Attend"}
-                percentage={"71%"}
-              />
-
-              <ChartLegends
-                backgroundColor={"#E6C54F"}
-                name={"Absent"}
-                percentage={"29%"}
-              />
-            </View> */}
-            <View
-              style={{
-                marginVertical: Normalize(16),
-                backgroundColor: '#f8f8f8',
-                borderRadius: Normalize(12)
-              }}
-            >
-              <BarCharts chartColor={chartColorSubject} title={'By status'} />
-              <View>
-                <ChartLegends
-                  backgroundColor={'#81AB96'}
-                  name={'Approved'}
-                  percentage={'71%'}
-                />
-                <ChartLegends
-                  backgroundColor={'#DD7878'}
-                  name={'Pending'}
-                  percentage={'7%'}
-                />
-                <ChartLegends
-                  backgroundColor={'#E6C54F'}
-                  name={'Cancelled'}
-                  percentage={'7%'}
-                />
-              </View>
-            </View>
-          </ScrollView>
+        {valueType == 'subject' && activeTab == '0' && (
+          <StatisticSubjectComponent />
         )}
-        {valueType == 'users' && (
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ paddingBottom: 16, flex: 1 }}
-          >
-            <View
-              style={{
-                marginTop: Normalize(16),
-                backgroundColor: '#f8f8f8',
-                borderRadius: Normalize(12)
-              }}
-            >
-              <PieChart
-                chartColor={chartColorUsers}
-                chartData={chartDataUsers}
-                title={'Number users of committes'}
-              />
-              <ChartLegends
-                backgroundColor={'#144B8D'}
-                name={'Darlene robertson'}
-                percentage={'36%'}
-              />
-
-              <ChartLegends
-                backgroundColor={'#5A81AF'}
-                name={'Eleanor Pena'}
-                percentage={'64%'}
-              />
-            </View>
-            <View
-              style={{
-                marginVertical: Normalize(16),
-                backgroundColor: '#f8f8f8',
-                borderRadius: Normalize(12)
-              }}
-            >
-              <BarCharts
-                chartColor={chartColorAttendance}
-                title={'Attendance'}
-              />
-              <ChartLegends
-                backgroundColor={'#81AB96'}
-                name={'Attend'}
-                percentage={'71%'}
-              />
-              <ChartLegends
-                backgroundColor={'#E6C54F'}
-                name={'Absent'}
-                percentage={'29%'}
-              />
-            </View>
-          </ScrollView>
-        )}
+        {valueType == 'users' && activeTab == '0' && <StatisticUserComponent />}
         {activeTab === '0' &&
         valueType !== 'subject' &&
         valueType !== 'users' ? (
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ paddingBottom: 16, flex: 1 }}
-          >
-            <View
-              style={{
-                marginTop: Normalize(16),
-                backgroundColor: '#f8f8f8',
-                borderRadius: Normalize(12),
-                flexDirection: Platform.isPad ? 'row' : 'column',
-                alignItems: Platform.isPad ? 'center' : null,
-                justifyContent: Platform.isPad ? 'space-between' : null
-              }}
-            >
-              <PieChart
-                chartColor={chartColorMeeting}
-                chartData={chartDataMeeting}
-                title={'Meeting Status'}
-              />
-
-              <View
-                style={{
-                  width: Platform.isPad ? '50%' : null,
-                  marginTop: Platform.isPad ? Normalize(50) : null
-                }}
-              >
-                <ChartLegends
-                  backgroundColor={'#144B8D'}
-                  name={'Tentative'}
-                  percentage={'7%'}
-                />
-
-                <ChartLegends
-                  backgroundColor={'#5A81AF'}
-                  name={'Pre-schedule'}
-                  percentage={'35%'}
-                />
-                <ChartLegends
-                  backgroundColor={'#A1B7D1'}
-                  name={'Scheduled'}
-                  percentage={'29%'}
-                />
-                <ChartLegends
-                  backgroundColor={'#E6C54F'}
-                  name={'Cancelled'}
-                  percentage={'16%'}
-                />
-                <ChartLegends
-                  backgroundColor={'#DD7878'}
-                  name={'Closed'}
-                  percentage={'8%'}
-                />
-                <ChartLegends
-                  backgroundColor={'#81AB96'}
-                  name={'Live'}
-                  percentage={'5%'}
-                />
-              </View>
-            </View>
-            <View
-              style={{
-                marginVertical: Normalize(16),
-                backgroundColor: '#f8f8f8',
-                borderRadius: Normalize(12),
-
-                flex: 1
-              }}
-            >
-              <BarCharts
-                chartColor={chartColorMeeting}
-                title={'Meeting status'}
-              />
-              {/* <ChartLegends
-                backgroundColor={"#144B8D"}
-                name={"Tentative"}
-                percentage={"7%"}
-              />
-
-              <ChartLegends
-                backgroundColor={"#5A81AF"}
-                name={"Pre-schedule"}
-                percentage={"35%"}
-              />
-              <ChartLegends
-                backgroundColor={"#A1B7D1"}
-                name={"Scheduled"}
-                percentage={"29%"}
-              />
-              <ChartLegends
-                backgroundColor={"#E6C54F"}
-                name={"Cancelled"}
-                percentage={"16%"}
-              />
-              <ChartLegends
-                backgroundColor={"#DD7878"}
-                name={"Closed"}
-                percentage={"8%"}
-              />
-              <ChartLegends
-                backgroundColor={"#81AB96"}
-                name={"Live"}
-                percentage={"5%"}
-              /> */}
-            </View>
-          </ScrollView>
+          <StatisticMeetingStatusComponent />
         ) : null}
         {activeTab === '1' && (
           <ScrollView
@@ -491,18 +287,18 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
     width: '100%',
-    padding: Normalize(16),
+    padding: SIZES[16],
     height: '100%'
   },
   committeeView: {
-    marginVertical: Normalize(10),
+    marginBottom: SIZES[10],
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
   },
   divider: {
     width: '100%',
-    height: Normalize(1),
+    height: SIZES[1],
     backgroundColor: Colors.line
   },
   txtCommittee: {

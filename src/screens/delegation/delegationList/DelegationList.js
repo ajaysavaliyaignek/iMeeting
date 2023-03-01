@@ -10,7 +10,13 @@ import { Colors } from '../../../themes/Colors';
 import Loader from '../../../component/Loader/Loader';
 import { DELETE_DELEGATION } from '../../../graphql/mutation';
 
-const DelegationList = ({ visibleIndex, setVisibleIndex, searchText }) => {
+const DelegationList = ({
+  visibleIndex,
+  setVisibleIndex,
+  searchText,
+  committeeIds
+}) => {
+  console.log({ committeeIds });
   const navigation = useNavigation();
   const [delegations, setDelegations] = useState([]);
 
@@ -20,7 +26,8 @@ const DelegationList = ({ visibleIndex, setVisibleIndex, searchText }) => {
       page: -1,
       pageSize: -1,
       searchValue: searchText,
-      sort: ''
+      sort: '',
+      committeeIds: committeeIds
     },
     onCompleted: (data) => {
       console.log('get all delegations', data.delegations.items);
@@ -65,7 +72,7 @@ const DelegationList = ({ visibleIndex, setVisibleIndex, searchText }) => {
   return (
     <View style={{ flex: 1 }}>
       {getAllDelegations.loading ? (
-        <Loader />
+        <Loader color={Colors.primary} />
       ) : delegations.length > 0 ? (
         <FlatList
           data={delegations}
@@ -124,36 +131,6 @@ const DelegationList = ({ visibleIndex, setVisibleIndex, searchText }) => {
           </Text>
         </View>
       )}
-      {/* <FlatList
-        data={data}
-        keyExtractor={(item, index) => {
-          index.toString();
-        }}
-        renderItem={({ item, index }) => {
-          return (
-            <DelegationCard
-              item={item}
-              index={index}
-              visibleIndex={visibleIndex}
-              setVisibleIndex={setVisibleIndex}
-              searchText={searchText}
-              onPressEdit={() => {
-                navigation.navigate('AddEditDelegation', {
-                  isEdit: true,
-                  delegationData: item
-                });
-                setVisibleIndex(-1);
-              }}
-              onPressView={() => {
-                navigation.navigate('DelegationDetails', {
-                  delegationData: item
-                });
-                setVisibleIndex(-1);
-              }}
-            />
-          );
-        }}
-      /> */}
     </View>
   );
 };

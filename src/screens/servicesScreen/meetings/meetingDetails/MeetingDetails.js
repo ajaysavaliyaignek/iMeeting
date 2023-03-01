@@ -39,6 +39,11 @@ const MeetingDetails = () => {
   const [role, setRole] = useState(item?.yourRoleName);
   const [meetingStatus, setMeetingStatus] = useState([]);
   const [loading, setLoading] = useState(true);
+  let isSoftClose = false;
+  let isLive = false;
+  if (item.yourRoleName == 'Head' && item.meetingStatusTitle == 'Soft-Closed') {
+    isSoftClose = true;
+  }
 
   // delete meeting
   const [deleteMeeting] = useMutation(DELETE_MEETING, {
@@ -132,6 +137,15 @@ const MeetingDetails = () => {
     )
   );
 
+  if (
+    item.status.entitys.canStart &&
+    moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
+      moment(meetingDate, 'YYYY-MM-DD hh:mm A')
+    )
+  ) {
+    isLive = true;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -162,7 +176,9 @@ const MeetingDetails = () => {
                         width:
                           item.meetingStatusTitle == 'Closed'
                             ? '100%'
-                            : !item.status.entitys.canStart
+                            : !isLive && !isSoftClose
+                            ? '48%'
+                            : isLive && !isSoftClose
                             ? '30%'
                             : '23%'
                       }
@@ -201,80 +217,85 @@ const MeetingDetails = () => {
                       width:
                         item.meetingStatusTitle == 'Closed'
                           ? '100%'
-                          : !item.status.entitys.canStart
+                          : !isLive && !isSoftClose
+                          ? '48%'
+                          : isLive && !isSoftClose
                           ? '30%'
                           : '23%'
                     }
                   ]}
                   onPress={onDeleteHandler}
                 />
-                {item.status.entitys.canStart &&
-                  moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
-                    moment(meetingDate, 'YYYY-MM-DD hh:mm A')
-                  ) && (
-                    <Button
-                      title={'Start'}
-                      layoutStyle={[styles.btnLayout]}
-                      onPress={() => {
-                        if (
-                          item.meetingStatusTitle !== 'Soft-Closed' &&
-                          item.meetingStatusTitle !== 'Live'
-                        ) {
-                          const filterStatus = meetingStatus?.filter(
-                            (status) => {
-                              if (
-                                status.meetingStatusTitle == 'Live' ||
-                                status.meetingStatusTitle == 'Live'
-                              ) {
-                                return status;
-                              }
-                            }
-                          );
-
-                          console.log(
-                            'filterstatus for live meeting',
-                            filterStatus
-                          );
-                          updateMeetingStatus({
-                            variables: {
-                              meeting: {
-                                meetingId: item?.meetingId,
-                                meetingStatusId:
-                                  filterStatus[0]?.meetingStatusId
-                              }
-                            }
-                          });
-                        } else {
-                          navigation.navigate('LiveMeetingMenu', {
-                            item,
-                            meetingStatus: meetingStatus
-                          });
-                        }
-                      }}
-                    />
-                  )}
-                {item.yourRoleName == 'Head' &&
-                  item.meetingStatusTitle == 'Soft-Closed' && (
-                    <Button
-                      title={'Approve meeting'}
-                      layoutStyle={[
-                        styles.btnLayout,
-                        {
-                          width:
-                            item.meetingStatusTitle == 'Closed'
-                              ? '100%'
-                              : !item.status.entitys.canStart
-                              ? '30%'
-                              : '23%'
-                        }
-                      ]}
-                      onPress={() => {
-                        navigation.navigate('ApproveMeeting', {
-                          meetingData: item
+                {isLive && (
+                  <Button
+                    title={'Start'}
+                    layoutStyle={[
+                      styles.btnLayout,
+                      {
+                        width:
+                          isLive && !isSoftClose
+                            ? '30%'
+                            : isLive && isSoftClose
+                            ? '23%'
+                            : null
+                      }
+                    ]}
+                    onPress={() => {
+                      if (
+                        item.meetingStatusTitle !== 'Soft-Closed' &&
+                        item.meetingStatusTitle !== 'Live'
+                      ) {
+                        const filterStatus = meetingStatus?.filter((status) => {
+                          if (
+                            status.meetingStatusTitle == 'Live' ||
+                            status.meetingStatusTitle == 'Live'
+                          ) {
+                            return status;
+                          }
                         });
-                      }}
-                    />
-                  )}
+
+                        console.log(
+                          'filterstatus for live meeting',
+                          filterStatus
+                        );
+                        updateMeetingStatus({
+                          variables: {
+                            meeting: {
+                              meetingId: item?.meetingId,
+                              meetingStatusId: filterStatus[0]?.meetingStatusId
+                            }
+                          }
+                        });
+                      } else {
+                        navigation.navigate('LiveMeetingMenu', {
+                          item,
+                          meetingStatus: meetingStatus
+                        });
+                      }
+                    }}
+                  />
+                )}
+                {isSoftClose && (
+                  <Button
+                    title={'Approve meeting'}
+                    layoutStyle={[
+                      styles.btnLayout,
+                      {
+                        width:
+                          item.meetingStatusTitle == 'Closed'
+                            ? '100%'
+                            : isLive
+                            ? '30%'
+                            : '23%'
+                      }
+                    ]}
+                    onPress={() => {
+                      navigation.navigate('ApproveMeeting', {
+                        meetingData: item
+                      });
+                    }}
+                  />
+                )}
               </View>
             )}
           </View>

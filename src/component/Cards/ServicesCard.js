@@ -26,6 +26,7 @@ const DashboardCard = ({
           backgroundColor,
           borderRadius: SIZES[12],
           alignItems: 'center',
+          paddingTop: SIZES[12],
           justifyContent: 'center',
           marginRight: SIZES[16],
           marginTop: SIZES[8]
@@ -39,7 +40,8 @@ const DashboardCard = ({
         style={[
           {
             ...Fonts.PoppinsRegular[12],
-            color: Colors.bold
+            color: Colors.bold,
+            textAlign: 'center'
           },
           textStyle
         ]}

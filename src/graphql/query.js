@@ -7,6 +7,7 @@ export const GET_ALL_DELEGATIONS = gql`
     $pageSize: Int
     $searchValue: String
     $sort: String
+    $committeeIds: String
   ) {
     delegations(
       date: $date
@@ -14,6 +15,7 @@ export const GET_ALL_DELEGATIONS = gql`
       pageSize: $pageSize
       searchValue: $searchValue
       sort: $sort
+      committeeIds: $committeeIds
     ) {
       items {
         committeeId

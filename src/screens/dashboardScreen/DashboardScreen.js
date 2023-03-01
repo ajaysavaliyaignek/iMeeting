@@ -121,6 +121,21 @@ const DashboardScreen = () => {
             cardBackgroundColor={'rgba(101, 142, 180, 0.1)'}
             count={meetingData?.length}
             addBackgroundColor={'#658EB4'}
+            onPressAdd={() =>
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Add meeting',
+                type: 'Meeting',
+                screensArray: [
+                  'general',
+                  'users',
+                  'dateandtime',
+                  'location',
+                  'subjects'
+                ],
+                isEdit: false,
+                details: null
+              })
+            }
           />
           <DashboardCard
             name={IconName.Appointments}
@@ -130,6 +145,15 @@ const DashboardScreen = () => {
             cardBackgroundColor={'rgba(171, 158, 200, 0.1)'}
             count={appointmentsData?.length}
             addBackgroundColor={'#AB9EC8'}
+            onPressAdd={() => {
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Add appointment',
+                type: 'Appointment',
+                screensArray: ['general', 'users', 'dateandtime', 'location'],
+                isEdit: false,
+                details: null
+              });
+            }}
           />
           <DashboardCard
             name={IconName.Video_Conferences}
@@ -139,6 +163,19 @@ const DashboardScreen = () => {
             cardBackgroundColor={'rgba(231, 157, 115, 0.1)'}
             count={13}
             addBackgroundColor={'#E79D73'}
+            onPressAdd={() => {
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Add video conference',
+                type: 'VideoConference',
+                screensArray: [
+                  'generalVideoConference',
+                  'users',
+                  'dateandtime'
+                ],
+                isEdit: false,
+                details: null
+              });
+            }}
           />
           <DashboardCard
             name={IconName.Tasks}
@@ -148,19 +185,20 @@ const DashboardScreen = () => {
             cardBackgroundColor={'rgba(221, 120, 120, 0.1)'}
             count={8}
             addBackgroundColor={'#DD7878'}
+            onPressAdd={() => {
+              navigation.navigate('AddTask', {
+                meetingDetails: null,
+                isMeetingTask: false,
+                isEdit: false,
+                taskData: null
+              });
+            }}
           />
         </View>
 
         {/* committes  */}
         <Text style={styles.txtCommittees}>Committees</Text>
         <CommitteeList />
-        {/* <FlatList
-          data={committeeData}
-          keyExtractor={(index) => index.toString()}
-          renderItem={({ item, index }) => {
-            return <CommitteesCard item={item} index={index} searchText={''} />;
-          }}
-        /> */}
       </ScrollView>
     </SafeAreaView>
   );

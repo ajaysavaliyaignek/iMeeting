@@ -96,18 +96,16 @@ const BarCharts = ({ chartColor, title }) => {
             'CEO conference',
             'Manchester United Mee...'
           ]}
-          style={{
-            tickLabels: {
-              ...Fonts.PoppinsRegular[14],
-              color: Colors.bold
-            }
-          }}
           gridComponent={<LineSegment />}
           tickLabelComponent={
             <VictoryLabel
               angle={90}
               verticalAnchor="middle"
               textAnchor="start"
+              style={{
+                ...Fonts.PoppinsRegular[14],
+                color: Colors.bold
+              }}
             />
           }
         />
