@@ -1,5 +1,5 @@
 import { Text, useWindowDimensions, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -64,12 +64,28 @@ import VideoConferenceDetails from './src/screens/videoConference/videoConferenc
 import DelegationList from './src/screens/delegation/delegationList/DelegationList';
 import AddEditDelegation from './src/screens/delegation/addEditDelegation/AddEditDelegation';
 import DelegationDetails from './src/screens/delegation/delegationDetails/DelegationDetails';
+import AddEvent from './src/screens/addEvent/AddEvent';
+import Notifications from './src/screens/notifications/Notifications';
+import CommitteeExpandedView from './src/screens/dashboardScreen/committeeList/committeeExpandedView/CommitteeExpandedView';
+import { GET_NOTIFICATION_COUNT } from './src/graphql/query';
+import { useQuery } from '@apollo/client';
 
 const bottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainBottomTab = () => {
   const { height, width } = useWindowDimensions();
+  const [count, setCount] = useState(0);
+  const { loading } = useQuery(GET_NOTIFICATION_COUNT, {
+    onCompleted: (data) => {
+      console.log('motifications count', data.notificationsCount);
+      setCount(data.notificationsCount.count);
+    },
+    onError: (data) => {
+      console.log('get all notification count error', data.message);
+    }
+  });
+
   return (
     <bottomTab.Navigator
       screenOptions={{
@@ -115,8 +131,9 @@ const MainBottomTab = () => {
                 <Text
                   style={{
                     ...Fonts.PoppinsRegular[10],
-                    color: Colors.secondary
+                    color: focused ? Colors.primary : Colors.secondary
                   }}
+                  numberOfLines={1}
                 >
                   Dashboard
                 </Text>
@@ -156,8 +173,9 @@ const MainBottomTab = () => {
                 <Text
                   style={{
                     ...Fonts.PoppinsRegular[10],
-                    color: Colors.secondary
+                    color: focused ? Colors.primary : Colors.secondary
                   }}
+                  numberOfLines={1}
                 >
                   Services
                 </Text>
@@ -198,8 +216,9 @@ const MainBottomTab = () => {
                 <Text
                   style={{
                     ...Fonts.PoppinsRegular[10],
-                    color: Colors.secondary
+                    color: focused ? Colors.primary : Colors.secondary
                   }}
+                  numberOfLines={1}
                 >
                   Calendar
                 </Text>
@@ -210,6 +229,60 @@ const MainBottomTab = () => {
           tabBarLabelStyle: { ...Fonts.PoppinsRegular[10] }
         }}
         component={CalenderScreen}
+      />
+      <bottomTab.Screen
+        name="Notification"
+        options={{
+          tabBarIcon: ({ focused }) => {
+            return (
+              <View
+                style={{
+                  borderTopColor: focused ? Colors.primary : null,
+                  borderTopWidth: focused ? SIZES[1] : 0,
+                  width:
+                    DeviceInfo.isTablet() || width > height ? '400%' : '90%',
+                  alignItems: 'center',
+                  justifyContent:
+                    DeviceInfo.isTablet() || width > height
+                      ? 'space-between'
+                      : 'center',
+                  height: '100%',
+                  flexDirection:
+                    DeviceInfo.isTablet() || width > height ? 'row' : null
+                }}
+              >
+                <Icon
+                  name={
+                    focused
+                      ? IconName.Notification_Focused
+                      : IconName.Notification
+                  }
+                  height={SIZES[20]}
+                  width={SIZES[20]}
+                />
+                <Text
+                  style={{
+                    ...Fonts.PoppinsRegular[10],
+                    color: focused ? Colors.primary : Colors.secondary
+                  }}
+                  numberOfLines={1}
+                >
+                  Notifications
+                </Text>
+                {count > 0 && (
+                  <View style={{ position: 'absolute', top: 0, right: 14 }}>
+                    <Text style={{ color: Colors.primary }}>
+                      {count < 10 ? `0${count}` : count}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            );
+          },
+          tabBarActiveTintColor: Colors.primary,
+          tabBarLabelStyle: { ...Fonts.PoppinsRegular[10] }
+        }}
+        component={Notifications}
       />
       <bottomTab.Screen
         name="ProfileStack"
@@ -240,8 +313,9 @@ const MainBottomTab = () => {
                 <Text
                   style={{
                     ...Fonts.PoppinsRegular[10],
-                    color: Colors.secondary
+                    color: focused ? Colors.primary : Colors.secondary
                   }}
+                  numberOfLines={1}
                 >
                   Profile
                 </Text>
@@ -339,6 +413,11 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="DelegationList" component={DelegationList} />
       <Stack.Screen name="AddEditDelegation" component={AddEditDelegation} />
       <Stack.Screen name="DelegationDetails" component={DelegationDetails} />
+      <Stack.Screen name="AddEvent" component={AddEvent} />
+      <Stack.Screen
+        name="CommitteeExpandedView"
+        component={CommitteeExpandedView}
+      />
     </Stack.Navigator>
   );
 };

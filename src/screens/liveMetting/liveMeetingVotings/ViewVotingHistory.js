@@ -29,7 +29,6 @@ const ViewVotingHistory = () => {
         setVotingHistoryList(data.votingHistory.items);
         setFilterHistory(data.votingHistory.items);
       }
-      console.log('getVotingHistory', data.votingHistory.items);
     },
     onError: (data) => {
       console.log('getVotingHistory error', data.message);

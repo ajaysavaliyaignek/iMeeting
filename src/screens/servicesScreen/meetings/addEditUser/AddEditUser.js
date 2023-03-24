@@ -17,7 +17,6 @@ const AddEditUser = ({ generaldData, setGeneralData }) => {
 
   const onUpdateSelection = (items) => {
     let newUsers = [];
-    console.log('Selected user from add appointment', items);
 
     items?.map((user) => {
       let indexPreviousUser =
@@ -52,15 +51,9 @@ const AddEditUser = ({ generaldData, setGeneralData }) => {
   };
 
   const onChangeUserState = (item, isRequired) => {
-    console.log('required item NAme', item.userName);
-    console.log('required item', isRequired);
-
     generaldData?.previousUser.map((user) => {
       if (user.userId === item.userId) {
-        console.log('required item NAme', user.userName);
-        console.log('required item', user.isRequired);
         user.isRequired = isRequired;
-        console.log('required item', user.isRequired);
       }
     });
     setGeneralData({

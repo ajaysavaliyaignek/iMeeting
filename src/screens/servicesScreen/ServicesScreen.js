@@ -34,8 +34,6 @@ const ServicesScreen = ({ navigation }) => {
   useEffect(() => {
     const getUrl = () => {
       AsyncStorage.getItem('@url').then((data) => {
-        console.log('url', data);
-
         setCompanyUrl(data);
       });
     };
@@ -114,6 +112,9 @@ const ServicesScreen = ({ navigation }) => {
             style={{ marginBottom: SIZES[16] }}
             textStyle={{ marginTop: SIZES[27] }}
             title={'Add event'}
+            onPress={() => {
+              navigation.navigate('AddEvent');
+            }}
           />
           <DashboardCard
             backgroundColor={Colors.gray}

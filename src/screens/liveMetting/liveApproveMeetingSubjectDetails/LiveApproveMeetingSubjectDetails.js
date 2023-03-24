@@ -42,7 +42,6 @@ const LiveApproveMeetingSubjectDetails = () => {
     fetchPolicy: 'cache-and-network',
     variables: { subjectId: item?.subjectId },
     onCompleted: (data, error) => {
-      console.log('subject data', data);
       if (data) {
         setCommentThreadId(data.subject.commentThreadId);
       }
@@ -62,8 +61,7 @@ const LiveApproveMeetingSubjectDetails = () => {
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
-        console.log('items data', data.comments.items[0].childComment[0]);
-setComments(data.comments.items[0]);
+        setComments(data.comments.items[0]);
       } else {
         console.log('no comments');
       }
@@ -87,7 +85,6 @@ setComments(data.comments.items[0]);
       }
     ],
     onCompleted: (data) => {
-      console.log('add comment data', data.addComment.status.statusCode);
       if (data.addComment.status.statusCode == 200) {
         setCommentId(null);
       }
@@ -166,6 +163,7 @@ setComments(data.comments.items[0]);
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           isMeeting={isMeeting}
+          isMom={isMom}
         />
         {activeTab == 'Details' &&
           (isMeeting ? (
@@ -201,6 +199,13 @@ setComments(data.comments.items[0]);
           />
         )}
         {activeTab == 'Decisions' && (
+          <LiveMeetingSubjectDecision
+            meetingData={meetingData}
+            item={item}
+            isMom={false}
+          />
+        )}
+        {activeTab == 'Approve Decisions' && (
           <LiveMeetingSubjectDecision
             meetingData={meetingData}
             item={item}

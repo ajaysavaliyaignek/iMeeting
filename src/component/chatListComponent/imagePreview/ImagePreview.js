@@ -9,11 +9,9 @@ import { checkPermission } from '../../downloadFile/DownloadFile';
 import { Colors } from '../../../themes/Colors';
 
 const ImagePreview = ({ file, index, isOwner }) => {
-  console.log('file', file);
   const [uri, setUri] = useState('');
   const [token, setToken] = useState('');
   const [isDownloaded, setIsDownloaded] = useState(false);
-  const [previewError, setPreviewError] = useState(null);
 
   useEffect(() => {
     const getToken = () => {
@@ -39,11 +37,10 @@ const ImagePreview = ({ file, index, isOwner }) => {
     .then(async (res) => {
       // Alert after successful downloading
       let base64 = await res.base64();
-      // console.log('res --------> ', base64);
+
       setUri(`data:image/${file.type};base64,${base64}`);
     });
 
-  // `data:image/${file.type};base64,${base64Data}`
   return (
     <View
       style={{
@@ -71,7 +68,6 @@ const ImagePreview = ({ file, index, isOwner }) => {
           key={index}
           onError={(e) => {
             console.log('image preview error', e.nativeEvent.error);
-            setPreviewError(e.nativeEvent.error);
           }}
         />
       )}

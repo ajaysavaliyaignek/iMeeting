@@ -37,8 +37,6 @@ const LoginScreen = ({ navigation }) => {
   // For this query need company url
   const [getAuth, { loading, data }] = useLazyQuery(GET_AUTH, {
     onCompleted: (data) => {
-      console.log(data);
-
       // set client id
       setClientId(data.oAuth2Application.clientId);
 
@@ -116,11 +114,9 @@ const LoginScreen = ({ navigation }) => {
         })
           .then((response) => response.json())
           .then((responseData) => {
-            console.log('responseData-----', responseData);
             if (responseData.error) {
               setError(responseData.error);
               setLoading(false);
-              console.log('login error', responseData.error);
             } else {
               const dataToken = responseData.access_token;
               let user = {
@@ -130,7 +126,6 @@ const LoginScreen = ({ navigation }) => {
                 clientSecret: clientSecret,
                 dataToken: dataToken
               };
-              console.log(user);
               storeToken(user);
               storeUserToken(dataToken);
               setError('');
@@ -181,13 +176,10 @@ const LoginScreen = ({ navigation }) => {
         })
           .then((response) => response.json())
           .then((responseData) => {
-            console.log('responseData-----', responseData);
             if (responseData.error) {
               setError(responseData.error);
-              console.log(responseData.error);
             } else {
               const dataToken = responseData.access_token;
-              console.log('dataToken', dataToken);
               let user = {
                 userName: userName,
                 url: url,
@@ -195,7 +187,6 @@ const LoginScreen = ({ navigation }) => {
                 clientSecret: clientSecret,
                 dataToken: dataToken
               };
-              console.log(user);
               storeToken(user);
 
               storeUserToken(dataToken);
@@ -231,7 +222,6 @@ const LoginScreen = ({ navigation }) => {
           }}
           keyboardType={'email-address'}
           onChange={() => {
-            console.log('i am called', url);
             setCompanyUrl(url);
             getAuth({ variables: { domainName: url } });
             storeUrl(url);
@@ -332,35 +322,29 @@ const LoginScreen = ({ navigation }) => {
 
         {/* login button */}
         <View style={styles.btnView}>
-          {loadingLogin ? (
-            <Loader
-              layOutStyle={{ paddingVertical: SIZES[10] }}
-              color={Colors.primary}
-            />
-          ) : (
-            <Button
-              onPress={Login}
-              title={'Log in'}
-              disable={
-                url === '' || userName === '' || password === '' || error !== ''
-                  ? true
-                  : false
-              }
-              layoutStyle={[
-                {
-                  opacity:
-                    url === '' ||
-                    userName === '' ||
-                    password === '' ||
-                    error !== ''
-                      ? 0.5
-                      : null
-                },
-                styles.loginButton
-              ]}
-              textStyle={styles.txtButton}
-            />
-          )}
+          <Button
+            isLoading={loadingLogin}
+            onPress={Login}
+            title={'Log in'}
+            disable={
+              url === '' || userName === '' || password === '' || error !== ''
+                ? true
+                : false
+            }
+            layoutStyle={[
+              {
+                opacity:
+                  url === '' ||
+                  userName === '' ||
+                  password === '' ||
+                  error !== ''
+                    ? 0.5
+                    : null
+              },
+              styles.loginButton
+            ]}
+            textStyle={styles.txtButton}
+          />
         </View>
       </View>
     </SafeAreaView>

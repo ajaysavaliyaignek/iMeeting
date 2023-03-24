@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Switch } from 'react-native';
 import React, { useState } from 'react';
 import { useLazyQuery, useQuery } from '@apollo/client';
 
@@ -11,6 +11,7 @@ import {
   GET_USER_PAYLOAD
 } from '../../../graphql/query';
 import Avatar from '../../../component/Avatar/Avatar';
+import CheckBox from '../../../component/checkBox/CheckBox';
 
 const ProfileDetails = () => {
   const [fileResponse, setFileResponse] = useState([]);
@@ -18,11 +19,27 @@ const ProfileDetails = () => {
 
   const [getUserBYId] = useLazyQuery(GET_COMMITTEE_MEMBER_BY_ID, {
     onCompleted: (data) => {
-      console.log('getUserBYId', data);
+      console.log('getUserBYId', data?.committeeMemberById);
       setUser(data?.committeeMemberById);
     },
     onError: (data) => {
       console.log('getUserBYId error', data.message);
+    }
+  });
+
+  //Get meeting attachments
+  user?.attachFiles?.map((id) => {
+    const getFile = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
+      variables: {
+        fileEntryId: id
+      },
+      onCompleted: (data) => {
+        fileResponse.push(data.uploadedFile);
+      }
+    });
+    if (getFile.error) {
+      console.log('File error', getFile.error);
     }
   });
 
@@ -128,28 +145,56 @@ const ProfileDetails = () => {
       </View>
 
       <Text style={styles.txtContacts}>Calendar sync</Text>
+      <View style={styles.rowCalendarContainer}>
+        <Button
+          title={'Google calendar'}
+          layoutStyle={styles.btnExternalUser}
+          textStyle={styles.txtBtnExternal}
+          iconName={require('../../../assets/Icons/GoogleCalendar.png')}
+          disable={true}
+        />
+        <Switch
+          disabled
+          value={
+            user?.googleCalendarSync == null
+              ? false
+              : user?.googleCalendarSync == true
+              ? true
+              : false
+          }
+        />
+      </View>
 
-      <Button
-        title={'Google calendar'}
-        layoutStyle={styles.btnExternalUser}
-        textStyle={styles.txtBtnExternal}
-        iconName={require('../../../assets/Icons/GoogleCalendar.png')}
-      />
-      <Button
-        title={'Outlook calendar'}
-        layoutStyle={styles.btnExternalUser}
-        textStyle={styles.txtBtnExternal}
-        iconName={require('../../../assets/Icons/OutlookCalendar.png')}
-      />
+      <View style={styles.rowCalendarContainer}>
+        <Button
+          title={'Outlook calendar'}
+          layoutStyle={styles.btnExternalUser}
+          textStyle={styles.txtBtnExternal}
+          iconName={require('../../../assets/Icons/OutlookCalendar.png')}
+          disable={true}
+        />
+        <Switch
+          disabled
+          value={
+            user?.outlookCalendarSync == null
+              ? false
+              : user?.outlookCalendarSync == true
+              ? true
+              : false
+          }
+        />
+      </View>
 
-      <AttachFiles
-        fileResponse={fileResponse}
-        setFileResponse={setFileResponse}
-        showAttachButton={true}
-        deleted={false}
-        download={true}
-        isShowAttchTitle={true}
-      />
+      {fileResponse?.length > 0 && (
+        <AttachFiles
+          fileResponse={fileResponse}
+          setFileResponse={setFileResponse}
+          showAttachButton={false}
+          deleted={false}
+          download={true}
+          isShowAttchTitle={true}
+        />
+      )}
     </ScrollView>
   );
 };

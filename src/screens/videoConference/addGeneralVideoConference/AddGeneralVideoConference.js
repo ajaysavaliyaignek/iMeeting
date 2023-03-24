@@ -33,7 +33,7 @@ const AddGeneralVideoConference = ({
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: false },
+    variables: { head: true, secretary: true, member: false, type: 5 },
     onCompleted: (data) => {
       if (data) {
         setCommittee(data?.committeesByRole?.items);

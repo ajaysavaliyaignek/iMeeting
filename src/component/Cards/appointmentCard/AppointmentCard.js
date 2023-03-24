@@ -45,8 +45,6 @@ const AppoinmentCard = ({
   });
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert('Delete appointment', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',

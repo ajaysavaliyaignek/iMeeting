@@ -1,5 +1,28 @@
 import { gql } from '@apollo/client';
 
+export const DELETE_NOTIFICATIONS = gql`
+  mutation deleteNotification($userNotificationEventId: Long) {
+    deleteNotification(userNotificationEventId: $userNotificationEventId) {
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
+    }
+  }
+`;
+export const UPDATE_NOTIFICATION = gql`
+  mutation updateNotification($notification: InputNotification!) {
+    updateNotification(notification: $notification) {
+      status {
+        entitys
+        statusCode
+        statusMessage
+      }
+    }
+  }
+`;
+
 export const UPDATE_DELEGETION = gql`
   mutation updateDelegation($delegation: InputDelegation!) {
     updateDelegation(delegation: $delegation) {

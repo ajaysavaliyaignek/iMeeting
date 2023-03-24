@@ -45,7 +45,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
   const [tabCounts, setTabCounts] = useState({});
-  let file = [];
+  console.log('meeting item', item);
 
   //Get meeting attachments
   item?.attachFileIds?.map((id) => {
@@ -97,7 +97,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
     fetchPolicy: 'cache-and-network',
     variables: {
-      locationId: item.locationId
+      locationId: item?.locationId
     },
     onCompleted: (data) => {
       if (data) {
@@ -113,7 +113,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const Committee = useQuery(GET_COMMITTEE_BY_ID, {
     fetchPolicy: 'cache-and-network',
     variables: {
-      organizationId: item.committeeId
+      organizationId: item?.committeeId
     },
     onCompleted: (data) => {
       if (data) {
@@ -125,36 +125,10 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
     }
   });
 
-  // delete meeting
-  // const [deleteMeeting] = useMutation(DELETE_MEETING, {
-  //   // export const GET_All_SUBJECTS = gql`
-  //   refetchQueries: [
-  //     {
-  //       query: GET_All_MEETING,
-  //       variables: {
-  //         onlyMyMeeting: false,
-  //         committeeIds: '',
-  //         screen: 0,
-  //         searchValue: '',
-  //         page: -1,
-  //         pageSize: -1
-  //       }
-  //     }
-  //   ],
-  //   onCompleted: (data) => {
-  //     if (data.deleteMeeting.status.statusCode == '200') {
-  //       navigation.goBack();
-  //     }
-  //   },
-  //   onError: (data) => {
-  //     console.log('dele meeting error', data);
-  //   }
-  // });
-
   const GetTabsCounts = useQuery(GET_LIVE_MEETING_TAB_COUNT, {
     fetchPolicy: 'cache-and-network',
     variables: {
-      id: item.meetingId,
+      id: item?.meetingId,
       type: 1
     },
     onCompleted: (data) => {
@@ -307,7 +281,12 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
             marginBottom: fileResponse?.length > 0 ? 0 : SIZES[24]
           }}
         >
-          {details('Platform', 'Google Meet')}
+          {details(
+            'Platform',
+            item?.platformlink?.includes('google')
+              ? 'Google Meet'
+              : 'Microsoft Teams'
+          )}
 
           {item?.platformlink && (
             <View

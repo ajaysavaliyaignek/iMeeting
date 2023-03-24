@@ -71,7 +71,6 @@ const AddVoting = () => {
     refetchQueries: ['votingDetails'],
     onCompleted: (data) => {
       if (data) {
-        console.log(data.addVotingQuestion.status);
         if (data.addVotingQuestion.status.statusCode == '200') {
           navigation.goBack();
         }
@@ -137,8 +136,6 @@ const AddVoting = () => {
 
                         return [...prev];
                       });
-
-                      console.log('answer array on change text', answerObject);
                     }}
                   />
                   <TouchableOpacity
@@ -244,19 +241,6 @@ const AddVoting = () => {
             title={'Save'}
             // isLoading={addVotingLoading}
             onPress={() => {
-              console.log('answer array on save', answerObject);
-              console.log('add edit voting data', {
-                answerIds: answersIds,
-                answers: answersText,
-                isMultipleSelect: switchMultiple,
-                isPrivate: switchPrivate,
-                meetingId:
-                  valueType == 'Meeting' ? meetingDetails?.meetingId : 0,
-                subjectId: valueSubject == null ? 0 : valueSubject,
-                type: 1,
-                votingId: 0,
-                votingTitle: titleVoting
-              });
               addVoting({
                 variables: {
                   voting: {

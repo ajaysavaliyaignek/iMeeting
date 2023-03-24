@@ -33,14 +33,12 @@ const SelectSubjects = () => {
     previosSubjects,
     meetingId
   } = route?.params;
-  console.log('committee from select subjects', committee.toString());
   const [searchText, setSearchText] = useState('');
   const [subjectData, setSubjectData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [checked, setChecked] = useState(false);
   const { selectedSubjects, setSelectedSubjects } = useContext(UserContext);
-  console.log('selectedSubjects', selectedSubject);
   var subjects = [];
   const {
     loading: SubjectsLoading,
@@ -55,10 +53,7 @@ const SelectSubjects = () => {
     },
 
     onCompleted: (data) => {
-      console.log(data?.subjects.items, 'get all subjects');
       subjects = data?.subjects.items.map((item, index) => {
-        console.log('data subjects', item);
-        console.log('previous subject', previosSubjects);
         let previousUserIndex = previosSubjects?.findIndex(
           (user) => user.subjectId === item.subjectId
         );
@@ -96,15 +91,12 @@ const SelectSubjects = () => {
     });
 
     onUpdateSelection(selectedUserList);
-    // setSelectedUsers(selectedUserList);
-    console.log('selectedUserList', selectedUserList);
 
     navigation.goBack();
   };
 
   useEffect(() => {
     const filterUser = subjectData.filter((user) => user.isSelected == true);
-    console.log('filterUser', filterUser);
     setSelectedSubjects(filterUser);
   }, [checked]);
 

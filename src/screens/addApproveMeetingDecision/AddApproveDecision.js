@@ -26,8 +26,6 @@ const AddApproveDecision = () => {
   const [statusName, setStatusName] = useState('');
   const [comment, setComment] = useState(isEdit ? item?.description : '');
 
-  console.log('item', item);
-
   // get decision status for dropdown
   const {
     loading: decisionStatusLoading,
@@ -61,7 +59,6 @@ const AddApproveDecision = () => {
     refetchQueries: ['decisions', 'subjects'],
     onCompleted: (data) => {
       if (data) {
-        console.log('update Decision', data?.updateDecision?.status);
         if (data.updateDecision.status.statusCode == '200') {
           navigation.goBack();
         }
@@ -151,19 +148,6 @@ const AddApproveDecision = () => {
             }
             // isLoading={addVotingLoading}
             onPress={() => {
-              console.log('update decision data ', {
-                decisionId: isEdit ? decisionId : 0,
-                subjectId: subjectsData?.subjectId,
-                committeeId: subjectsData?.committeeId,
-                committeeName: subjectsData?.committeeName,
-                statusId: valueApproveDecision,
-                description: comment,
-                attachFileIds: [],
-                meetingId: 0,
-                dateOfCreation: moment(new Date()).format('DD/MM/YYYY'),
-                statusTitle: '',
-                id: 1
-              });
               updateDecision({
                 variables: {
                   decision: {
@@ -175,7 +159,7 @@ const AddApproveDecision = () => {
                     description: comment,
                     attachFileIds: [],
                     meetingId: 0,
-                    dateOfCreation: moment(new Date()).format('DD/MM/YYYY'),
+                    dateOfCreation: moment(new Date()).format('YYYY-MM-DD'),
                     statusTitle: '',
                     id: 1
                   }

@@ -43,15 +43,12 @@ const CommitteeScreen = () => {
     setCommittees([...committees]);
   };
 
-  console.log('COMMITTE FROM COMMITTE SCRREN', selectCommittee);
-
   const { loading: CommitteeLoadingByRole, error: CommitteeErrorByRole } =
     useQuery(GET_COMMITTEES_BY_ROLE, {
       fetchPolicy: 'cache-and-network',
-      variables: { head: true, secretary: true, member: false },
+      variables: { head: true, secretary: true, member: true,type:8 },
       onCompleted: (data) => {
         if (data) {
-          console.log('committees', data?.committeesByRole.items);
           filterCommittee = data?.committeesByRole.items.map((item, index) => {
             let previousUserIndex = committee?.findIndex(
               (user) => user.organizationId === item.organizationId
@@ -62,7 +59,6 @@ const CommitteeScreen = () => {
             }
             return { ...item, isSelected };
           });
-          console.log('filter commitee', filterCommittee);
           if (filterCommittee) {
             setCommittees(filterCommittee);
           }
@@ -75,34 +71,18 @@ const CommitteeScreen = () => {
   }
 
   const setSelectedCommitee = () => {
-    console.log('committes==>', committees);
     const selectedUserList = [];
     committees.map((committee) => {
-      console.log('user', committee.isSelected);
       if (committee.isSelected) {
         selectedUserList.push(committee);
-        // console.log('selectCommittee', selectCommittee);
       }
     });
-    console.log('selectCommittee', selectedUserList);
     setCommittee(selectedUserList);
     navigation.goBack();
   };
 
   const setAllCommittee = () => {
-    // setCommittees((previous) => {
-    //   let selectedBoxes = previous.selectedBoxes;
-    //   let index = selectedBoxes.indexOf(id);
-    //   if (index === -1) {
-    //     selectedBoxes.push(id);
-    //   } else {
-    //     selectedBoxes.splice(index, 1);
-    //   }
-    //   return { selectedBoxes };
-    // }),
     committees?.map((committee) => {
-      console.log('all committee=======>', committee);
-
       committee.isSelected = !committee.isSelected;
     });
     setCommittees([...committees]);

@@ -20,7 +20,6 @@ const DelegationDetails = () => {
   const [deleteDelegation] = useMutation(DELETE_DELEGATION, {
     refetchQueries: ['delegations'],
     onCompleted: (data) => {
-      console.log('delete delegation', data.deleteDelegation.status);
       if (data.deleteDelegation.status.statusCode == 200) {
         navigation.navigate('Details', {
           title: 'Delegations',
@@ -34,8 +33,6 @@ const DelegationDetails = () => {
   });
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert('Delete delegation', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',

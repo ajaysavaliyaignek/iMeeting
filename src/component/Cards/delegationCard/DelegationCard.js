@@ -41,12 +41,7 @@ const DelegationCard = ({
     );
   };
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={() => setVisibleIndex(-1)}
-      //   key={item.appointmentId}
-      // style={{ opacity: item.isDisable && 0.5 }}
-    >
+    <TouchableOpacity activeOpacity={1} onPress={() => setVisibleIndex(-1)}>
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}

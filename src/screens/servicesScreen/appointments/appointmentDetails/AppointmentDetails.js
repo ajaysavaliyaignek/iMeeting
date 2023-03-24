@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  FlatList,
   ToastAndroid,
   Platform,
   Linking
@@ -43,14 +42,11 @@ const AppointmentsDetails = () => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item, isDisable } = route?.params;
-  console.log('item from appoinment details', item);
-  console.log(isDisable);
   const [fileResponse, setFileResponse] = useState([]);
   const [appointment, setAppointment] = useState(null);
   const [role, setRole] = useState(item.yourRoleName);
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
-  const [valueIndex, setValueIndex] = useState(null);
   let fileId = item?.attachFileIds;
 
   // get mappointment by id
@@ -61,9 +57,7 @@ const AppointmentsDetails = () => {
     },
     onCompleted: (data) => {
       if (data) {
-        console.log('get appointment by id', data);
         setAppointment(data.appointment);
-        // setRole(data.meeting.yourRoleName);
       }
     },
     onError: (data) => {
@@ -73,7 +67,6 @@ const AppointmentsDetails = () => {
 
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
     onCompleted: (data) => {
-      console.log('answer data', data.answer);
       setAnswer(data.answer);
     }
   });
@@ -113,7 +106,6 @@ const AppointmentsDetails = () => {
       console.log('file error', error);
     }
   });
-  console.log('file response', fileResponse);
 
   const DurationTime = moment(
     `${appointment?.endDate} ${appointment?.endTime}`,

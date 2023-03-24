@@ -4,7 +4,6 @@ import { styles } from './styles';
 import CheckBox from '../checkBox/CheckBox';
 
 const TaskTypeCard = ({ type, index, onChecked }) => {
-  console.log(type);
   return (
     <Pressable
       key={index}

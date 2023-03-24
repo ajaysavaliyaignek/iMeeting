@@ -17,8 +17,6 @@ const CalenderdayEventsComponent = ({ events, date, day, isSchedulerView }) => {
     'Saturday'
   ];
 
-  // console.log('events', events);
-
   const Day = weekday[new Date(date).getDay()];
   return (
     <View

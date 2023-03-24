@@ -26,7 +26,6 @@ const ChatListComponent = ({ chatData }) => {
   const { width } = useWindowDimensions();
   const { user } = useContext(UserContext);
   let setIsDownloaded = () => {};
-  console.log('chat data', chatData);
 
   const scrollViewRef = useRef();
 

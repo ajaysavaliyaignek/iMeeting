@@ -36,9 +36,7 @@ const AddEditSubjects = ({
   const [openIndex, setOpenIndex] = useState(-1);
   const [selectSubjects, setSelectedSubjects] = useState([]);
   const [previosSubjects, setPreviosSubjects] = useState([]);
-  const [isFeedback, setIsFeedback] = useState(false);
-  const [feedbackDate, setFeedDate] = useState('');
-  const [isSuggestion, setIsSuggestion] = useState(false);
+
   const [openCalendar, setOpenCalendar] = useState(false);
   let subjects = [];
 
@@ -334,8 +332,8 @@ const AddEditSubjects = ({
             onCancel={() => setOpenCalendar(false)}
             // generaldData?.startDateTime != '' &&
             //           generaldData?.endDateTime != ''
-            minimumDate={generaldData?.startDateTime}
-            maximumDate={generaldData?.endDateTime}
+            minimumDate={new Date(generaldData?.startDateTime)}
+            maximumDate={new Date(generaldData?.endDateTime)}
             // date={new Date()}
             // timePickerModeAndroid="spinner"
           />

@@ -75,7 +75,6 @@ const ChatBoxInput = ({ meetingData, message, setMessage }) => {
       <MentionInput
         value={message}
         onChange={(value) => {
-          console.log('text input', value);
           setMessage(value);
         }}
         partTypes={[

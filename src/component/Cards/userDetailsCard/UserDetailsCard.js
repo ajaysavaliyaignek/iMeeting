@@ -71,9 +71,6 @@ const UserDetailsCard = ({
     refetchQueries: ['liveMeetingUsers'],
     onCompleted: (data) => {
       console.log('update speaker', data);
-      // if (data.updateSpeaker.status == '200') {
-      //   navigation.goBack();
-      // }
     },
     onError: (data) => console.log('update speaker error', data)
   });

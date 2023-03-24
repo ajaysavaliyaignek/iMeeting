@@ -19,11 +19,6 @@ const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
   const [disable, setDisable] = useState(false);
 
   useEffect(() => {
-    console.log('--------', {
-      answerIds: answerIds,
-      votingId: item?.votingId,
-      isMultipleSelect: item?.isMultipleSelect
-    });
     if (item?.isMultipleSelect && answerIds?.length > 0) {
       addVotingAnswer({
         variables: {
@@ -56,19 +51,14 @@ const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
     onCompleted: (data) => {
       if (data) {
         console.log('add voting answer', data.addUserAnswer);
-        // if (data.addVotingQuestion.status.statusCode == '200') {
-        //   navigation.goBack();
-        // }
       }
     }
   });
 
   const onChoicePress = (data) => {
-    console.log('choice press', data);
     setAnswerIds([...answerIds, data?.id]);
-    console.log('answerIds', answerIds);
+
     if (item.isMultipleSelect !== true) {
-      console.log('is not multiple');
       addVotingAnswer({
         variables: {
           voting: {

@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Divider } from 'react-native-paper';
@@ -16,6 +16,8 @@ import { GET_All_USERS, GET_COMMITTEES_BY_ROLE } from '../../../graphql/query';
 import DropDownPicker from '../../../component/DropDownPicker/DropDownPicker';
 import Loader from '../../../component/Loader/Loader';
 import { UPDATE_DELEGETION } from '../../../graphql/mutation';
+import CheckBox from '../../../component/checkBox/CheckBox';
+import { Fonts } from '../../../themes';
 
 const AddEditDelegation = () => {
   const navigation = useNavigation();
@@ -39,6 +41,8 @@ const AddEditDelegation = () => {
       : generaldData?.startDate,
     whoReplaces: isEdit ? delegationData.transferredUserId : null
   });
+  const [eventTypes, setEventTypes] = useState([]);
+
   // get users data from the server
   const { loading: UsersLoading, error: UsersError } = useQuery(GET_All_USERS, {
     fetchPolicy: 'cache-and-network',
@@ -48,7 +52,6 @@ const AddEditDelegation = () => {
       searchValue: ''
     },
     onCompleted: (data) => {
-      // console.log('get all user data', data.committeeMembersList.items);
       setUsers(data?.committeeMembersList.items);
     },
     onError: (data) => {
@@ -63,7 +66,7 @@ const AddEditDelegation = () => {
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: false },
+    variables: { head: true, secretary: true, member: false, type: 6 },
     onCompleted: (data) => {
       if (data) {
         setCommittee(data?.committeesByRole?.items);
@@ -91,7 +94,6 @@ const AddEditDelegation = () => {
     {
       refetchQueries: ['delegations'],
       onCompleted: (data) => {
-        console.log('update delegation', data);
         if (data.updateDelegation.status.statusCode == '200') {
           navigation.goBack();
         }
@@ -99,6 +101,60 @@ const AddEditDelegation = () => {
       onError: (data) => console.log('update delegation error', data)
     }
   );
+  useEffect(() => {
+    if (delegationData?.types.split(',').includes('1')) {
+      eventTypes.push(1);
+    }
+    if (delegationData?.types.split(',').includes('4')) {
+      eventTypes.push(4);
+    }
+    if (delegationData?.types.split(',').includes('3')) {
+      eventTypes.push(3);
+    }
+    if (delegationData?.types.split(',').includes('5')) {
+      eventTypes.push(5);
+    }
+  }, []);
+  const [types, setTypes] = useState([
+    {
+      type: 1,
+      title: 'Meeting',
+      isCheked: isEdit
+        ? delegationData?.types.split(',').includes('1')
+          ? true
+          : false
+        : false
+    },
+    {
+      type: 4,
+      title: 'Appointment',
+      isCheked: isEdit
+        ? delegationData?.types.split(',').includes('4')
+          ? true
+          : false
+        : false
+    },
+    {
+      type: 3,
+      title: 'Task',
+      isCheked: isEdit
+        ? delegationData?.types.split(',').includes('3')
+          ? true
+          : false
+        : false
+    },
+    {
+      type: 5,
+      title: 'Video conference',
+      isCheked: isEdit
+        ? delegationData?.types.split(',').includes('5')
+          ? true
+          : false
+        : false
+    }
+  ]);
+
+  console.log({ eventTypes: eventTypes.join(',') });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -189,6 +245,37 @@ const AddEditDelegation = () => {
           value={generaldData?.whoReplaces}
           styleContainer={{ marginTop: SIZES[24] }}
         />
+
+        {types.map((type, index) => {
+          return (
+            <View
+              style={{
+                marginTop: SIZES[24],
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <Text style={{ ...Fonts.PoppinsRegular[14], color: Colors.bold }}>
+                {type.title}
+              </Text>
+              <CheckBox
+                value={type.isCheked}
+                onValueChange={() => {
+                  type.isCheked = !type.isCheked;
+
+                  if (type.isCheked == true) {
+                    setEventTypes([...eventTypes, type.type]);
+                  } else {
+                    var j = eventTypes.indexOf(type.type);
+                    eventTypes.splice(j, 1);
+                  }
+                  setTypes([...types]);
+                }}
+              />
+            </View>
+          );
+        })}
         {/* date  picker modal */}
         <DateTimePickerModal
           isVisible={openCalendar}
@@ -228,19 +315,6 @@ const AddEditDelegation = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              console.log('update delegation', {
-                delegation: {
-                  delegationId: isEdit ? delegationData.delegationId : 0,
-                  committeeId: generaldData.valueCommitee,
-                  startDate: moment(generaldData?.startDate).format(
-                    'YYYY-MM-DD hh:mm A'
-                  ),
-                  endDate: moment(generaldData?.endDate).format(
-                    'YYYY-MM-DD hh:mm A'
-                  ),
-                  transferredUserId: generaldData.whoReplaces
-                }
-              });
               updateDelegation({
                 variables: {
                   delegation: {
@@ -252,7 +326,8 @@ const AddEditDelegation = () => {
                     endDate: moment(generaldData?.endDate).format(
                       'YYYY-MM-DD hh:mm A'
                     ),
-                    transferredUserId: generaldData.whoReplaces
+                    transferredUserId: generaldData.whoReplaces,
+                    types: eventTypes.join(',')
                   }
                 }
               });

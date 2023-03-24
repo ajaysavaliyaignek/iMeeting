@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
-import Voice from '@react-native-community/voice';
+
 
 import Header from '../../component/header/Header';
 import { Icon, IconName } from '../../component';
@@ -22,6 +22,7 @@ import SubjectCard from '../../component/Cards/subjectCard/SubjectCard';
 import { Button } from '../../component/button/Button';
 import { GET_All_SUBJECTS, GET_SUBJECT_BY_ID } from '../../graphql/query';
 import moment from 'moment';
+import SerachAndButtoncomponent from '../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const Subjects = () => {
   const navigation = useNavigation();
@@ -31,8 +32,11 @@ const Subjects = () => {
   const [subject, setSubject] = useState([]);
   const [filterData, setFilterData] = useState([]);
   const [valueIndex, setValueIndex] = useState(-1);
+  
   // let subjects = [];
   let queryParams = [];
+
+  
 
   if (meetingData?.yourRoleName == 'Member') {
     queryParams = {
@@ -76,7 +80,6 @@ const Subjects = () => {
     onCompleted: (data) => {
       setSubject(data?.subjects.items);
       setFilterData(data?.subjects.items);
-      console.log('subjects', data?.subjects.items);
     }
   });
 
@@ -112,7 +115,14 @@ const Subjects = () => {
           onLeftPress={() => navigation.goBack()}
         />
         <View style={styles.subContainer}>
-          <View style={styles.searchContainer}>
+          <SerachAndButtoncomponent
+            isButtonShow={false}
+            value={searchText}
+            onChangeText={setSearchText}
+            role={'Member'}
+            containerStyle={{ marginHorizontal: 0 }}
+          />
+          {/* <View style={styles.searchContainer}>
             <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
             <TextInput
               value={searchText}
@@ -120,14 +130,24 @@ const Subjects = () => {
               placeholder={'Search'}
               onChangeText={(text) => searchFilterUsers(text)}
             />
-            <TouchableOpacity>
-              <Icon
-                name={IconName.Speaker}
-                height={SIZES[15]}
-                width={SIZES[10]}
-              />
-            </TouchableOpacity>
-          </View>
+            {!start ? (
+              <TouchableOpacity onPress={startRecording}>
+                <Icon
+                  name={IconName.Speaker}
+                  height={SIZES[15]}
+                  width={SIZES[10]}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={stopRecording}>
+                <Icon
+                  name={IconName.Close}
+                  height={SIZES[15]}
+                  width={SIZES[10]}
+                />
+              </TouchableOpacity>
+            )}
+          </View> */}
           <View style={styles.deadlineContainer}>
             <Text style={styles.txtDeadlineTitle}>
               RECIEVING SUBJECTS DEADLINE
@@ -246,7 +266,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: SIZES[24]
+    marginVertical: SIZES[24]
   },
   cancelBtnLayout: {
     backgroundColor: '#F3F6F9',

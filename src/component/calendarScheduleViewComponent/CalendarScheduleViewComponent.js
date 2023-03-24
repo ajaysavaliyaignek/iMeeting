@@ -26,13 +26,6 @@ const CalendarScheduleViewComponent = () => {
   const [eventDetails, setEventDetails] = useState(calDateList);
   const flatListRef = useRef(null);
   const [date, setDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
-  const today = parseInt(moment(new Date()).format('DD'));
-  // const [scrollIndex, setScrollIndex] = useState(
-  //   parseInt(moment(new Date()).format('DD')) - 1
-  // );
-
-  // const [isNextPage, setIsNextPage] = useState(true);
-  console.log('today', { today });
   var previousList = [];
   var setDateOnScroll = false;
 
@@ -49,7 +42,7 @@ const CalendarScheduleViewComponent = () => {
 
   useEffect(() => {
     recentUsedMonth = CalanderDate.format('YYYY-MM-01');
-    console.log('useeffect');
+
     if (dataInList.findIndex((item) => item == recentUsedMonth) == -1) {
       dataInList.push(recentUsedMonth);
       getCalenderEvents({
@@ -128,7 +121,6 @@ const CalendarScheduleViewComponent = () => {
               eventsOfTheDay: dateEventList
             });
           } else {
-            console.log('isPrevious');
             previousList.push({
               date: element,
               displayDate: moment(element).format('MMM DD').toString(),
@@ -137,18 +129,10 @@ const CalendarScheduleViewComponent = () => {
               }),
               eventsOfTheDay: dateEventList
             });
-            // calDateList = previousList.concat(calDateList);
           }
         });
 
         setEventDetails(previousList.concat(calDateList));
-
-        // if (!firstScrollDone) {
-        //   scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
-        // } else {
-        //   console.log('curruntItemDateInView', curruntItemDateInView);
-        //   scrollToDate(curruntItemDateInView);
-        // }
       }
     },
     onError: (data) => {
@@ -157,12 +141,6 @@ const CalendarScheduleViewComponent = () => {
   });
   useEffect(() => {
     if (eventDetails.length > 0) {
-      console.log('eventDetails.length', eventDetails.length);
-      // const scrollingNumber = Math.floor(
-      //   Math.random() * eventDetails.length - 1
-      // );
-      // console.log('item to be Scoll', eventDetails[scrollingNumber]);
-
       if (!firstScrollDone) {
         scrollList(parseInt(moment(new Date()).format('DD')) - 1);
       }
@@ -170,7 +148,7 @@ const CalendarScheduleViewComponent = () => {
         let index = eventDetails?.findIndex(
           (data) => data?.date === curruntItemDateInView
         );
-        console.log('index', index);
+
         scrollList(index);
       }
     }
@@ -188,29 +166,9 @@ const CalendarScheduleViewComponent = () => {
       }, 500);
     }
   };
-  // const scrollToDate = (date) => {
-  //   firstScrollDone = true;
-  //   console.log('date===>', date);
-  //   console.log('calDatelist======>', eventDetails.length);
-
-  //   let index = eventDetails?.findIndex((data) => data?.date === date);
-  //   console.log('index', index);
-  //   scrollIndex = index;
-  //   if (index > 0 && eventDetails?.length > 0) {
-  //     setTimeout(() => {
-  //       console.log('index:::::', index);
-
-  //       flatListRef?.current?.scrollToIndex({
-  //         animation: true,
-  //         index: index
-  //       });
-  //     }, 500);
-  //   }
-  // };
 
   const renderNextMonthEvents = () => {
     isNextPage = true;
-    // setIsNextPage(true);
 
     let newDate = moment(eventDetails[eventDetails.length - 1].date).add(
       1,
@@ -223,7 +181,6 @@ const CalendarScheduleViewComponent = () => {
       var end = moment(newDate).endOf('month').format('YYYY-MM-DD');
       recentUsedMonth = moment(newDate).format('YYYY-MM-01');
 
-      console.log(`Calling next page with date ${begin} and ${end}`);
       getCalenderEvents({
         variables: {
           startDate: begin.toString(),
@@ -240,15 +197,11 @@ const CalendarScheduleViewComponent = () => {
   const renderPreviousMonthEvents = () => {
     if (eventDetails.length <= 0) return;
     isNextPage = false;
-    // setIsNextPage(false);
-
     let newDate = moment(eventDetails[0].date).add(-1, 'month');
-
     var begin = moment(newDate).format('YYYY-MM-01');
     recentUsedMonth = begin;
-
     var end = moment(newDate).endOf('month').format('YYYY-MM-DD');
-    // console.log(begin, end);
+
     getCalenderEvents({
       variables: {
         startDate: begin.toString(),
@@ -264,8 +217,6 @@ const CalendarScheduleViewComponent = () => {
   const onViewCallBack = useRef(({ changed, viewableItems }) => {
     curruntItemDateInView = viewableItems[0]?.item?.date;
     scrollIndex = viewableItems[0]?.index;
-    // setDate(curruntItemDateInView);
-    console.log('Current displaying data of the ', curruntItemDateInView);
   });
 
   const viewabilityConfig = useRef({
@@ -312,14 +263,6 @@ const CalendarScheduleViewComponent = () => {
                   });
                 }
               }, 100);
-              console.log('scrolling faid::::', info);
-              // const wait = new Promise((resolve) => setTimeout(resolve, 500));
-              // wait.then(() => {
-              //   flatListRef.current?.scrollToIndex({
-              //     index: info.index,
-              //     animated: true
-              //   });
-              // });
             }}
             data={eventDetails}
             style={{ paddingHorizontal: SIZES[16] }}
@@ -331,8 +274,6 @@ const CalendarScheduleViewComponent = () => {
             }}
             onEndReachedThreshold={0.5}
             onScrollBeginDrag={(e) => {
-              console.log('onScrollBeginDrag');
-
               setDateOnScroll = true;
             }}
             onScrollEndDrag={() => {
@@ -350,11 +291,6 @@ const CalendarScheduleViewComponent = () => {
               setDateOnScroll = false;
             }}
             onMomentumScrollEnd={(e) => {
-              console.log(
-                'onMomentumScrollEnd with date ',
-                curruntItemDateInView
-              );
-
               if (setDateOnScroll && eventDetails.length > 0) {
                 if (scrollIndex == 0) {
                   renderPreviousMonthEvents();

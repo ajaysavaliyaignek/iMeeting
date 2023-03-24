@@ -151,7 +151,6 @@ const IMeetingChatTextInput = ({
               <Pressable
                 key={one.userId}
                 onPress={() => {
-                  console.log('one', one);
                   onSuggestionPress({ id: one.userId, name: one.userName });
                 }}
                 style={{ padding: 12 }}
@@ -205,19 +204,6 @@ const IMeetingChatTextInput = ({
     if (reqTimer) {
       clearTimeout(reqTimer);
     }
-
-    // reqTimer = setTimeout(() => {
-    //   getUserSuggestions(keyword)
-    //     .then((data) => {
-    //       setState({
-    //         keyword: keyword,
-    //         data: [...data]
-    //       });
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    // }, 200);
   }
   const getUserSuggestions = (displayName = '') => {
     return fetch(`http://localhost:8080/?username=${displayName.slice(1)}`, {
@@ -226,7 +212,6 @@ const IMeetingChatTextInput = ({
         'Content-type': 'application/json'
       }
     }).then((res) => {
-      console.log(res);
       if (!res.ok) {
         throw new Error('Went wrong');
       }

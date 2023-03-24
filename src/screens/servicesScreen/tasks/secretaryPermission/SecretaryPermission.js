@@ -38,7 +38,7 @@ const SecretaryPermission = () => {
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: false },
+    variables: { head: true, secretary: true, member: false, type: 3 },
     onCompleted: (data) => {
       if (data) {
         setCommittees(data?.committeesByRole?.items);
@@ -55,8 +55,6 @@ const SecretaryPermission = () => {
     {
       onCompleted: (data) => {
         if (data) {
-          console.log('secretary permission', data.taskSecretaryPermission);
-
           setSecretoryPermission(data.taskSecretaryPermission);
           getRoles({
             variables: {
@@ -134,10 +132,6 @@ const SecretaryPermission = () => {
   const [updateSecretaryPermission] = useMutation(UPDATE_SECRETARY_PERMISSION, {
     refetchQueries: ['taskSecretaryPermission'],
     onCompleted: (data) => {
-      console.log(
-        'updateSecretaryPermission',
-        data.updateTaskSecretaryPermission
-      );
       if (data.updateTaskSecretaryPermission.status.statusCode == '200') {
         alert(data.updateTaskSecretaryPermission.status.statusMessage);
       }
@@ -215,15 +209,6 @@ const SecretaryPermission = () => {
             title={'Save'}
             disable={secretaryPermission?.userRole == 'Head' ? false : true}
             onPress={() => {
-              console.log('updateSecretaryPermission', {
-                committeeId: valueCommitee,
-                isMinutesofMeetingApproval: meetingApprovedData?.isAccess,
-                isSubjectApproval: subjectApprovedData?.isAccess,
-                allTaskTypesApproveByHead: taskApprovedData?.isAccess,
-                TaskTypesApproveByHeadRoleId: taskApprovedData?.id,
-                minutesofMeetingApprovalRoleId: meetingApprovedData?.id,
-                subjectApprovalRoleId: subjectApprovedData?.id
-              });
               updateSecretaryPermission({
                 variables: {
                   taskSecretaryPermission: {

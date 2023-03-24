@@ -44,16 +44,6 @@ const EditAppointmentDateAndTime = () => {
     item,
     userRequired
   } = route?.params;
-  console.log('appintment data from date and time', {
-    attachFiles,
-    committee,
-    title,
-    discription,
-    users,
-    item,
-    userRequired,
-    appointmentsData
-  });
 
   const [startDate, setStartdate] = useState(
     item.setDate == null
@@ -110,19 +100,12 @@ const EditAppointmentDateAndTime = () => {
   ]);
 
   const handleConfirmClock = (date) => {
-    console.log('A time has been picked: ', date);
-
     const time = moment(date).format('LT');
-    console.log('time', time);
 
     var d = dates.toLocaleDateString();
     let currentDate = moment().format('DD/MM/YYYY');
 
     if (d == currentDate) {
-      console.log(
-        moment(time, 'hh:mm A').isSameOrAfter(moment()),
-        "moment(time, 'hh:mm A').isSameOrAfter(moment())"
-      );
       if (moment(time, 'hh:mm A').isAfter(moment())) {
         if (value == 'startTime') {
           setStartTime(time);
@@ -142,16 +125,9 @@ const EditAppointmentDateAndTime = () => {
         setEndTime(time);
         setTime(date);
       }
-      // if (value == 'endTime') {
-      //   setEndTime(time);
-      // }
       setOpenClock(false);
     }
-    console.log(
-      moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A')),
-      'time compare'
-    );
-    console.log(startTime, 'startTime');
+
     if (value == 'endTime') {
       if (startDate == endDate) {
         if (moment(time, 'hh:mm A').isAfter(moment(startTime, 'hh:mm A'))) {
@@ -175,14 +151,11 @@ const EditAppointmentDateAndTime = () => {
     }
   };
   const handleConfirmCalendar = (date) => {
-    console.log('A date has been picked: ', date);
 
     const Date = moment(date).format('DD MMM,YYYY');
     const newDate = moment(date).format('YYYY-MM-DD');
     const time = moment(date).format('LT');
-    console.log('time', time);
-    console.log('new date', newDate);
-    console.log('time', Date);
+
     if (value == 'startDate') {
       setStartdate(Date);
       setStartNewDate(newDate);
@@ -379,16 +352,7 @@ const EditAppointmentDateAndTime = () => {
           minimumDate={value === 'startDate' ? new Date() : dates}
           date={value === 'startDate' ? dates : date}
         />
-        {/* {openCalendar && (
-          <RNDateTimePicker
-            value={new Date()}
-            display="default"
-            onChange={(event, date) => {
-              console.log(event);
-              console.log(date);
-            }}
-          />
-        )} */}
+       
         <DateTimePickerModal
           isVisible={openClock}
           mode="time"

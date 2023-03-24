@@ -51,5 +51,6 @@ export const SIZES = {
   265: Normalize(265),
   280: Normalize(280),
   350: Normalize(350),
-  400: Normalize(400)
+  400: Normalize(400),
+  600: Normalize(600)
 };

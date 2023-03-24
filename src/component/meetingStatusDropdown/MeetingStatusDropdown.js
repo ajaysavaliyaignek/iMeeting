@@ -63,7 +63,7 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
                   item.meetingStatusTitle === 'Live' ||
                   item.meetingStatusTitle === 'Pre-Scheduled' ||
                   item.meetingStatusTitle === 'Scheduled' ||
-                  item.meetingStatusTitle === 'Sof    t-Closed' ||
+                  item.meetingStatusTitle === 'Soft-Closed' ||
                   (item.meetingStatusTitle === 'Tentative' && true)
               };
             } else if (
@@ -186,12 +186,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
         disabled={items.isDisable}
         onPress={() => {
           if (items.isDisable) {
-            console.log('isDisable');
             setValueStatus(item.meetingStatusTitle);
             return;
           } else {
-            console.log('isNotDisable');
-            // setValueStatusTitle(items.label);
             setValueStatus(items.label);
             UpdateMeetingStatus({
               variables: {
@@ -421,23 +418,10 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
             : Colors.bold
         }
         onChange={(items) => {
-          console.log('on change', items);
           if (items.isDisable) {
-            // console.log('isDisable');
-            // setValueStatus(item.meetingStatusTitle);
             return;
           } else {
-            console.log('isNotDisable');
-            // setValueStatusTitle(items.label);
             setValueStatus(items.label);
-            // UpdateMeetingStatus({
-            //   variables: {
-            //     meeting: {
-            //       meetingId: item.meetingId,
-            //       meetingStatusId: items.value
-            //     }
-            //   }
-            // });
           }
         }}
         selectedTextStyle={{

@@ -37,25 +37,23 @@ const SubjectCard = ({
             screen: 1
           }
         }
-      ]
+      ],
+      onCompleted: (data) => {
+        console.log('delete subject data', data.deleteSubject.status);
+      },
+      onError: (data) => {
+        Alert.alert('Delete Subject Error', [
+          {
+            text: data.message,
+
+            style: 'default'
+          }
+        ]);
+      }
     }
   );
-  if (data) {
-    console.log('delete data', data.deleteSubject.status);
-  }
-  if (error) {
-    Alert.alert('Delete Subject Error', [
-      {
-        text: error,
-
-        style: 'default'
-      }
-    ]);
-  }
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',

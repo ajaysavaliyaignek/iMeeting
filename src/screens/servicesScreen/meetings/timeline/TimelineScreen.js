@@ -30,23 +30,17 @@ import Loader from '../../../../component/Loader/Loader';
 import EventCalendar from 'react-native-events-calendar';
 
 const TimelineScreen = () => {
-  const { width, height } = useWindowDimensions();
-  const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const navigation = useNavigation();
   const route = useRoute();
   const { selectedUsers } = route?.params;
-  // console.log(' from timeline', selectedUsers);
-  let userId = [];
-
   const [date, setDate] = useState(new Date());
-  const [selected, setSelected] = useState(false);
   const [event, setEvents] = useState(null);
   const [items, setItems] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [timelineUser, setTimelineUser] = useState([]);
   const [selectUser, setSelectuser] = useState([]);
   const [userIds, setUserIds] = useState([]);
-  console.log('selectUser', selectUser);
 
   useEffect(() => {
     let selectForTimeline = selectedUsers.map((user) => {
@@ -66,8 +60,6 @@ const TimelineScreen = () => {
     });
     setUserIds(userId?.join());
   }, [selectUser]);
-
-  console.log('userIds', { userid: userIds });
 
   const { data, error, loading } = useQuery(GET_TIMELINE_REVIEW, {
     fetchPolicy: 'cache-and-network',
@@ -194,8 +186,6 @@ const TimelineScreen = () => {
     }
   ];
 
-  console.log(event);
-
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -264,7 +254,6 @@ const TimelineScreen = () => {
           markedDates={markedDatesArray}
           onDateSelected={(date) => {
             setDate(new Date(date));
-            console.log(date.toDate());
           }}
           scrollable={true}
           dayComponentHeight={100}
@@ -296,14 +285,6 @@ const TimelineScreen = () => {
           {event?.events.length} events
         </Text>
         <ScrollView style={{ flex: 1 }}>
-          {/* <EventCalendar
-            // eventTapped={this._eventTapped.bind(this)}
-            events={events}
-            width={width}
-            initDate={date}
-            renderEvent={(event) => <Text>{event.title}</Text>}
-            eventTapped={console.log('event pressed')}
-          /> */}
           <Timetable
             items={items}
             cardComponent={MyItemCard}

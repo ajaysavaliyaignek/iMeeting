@@ -152,6 +152,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
   }
 
   // for get meeting and appointment data by id
+  console.log({ mutationParams });
 
   if (type == 'Meeting' && isEdit) {
     const {
@@ -165,8 +166,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
       },
       onCompleted: (data) => {
         if (data) {
-          console.log('meeting by id', data.meeting);
-          // setMeeting(data.meeting);
           let meeting = data?.meeting;
           setGeneralData({
             title: meeting?.meetingTitle,
@@ -210,12 +209,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
         id: details?.appointmentId
       },
       onCompleted: (data) => {
-        console.log(
-          'appointment by id from edit appointment general',
-          data.appointment
-        );
         if (data) {
-          // setAppointment(data.appointment);
           let appointment = data.appointment;
           setGeneralData({
             title: appointment.appointmentTitle,
@@ -254,10 +248,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
         id: details?.videoConferenceId
       },
       onCompleted: (data) => {
-        console.log(
-          'videoConference by id from edit videoConference general',
-          data.videoConference
-        );
         if (data) {
           // setAppointment(data.appointment);
           let videoConference = data.videoConference;
@@ -314,7 +304,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
         }
       ],
       onCompleted: (data) => {
-        console.log('add meeting', data.updateMeeting);
+        console.log('update meeting', data);
         if (data.updateMeeting.status.statusCode == '200') {
           navigation.navigate('Details', {
             title: 'Meetings',
@@ -340,7 +330,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
         }
       ],
       onCompleted: (data) => {
-        console.log('add appointment', data.updateAppointment);
         if (data.updateAppointment.status.statusCode == '200') {
           navigation.navigate('AppointmentsList');
           setSelectedUsers([]);
@@ -371,7 +360,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
         }
       ],
       onCompleted: (data) => {
-        console.log('add videoconference', data.updateVideoConference);
         if (data.updateVideoConference.status.statusCode == '200') {
           navigation.navigate('VideoConferenceList');
         }
@@ -381,8 +369,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
       }
     }
   );
-
-  console.log('mutationParams', mutationParams);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -423,7 +409,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
             setVisibleIndex,
             fileResponse,
             setFileResponse,
-            screenName
+            type
           )}
 
           {/* button container */}
@@ -475,10 +461,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
                         }
                       });
                     } else if (type == 'VideoConference') {
-                      console.log(
-                        'videoConferenceParams',
-                        videoConferenceParams
-                      );
                       addVideoConference({
                         variables: {
                           videoConference: videoConferenceParams
@@ -504,10 +486,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
                           generaldData?.valueCommitee != null
                           ? 1
                           : 0.5
-                        : curentPosition == 1
-                        ? users?.length <= 0 && requiredUsers?.length <= 0
-                          ? 0.5
-                          : 1
                         : curentPosition == 2
                         ? generaldData?.startDateTime != '' &&
                           generaldData?.endDateTime != '' &&
@@ -521,8 +499,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                           ? 1
                           : 0.5
                         : curentPosition == 4
-                        ? subjects.length > 0 &&
-                          generaldData?.calendarValue != ''
+                        ? generaldData?.calendarValue != ''
                           ? 1
                           : 0.5
                         : 1,
@@ -537,10 +514,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
                       generaldData?.valueCommitee != null
                       ? false
                       : true
-                    : curentPosition == 1
-                    ? users?.length <= 0 && requiredUsers?.length <= 0
-                      ? true
-                      : false
                     : curentPosition == 2
                     ? generaldData?.startDateTime != '' &&
                       generaldData?.endDateTime != '' &&
@@ -554,7 +527,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                       ? false
                       : true
                     : curentPosition == 4
-                    ? subjects.length > 0 && generaldData?.calendarValue != ''
+                    ? generaldData?.calendarValue != ''
                       ? false
                       : true
                     : false

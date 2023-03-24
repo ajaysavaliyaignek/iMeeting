@@ -33,13 +33,6 @@ const YourAnswer = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { item, userID } = route?.params;
-  console.log(
-    'item from your answer',
-    item.meetingId,
-    item.appointmentId,
-    userID
-  );
-  const [open, setOpen] = useState(false);
   const [valueAnswer, setValue] = useState(null);
   const [suggestedTime, setSuggestedTime] = useState('');
   const [openTimePicker, setOpenTimePicker] = useState(false);
@@ -115,7 +108,6 @@ const YourAnswer = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('add answer status', data.updateAnswer);
       if (data.updateAnswer.status.statusCode == 200) {
         navigation.goBack();
       }
@@ -126,11 +118,8 @@ const YourAnswer = () => {
   });
 
   const handleConfirmClock = (date) => {
-    console.log('A date has been picked: ', date);
-
     const time = moment(date).format('LT');
     setSuggestedTime(time);
-    console.log('time', time);
     setOpenTimePicker(false);
   };
 
@@ -195,19 +184,6 @@ const YourAnswer = () => {
             layoutStyle={[styles.nextBtnLayout]}
             textStyle={styles.txtNextBtn}
             onPress={() => {
-              console.log('add answer data', {
-                answer: valueAnswer,
-                appointmentId:
-                  item?.appointmentId == undefined ? 0 : item?.appointmentId,
-                suggestionTime:
-                  valueAnswer == 'Suggest time' ? suggestedTime : '',
-                meetingId: item?.meetingId == undefined ? 0 : item?.meetingId,
-                videoConferenceId:
-                  item?.meetingId == undefined &&
-                  item?.appointmentId == undefined
-                    ? item.videoConferenceId
-                    : 0
-              });
               updateAnswer({
                 variables: {
                   answer: {

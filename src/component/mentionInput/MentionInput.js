@@ -56,8 +56,6 @@ const MentionInput = ({
     [message, partTypes]
   );
 
-  console.log('parts', parts);
-
   const handleSelectionChange = (event) => {
     setSelection(event.nativeEvent.selection);
 
@@ -82,7 +80,6 @@ const MentionInput = ({
    * - Trigger onChange callback with new value
    */
   const onSuggestionPress = (mentionType) => (suggestion) => {
-    console.log('suggestion', suggestion);
     const newValue = generateValueWithAddedSuggestion(
       parts,
       mentionType,
@@ -95,7 +92,6 @@ const MentionInput = ({
       return;
     }
 
-    console.log('newValue', suggestion.name);
     userName.push(`@${suggestion.name}`);
     userId.push(`@[${suggestion.name}](${suggestion.id})`);
     // setUserName(suggestion.name);
@@ -133,7 +129,6 @@ const MentionInput = ({
    */
 
   const onChangeInput = (changedText) => {
-    console.log('hello', changedText);
     setMessage(changedText);
     // setValue(changedText);
   };
@@ -161,23 +156,7 @@ const MentionInput = ({
           style={[styles.textInput]}
           onBlur={onBlur}
           onFocus={onFocus}
-        >
-          {/* <Text>
-            {console.log('parts=========', parts)}
-            {parts.map(({ text, partType, data }, index) =>
-              partType ? (
-                <Text
-                  key={`${index}-${data?.trigger ?? 'pattern'}`}
-                  style={partType.textStyle ?? defaultMentionTextStyle}
-                >
-                  {text}
-                </Text>
-              ) : (
-                <Text key={index}>{text}</Text>
-              )
-            )}
-          </Text> */}
-        </TextInput>
+        ></TextInput>
         <View style={styles.iconContainer}>
           <TouchableOpacity
             style={styles.attachIconView}
@@ -203,8 +182,6 @@ const MentionInput = ({
 
                 string = finalAns;
               }
-
-              console.log('final ans', { string: string });
 
               updateChat({
                 variables: {

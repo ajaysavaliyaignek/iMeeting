@@ -22,16 +22,16 @@ const PieChart = ({ title, chartData, chartColor }) => {
         {title}
       </Text>
       <VictoryPie
-        labelPosition={'endAngle'}
+        labelPosition={'centroid'}
         data={chartData}
         width={Normalize(350)}
-        height={Normalize(265)}
-        innerRadius={Normalize(60)}
+        height={300}
+        innerRadius={80}
         style={{
           labels: {
             fill: Colors.bold,
             ...Fonts.PoppinsRegular[12],
-            padding: 7
+            padding: 10
           }
         }}
         padAngle={6}

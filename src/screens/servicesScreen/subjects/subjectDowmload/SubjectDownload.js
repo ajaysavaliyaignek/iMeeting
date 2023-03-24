@@ -27,10 +27,7 @@ import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker'
 const SubjectDownload = () => {
   const route = useRoute();
   const { item, downloadType } = route?.params;
-  console.log('subject from subject download', item);
-  console.log('downloadType', downloadType);
-
-  const navigation = useNavigation();
+ const navigation = useNavigation();
   const [valueType, setValueType] = useState(null);
   const [items, setItems] = useState([
     { label: 'PDF', value: 'PDF' },
@@ -38,23 +35,9 @@ const SubjectDownload = () => {
   ]);
   const [isAttachFileSwitchOn, setIsAttachFileSwitchOn] = useState(false);
   const [isCommentsSwitchOn, setIsCommentsSwitchOn] = useState(false);
-  const [base64, setBese64] = useState(null);
-  const [fileName, setFileName] = useState(null);
 
   const checkPermission = async () => {
-    console.log('download params', {
-      attachFile: isAttachFileSwitchOn,
-      comments: isCommentsSwitchOn,
-      format: valueType,
-      id:
-        downloadType == 'Subject'
-          ? +item?.subjectId
-          : downloadType == 'Task'
-          ? +item?.taskId
-          : 0,
-      type: downloadType == 'Subject' ? 2 : downloadType == 'Task' ? 3 : 0
-    });
-    console.log('check permission');
+   
     if (Platform.OS === 'ios') {
       downloadFiles({
         variables: {
@@ -88,7 +71,6 @@ const SubjectDownload = () => {
           }
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Storage Permission Granted.');
           downloadFiles({
             variables: {
               attachFile: isAttachFileSwitchOn,
@@ -119,7 +101,6 @@ const SubjectDownload = () => {
     GET_ZIP_PDF_DOWNLOAD,
     {
       onCompleted: async (data, error) => {
-        console.log(' download data', data);
         let base64Str = data?.report?.fileData?.base64;
 
         let fPath = Platform.select({
@@ -142,17 +123,7 @@ const SubjectDownload = () => {
         if (Platform.OS == 'ios') {
           await RNFetchBlob.fs.createFile(fPath, base64Str, 'base64');
         } else {
-          // let options = {
-          //   fileCache: true,
-          //   addAndroidDownloads: {
-          //     path: fPath,
-          //     description: 'downloading file...',
-          //     notification: true,
-          //     // useDownloadManager works with Android only
-          //     useDownloadManager: true
-          //   }
-          // };
-          // RNFetchBlob.config(options);
+    
 
           await RNFetchBlob.fs.writeFile(fPath, base64Str, 'base64');
         }
@@ -160,7 +131,6 @@ const SubjectDownload = () => {
         if (Platform.OS == 'ios') {
           RNFetchBlob.ios.openDocument(fPath);
         } else {
-          console.log('file path2', fPath);
 
           RNFetchBlob.android.actionViewIntent(fPath);
           await FileViewer.open(fPath, { showOpenWithDialog: true });
@@ -170,9 +140,7 @@ const SubjectDownload = () => {
       fetchPolicy: 'cache-and-network'
     }
   );
-  // if (base64) {
-  //   checkPermission(`data:application/${valueType};base64,${base64}`);
-  // }
+ 
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

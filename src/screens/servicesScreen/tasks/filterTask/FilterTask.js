@@ -58,7 +58,6 @@ const FilterTask = () => {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data) {
-        console.log('task status', taskStatus);
         setTaskStatus(data.taskStatus.items);
         newTaksStatus = data.taskStatus.items.map((item, index) => {
           let previousTaskStatusIndex = taskStatusList?.findIndex(

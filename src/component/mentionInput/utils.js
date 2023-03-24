@@ -508,7 +508,7 @@ const parseValue = (value, partTypes, positionOffset = 0) => {
       }
     }
   }
-  console.log('plainText,parts', plainText, parts);
+
   // Exiting from parseValue
   return {
     plainText,

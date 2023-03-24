@@ -49,13 +49,10 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
 
   // set date time from clock model
   const handleConfirmCalendar = (date) => {
-    console.log('status of isStartDate ', isStartDate);
-    console.log('clock', moment(date).date(generaldData?.startDateTime.date));
     if (isStartDate) {
       // date = moment(date).date(generaldData?.startDateTime.date);
 
       if (moment(date).isBefore(moment(new Date()))) {
-        console.log('start date issue');
         Alert.alert('Invalid start date');
 
         setOpenCalendar(false);
@@ -68,11 +65,8 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
         endDateTime: date
       });
     } else {
-      // date = moment(date).date(generaldData?.endDateTime.date);
 
       if (moment(date).isBefore(moment(generaldData?.startDateTime))) {
-        console.log('end date issue');
-        // Alert.alert('Invalid end date');
         setGeneralData({ ...generaldData, endDateTime: date });
         setOpenCalendar(false);
         return;
@@ -90,13 +84,8 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
         .hour(moment(generaldData?.startDateTime).hour)
         .minute(moment(generaldData?.startDateTime).minute);
       if (moment(date).isBefore(moment(new Date()))) {
-        console.log('start time issue');
         Alert.alert('Invalid start time');
-        // setGeneralData({
-        //   ...generaldData,
-        //   startDateTime: date,
-        //   endDateTime: date
-        // });
+       
 
         setOpenClock(false);
         return;
@@ -111,7 +100,6 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
         .hour(moment(generaldData?.endDateTime).hour)
         .minute(moment(generaldData?.endDateTime).minute);
       if (moment(date).isBefore(moment(generaldData?.startDateTime))) {
-        console.log('end time issue');
         Alert.alert('Invalid end time');
         setOpenClock(false);
         return;
@@ -126,7 +114,6 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
   const TimeZone = useQuery(GET_TIMEZONE, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      console.log(data.timeZone.items);
       if (data) {
         setTimeZone(data.timeZone.items);
         let filterTimeZone = data?.timeZone?.items?.filter((time) => {
@@ -134,7 +121,6 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
             return time;
           }
         });
-        console.log('currentTimeZone', filterTimeZone);
         if (details == null) {
           setGeneralData({
             ...generaldData,

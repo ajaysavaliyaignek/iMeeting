@@ -54,10 +54,6 @@ const TaskDetails = () => {
       },
 
       onCompleted: (data) => {
-        console.log('get file ', data);
-        // setFileResponse((pre) => {
-        //   return [...pre, data.uploadedFile];
-        // });
         fileResponse.push(data.uploadedFile);
       }
     });
@@ -107,14 +103,6 @@ const TaskDetails = () => {
     onCompleted: (data) => {
       if (data) {
         setTaskDetails(data.task);
-        // data?.task?.attachFiles?.map((id) => {
-        //   console
-        //   getFile({
-        //     variables: {
-        //       fileEntryId: id
-        //     }
-        //   });
-        // });
       }
     },
     onError: (data) => {
@@ -155,7 +143,6 @@ const TaskDetails = () => {
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
-        console.log('comments', data.comments.items);
         setComments(data.comments.items[0]);
       } else {
         console.log('no comments');
@@ -178,7 +165,6 @@ const TaskDetails = () => {
   const [deleteTask] = useMutation(DELETE_TASK, {
     refetchQueries: ['tasks'],
     onCompleted: (data) => {
-      console.log('delete tasks', data.deleteTask.status);
       if (data.deleteTask.status.statusCode == '200') {
         navigation.goBack();
       }

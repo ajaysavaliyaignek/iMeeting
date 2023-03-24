@@ -41,13 +41,13 @@ const AttachFiles = ({
         presentationStyle: 'fullScreen',
         type: [DocumentPicker.types.allFiles]
       });
-      console.log('file response', response);
+
       const url = await AsyncStorage.getItem('@url');
       response.map((res) => {
         if (res !== null) {
           const formData = new FormData();
           formData.append('file', res);
-          console.log('formdata', formData);
+
           setLoading(true);
           fetch(`https://${url}//o/imeeting-rest/v1.0/file-upload`, {
             method: 'POST',
@@ -78,7 +78,7 @@ const AttachFiles = ({
         }
       });
     } catch (err) {
-      console.log(err);
+      console.log('document picker error', err);
     }
   }, []);
 

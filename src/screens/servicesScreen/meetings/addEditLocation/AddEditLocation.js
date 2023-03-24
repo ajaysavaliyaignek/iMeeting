@@ -9,11 +9,10 @@ import { Button } from '../../../../component/button/Button';
 import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 
-const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
+const AddEditLocation = ({ generaldData, setGeneralData, type }) => {
   const navigation = useNavigation();
   const [location, setLocation] = useState([]);
   const [error, setError] = useState(null);
-  console.log('screenName', screenName);
 
   // get all location for location dropdown
   const {
@@ -23,7 +22,7 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
   } = useQuery(GET_ALL_LOCATION, {
     fetchPolicy: 'cache-and-network',
     variables: {
-      locationType: screenName == 'Add meeting' ? 1 : 4
+      locationType: type == 'Meeting' ? 1 : 4
     },
 
     onCompleted: (data) => {
@@ -41,7 +40,7 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
     navigation.navigate('LocationDetails', {
       locationId: generaldData?.valueLocation,
 
-      locationType: screenName == 'Meeting' ? 1 : 4,
+      locationType: type == 'Meeting' ? 1 : 4,
       role: 'Head',
       isLiveMeeting: false
     });
@@ -87,7 +86,7 @@ const AddEditLocation = ({ generaldData, setGeneralData, screenName }) => {
             title={'Add location'}
             onPress={() =>
               navigation.navigate('AddLocation', {
-                locationType: screenName == 'Add meeting' ? 1 : 4
+                locationType: type == 'Meeting' ? 1 : 4
               })
             }
             layoutStyle={[

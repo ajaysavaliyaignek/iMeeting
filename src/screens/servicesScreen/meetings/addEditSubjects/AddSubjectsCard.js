@@ -159,7 +159,6 @@ const AddSubjectsCard = ({
                 setOpenIndex(-1);
               }}
               onSelectItem={(value) => {
-                console.log('value status', value);
                 updateSubjectStatus({
                   variables: {
                     subject: {

@@ -20,14 +20,15 @@ const AddMinutesOfMeetingDecision = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { isEdit, momDecisionData, meetingData, decisionId } = route?.params;
-  console.log('momDecisionData', momDecisionData);
   const [comment, setComment] = useState(
     isEdit ? momDecisionData.description : ''
   );
   const [meetingStatus, setMeetingStatus] = useState([]);
   const [decision, setDecision] = useState('');
-
+  let showFinalApproveButton =
+    meetingData.status.entitys.organizationName == meetingData.committeeTitle;
   // getMeetingSubjects for meeting
+  console.log('meeting data from add mom', meetingData);
   const getMeetingSubjects = useQuery(GET_MEETING_STATUS, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
@@ -43,7 +44,6 @@ const AddMinutesOfMeetingDecision = () => {
   const [updateMeetingStatus] = useMutation(UPDATE_MEETING_STATUS, {
     refetchQueries: ['meetings'],
     onCompleted: (data) => {
-      console.log('updateMeetingSttaus', data.updateMeetingStatus.status);
       if (data?.updateMeetingStatus?.status?.statusCode == '200') {
         navigation.navigate('Details', {
           title: 'Meetings',
@@ -52,7 +52,7 @@ const AddMinutesOfMeetingDecision = () => {
       }
     },
     onError: (data) => {
-      console.log('updateMeetingSttaus', data.message);
+      console.log('updateMeetingSttaus error', data.message);
     }
   });
 
@@ -62,8 +62,8 @@ const AddMinutesOfMeetingDecision = () => {
   ] = useMutation(UPDATE_DECISION, {
     refetchQueries: ['decisions'],
     onCompleted: (data) => {
+      console.log('update minutes of meeting Decision', data);
       if (data) {
-        console.log('update Decision', data?.updateDecision?.status);
         if (data?.updateDecision?.status?.statusCode == '200') {
           if (decision == 'Send' || decision == 'Approve') {
             navigation.navigate('Details', {
@@ -77,7 +77,6 @@ const AddMinutesOfMeetingDecision = () => {
               }
             });
             // navigation.goBack();
-            console.log('filterstatus for final close', filterStatus);
             updateMeetingStatus({
               variables: {
                 meeting: {
@@ -114,7 +113,7 @@ const AddMinutesOfMeetingDecision = () => {
           <Text style={styles.txtNameTitle}>COMMITTEE TITLE</Text>
           <View style={styles.viewContainer}>
             <Text style={styles.txtCommittee}>
-              {meetingData?.committeeTitle}
+              {meetingData.status.entitys.organizationName}
             </Text>
           </View>
           <Divider style={styles.divider} />
@@ -151,21 +150,22 @@ const AddMinutesOfMeetingDecision = () => {
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}>
           <Button
+            disable={meetingData.status.entitys.Send == 'false' ? true : false}
             title={'Send'}
             onPress={() => {
               setDecision('Send');
               updateDecision({
                 variables: {
                   decision: {
-                    decisionId: isEdit ? decisionId : 0,
+                    decisionId: 0,
                     subjectId: 0,
-                    committeeId: meetingData?.committeeId,
-                    committeeName: meetingData?.committeeTitle,
+                    committeeId: meetingData?.status.entitys.organizationId,
+                    committeeName: meetingData.status.entitys.organizationName,
                     statusId: 0,
                     description: comment,
                     attachFileIds: [],
                     meetingId: meetingData?.meetingId,
-                    dateOfCreation: moment(new Date()).format('DD/MM/YYYY'),
+                    dateOfCreation: moment(new Date()).format('YYYY-MM-DD'),
                     statusTitle: 'Send',
                     id: 1
                   }
@@ -174,26 +174,33 @@ const AddMinutesOfMeetingDecision = () => {
             }}
             layoutStyle={[
               styles.cancelBtnLayout,
-              { marginVertical: SIZES[12], width: '22%' }
+              {
+                marginVertical: SIZES[12],
+                width: showFinalApproveButton ? '22%' : '48%',
+                opacity: meetingData.status.entitys.Send == 'false' ? 0.5 : 1
+              }
             ]}
             textStyle={styles.txtCancelButton}
           />
           <Button
             title={'Approve'}
+            disable={
+              meetingData.status.entitys.Approve == 'false' ? true : false
+            }
             onPress={() => {
               setDecision('Approve');
               updateDecision({
                 variables: {
                   decision: {
-                    decisionId: isEdit ? decisionId : 0,
+                    decisionId: 0,
                     subjectId: 0,
-                    committeeId: meetingData?.committeeId,
-                    committeeName: meetingData?.committeeTitle,
+                    committeeId: meetingData?.status.entitys.organizationId,
+                    committeeName: meetingData.status.entitys.organizationName,
                     statusId: 0,
                     description: comment,
                     attachFileIds: [],
                     meetingId: meetingData?.meetingId,
-                    dateOfCreation: moment(new Date()).format('DD/MM/YYYY'),
+                    dateOfCreation: moment(new Date()).format('YYYY-MM-DD'),
                     statusTitle: 'Approve',
                     id: 1
                   }
@@ -202,52 +209,54 @@ const AddMinutesOfMeetingDecision = () => {
             }}
             layoutStyle={[
               styles.cancelBtnLayout,
-              { marginVertical: SIZES[12], width: '35%' }
+              {
+                marginVertical: SIZES[12],
+                width: showFinalApproveButton ? '35%' : '48%',
+                opacity: meetingData.status.entitys.Approve == 'false' ? 0.5 : 1
+              }
             ]}
             textStyle={styles.txtCancelButton}
           />
-          <Button
-            title={'Final approve'}
-            // isLoading={addDecisionLoading}
-            // disable={
-            //   subjectsData?.committeeName === '' ||
-            //   valueApproveDecision === null
-            //     ? true
-            //     : false
-            // }
-            isLoading={addDecisionLoading}
-            onPress={() => {
-              setDecision('Final approve');
-              updateDecision({
-                variables: {
-                  decision: {
-                    decisionId: isEdit ? decisionId : 0,
-                    subjectId: 0,
-                    committeeId: meetingData?.committeeId,
-                    committeeName: meetingData?.committeeTitle,
-                    statusId: 0,
-                    description: comment,
-                    attachFileIds: [],
-                    meetingId: meetingData?.meetingId,
-                    dateOfCreation: moment(new Date()).format('DD/MM/YYYY'),
-                    statusTitle: 'Final approve',
-                    id: 1
+          {showFinalApproveButton && (
+            <Button
+              title={'Final approve'}
+              disable={
+                meetingData.status.entitys.FinalApprove == 'false'
+                  ? true
+                  : false
+              }
+              isLoading={addDecisionLoading}
+              onPress={() => {
+                setDecision('Final approve');
+                updateDecision({
+                  variables: {
+                    decision: {
+                      decisionId: 0,
+                      subjectId: 0,
+                      committeeId: meetingData?.status.entitys.organizationId,
+                      committeeName:
+                        meetingData.status.entitys.organizationName,
+                      statusId: 0,
+                      description: comment,
+                      attachFileIds: [],
+                      meetingId: meetingData?.meetingId,
+                      dateOfCreation: moment(new Date()).format('YYYY-MM-DD'),
+                      statusTitle: 'Final approve',
+                      id: 1
+                    }
                   }
+                });
+              }}
+              layoutStyle={[
+                styles.nextBtnLayout,
+                {
+                  opacity:
+                    meetingData.status.entitys.FinalApprove == 'false' ? 0.5 : 1
                 }
-              });
-            }}
-            layoutStyle={[
-              // {
-              //   opacity:
-              //     subjectsData?.committeeName === '' ||
-              //     valueApproveDecision === null
-              //       ? 0.5
-              //       : null
-              // },
-              styles.nextBtnLayout
-            ]}
-            textStyle={styles.txtNextBtn}
-          />
+              ]}
+              textStyle={styles.txtNextBtn}
+            />
+          )}
         </View>
       </View>
     </SafeAreaView>

@@ -1,77 +1,77 @@
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Platform,
   SafeAreaView
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation } from '@react-navigation/native';
+import CalendarPicker from 'react-native-calendar-picker';
 
-import ChartLegends from '../../component/chartLegends/ChartLegends';
-import BarCharts from '../../component/barCharts/BarCharts';
 import Header from '../../component/header/Header';
 import { Colors } from '../../themes/Colors';
 import { Icon, IconName } from '../../component';
-import Normalize from '../../themes/mixins';
 import { Fonts } from '../../themes';
-import PieChart from '../../component/pieCharts/PieChart';
 import { SIZES } from '../../themes/Sizes';
 import StatisticSubjectComponent from '../../component/statisticComponents/statisticSubjectComponent/StatisticSubjectComponent';
 import StatisticUserComponent from '../../component/statisticComponents/statisticUserComponent/StatisticUserComponent';
 import StatisticMeetingStatusComponent from '../../component/statisticComponents/statisticMeetingStatusComponent/StatisticMeetingStatusComponent';
+import StatisticMeetingAttendanceComponent from '../../component/statisticComponents/statisticMeetingAttendanceComponent/StatisticMeetingAttendanceComponent';
+import DropDownPicker from '../../component/DropDownPicker/DropDownPicker';
+import moment from 'moment';
 
 const StatisticScreen = () => {
   const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState('0');
-  const [openType, setOpenType] = useState(false);
+  const [activeTab, setActiveTab] = useState('status');
   const [valueType, setValueType] = useState('meeting');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setendDate] = useState('');
+  const [displayedDate, setDisplayedDate] = useState(moment());
+  const [open, setOpen] = useState(false);
   const [itemsType, setItemsType] = useState([
     { label: 'Meeting', value: 'meeting' },
     { label: 'Subject', value: 'subject' },
     { label: 'Users', value: 'users' }
   ]);
-  const [openPeriod, setOpenPeriod] = useState(false);
-  const [valuePeriod, setValuePeriod] = useState(null);
+  const [valuePeriod, setValuePeriod] = useState('');
   const [itemsPeriod, setItemsPeriod] = useState([
     { label: '5-11 sep', value: '5-11 sep' },
     { label: '6-10 oct', value: '6-10 oct' }
   ]);
+  const [selectedCommittees, setSelectedCommittees] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  console.log('selectedCommittees', selectedCommittees);
+  console.log('selectedUsers', selectedUsers);
+
+  function onDateChange(date, type) {
+    if (type === 'END_DATE') {
+      setendDate(date);
+      setOpen(false);
+    } else {
+      setStartDate(date);
+      setendDate(null);
+    }
+  }
 
   useEffect(() => {
-    console.log('valueType', valueType);
-    console.log('itemsType', itemsType);
-  }, [valueType, itemsType]);
-
-  const chartDataMeeting = [
-    { y: 7, x: `7%\nTentative` },
-    { y: 35, x: `35%\nPre-schedule` },
-    { y: 29, x: `29%\nScheduled` },
-    { y: 16, x: `16%\nCancelled` },
-    { y: 8, x: `8%\nClosed` },
-    { y: 5, x: `5%\nLive` }
-  ];
-
-  const chartDataAttendance = [
-    { y: 71, x: `71%\nAttend` },
-    { y: 29, x: `29%\nAbsent` }
-  ];
-  const chartColorMeeting = [
-    '#144B8D',
-    '#5A81AF',
-    '#A1B7D1',
-    '#E6C54F',
-    '#DD7878',
-    '#81AB96'
-  ];
-  const chartColorAttendance = ['#81AB96', '#E6C54F'];
+    if (
+      startDate !== '' &&
+      endDate !== '' &&
+      startDate !== null &&
+      endDate !== null
+    ) {
+      setValuePeriod(
+        `${moment(startDate).format('DD MMM')}-${moment(endDate).format(
+          'DD MMM'
+        )}`
+      );
+    }
+  }, [startDate, endDate]);
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingBottom: 16 }}>
+    <SafeAreaView style={styles.mainContainer}>
       {/* header */}
       <Header
         name={'Statistic'}
@@ -82,199 +82,115 @@ const StatisticScreen = () => {
         <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
-          // onPress={() =>
-          //   navigation.navigate('Committee', {
-          //     Data: null,
-          //     activeTab: null,
-          //     setCommittee: null,
-          //     committee: null
-          //   })
-          // }
+          onPress={() => {
+            navigation.navigate('CommitteeExpandedView', {
+              setSelectedCommittees: setSelectedCommittees,
+              setSelectedUsers,
+              valueType
+            });
+          }}
         >
           <Text style={styles.txtCommittee}>Committee</Text>
           <Icon
             name={IconName.Arrow_Right}
-            height={Normalize(12)}
-            width={Normalize(6)}
+            height={SIZES[12]}
+            width={SIZES[6]}
           />
         </TouchableOpacity>
         <Divider style={styles.divider} />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            zIndex: 20,
-            paddingVertical: Normalize(16)
-          }}
-        >
-          <View
-            style={{
-              width: '49%'
+        <View style={styles.dropdownContainer}>
+          <DropDownPicker
+            title={'TYPE'}
+            data={itemsType}
+            placeholder={''}
+            setData={setValueType}
+            value={valueType}
+            styleContainer={{ width: '48%', marginBottom: SIZES[16] }}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              setOpen(!open);
             }}
+            style={{ width: '48%', marginBottom: SIZES[16] }}
           >
-            <Text style={styles.txtType}>TYPE</Text>
             <DropDownPicker
-              open={openType}
-              value={valueType}
-              items={itemsType}
-              setOpen={setOpenType}
-              setValue={setValueType}
-              setItems={setItemsType}
-              placeholder={'TYPE'}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              style={{
-                height: Normalize(44),
-                borderWidth: 0,
-                borderBottomWidth: Normalize(1),
-                borderBottomColor: Colors.line
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14], color: Colors.bold }}
-            />
-          </View>
-          <View
-            style={{
-              width: '48%'
-            }}
-          >
-            <Text style={styles.txtType}>PERIOD</Text>
-            <DropDownPicker
-              open={openPeriod}
+              title={'PERIOD'}
+              data={itemsPeriod}
+              placeholder={valuePeriod}
+              disable={true}
+              setData={setValuePeriod}
               value={valuePeriod}
-              items={itemsPeriod}
-              setOpen={setOpenPeriod}
-              setValue={setValuePeriod}
-              setItems={setItemsPeriod}
-              placeholder={'PERIOD'}
-              placeholderStyle={{
-                ...Fonts.PoppinsRegular[12],
-                color: Colors.secondary
-              }}
-              style={{
-                height: Normalize(44),
-                borderWidth: 0,
-                borderBottomWidth: Normalize(1),
-                borderBottomColor: Colors.line
-              }}
-              textStyle={{ ...Fonts.PoppinsRegular[14] }}
-              listItemContainerStyle={{
-                backgroundColor: Colors.white
-              }}
+              // styleContainer={{ width: '48%', marginBottom: SIZES[16] }}
             />
-          </View>
+          </TouchableOpacity>
         </View>
+        {open && (
+          <CalendarPicker
+            startFromMonday={true}
+            allowRangeSelection={true}
+            // minDate={minDate}
+            // maxDate={maxDate}
+            todayBackgroundColor={Colors.primary}
+            selectedDayColor={Colors.primary}
+            selectedDayTextColor="#FFFFFF"
+            onDateChange={onDateChange}
+          />
+        )}
         {valueType == 'meeting' && (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: 'rgba(118, 118, 128, 0.12)',
-              borderRadius: Normalize(10),
-              padding: Normalize(2)
-            }}
-          >
+          <View style={styles.btnView}>
             <TouchableOpacity
-              style={{
-                paddingVertical: Normalize(8),
-                width: '50%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: Normalize(8),
-                backgroundColor:
-                  activeTab === '0' ? Colors.white : 'transparent'
-              }}
-              onPress={() => setActiveTab('0')}
+              style={[
+                styles.btnContainer,
+                {
+                  backgroundColor:
+                    activeTab === 'status' ? Colors.white : 'transparent'
+                }
+              ]}
+              onPress={() => setActiveTab('status')}
             >
-              <Text
-                style={{ ...Fonts.PoppinsSemiBold[12], color: Colors.bold }}
-              >
-                Status
-              </Text>
+              <Text style={styles.txtBtn}>Status</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{
-                paddingVertical: Normalize(8),
-                width: '50%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: Normalize(8),
-                backgroundColor:
-                  activeTab === '1' ? Colors.white : 'transparent'
-              }}
-              onPress={() => setActiveTab('1')}
+              style={[
+                styles.btnContainer,
+                {
+                  backgroundColor:
+                    activeTab === 'attendance' ? Colors.white : 'transparent'
+                }
+              ]}
+              onPress={() => setActiveTab('attendance')}
             >
-              <Text
-                style={{ ...Fonts.PoppinsSemiBold[12], color: Colors.bold }}
-              >
-                Attendance
-              </Text>
+              <Text style={styles.txtBtn}>Attendance</Text>
             </TouchableOpacity>
           </View>
         )}
-        {valueType == 'subject' && activeTab == '0' && (
-          <StatisticSubjectComponent />
+        {valueType == 'subject' && (
+          <StatisticSubjectComponent
+            selectedCommittees={selectedCommittees}
+            startDate={startDate}
+            endDate={endDate}
+          />
         )}
-        {valueType == 'users' && activeTab == '0' && <StatisticUserComponent />}
-        {activeTab === '0' &&
-        valueType !== 'subject' &&
-        valueType !== 'users' ? (
-          <StatisticMeetingStatusComponent />
-        ) : null}
-        {activeTab === '1' && (
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ paddingBottom: 16, flex: 1 }}
-          >
-            <View
-              style={{
-                marginTop: Normalize(16),
-                backgroundColor: '#f8f8f8',
-                borderRadius: Normalize(12)
-              }}
-            >
-              <PieChart
-                chartColor={chartColorAttendance}
-                chartData={chartDataAttendance}
-                title={'Attendance'}
-              />
-              <ChartLegends
-                backgroundColor={'#81AB96'}
-                name={'Attend'}
-                percentage={'71%'}
-              />
-
-              <ChartLegends
-                backgroundColor={'#E6C54F'}
-                name={'Absent'}
-                percentage={'29%'}
-              />
-            </View>
-            <View
-              style={{
-                marginVertical: Normalize(16),
-                backgroundColor: '#f8f8f8',
-                borderRadius: Normalize(12)
-              }}
-            >
-              <BarCharts
-                chartColor={chartColorAttendance}
-                title={'Attendance'}
-              />
-              <ChartLegends
-                backgroundColor={'#81AB96'}
-                name={'Attend'}
-                percentage={'71%'}
-              />
-              <ChartLegends
-                backgroundColor={'#E6C54F'}
-                name={'Absent'}
-                percentage={'29%'}
-              />
-            </View>
-          </ScrollView>
+        {valueType == 'users' && (
+          <StatisticUserComponent
+            startDate={startDate}
+            endDate={endDate}
+            selectedUsers={selectedUsers}
+          />
+        )}
+        {activeTab === 'status' && valueType == 'meeting' && (
+          <StatisticMeetingStatusComponent
+            selectedCommittees={selectedCommittees}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        )}
+        {activeTab === 'attendance' && valueType == 'meeting' && (
+          <StatisticMeetingAttendanceComponent
+            selectedCommittees={selectedCommittees}
+            startDate={startDate}
+            endDate={endDate}
+          />
         )}
       </View>
     </SafeAreaView>
@@ -284,6 +200,7 @@ const StatisticScreen = () => {
 export default StatisticScreen;
 
 const styles = StyleSheet.create({
+  mainContainer: { flex: 1, paddingBottom: SIZES[16] },
   container: {
     backgroundColor: Colors.white,
     width: '100%',
@@ -309,5 +226,32 @@ const styles = StyleSheet.create({
     ...Fonts.PoppinsRegular[12],
     fontWeight: '500',
     color: Colors.secondary
-  }
+  },
+  btnContainer: {
+    paddingVertical: SIZES[8],
+    width: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: SIZES[8]
+  },
+  btnView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(118, 118, 128, 0.12)',
+    borderRadius: SIZES[10],
+    padding: SIZES[2]
+  },
+  dropdownContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 20
+  },
+  dropdown: {
+    height: SIZES[44],
+    borderWidth: 0,
+    borderBottomWidth: SIZES[1],
+    borderBottomColor: Colors.line
+  },
+  txtBtn: { ...Fonts.PoppinsSemiBold[12], color: Colors.bold }
 });

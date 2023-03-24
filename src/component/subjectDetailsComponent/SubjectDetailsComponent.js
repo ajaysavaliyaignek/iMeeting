@@ -1,32 +1,22 @@
 import {
   View,
   Text,
-  SafeAreaView,
   ScrollView,
-  Alert,
   TouchableOpacity,
-  Platform,
   FlatList
 } from 'react-native';
 import React, { useState } from 'react';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { TextInput } from 'react-native-paper';
+import moment from 'moment';
+import { useQuery } from '@apollo/client';
 
 import { styles } from './styles';
 import { Colors } from '../../themes/Colors';
 import CommentCard from '../../component/Cards/commentCard/CommentCard';
 import { Icon, IconName } from '../../component';
 import { SIZES } from '../../themes/Sizes';
-import { useMutation, useQuery } from '@apollo/client';
-import {
-  GET_All_COMMENTS_THREAD,
-  GET_All_SUBJECTS,
-  GET_FILE,
-  GET_SUBJECT_BY_ID
-} from '../../graphql/query';
-import { DELETE_SUBJECTS, UPDATE_COMMENT } from '../../graphql/mutation';
+import { GET_FILE } from '../../graphql/query';
 import AttachFiles from '../../component/attachFiles/AttachFiles';
-import moment from 'moment';
 
 const SubjectDetailsComponent = ({
   item,
@@ -39,9 +29,6 @@ const SubjectDetailsComponent = ({
   comments,
   setComments
 }) => {
-  const navigation = useNavigation();
-  console.log('item-----', item);
-
   const [fileId, setFileId] = useState(item?.attachFileIds);
   const [fileResponse, setFileResponse] = useState([]);
 
@@ -53,7 +40,6 @@ const SubjectDetailsComponent = ({
       },
       onCompleted: (data) => {
         setFileResponse((prev) => {
-          console.log('prev', prev);
           if (prev.fileEnteryId !== id) {
             return [...prev, data.uploadedFile];
           }
@@ -157,8 +143,8 @@ const SubjectDetailsComponent = ({
               <TouchableOpacity
                 onPress={() => {
                   console.log('commenttext', commenttext);
-                  console.log('parentCommentId', commentThreadId);
-                  console.log('commentId', commentId);
+                  console.log('parentCommentId', comments.commentId);
+
                   if (commentId == null) {
                     addComment({
                       variables: {

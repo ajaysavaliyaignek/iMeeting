@@ -78,7 +78,6 @@ const LiveMeetingMenu = () => {
 
   useEffect(() => {
     socketEventUpdate.current.onmessage = (e) => {
-      console.log('message----', e.data);
       setSocketEventUpdateMessage(e.data);
       e &&
         client.refetchQueries({
@@ -245,7 +244,6 @@ const LiveMeetingMenu = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('updateMeetingSttaus', data.updateMeetingStatus.status);
       if (data.updateMeetingStatus.status.statusCode == '200') {
         navigation.navigate('Details', {
           title: 'Meetings',
@@ -255,7 +253,7 @@ const LiveMeetingMenu = () => {
       }
     },
     onError: (data) => {
-      console.log('updateMeetingSttaus', data.message);
+      console.log('updateMeetingStaus error', data.message);
     }
   });
 
@@ -414,8 +412,6 @@ const LiveMeetingMenu = () => {
                           return status;
                         }
                       });
-                      // navigation.goBack();
-                      console.log('filterstatus for final close', filterStatus);
                       updateMeetingStatus({
                         variables: {
                           meeting: {
@@ -438,8 +434,6 @@ const LiveMeetingMenu = () => {
                         return status;
                       }
                     });
-                    console.log('filterstatus for final close', filterStatus);
-                    // navigation.goBack();
                     updateMeetingStatus({
                       variables: {
                         meeting: {

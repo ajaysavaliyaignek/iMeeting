@@ -17,17 +17,6 @@ const CommitteeCard = ({
   setIsChecked,
   checkToggle
 }) => {
-  const [isChecked, setChecked] = useState(false);
-  console.log('item from cimmittecard', item);
-
-  // useEffect(() => {
-  //   committee?.map((user) => {
-  //     if (user.organizationId == item.organizationId) {
-  //       item.isSelected = true;
-  //     }
-  //   });
-  // }, [committee]);
-
   return (
     <TouchableOpacity
       style={styles.rowDataContainer}

@@ -30,7 +30,6 @@ const LiveMeetingVotings = ({
       searchValue: searchText
     },
     onCompleted: (data, error) => {
-      console.log('voting details', data?.votingDetails?.items);
       if (data) {
         setVotingDetails(data?.votingDetails?.items);
       }
@@ -41,10 +40,6 @@ const LiveMeetingVotings = ({
   });
 
   useEffect(() => {
-    console.log(
-      'socketEventUpdateMessage from voting details',
-      socketEventUpdateMessage
-    );
     if (socketEventUpdateMessage == 'votingDetails') {
       client.refetchQueries({
         include: [GET_VOTING_DETAILS]

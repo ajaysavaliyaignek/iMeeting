@@ -41,16 +41,7 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
             return type;
           }
         });
-        // onlyMyTask: $onlyMyTask
-        // page: $page
-        // pageSize: $pageSize
-        // searchValue: $searchValue
-        // sort: $sort
-        // taskStatusIds: $taskStatusIds
-        // taskTypeIds: $taskTypeIds
-        // date: $date
-        // subjectId: $subjectId
-        // meetingId: $meetingId
+
         TasksData({
           variables: {
             searchValue: searchText,
@@ -59,12 +50,9 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
             subjectId: 0,
             taskTypeIds: filterTaskType[0]?.id?.toString(),
             page: -1,
-            pageSize:-1
+            pageSize: -1
           }
         });
-
-        console.log('filterTaskType', filterTaskType);
-        // setTaskTypes(data.taskType.items);
       }
     },
     onError: (data) => {
@@ -76,7 +64,6 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
     fetchPolicy: 'cache-and-network',
 
     onCompleted: (data) => {
-      console.log('TasksData', data?.tasks.items);
       setTasksData(data?.tasks.items);
     },
     onError: (data) => {
@@ -123,10 +110,6 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
   };
 
   useEffect(() => {
-    console.log(
-      'socketEventUpdateMessage from tasks',
-      socketEventUpdateMessage
-    );
     if (socketEventUpdateMessage == 'tasks') {
       client.refetchQueries({
         include: [GET_ALL_TASKS]

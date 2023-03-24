@@ -30,8 +30,6 @@ const EditLocation = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { meetingLocation, locationType } = route?.params;
-  console.log('location from edit location', meetingLocation);
-  console.log('location type', locationType);
   const [linkText, setLinkText] = useState(meetingLocation?.googleMapURL);
   const [title, setTitle] = useState(meetingLocation?.title);
   const [capacity, setCapacity] = useState(
@@ -56,7 +54,6 @@ const EditLocation = () => {
       ],
       onCompleted: (data) => {
         if (data) {
-          console.log(data.updateLocation.status);
           if (data.updateLocation.status.statusCode == '200') {
             navigation.goBack();
           }
@@ -214,28 +211,6 @@ const EditLocation = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              console.log(
-                'building',
-                parseInt(building),
-                'city',
-                city,
-                'floor',
-                parseInt(floor),
-                'googleMapURL',
-                linkText,
-                'locationId',
-                0,
-                'peopleCapacity',
-                parseInt(capacity),
-                'room',
-                parseInt(room),
-                'street',
-                street,
-                'title',
-                title,
-                'locationType',
-                2
-              );
               editLocation({
                 variables: {
                   location: {

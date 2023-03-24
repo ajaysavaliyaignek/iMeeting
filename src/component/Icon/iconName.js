@@ -58,7 +58,9 @@ const IconName = {
   CorrectIcon_Red: 'CorrectIcon_Red',
   CorrectIcon_Purple: 'CorrectIcon_Purple',
   GoogleCalendar: 'GoogleCalendar',
-  OutlookCalendar: 'OutlookCalendar'
+  OutlookCalendar: 'OutlookCalendar',
+  Notification: 'Notification',
+  Notification_Focused: 'Notification_Focused'
 };
 
 export default IconName;

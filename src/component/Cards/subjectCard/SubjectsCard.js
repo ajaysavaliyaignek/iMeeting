@@ -18,6 +18,7 @@ import { styles } from './styles';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
 import SubjectDecisionDropDown from '../../subjectDecisionDropDown/SubjectDecisionDropDown';
 import SubjectStatusDropdown from '../../subjectStatusDropdown/SubjectStatusDropdown';
+import { Fonts } from '../../../themes';
 
 const SubjectsCard = ({
   item,
@@ -33,11 +34,11 @@ const SubjectsCard = ({
   isLiveMeetingSubject,
   isApproveMeetingSubject
 }) => {
-  console.log('subject', item);
   const navigation = useNavigation();
   const [statusTitleOption, setstatusTitleOption] = useState([]);
   const [user, setUser] = useState({});
   const [decisionData, setDecisionData] = useState([]);
+  
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
     onCompleted: (data) => {
@@ -82,7 +83,6 @@ const SubjectsCard = ({
                 return e.statusTitle === 'Pre-Proposed';
               })[0].statusId === item.statusId
             ) {
-              console.log('role name=====>', user[0]?.roleName);
               if (user[0]?.roleName == 'Head') {
                 return {
                   key: status.statusId,
@@ -295,8 +295,9 @@ const SubjectsCard = ({
             subjectId={item.subjectId}
             decisionData={decisionData}
             setDecisionData={setDecisionData}
-            isMomDecision={isMomDecision}
+            isMomDecision={is}
             item={item}
+            meetingData={meetingData}
           />
         ) : (
           <View
@@ -341,10 +342,46 @@ const SubjectsCard = ({
           {isSubjectStatus && (
             <RowData
               name={'Status'}
-              isDropDown={true}
+              isDropDown={false}
               discription={item.statusTitle}
               marginLeft={24}
               isDecisionSubjectDropDown={false}
+              backgroundColor={
+                item.statusTitle == 'Deleted'
+                  ? '#ffc8be'
+                  : item.statusTitle == 'Pre-Proposed'
+                  ? '#b4dcff'
+                  : item.statusTitle == 'Tentative'
+                  ? '#deb887'
+                  : item.statusTitle == 'Approved'
+                  ? 'rgba(129, 171, 150, 0.1)'
+                  : item.statusTitle == 'Transferred'
+                  ? 'rgba(231, 157, 115, 0.1)'
+                  : item.statusTitle == 'Proposed'
+                  ? 'rgb(101, 142, 180, 0.1)'
+                  : item.statusTitle == 'Unassigned'
+                  ? 'rgb(101, 142, 180, 0.1)'
+                  : Colors.white
+              }
+              style={{
+                color:
+                  item.statusTitle == 'Deleted'
+                    ? '#ff6347'
+                    : item.statusTitle == 'Pre-Proposed'
+                    ? '#337ab7'
+                    : item.statusTitle == 'Tentative'
+                    ? ' #89530d;'
+                    : item.statusTitle == 'Approved'
+                    ? 'rgba(129, 171, 150, 1)'
+                    : item.statusTitle == 'Transferred'
+                    ? 'rgba(231, 157, 115, 1)'
+                    : item.statusTitle == 'Proposed'
+                    ? 'rgb(101, 142, 180, 1)'
+                    : item.statusTitle == 'Unassigned'
+                    ? 'rgb(101, 142, 180, 1)'
+                    : Colors.bold,
+                ...Fonts.PoppinsRegular[14]
+              }}
             />
           )}
         </View>
@@ -364,8 +401,9 @@ const SubjectsCard = ({
           <RowData
             name={'Decision'}
             marginLeft={24}
+            discription={item.statusTitle}
             isDecisionSubjectDropDown={true}
-            isMomDecision={true}
+            // isMomDecision={true}
           />
         </View>
       ) : (
@@ -449,14 +487,18 @@ const SubjectsCard = ({
                   decisionData?.statusTitle == ''
                   ? false
                   : true
-                : item.status.entitys.isDisable
+                : item.status.entitys.isDisable == 'true'
+                ? true
+                : false
             }
             deleted={
               isLiveMeetingSubject || isApproveMeetingSubject
                 ? false
                 : isDecisionSubject
                 ? false
-                : item.status.entitys.isDisable
+                : item.status.entitys.isDisable == 'true'
+                ? true
+                : false
             }
             isViewable={
               isDecisionSubject && isApproveMeetingSubject

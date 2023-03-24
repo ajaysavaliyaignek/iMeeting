@@ -20,9 +20,8 @@ const CommitteeList = ({ isProfileCommittee }) => {
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: true },
+    variables: { head: true, secretary: true, member: true ,type:8},
     onCompleted: (data) => {
-      console.log('Committee Data', data?.committeesByRole?.items);
       if (data) {
         setCommittees(data?.committeesByRole?.items);
         setFilterCommittees(data?.committeesByRole?.items);

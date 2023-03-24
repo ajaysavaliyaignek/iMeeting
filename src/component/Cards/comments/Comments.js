@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import React, { useState } from 'react';
 import moment from 'moment';
 import { useMutation } from '@apollo/client';
@@ -42,23 +42,6 @@ const Comments = ({
 }) => {
   const [openModel, setOpenModel] = useState(false);
 
-  const [addComment, { data, loading, error }] = useMutation(UPDATE_COMMENT, {
-    // export const GET_All_SUBJECTS = gql`
-    refetchQueries: [
-      {
-        query: GET_All_COMMENTS_THREAD,
-        variables: { commentCategoryId: commentThreadId }
-      }
-    ]
-  });
-
-  if (data) {
-    console.log('addComment', data);
-  }
-  if (error) {
-    console.log('addCommentError', error);
-  }
-
   // delete comment
   const [
     deleteComment,
@@ -68,26 +51,27 @@ const Comments = ({
       error: DeleteCommentError
     }
   ] = useMutation(DELETE_COMMENT_THREAD, {
-    // export const GET_All_SUBJECTS = gql`
     refetchQueries: [
       {
         query: GET_All_COMMENTS_THREAD,
         variables: { commentCategoryId: commentThreadId }
       }
-    ]
-  });
-  if (DeleteCommentData) {
-    console.log('delete data', data);
-  }
-  if (DeleteCommentError) {
-    Alert.alert('Delete Subject Error', [
-      {
-        text: error,
+    ],
+    onCompleted: (data) => {
+      console.log('delete data', data);
+    },
+    onError: (data) => {
+      if (data) {
+        Alert.alert('Delete Subject Error', [
+          {
+            text: data.message,
 
-        style: 'default'
+            style: 'default'
+          }
+        ]);
       }
-    ]);
-  }
+    }
+  });
 
   const editDeleteModal = (commentId, comment, parentId) => {
     return (
@@ -103,11 +87,7 @@ const Comments = ({
           <TouchableOpacity
             style={styles.btnView}
             onPress={() => {
-              //   setReply(true);
-              //   setValueIndex(index);
               setOpenModel(false);
-              //   setOpenChildModel(false);
-              //   setComment(comment);
 
               if (child) {
                 setChildCommentId(item.commentId);
@@ -117,7 +97,6 @@ const Comments = ({
               } else {
                 setCommentText(comment);
                 setCommentId(item.commentId);
-                // setReplyEdit(true);
               }
             }}
           >

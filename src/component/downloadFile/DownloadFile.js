@@ -4,7 +4,6 @@ import RNFetchBlob from 'rn-fetch-blob';
 import FileViewer from 'react-native-file-viewer';
 
 export const checkPermission = async (file, setIsDownloaded) => {
-  console.log('check permission', file);
   if (Platform.OS === 'ios') {
     downloadFile(file, setIsDownloaded);
   } else {
@@ -16,13 +15,11 @@ export const checkPermission = async (file, setIsDownloaded) => {
           message: 'Application needs access to your storage to download File'
         }
       );
-      console.log('permission', PermissionsAndroid.RESULTS.GRANTED);
+
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         // Start downloading
 
         downloadFile(file, setIsDownloaded);
-
-        console.log('Storage Permission Granted.');
       } else {
         // If permission denied then show alert
         Alert.alert('Error', 'Storage Permission Not Granted');
@@ -42,7 +39,6 @@ const downloadFile = async (fileUrl, setIsDownloaded) => {
   let file_ext = getFileExtention(FILE_URL);
 
   file_ext = '.' + file_ext[0].split('?')[0];
-  console.log('file_ext', file_ext);
 
   // config: To get response by passing the downloading related options
   // fs: Root directory path to download
@@ -63,7 +59,6 @@ const downloadFile = async (fileUrl, setIsDownloaded) => {
     }
   };
   const token = await AsyncStorage.getItem('@token');
-  console.log('token', token);
 
   config(options)
     .fetch('GET', FILE_URL, {
@@ -71,14 +66,10 @@ const downloadFile = async (fileUrl, setIsDownloaded) => {
     })
     .then(async (res) => {
       // Alert after successful downloading
-      console.log('res -> ', await res.base64());
 
       setIsDownloaded(true);
       if (Platform.OS == 'ios') {
-        // alert('File Downloaded Successfully.');
-        // RNFetchBlob.ios.openDocument(RootDir);
         if (Platform.OS === 'ios') {
-          // RNFetchBlob.fs.writeFile(RootDir, res.data, 'base64');
           await RNFetchBlob.fs.createFile(
             RootDir,
             await res.base64(),

@@ -45,10 +45,6 @@ const AddSpeaker = () => {
       isSpeaker: false
     },
     onCompleted: (data) => {
-      console.log(
-        'is live meeting users data',
-        data.liveMeetingUsers.userDetails
-      );
       setUsers(data.liveMeetingUsers.userDetails);
     },
     onError: (data) => {
@@ -67,7 +63,6 @@ const AddSpeaker = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('update speaker', data);
       if (data.updateSpeaker.status == '200') {
         navigation.goBack();
       }

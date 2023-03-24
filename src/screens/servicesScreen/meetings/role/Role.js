@@ -42,7 +42,6 @@ const Role = () => {
     setRolesId(newData);
   };
 
-  console.log(rolesId);
   // get roles
   const {
     loading: rolesLoading,
@@ -55,7 +54,6 @@ const Role = () => {
     },
 
     onCompleted: (data) => {
-      console.log('get roles', data.roleList.roles);
       setRoles(data?.roleList.roles);
     }
   });

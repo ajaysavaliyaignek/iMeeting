@@ -56,7 +56,6 @@ const AddExternalUser = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log(data.updateCommitteeMember.status);
       if (data.updateCommitteeMember.status.statusCode == '200') {
         navigation.goBack();
         setEmail('');
@@ -108,11 +107,6 @@ const AddExternalUser = () => {
       console.log(err);
     }
   }, []);
-
-  useEffect(() => {
-    console.log('base64Url', base64Url);
-  }, [base64Url]);
-  // console.log('base64Url', base64Url);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -245,27 +239,6 @@ const AddExternalUser = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              console.log('external user data', {
-                attachFiles: [],
-                emails: [email],
-                externalUser: true,
-                externalUserOrganization: organization,
-                familyName: lastName,
-                firstName: firstName,
-                googleCalendarSync: false,
-                organizationIds: [],
-                organizations: [],
-                outlookCalendarSync: false,
-                phoneNumber: number,
-                privateDetails: privateDetails,
-                profilePicture: base64Url,
-                roles: [],
-                secondName: secondName,
-                sendSMS: sensSMS,
-                thirdName: '',
-                title: '',
-                userId: 0
-              });
               addExternalUser({
                 variables: {
                   committeeMember: {
@@ -293,12 +266,7 @@ const AddExternalUser = () => {
               });
               // navigation.navigate('AddMeetingUser')
             }}
-            layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
-              styles.nextBtnLayout
-            ]}
+            layoutStyle={[styles.nextBtnLayout]}
             textStyle={styles.txtNextBtn}
           />
         </View>

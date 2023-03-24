@@ -14,6 +14,8 @@ export { default as Account_Focused } from './TabBar/Account_Focused.svg';
 export { default as Calendar_Focused } from './TabBar/Calendar_Focused.svg';
 export { default as Dashboard_Focused } from './TabBar/Dashboard_Focused.svg';
 export { default as Services_Focused } from './TabBar/Services_Focused.svg';
+export { default as Notification } from './TabBar/Notification.svg';
+export { default as Notification_Focused } from './TabBar/Notification_Focused.svg';
 
 // dashboard icon
 export { default as Meetings } from './Navigation/Meetings.svg';

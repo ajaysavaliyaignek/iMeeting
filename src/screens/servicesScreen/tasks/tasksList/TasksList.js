@@ -62,7 +62,7 @@ const TasksList = () => {
     setTaskStatusName(statusName?.join());
   }, [taskStatusList]);
 
-  // get ALL appointment
+  // get ALL tasks
   const Tasks = useQuery(GET_ALL_TASKS, {
     fetchPolicy: 'cache-and-network',
     variables: {
@@ -92,8 +92,6 @@ const TasksList = () => {
   });
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
@@ -266,7 +264,13 @@ const TasksList = () => {
                   }
                   onPressView={() => {
                     setVisibleIndex(-1);
-                    navigation.navigate('TaskDetails', { item });
+                    if (item.taskType == 'Minutes of Meeting approval') {
+                      navigation.navigate('ApproveMeeting', {
+                        item: item
+                      });
+                    } else {
+                      navigation.navigate('TaskDetails', { item });
+                    }
                   }}
                   setVisibleIndex={setVisibleIndex}
                   isDeleteable={
@@ -275,7 +279,6 @@ const TasksList = () => {
                       : true
                   }
                   onPressDelete={(items) => {
-                    console.log('delete task item', items);
                     onDeleteHandler(items?.taskId);
                     setVisibleIndex(-1);
                   }}

@@ -94,7 +94,6 @@ const AddTask = () => {
   const getTaskExecutor = useQuery(GET_TASK_EXECUTORS, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      console.log('getTaskExecutor data', data);
       if (data) {
         let executor = data?.taskExecutor?.executorIds?.map((exe, index) => {
           return { value: exe, label: data.taskExecutor?.executorNames[index] };
@@ -132,7 +131,6 @@ const AddTask = () => {
       refetchQueries: ['tasks', 'task'],
       onCompleted: (data) => {
         if (data) {
-          console.log('updateTask', data.updateTask.status.statusCode);
           if (data.updateTask.status.statusCode == '200') {
             navigation.goBack();
           }
@@ -285,22 +283,6 @@ const AddTask = () => {
             }
             // isLoading={addVotingLoading}
             onPress={() => {
-              console.log('updat task data', {
-                attachFiles: fileId,
-                deadlineDate: moment(calendarValue.calendarValue).format(
-                  'YYYY-MM-DD'
-                ),
-                description: taskDescription,
-                executorId: valueExecutor,
-                priorityId: valuePriority,
-                // taskStatusId: isEdit ? taskData?.taskStatusId : 0,
-                taskId: isEdit ? taskData?.taskId : 0,
-                title: titleTask,
-                taskTypeId: isEdit ? taskData?.taskTypeId : 0,
-                subjectId: valueSubject == null ? 0 : valueSubject,
-                meetingId:
-                  meetingDetails == null ? 0 : meetingDetails?.meetingId
-              });
               updateTask({
                 variables: {
                   task: {

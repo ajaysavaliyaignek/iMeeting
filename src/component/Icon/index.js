@@ -251,6 +251,18 @@ const Icon = ({ name, height = SIZES[24], width = SIZES[24], fill }) => {
         return (
           <SVGImage.OutlookCalendar height={height} width={width} fill={fill} />
         );
+      case IconName.Notification:
+        return (
+          <SVGImage.Notification height={height} width={width} fill={fill} />
+        );
+      case IconName.Notification_Focused:
+        return (
+          <SVGImage.Notification_Focused
+            height={height}
+            width={width}
+            fill={fill}
+          />
+        );
 
       default:
         return null;

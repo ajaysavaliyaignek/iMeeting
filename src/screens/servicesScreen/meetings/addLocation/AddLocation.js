@@ -49,11 +49,9 @@ const AddLocation = () => {
       ],
       onCompleted: (data) => {
         if (data) {
-          console.log(data.updateLocation.status);
           if (data.updateLocation.status.statusCode == '200') {
             navigation.goBack();
           }
-          // navigation.goBack();
         }
       }
     }
@@ -204,28 +202,6 @@ const AddLocation = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              console.log(
-                'building',
-                parseInt(building),
-                'city',
-                city,
-                'floor',
-                parseInt(floor),
-                'googleMapURL',
-                linkText,
-                'locationId',
-                0,
-                'peopleCapacity',
-                parseInt(capacity),
-                'room',
-                parseInt(room),
-                'street',
-                street,
-                'title',
-                title,
-                'locationType',
-                locationType
-              );
               addLocation({
                 variables: {
                   location: {

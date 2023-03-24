@@ -13,7 +13,8 @@ const SubjectDecisionDropDown = ({
   decisionData,
   setDecisionData,
   isMomDecision,
-  item
+  item,
+  meetingData
 }) => {
   const navigation = useNavigation();
   const [subjectDecision, setSubjectDecision] = useState(null);
@@ -30,6 +31,7 @@ const SubjectDecisionDropDown = ({
     },
     onCompleted: (data, error) => {
       if (data) {
+        // console.log('approve subject decision', data.decisions);
         setDecisionData(data?.decisions?.items[0]);
       }
       if (error) {
@@ -93,19 +95,19 @@ const SubjectDecisionDropDown = ({
             {decisionData?.statusTitle}
           </Text>
         </View>
+      ) : isMomDecision && meetingData?.meetingStatusTitle !== 'Closed' ? (
+        <Button
+          title={'Add approve decision'}
+          layoutStyle={{ backgroundColor: Colors.white }}
+          textStyle={{ color: Colors.primary }}
+          onPress={() => {
+            navigation.navigate('AddApproveDecision', {
+              subjectsData: item
+            });
+          }}
+        />
       ) : (
-        isMomDecision && (
-          <Button
-            title={'Add approve decision'}
-            layoutStyle={{ backgroundColor: Colors.white }}
-            textStyle={{ color: Colors.primary }}
-            onPress={() => {
-              navigation.navigate('AddApproveDecision', {
-                subjectsData: item
-              });
-            }}
-          />
-        )
+        <Text style={{ marginLeft: 24 }}>{'---------'}</Text>
       )}
     </View>
   );

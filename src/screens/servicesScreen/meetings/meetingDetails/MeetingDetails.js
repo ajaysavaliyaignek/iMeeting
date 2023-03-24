@@ -41,7 +41,11 @@ const MeetingDetails = () => {
   const [loading, setLoading] = useState(true);
   let isSoftClose = false;
   let isLive = false;
-  if (item.yourRoleName == 'Head' && item.meetingStatusTitle == 'Soft-Closed') {
+  if (
+    item.yourRoleName == 'Head' &&
+    (item.meetingStatusTitle == 'Soft-Closed' ||
+      item.meetingStatusTitle == 'Closed')
+  ) {
     isSoftClose = true;
   }
 
@@ -107,7 +111,6 @@ const MeetingDetails = () => {
   const [updateMeetingStatus] = useMutation(UPDATE_MEETING_STATUS, {
     refetchQueries: ['meetings'],
     onCompleted: (data) => {
-      console.log('updateMeetingSttaus', data.updateMeetingStatus.status);
       if (data.updateMeetingStatus.status.statusCode == '200') {
         navigation.navigate('LiveMeetingMenu', {
           item,
@@ -116,7 +119,7 @@ const MeetingDetails = () => {
       }
     },
     onError: (data) => {
-      console.log('updateMeetingSttaus', data.message);
+      console.log('updateMeetingStatus error', data.message);
     }
   });
 
@@ -129,16 +132,8 @@ const MeetingDetails = () => {
 
   let meetingDate = `${item.setDate} ${item.setTime}`;
 
-  console.log('newdate', newdate);
-
-  console.log(
-    moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
-      moment(meetingDate, 'YYYY-MM-DD hh:mm A')
-    )
-  );
-
   if (
-    item.status.entitys.canStart &&
+    item.status.entitys.canStart == 'true' &&
     moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
       moment(meetingDate, 'YYYY-MM-DD hh:mm A')
     )
@@ -216,7 +211,7 @@ const MeetingDetails = () => {
                       backgroundColor: '#DD7878',
                       width:
                         item.meetingStatusTitle == 'Closed'
-                          ? '100%'
+                          ? '48%'
                           : !isLive && !isSoftClose
                           ? '48%'
                           : isLive && !isSoftClose
@@ -254,10 +249,6 @@ const MeetingDetails = () => {
                           }
                         });
 
-                        console.log(
-                          'filterstatus for live meeting',
-                          filterStatus
-                        );
                         updateMeetingStatus({
                           variables: {
                             meeting: {
@@ -283,7 +274,7 @@ const MeetingDetails = () => {
                       {
                         width:
                           item.meetingStatusTitle == 'Closed'
-                            ? '100%'
+                            ? '48%'
                             : isLive
                             ? '30%'
                             : '23%'
@@ -291,7 +282,7 @@ const MeetingDetails = () => {
                     ]}
                     onPress={() => {
                       navigation.navigate('ApproveMeeting', {
-                        meetingData: item
+                        item: item
                       });
                     }}
                   />

@@ -42,34 +42,13 @@ const EditAppointmentLocation = () => {
     item,
     userRequired
   } = route?.params;
-  // console.log('appointment data from addmeetinglocation', {
-  //   attachFiles,
-  //   committee,
-  //   title,
-  //   discription,
-  //   users,
-  //   startDate,
-  //   endDate,
-  //   startTime,
-  //   endTime,
-  //   TimeZone,
-  //   Repeat,
-  //   item,
-  //   userRequired
-  // });
-  console.log('appointment id', item.appointmentId);
+
   const [valueLocation, setValueLocation] = useState(item.locationId);
-  const [onFocus, setIsFocus] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(
     item.platformName == 'Google Meet' ? 1 : 2
   );
-  const { setSelectedUsers } = useContext(UserContext);
-  const [platform, setPlatform] = useState(null);
   const [location, setLocation] = useState([]);
   const [error, setError] = useState('');
-  const [items, setItems] = useState([
-    { label: 'Office 2', value: 'Office 2' }
-  ]);
 
   const {
     loading: LocationLoading,
@@ -223,24 +202,6 @@ const EditAppointmentLocation = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              console.log({
-                appointmentDescription: discription,
-                appointmentId: item.appointmentId,
-                appointmentTitle: title,
-                attachFileIds: attachFiles,
-                committeeId: committee,
-                locationId: valueLocation,
-                platformId:
-                  valueVideoConference !== null ? valueVideoConference : 0,
-                repeat: Repeat,
-                required: userRequired,
-                setDate: startDate,
-                setTime: startTime,
-                endDate: endDate,
-                endTime: endTime,
-                timeZone: TimeZone,
-                userIds: users
-              });
               addAppointment({
                 variables: {
                   appointment: {

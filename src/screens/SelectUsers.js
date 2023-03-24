@@ -155,7 +155,6 @@ const SelectUsers = () => {
         searchValue: searchText
       },
       onCompleted: (data) => {
-        console.log('externaluserdata', data.committeeMembersList.items);
         externalUserData = data?.committeeMembersList.items.map(
           (item, index) => {
             let previousUserIndex = previousUser?.findIndex(
@@ -386,7 +385,8 @@ const styles = StyleSheet.create({
   txtBtnServices: { ...Fonts.PoppinsSemiBold[12], color: Colors.bold },
   btnExternalUser: {
     backgroundColor: Colors.Blue_Light,
-    marginBottom: SIZES[16]
+    marginBottom: SIZES[16],
+    marginHorizontal: SIZES[16]
   },
   txtBtnExternal: {
     ...Fonts.PoppinsSemiBold[14],

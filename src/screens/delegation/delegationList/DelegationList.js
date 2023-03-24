@@ -16,13 +16,13 @@ const DelegationList = ({
   searchText,
   committeeIds
 }) => {
-  console.log({ committeeIds });
   const navigation = useNavigation();
   const [delegations, setDelegations] = useState([]);
 
   const getAllDelegations = useQuery(GET_ALL_DELEGATIONS, {
     variables: {
-      date: '',
+      startDate: '',
+      endDate: '',
       page: -1,
       pageSize: -1,
       searchValue: searchText,
@@ -30,7 +30,6 @@ const DelegationList = ({
       committeeIds: committeeIds
     },
     onCompleted: (data) => {
-      console.log('get all delegations', data.delegations.items);
       setDelegations(data.delegations.items);
     },
     onError: (data) => {
@@ -49,8 +48,6 @@ const DelegationList = ({
   });
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert('Delete delegation', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',

@@ -136,7 +136,6 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
     onCompleted: (data) => {
       if (data) {
         setChatData(data.meetingChat.items);
-        console.log('data.meetingChat.items', data.meetingChat.items);
       }
     },
     onError: (data) => {
@@ -152,7 +151,6 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
     },
     onCompleted: (data) => {
       if (data) {
-        console.log('getLivemeetingUser', data.liveMeetingUsers.userDetails);
         setLiveMettingUser(data.liveMeetingUsers.userDetails);
       }
     },
@@ -162,7 +160,6 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
   });
 
   useEffect(() => {
-    console.log('socketEventUpdateMessage------', socketEventUpdateMessage);
     if (socketEventUpdateMessage == 'meetingChat') {
       client.refetchQueries({
         include: [GET_ALL_CHATS]

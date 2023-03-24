@@ -11,7 +11,6 @@ const Livemeetingsubjects = ({ item, socketEventUpdateMessage }) => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  console.log('meeting', item);
 
   return (
     <TouchableOpacity

@@ -16,20 +16,30 @@ const AddEditGeneralScreen = ({
   setGeneralData,
   details,
   fileResponse,
-  setFileResponse
+  setFileResponse,
+  type
 }) => {
   const [committee, setCommittee] = useState(null);
   const [token, setToken] = useState('');
 
+  let committeeRoleType =
+    type == 'Meeting'
+      ? 1
+      : type == 'Appointment'
+      ? 4
+      : type == 'VideoConference'
+      ? 5
+      : null;
+
+  console.log('committeeRoleType', committeeRoleType);
+
   details?.attachFileIds?.map((id) => {
-    console.log('id', id);
     const { loading, error } = useQuery(GET_FILE, {
       fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
       onCompleted: (data) => {
-        console.log('get file by id', data.uploadedFile);
         if (data) {
           setFileResponse((prev) => {
             const pevDaa = prev.filter((ite) => {
@@ -45,7 +55,6 @@ const AddEditGeneralScreen = ({
     }
   });
 
-  console.log('generaldData?.fileResponse', generaldData?.fileResponse);
   // fetch commitees
   const {
     loading: CommitteeLoading,
@@ -53,7 +62,12 @@ const AddEditGeneralScreen = ({
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: false },
+    variables: {
+      head: true,
+      secretary: true,
+      member: false,
+      type: committeeRoleType
+    },
     onCompleted: (data) => {
       if (data) {
         setCommittee(data?.committeesByRole?.items);

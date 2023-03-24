@@ -39,14 +39,6 @@ const VotingQueAnsComponent = ({
         isMultipleSelect={item?.isMultipleSelect}
         onChoicePress={onChoicePress}
       />
-      {/* <RNPoll
-              totalVotes={30}
-              choices={choices}
-              onChoicePress={(selectedChoice) =>
-                console.log('SelectedChoice: ', selectedChoice)
-              }
-              hasBeenVoted={false}
-            /> */}
     </View>
   );
 };

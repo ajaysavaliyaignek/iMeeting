@@ -35,12 +35,8 @@ const EditSubjectScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { item } = route?.params;
-  console.log('item from edit screen', item);
   const [title, setTitle] = useState(item.subjectTitle);
   const [discription, setDescription] = useState(item.description);
-  const [openCategory, setOpenCategory] = useState(false);
-  const [openCommittee, setOpenCommitee] = useState(false);
-  const [openMeeting, setOpenMeeting] = useState(false);
   const [valueCategory, setValueCategory] = useState(item.subjectCategoryId);
   const [valueCommittee, setValueCommittee] = useState(item.committeeId);
   const [valueMeeting, setValueMeeting] = useState(item?.meetingId);
@@ -77,21 +73,12 @@ const EditSubjectScreen = () => {
 
     setFilesId(fileId);
   }, [fileResponse]);
-  console.log('file id', filesId);
-
-  const getFileExtention = (fileUrl) => {
-    // To get the file extension
-    return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
-  };
-  // fetch file
-  const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =
     useQuery(GET_All_SUBJECTS_CATEGORY, {
       onCompleted: (data) => {
         if (data) {
-          console.log('subject category', data.subjectCategories.items);
           setCategory(data.subjectCategories.items);
         }
       }
@@ -108,7 +95,6 @@ const EditSubjectScreen = () => {
       variables: { isDeleted: false },
       onCompleted: (data) => {
         if (data) {
-          console.log('committees', data?.committees.items);
           setCommittee(data.committees.items);
         }
       }
@@ -125,7 +111,6 @@ const EditSubjectScreen = () => {
       variables: { onlyMyMeeting: false, screen: 1 },
       onCompleted: (data) => {
         if (data) {
-          console.log('meetings', data?.meetings.items);
           setMeetings(data.meetings.items);
         }
       }
@@ -276,12 +261,6 @@ const EditSubjectScreen = () => {
             <Button
               title={'Save'}
               onPress={() => {
-                console.log('subjectTitle', title);
-                console.log('description', discription);
-                console.log('attachFileIds', filesId);
-                console.log('valueCommittee', valueCommittee);
-                console.log('valueCategory', valueCategory);
-                console.log('valueMeeting', valueMeeting);
                 addSubject({
                   variables: {
                     subject: {

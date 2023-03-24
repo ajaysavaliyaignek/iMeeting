@@ -54,7 +54,7 @@ const LiveMeetingSubjectDecision = ({
     variables: queryParams,
     onCompleted: (data, error) => {
       if (data) {
-        console.log('decision', data.decisions.items);
+        console.log('getDecision ', data.decisions);
         setDecisionData(data.decisions.items);
         data.decisions.items[0]?.attachFileIds?.map((id) => {
           const getFile = useQuery(GET_FILE, {
@@ -242,42 +242,50 @@ const LiveMeetingSubjectDecision = ({
           <Text
             style={{ ...Fonts.PoppinsRegular[14], color: Colors.secondary }}
           >
-            There is no decision yet{' '}
+            There is no decision yet.{' '}
           </Text>
-          {meetingData?.yourRoleName == 'Head' && (
-            <Button
-              title={
-                isMom
-                  ? 'Add approve decision'
-                  : isMeeting
-                  ? 'Add minutes of meeting decision'
-                  : 'Add decision'
-              }
-              layoutStyle={styles.cancelBtnLayout}
-              textStyle={styles.txtCancelButton}
-              onPress={() => {
-                isMom
-                  ? navigation.navigate('AddApproveDecision', {
-                      subjectsData: subjectData,
-                      isEdit: false,
-                      item: null
-                    })
-                  : navigation.navigate('AddEditDecision', {
-                      meetingDetails: meetingData,
-                      decisionId: null,
-                      isEdit: false,
-                      decisionData: null,
-                      subjectId: subjectData?.subjectId
-                    });
-                // navigation.navigate('AddEditDecision', {
-                //   meetingDetails: meetingData,
-                //   isEdit: false,
-                //   decisionData: null,
-                //   subjectId: subjectData?.subjectId
-                // });
-              }}
-            />
-          )}
+          {meetingData?.yourRoleName == 'Head' &&
+            meetingData?.meetingStatusTitle !== 'Closed' && (
+              <Button
+                title={
+                  isMom
+                    ? 'Add approve decision'
+                    : isMeeting
+                    ? 'Add minutes of meeting decision'
+                    : 'Add decision'
+                }
+                layoutStyle={styles.cancelBtnLayout}
+                textStyle={styles.txtCancelButton}
+                onPress={() => {
+                  isMom
+                    ? navigation.navigate('AddApproveDecision', {
+                        subjectsData: subjectData,
+                        isEdit: false,
+                        item: null
+                      })
+                    : isMeeting
+                    ? navigation.navigate('AddMinutesOfMeetingDecision', {
+                        isEdit: false,
+                        momDecisionData: null,
+                        meetingData: meetingData,
+                        decisionId: null
+                      })
+                    : navigation.navigate('AddEditDecision', {
+                        meetingDetails: meetingData,
+                        decisionId: null,
+                        isEdit: false,
+                        decisionData: null,
+                        subjectId: subjectData?.subjectId
+                      });
+                  // navigation.navigate('AddEditDecision', {
+                  //   meetingDetails: meetingData,
+                  //   isEdit: false,
+                  //   decisionData: null,
+                  //   subjectId: subjectData?.subjectId
+                  // });
+                }}
+              />
+            )}
         </View>
       )}
     </View>

@@ -70,19 +70,12 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
       ],
       onCompleted: (data) => {
         console.log('delete meeting', data.deleteMeeting.status);
+      },
+      onError: (data) => {
+        console.log('delete meering error', data);
       }
     }
   );
-
-  if (error) {
-    Alert.alert('Delete Subject Error', [
-      {
-        text: error,
-
-        style: 'default'
-      }
-    ]);
-  }
 
   const onDeleteHandler = () => {
     Alert.alert('Delete meeting', 'Are you sure you want to delete this?', [

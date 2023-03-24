@@ -28,7 +28,6 @@ const SelectUser = () => {
     selectedUsers.map((user) => {
       if (user.isSelectedForTimeline) {
         selectedUserList.push(user);
-        // console.log('selectCommittee', selectCommittee);
       }
     });
 
@@ -54,19 +53,16 @@ const SelectUser = () => {
   useEffect(() => {
     selectedUsers?.map((user) => {
       if (user.isRequired == true) {
-        console.log('1');
         setRequiredUsers((prev) => {
           return [...prev, user];
         });
       }
       if (user.isRequired == false) {
-        console.log('2');
         setOptionalUser((prev) => {
           return [...prev, user];
         });
       }
     });
-    // setRequiredUsers([...requiredUsers]);
   }, [selectedUsers]);
 
   return (

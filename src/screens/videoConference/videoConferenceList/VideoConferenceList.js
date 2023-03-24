@@ -37,7 +37,6 @@ const VideoConferenceList = () => {
       sort: ''
     },
     onCompleted: (data) => {
-      console.log('getAllVideoConferences', data.videoConferences.items);
       setVideoConferences(data.videoConferences.items);
     },
     onError: (data) => {

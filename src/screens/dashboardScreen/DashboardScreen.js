@@ -21,72 +21,25 @@ import CommitteesCard from '../../component/Cards/CommitteesCard';
 import {
   GET_All_APPOINTMENT,
   GET_All_COMMITTEE,
-  GET_All_MEETING
+  GET_All_MEETING,
+  GET_ALL_TASKS,
+  GET_ALL_VIDEO_CONFERENCES,
+  GET_EVENT_COUNTS
 } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
 import CommitteeList from './committeeList/CommitteeList';
 
 const DashboardScreen = () => {
   const navigation = useNavigation();
-  const [meetingData, setMeetingData] = useState(null);
-  const [appointmentsData, setAppointmentData] = useState(null);
-  const [committeeData, setCommitteeData] = useState(null);
+  const [counts, setCounts] = useState(null);
 
-  // get ALL MEETINGS
-  const {
-    loading: loadingGetMeetings,
-    error: errorGetMeetings,
-    data: dataGetMeetings
-  } = useQuery(GET_All_MEETING, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      onlyMyMeeting: false,
-      committeeIds: '',
-      screen: 0,
-      searchValue: '',
-      page: -1,
-      pageSize: -1
-    },
+  const {} = useQuery(GET_EVENT_COUNTS, {
     onCompleted: (data) => {
-      if (data) {
-        setMeetingData(data?.meetings.items);
-      }
+      console.log('events count', data);
+      setCounts(data.counts);
     },
     onError: (data) => {
-      console.log('GetMeetings error---', data.message);
-    }
-  });
-
-  // get ALL appointment
-  const Appointment = useQuery(GET_All_APPOINTMENT, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      searchValue: '',
-      page: -1,
-      pageSize: -1
-    },
-
-    onCompleted: (data) => {
-      setAppointmentData(data?.appointments.items);
-    },
-    onError: (data) => {
-      console.log('all appointment error', data);
-    }
-  });
-
-  const Committes = useQuery(GET_All_COMMITTEE, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      page: -1,
-      pageSize: -1,
-      searchValue: '',
-      isDeleted: true
-    },
-    onCompleted: (data) => {
-      setCommitteeData(data.committees.items);
-    },
-    onError: (data) => {
-      console.log('get all committees error', data.message);
+      console.log('event count error', data.message);
     }
   });
 
@@ -119,7 +72,7 @@ const DashboardScreen = () => {
             width={Normalize(20)}
             title={'Meeting'}
             cardBackgroundColor={'rgba(101, 142, 180, 0.1)'}
-            count={meetingData?.length}
+            count={counts?.meetingCounts}
             addBackgroundColor={'#658EB4'}
             onPressAdd={() =>
               navigation.navigate('AddEditMeetingAppointmentVideoConference', {
@@ -143,7 +96,7 @@ const DashboardScreen = () => {
             width={Normalize(20)}
             title={'Appointment'}
             cardBackgroundColor={'rgba(171, 158, 200, 0.1)'}
-            count={appointmentsData?.length}
+            count={counts?.appointmentCounts}
             addBackgroundColor={'#AB9EC8'}
             onPressAdd={() => {
               navigation.navigate('AddEditMeetingAppointmentVideoConference', {
@@ -161,7 +114,7 @@ const DashboardScreen = () => {
             width={Normalize(22)}
             title={'Video conferences'}
             cardBackgroundColor={'rgba(231, 157, 115, 0.1)'}
-            count={13}
+            count={counts?.videoConferenceCounts}
             addBackgroundColor={'#E79D73'}
             onPressAdd={() => {
               navigation.navigate('AddEditMeetingAppointmentVideoConference', {
@@ -183,7 +136,7 @@ const DashboardScreen = () => {
             width={Normalize(18)}
             title={'Task'}
             cardBackgroundColor={'rgba(221, 120, 120, 0.1)'}
-            count={8}
+            count={counts?.taskCounts}
             addBackgroundColor={'#DD7878'}
             onPressAdd={() => {
               navigation.navigate('AddTask', {

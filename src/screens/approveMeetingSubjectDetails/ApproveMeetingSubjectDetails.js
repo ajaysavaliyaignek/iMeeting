@@ -18,6 +18,7 @@ const ApproveMeetingSubjectDetails = ({ meetingData }) => {
         value={searchText}
       />
       <SubjectListComponent
+        isLiveMeetingSubject={true}
         isApproveMeetingSubject={true}
         committeeIds={''}
         meetingId={meetingData.meetingId}

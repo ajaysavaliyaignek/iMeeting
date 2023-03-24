@@ -53,17 +53,11 @@ const LiveMeetingDetails = ({ item, meeting }) => {
 
     const hours = parseInt(duration.asHours());
     setHours(hours);
-    console.log('hours', hours);
     if (hours <= 0) {
       const minutes = parseInt(duration.asMinutes());
       setMinutes(minutes);
     }
   }, []);
-
-  // Calculate the duration
-  // Keep in mind you can get the duration in seconds, days, etc.
-
-  console.log('file id', meeting?.attachFileIds);
 
   // get location
   const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
@@ -72,7 +66,6 @@ const LiveMeetingDetails = ({ item, meeting }) => {
       locationId: item.locationId
     },
     onCompleted: (data) => {
-      console.log('location by id', data.location);
       if (data) {
         setLocation(data.location);
       }
@@ -90,7 +83,6 @@ const LiveMeetingDetails = ({ item, meeting }) => {
     },
     onCompleted: (data) => {
       if (data) {
-        console.log('platform link', data.videoConferencePlatformLink);
         setPlatform(data.videoConferencePlatformLink);
       }
     },

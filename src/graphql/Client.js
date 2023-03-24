@@ -17,7 +17,6 @@ export const Client = () => {
       DeviceEventEmitter.removeAllListeners('urlChanged');
     };
   }, []);
-  console.log('url from client', url);
 
   useEffect(() => {
     getUrl();
@@ -25,7 +24,6 @@ export const Client = () => {
 
   const getUrl = () => {
     AsyncStorage.getItem('@url').then((data) => {
-      console.log('url from client inside function', data);
       setUrl(data);
     });
   };

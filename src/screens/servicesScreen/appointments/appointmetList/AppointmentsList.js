@@ -39,8 +39,6 @@ const AppointmentsList = () => {
     },
 
     onCompleted: (data) => {
-      console.log('all appointment', data?.appointments.items);
-
       setAppointmentData(data?.appointments.items);
     },
     onError: (data) => {

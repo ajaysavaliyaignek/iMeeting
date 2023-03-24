@@ -8,7 +8,8 @@ import { Fonts } from '../../themes';
 const NavigationMenuForApproveSubjectsMeeting = ({
   activeTab,
   setActiveTab,
-  isMeeting
+  isMeeting,
+  isMom
 }) => {
   const navigationMenu = isMeeting
     ? [
@@ -17,6 +18,14 @@ const NavigationMenuForApproveSubjectsMeeting = ({
         { id: '2', name: 'Votings' },
         { id: '3', name: 'Tasks' },
         { id: '4', name: 'Decisions' }
+      ]
+    : isMom
+    ? [
+        { id: '0', name: 'Details' },
+        { id: '1', name: 'Votings' },
+        { id: '2', name: 'Tasks' },
+        { id: '3', name: 'Decisions' },
+        { id: '4', name: 'Approve Decisions' }
       ]
     : [
         { id: '0', name: 'Details' },
@@ -35,7 +44,7 @@ const NavigationMenuForApproveSubjectsMeeting = ({
               {
                 backgroundColor:
                   activeTab == menu.name ? Colors.white : 'transparent',
-                width: isMeeting ? '20%' : '25%'
+                width: isMom || isMeeting ? '20%' : '24%'
               }
             ]}
             onPress={() => {

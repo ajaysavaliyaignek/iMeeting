@@ -22,22 +22,11 @@ const DeadlineSuggestion = () => {
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
   );
-  console.log('generak data', generaldData);
   const [horizontal, setHorizontal] = useState(false);
-  const [activeTab, setActiveTab] = useState('1');
-  console.log(calendarDate);
-
-  const updateCalendarDate = () => {
-    setCalendarDate(calendarDate.format('YYYY-MM-DD'));
-  };
 
   const onPressArrowLeft = () => {
     const newDate = CalanderDate.add(-1, 'M').format('YYYY-MM-DD');
-    console.log('newDate', newDate);
     setCalendarDate(newDate);
-
-    // calendarDate = calendarDate.add(-1, 'month');
-    // updateCalendarDate();
   };
 
   const onPressArrowRight = (addMonth) => {
@@ -62,7 +51,7 @@ const DeadlineSuggestion = () => {
           date={'2023-02-15'}
           // current={calendarDate}
           onDayPress={(date) => {
-            console.log('date', date.dateString);
+            console.log('deadline date', date);
             setCalendarValue((prev) => {
               return { ...prev, calendarValue: date.dateString };
             });

@@ -45,8 +45,6 @@ const UserCard = ({
             color={Colors.switch}
             value={value.isRequired}
             onValueChange={(isRequired) => {
-              console.log('new changed value ', isRequired);
-
               onChangeUser(value, isRequired);
             }}
             disabled={disableSwitch}

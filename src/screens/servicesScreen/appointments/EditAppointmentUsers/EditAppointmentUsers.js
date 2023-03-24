@@ -27,15 +27,11 @@ import UserDetailsComponent from '../../../../component/userDetailsComponent/Use
 const EditAppointmentUsers = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  // const { item } = route?.params;
   const [searchText, setSearchText] = useState('');
-  const [required, setRequired] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const { attachFiles, committee, title, discription, item } = route?.params;
-  console.log({ attachFiles, committee, title, discription, item });
   const { selectedUsers, appointmentsData, setAppointmentsData } =
     useContext(UserContext);
-  console.log('appointmentdata from edit app user', appointmentsData);
   const [previousUser, setPreviousUser] = useState([]);
   const [appointment, setAppointment] = useState([]);
   let backUpUser = [];
@@ -85,15 +81,6 @@ const EditAppointmentUsers = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const userId = selectedUsers?.map((item) => {
-  //     return item.userId;
-  //   });
-  //   setUsers(userId);
-  // }, [selectedUsers]);
-
-  console.log('userrs', users);
-
   const searchFilterUsers = (text) => {
     if (text) {
       const newData = selectedUsers?.filter((item) => {
@@ -119,7 +106,6 @@ const EditAppointmentUsers = () => {
           : -1;
       if (indexPreviousUser === -1) {
         // newUsers.push(user);
-        console.log('appointment', appointment);
 
         let index =
           backUpUser?.length > 0
@@ -143,15 +129,9 @@ const EditAppointmentUsers = () => {
   };
 
   const onChangeUserState = (item, isRequired) => {
-    console.log('required item NAme', item.userName);
-    console.log('required item', isRequired);
-
     previousUser.map((user) => {
       if (user.userId === item.userId) {
-        console.log('required item NAme', user.userName);
-        console.log('required item', user.isRequired);
         user.isRequired = isRequired;
-        console.log('required item', user.isRequired);
         setPreviousUser([...previousUser]);
       }
     });
@@ -179,9 +159,7 @@ const EditAppointmentUsers = () => {
   };
 
   users = previousUser?.map((item) => item.userId);
-  console.log('userId', users);
   requiredUsers = previousUser?.map((item) => item.isRequired);
-  console.log('userRequired', requiredUsers);
 
   return (
     <SafeAreaView style={styles.container}>

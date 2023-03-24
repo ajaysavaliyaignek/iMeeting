@@ -21,11 +21,8 @@ const Users = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { userDetails } = route?.params;
-  console.log('userdetails from users', userDetails);
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState(userDetails);
-  const [valueIndex, setValueIndex] = useState(-1);
-  const { required, setRequired } = useContext(UserContext);
 
   const searchFilterUsers = (text) => {
     if (text) {

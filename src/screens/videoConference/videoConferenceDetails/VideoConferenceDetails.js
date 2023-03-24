@@ -32,7 +32,6 @@ const VideoConferenceDetails = () => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item } = route?.params;
-  console.log('item from video conference details', item);
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
   const [role, setRole] = useState(item.yourRoleName);
@@ -40,7 +39,6 @@ const VideoConferenceDetails = () => {
   // get answer
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
     onCompleted: (data) => {
-      // console.log('answer data', data.answer);
       setAnswer(data.answer);
     },
     onError: (data) => {
@@ -78,7 +76,6 @@ const VideoConferenceDetails = () => {
   const [deleteVideoConference] = useMutation(DELETE_VIDEO_CONFERENCE, {
     refetchQueries: ['videoConferences', 'videoConference'],
     onCompleted: (data) => {
-      console.log('delete appointment', data.deleteVideoConference.status);
       navigation.navigate('VideoConferenceList');
     },
     onError: (data) => {
@@ -87,8 +84,6 @@ const VideoConferenceDetails = () => {
   });
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert(
       'Delete video conference',
       'Are you sure you want to delete this?',

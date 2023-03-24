@@ -32,13 +32,13 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
       meetingId: meetingData?.meetingId,
 
       searchValue: searchText,
-      type: 2,
+      type: 1,
       subjectId: 0
     };
   } else {
     queryParams = {
       meetingId: meetingData?.meetingId,
-      type: 2,
+      type: 1,
       searchValue: searchText,
       subjectId: SubjectData?.subjectId
     };
@@ -49,7 +49,7 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
     variables: queryParams,
     onCompleted: (data, error) => {
       if (data) {
-        console.log('get voting details', data?.votingDetails?.items);
+        console.log('getVotingDetails data', data?.votingDetails?.items);
         setVotingDetails(data?.votingDetails?.items);
       }
       if (error) {

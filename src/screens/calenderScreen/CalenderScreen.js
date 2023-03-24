@@ -2,21 +2,17 @@ import {
   View,
   Text,
   SafeAreaView,
-  TouchableOpacity,
-  useWindowDimensions
+
 } from 'react-native';
 import React, { useState } from 'react';
 import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
 
 import { styles } from './styles';
-import { Icon, IconName } from '../../component';
-import { SIZES } from '../../themes/Sizes';
 import { Button } from '../../component/button/Button';
 import { Colors } from '../../themes/Colors';
 import CalendarMonthViewComponent from '../../component/calendarMonthViewComponent/CalendarMonthViewComponent';
 import CalendarScheduleViewComponent from '../../component/calendarScheduleViewComponent/CalendarScheduleViewComponent';
-import CalendarScheduleViewComponentNew from '../../component/calendarScheduleViewComponent/CalendarScheduleViewComponentNew';
 import Header from '../../component/header/Header';
 
 let CalanderDate = moment();

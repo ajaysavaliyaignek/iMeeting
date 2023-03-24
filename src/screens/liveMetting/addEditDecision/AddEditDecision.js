@@ -17,7 +17,6 @@ import {
   GET_ALL_DECISION_BY_ID,
   GET_All_SUBJECTS,
   GET_ALL_SUBJECTS_STATUS,
-  GET_COMMITTEES_BY_ROLE,
   GET_FILE
 } from '../../../graphql/query';
 import { UPDATE_DECISION } from '../../../graphql/mutation';
@@ -47,20 +46,17 @@ const AddEditDecision = () => {
         decision: decisionId
       },
       onCompleted: (data) => {
-        console.log('decision data', data);
         setValueSubject(data?.decision?.subjectId);
         setValueDecision(data?.decision?.statusId);
         setValueCommiteee(data?.decision?.committeeId);
         setDecisionDescription(data?.decision?.description);
         data?.decision?.attachFileIds?.map((id) => {
-          console.log('id', id);
           const { loading, error } = useQuery(GET_FILE, {
             fetchPolicy: 'cache-and-network',
             variables: {
               fileEntryId: id
             },
             onCompleted: (data) => {
-              console.log('get file by id', data.uploadedFile);
               if (data) {
                 setFileResponse((prev) => {
                   const pevDaa = prev.filter((ite) => {
@@ -146,11 +142,7 @@ const AddEditDecision = () => {
     },
 
     onCompleted: (data) => {
-      console.log('decision status', data.subjectStatus.items);
-      // setSubjectList(data?.subjects.items);
       setDecisionItems(data.subjectStatus.items);
-
-      // setSubjectData(data?.subjects.items);
     },
     onError: (data) => {
       console.log('decision error---', data.message);
@@ -163,16 +155,14 @@ const AddEditDecision = () => {
   ] = useMutation(UPDATE_DECISION, {
     refetchQueries: ['decisions', 'subjects'],
     onCompleted: (data) => {
+      console.log('updateDecision mom', data.updateDecision.status);
       if (data) {
-        console.log('update Decision', data?.updateDecision?.status);
         if (data.updateDecision.status.statusCode == '200') {
           navigation.goBack();
         }
       }
     }
   });
-
-  console.log('value decision', valueDecisionName);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -272,26 +262,14 @@ const AddEditDecision = () => {
           <Button
             title={'Save'}
             disable={
-              decisionDescription === '' ||
-              decisionId === null ||
+              decisionDescription === '' &&
+              decisionId === null &&
               valueSubject == null
                 ? true
                 : false
             }
             // isLoading={addVotingLoading}
             onPress={() => {
-              console.log('update decision data ', {
-                decisionId: isEdit ? decisionId : 0,
-                subjectId: valueSubject,
-                committeeId: valueCommittee ? valueCommittee : 0,
-                statusId: valueDecision,
-                description: decisionDescription,
-                attachFileIds: fileId,
-                meetingId: 0,
-                dateOfCreation: '',
-                statusTitle: '',
-                id: 0
-              });
               updateDecision({
                 variables: {
                   decision: {
@@ -312,9 +290,9 @@ const AddEditDecision = () => {
             layoutStyle={[
               {
                 opacity:
-                  decisionDescription === '' ||
-                  decisionId === null ||
-                  valueSubject == null
+                  decisionDescription === '' &&
+                  decisionId === null &&
+                  valueSubject === null
                     ? 0.5
                     : null
               },

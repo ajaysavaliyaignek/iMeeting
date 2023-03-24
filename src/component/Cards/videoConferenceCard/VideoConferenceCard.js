@@ -43,8 +43,6 @@ const VideoConferenceCard = ({
   });
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert(
       'Delete video conference',
       'Are you sure you want to delete this?',

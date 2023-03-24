@@ -64,13 +64,9 @@ const UsersCard = ({
 
   return (
     <Pressable
-      // activeOpacity={0.8}
-
       onPress={() => {
-        console.log('user pressed');
         setEditModal(false);
         onChecked(item);
-        // checkToggle(item.userId);
       }}
       key={item.userId}
     >
@@ -86,9 +82,6 @@ const UsersCard = ({
               searchText
             )}
           </Text>
-          {/* <Text style={styles.txtCommitteeTitle}>
-            {item.firstName} {item.secondName}
-          </Text> */}
         </View>
         <View style={styles.userDetailsContainer}>
           <View>
@@ -108,16 +101,8 @@ const UsersCard = ({
             )}
           </View>
           <CheckBox
-            // value={selectUser || selectAllExternal ? true : selectUser}
             onValueChange={() => {
               onChecked(item);
-
-              // allUserButton
-              //   ? setSelectAll(!selectAll)
-              //   : setIsCheckAll(!isCheckAll);
-              // if (isCheckAll) {
-              //   user.push(item);
-              // } else user.pop(item);
             }}
             value={item.isSelected}
           />

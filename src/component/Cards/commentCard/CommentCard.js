@@ -31,7 +31,6 @@ const CommentCard = ({
   const [valueIndex, setValueIndex] = useState(-1);
 
   const [addComment, { data, loading, error }] = useMutation(UPDATE_COMMENT, {
-    // export const GET_All_SUBJECTS = gql`
     refetchQueries: [
       {
         query: GET_All_COMMENTS_THREAD,
@@ -42,15 +41,11 @@ const CommentCard = ({
       if (data.addComment.status.statusCode == 200) {
         setChildCommentId(null);
       }
+    },
+    onError: (data) => {
+      console.log('add comment error', data);
     }
   });
-
-  if (data) {
-    console.log('addComment', data);
-  }
-  if (error) {
-    console.log('addCommentError', error);
-  }
 
   return (
     <TouchableOpacity
@@ -105,8 +100,6 @@ const CommentCard = ({
           <TouchableOpacity
             disabled={commentText !== '' ? false : true}
             onPress={() => {
-              console.log('edit', edit);
-              console.log('child comment id', childCommentId);
               if (childCommentId != null) {
                 addComment({
                   variables: {
@@ -145,7 +138,6 @@ const CommentCard = ({
         >
           {/* <CommentCard /> */}
           {item.childComment.map((comment, index) => {
-            console.log('child comments', comment);
             return (
               <View style={{ flex: 1 }}>
                 <Comments
@@ -196,8 +188,6 @@ const CommentCard = ({
                     <TouchableOpacity
                       disabled={commentText !== '' ? false : true}
                       onPress={() => {
-                        console.log('edit', edit);
-                        console.log('child comment id', childCommentId);
                         if (childCommentId != null) {
                           addComment({
                             variables: {

@@ -15,12 +15,33 @@ import LiveApproveMeetingSubjectVotingsDetails from '../liveMetting/liveApproveM
 import LiveApproveMeetingSubjectTaskDetails from '../liveMetting/liveApproveMeetingSubjectTaskDetails/LiveApproveMeetingSubjectTaskDetails';
 import ApproveMeetingSubjectDetails from '../approveMeetingSubjectDetails/ApproveMeetingSubjectDetails';
 import LiveMeetingSubjectDecision from '../liveMetting/liveMeetingSubjectDecision/LiveMeetingSubjectDecision';
+import { GET_MEETING_BY_ID } from '../../graphql/query';
+import { useQuery } from '@apollo/client';
 
 const ApproveMeeting = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { item, meetingData, isMeeting } = route?.params;
   const [activeTab, setActiveTab] = useState('Details');
+  const [meeting, setMeeting] = useState(null);
+  console.log('item', item);
+  // console.log('meetingData', meetingData);
+  // get meeting by iod
+  const GetMeetingById = useQuery(GET_MEETING_BY_ID, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      meetingId: item?.meetingId
+    },
+    onCompleted: (data) => {
+      if (data) {
+        setMeeting(data.meeting);
+        // setRole(data.meeting.yourRoleName);
+      }
+    },
+    onError: (data) => {
+      console.log('error in get meeting by id', data);
+    }
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -36,59 +57,61 @@ const ApproveMeeting = () => {
           isMeeting={true}
         />
         {activeTab == 'Details' && (
-          <DetailsComponent item={meetingData} isLiveMeetingDetails={false} />
+          <DetailsComponent item={meeting} isLiveMeetingDetails={false} />
         )}
         {activeTab == 'Subjects' && (
-          <ApproveMeetingSubjectDetails meetingData={meetingData} />
+          <ApproveMeetingSubjectDetails meetingData={meeting} />
         )}
         {activeTab == 'Votings' && (
           <LiveApproveMeetingSubjectVotingsDetails
-            meetingData={meetingData}
+            meetingData={meeting}
             item={item}
             isMeeting={true}
           />
         )}
         {activeTab == 'Tasks' && (
           <LiveApproveMeetingSubjectTaskDetails
-            meetingData={meetingData}
+            meetingData={meeting}
             item={item}
             isMeeting={true}
           />
         )}
         {activeTab == 'Decisions' && (
           <LiveMeetingSubjectDecision
-            meetingData={meetingData}
+            meetingData={meeting}
             item={item}
             isMeeting={true}
           />
         )}
       </View>
-      {meetingData?.yourRoleName !== 'Member' && activeTab !== 'Decisions' && (
-        <View
-          style={{
-            backgroundColor: Colors.white,
-            justifyContent: 'flex-end',
-            paddingHorizontal: SIZES[16]
-          }}
-        >
-          <Divider style={styles.divider} />
-          <Button
-            title={'Minutes of meeting decision'}
-            layoutStyle={[
-              styles.nextBtnLayout,
-              { backgroundColor: '#81AB96', width: '100%' }
-            ]}
-            textStyle={styles.txtNextBtn}
-            onPress={() => {
-              navigation.navigate('AddMinutesOfMeetingDecision', {
-                isEdit: false,
-                momDecisionData: null,
-                meetingData: meetingData
-              });
+      {meeting?.yourRoleName !== 'Member' &&
+        activeTab !== 'Decisions' &&
+        meeting?.meetingStatusTitle !== 'Closed' && (
+          <View
+            style={{
+              backgroundColor: Colors.white,
+              justifyContent: 'flex-end',
+              paddingHorizontal: SIZES[16]
             }}
-          />
-        </View>
-      )}
+          >
+            <Divider style={styles.divider} />
+            <Button
+              title={'Minutes of meeting decision'}
+              layoutStyle={[
+                styles.nextBtnLayout,
+                { backgroundColor: '#81AB96', width: '100%' }
+              ]}
+              textStyle={styles.txtNextBtn}
+              onPress={() => {
+                navigation.navigate('AddMinutesOfMeetingDecision', {
+                  isEdit: false,
+                  momDecisionData: null,
+                  meetingData: meeting
+                });
+              }}
+            />
+          </View>
+        )}
     </SafeAreaView>
   );
 };

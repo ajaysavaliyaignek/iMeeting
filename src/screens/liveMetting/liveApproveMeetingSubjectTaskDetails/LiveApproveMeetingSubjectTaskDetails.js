@@ -27,6 +27,7 @@ const LiveApproveMeetingSubjectTaskDetails = ({
   const [searchText, setSearchText] = useState('');
   const [tasksData, setTasksData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
+  console.log('subjectData', subjectData);
 
   const TaskType = useQuery(GET_TASK_TYPES, {
     fetchPolicy: 'cache-and-network',
@@ -43,13 +44,12 @@ const LiveApproveMeetingSubjectTaskDetails = ({
             searchValue: searchText,
             onlyMyTask: false,
             meetingId: meetingData?.meetingId,
-            subjectId: subjectData?.subjectId,
-            taskTypeIds: filterTaskType[0]?.id?.toString()
+            subjectId: 0,
+            taskTypeIds: filterTaskType[0]?.id?.toString(),
+            page: -1,
+            pageSize: -1
           }
         });
-
-        console.log('filterTaskType', filterTaskType);
-        // setTaskTypes(data.taskType.items);
       }
     },
     onError: (data) => {
@@ -61,7 +61,6 @@ const LiveApproveMeetingSubjectTaskDetails = ({
     fetchPolicy: 'cache-and-network',
 
     onCompleted: (data) => {
-      console.log('TasksData', data?.tasks.items);
       setTasksData(data?.tasks.items);
     },
     onError: (data) => {

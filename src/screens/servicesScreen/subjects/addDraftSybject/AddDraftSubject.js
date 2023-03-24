@@ -58,7 +58,6 @@ const AddDraftSubject = () => {
       fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         if (data) {
-          console.log('subject category', data.subjectCategories.items);
           setCategory(data.subjectCategories.items);
         }
       }
@@ -75,7 +74,7 @@ const AddDraftSubject = () => {
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: false },
+    variables: { head: true, secretary: true, member: false, type: 2 },
     onCompleted: (data) => {
       if (data) {
         setCommittee(data?.committeesByRole?.items);
@@ -102,7 +101,6 @@ const AddDraftSubject = () => {
       },
       onCompleted: (data) => {
         if (data) {
-          console.log('meetings', data?.meetings.items);
           setMeetings(data.meetings.items);
         }
       }
@@ -122,7 +120,6 @@ const AddDraftSubject = () => {
     );
     setToken(JSON.parse(user)?.dataToken);
   };
-  console.log('token from add subject', token);
 
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
     // export const GET_All_SUBJECTS = gql`
@@ -133,9 +130,7 @@ const AddDraftSubject = () => {
       }
     }
   });
-  if (data) {
-    console.log(data);
-  }
+
   if (error) {
     console.log('addsubject error--', error);
   }
@@ -246,12 +241,6 @@ const AddDraftSubject = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              console.log('subjectTitle', title);
-              console.log('description', discription);
-              console.log('attachFileIds', filesId);
-              console.log('valueCommittee', valueCommittee);
-              console.log('valueCategory', valueCategory);
-              console.log('meetingId', meetingId);
               addSubject({
                 variables: {
                   subject: {

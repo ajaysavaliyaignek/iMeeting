@@ -58,11 +58,14 @@ const Header = ({
               {
                 marginLeft: Platform.isPad
                   ? leftIconName
-                    ? '10%'
-                    : '45%'
+                    ? '40%'
+                    : rightIconName
+                    ? '8%'
+                    : '30%'
                   : rightIconName
                   ? '8%'
                   : '30%',
+
                 width: '30%',
 
                 alignSelf: 'center'

@@ -1,8 +1,85 @@
 import { gql } from '@apollo/client';
 
+export const GET_MAP_COMMITTEES = gql`
+  query mapCommittees($type: Int) {
+    mapCommittees(type: $type) {
+      items {
+        committeeTitle
+        children
+        committeeId
+        isDisable
+        userIds
+        userNames
+      }
+    }
+  }
+`;
+
+export const GET_NOTIFICATION_COUNT = gql`
+  query {
+    notificationsCount {
+      count
+    }
+  }
+`;
+export const GET_ALL_NOTIFICATIONS = gql`
+  query {
+    notifications {
+      items {
+        archived
+        notificationText
+        url
+        userNotificationEventId
+      }
+    }
+  }
+`;
+
+export const GET_STATISTICS = gql`
+  query statistics(
+    $type: Int
+    $graphType: Int
+    $committeeIds: String
+    $attendanceStatusIds: String
+    $startDate: String
+    $endDate: String
+    $statusIds: String
+    $userIds: String
+  ) {
+    statistics(
+      type: $type
+      graphType: $graphType
+      committeeIds: $committeeIds
+      attendanceStatusIds: $attendanceStatusIds
+      startDate: $startDate
+      endDate: $endDate
+      statusIds: $statusIds
+      userIds: $userIds
+    ) {
+      statisticContent
+      statisticStatus
+      statisticCommittees
+      statisticColors
+    }
+  }
+`;
+
+export const GET_EVENT_COUNTS = gql`
+  query {
+    counts {
+      meetingCounts
+      appointmentCounts
+      subjectCounts
+      taskCounts
+      videoConferenceCounts
+    }
+  }
+`;
+
 export const GET_ALL_DELEGATIONS = gql`
   query delegations(
-    $date: String
+    $startDate: String
+    $endDate: String
     $page: Int
     $pageSize: Int
     $searchValue: String
@@ -10,7 +87,8 @@ export const GET_ALL_DELEGATIONS = gql`
     $committeeIds: String
   ) {
     delegations(
-      date: $date
+      startDate: $startDate
+      endDate: $endDate
       page: $page
       pageSize: $pageSize
       searchValue: $searchValue
@@ -28,6 +106,7 @@ export const GET_ALL_DELEGATIONS = gql`
         startDate
         transferredUserId
         transferredUserName
+        types
       }
     }
   }
@@ -969,8 +1048,14 @@ export const GET_COMMITTEES_BY_ROLE = gql`
     $head: Boolean
     $member: Boolean
     $secretary: Boolean
+    $type: Int
   ) {
-    committeesByRole(head: $head, member: $member, secretary: $secretary) {
+    committeesByRole(
+      head: $head
+      member: $member
+      secretary: $secretary
+      type: $type
+    ) {
       items {
         categoryTitle
         children

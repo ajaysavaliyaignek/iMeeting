@@ -39,7 +39,8 @@ export const styles = StyleSheet.create({
   },
   btnExternalUser: {
     backgroundColor: Colors.Blue_Light,
-    marginBottom: SIZES[16]
+
+    width: '70%'
   },
   txtBtnExternal: {
     ...Fonts.PoppinsSemiBold[14],
@@ -48,6 +49,12 @@ export const styles = StyleSheet.create({
   txtContacts: {
     ...Fonts.PoppinsBold[24],
     color: Colors.bold,
+    marginBottom: SIZES[16]
+  },
+  rowCalendarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: SIZES[16]
   }
 });

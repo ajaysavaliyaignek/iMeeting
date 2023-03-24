@@ -32,12 +32,10 @@ const CalendarScheduleViewComponentNew = () => {
   const [itemHeights, setItemHeights] = useState([]);
   useEffect(() => {
     if (eventDetails.length > 0) {
-      console.log('scrollIndex', scrollIndex);
-      console.log('dateArray.length', eventDetails.length);
       const scrollingNumber = Math.floor(
         Math.random() * eventDetails.length - 1
       );
-      console.log('item to be Scoll', eventDetails[scrollingNumber]);
+
       scrollList(scrollIndex);
     }
   }, [eventDetails]);
@@ -113,7 +111,6 @@ const CalendarScheduleViewComponentNew = () => {
               })
             });
           } else {
-            console.log('isPrevious');
             previousList.push({
               date: element,
               displayDate: moment(element).format('MMM DD').toString(),
@@ -124,18 +121,10 @@ const CalendarScheduleViewComponentNew = () => {
                 return { ...item, user_images: [] };
               })
             });
-            // calDateList = previousList.concat(calDateList);
           }
         });
 
         setEventDetails(previousList.concat(calDateList));
-
-        // if (!firstScrollDone) {
-        //   scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
-        // } else {
-        //   console.log('curruntItemDateInView', curruntItemDateInView);
-        //   scrollToDate(curruntItemDateInView);
-        // }
       }
     },
     onError: (data) => {
@@ -145,7 +134,7 @@ const CalendarScheduleViewComponentNew = () => {
 
   useEffect(() => {
     recentUsedMonth = moment().format('YYYY-MM-01');
-    console.log('useeffect');
+
     if (dataInList.findIndex((item) => item == recentUsedMonth) == -1) {
       dataInList.push(recentUsedMonth);
       getCalenderEvents({
@@ -160,83 +149,13 @@ const CalendarScheduleViewComponentNew = () => {
       });
     }
   }, []);
-  // useEffect(() => {
-  // //   let daysInMonth = moment(recentUsedMonth, 'YYYY-MM-DD').daysInMonth();
-
-  // //   let month = parseInt(moment(recentUsedMonth, 'YYYY-MM-DD').format('MM'));
-  // //   let year = moment(recentUsedMonth, 'YYYY-MM-DD').year();
-
-  // //   const getDaysInMonth = (month, year) =>
-  // //     new Array(daysInMonth)
-  // //       .fill('')
-  // //       .map((v, i) =>
-  // //         moment(new Date(year, month - 1, i + 1)).format('YYYY-MM-DD')
-  // //       );
-
-  // //   let newList = [];
-
-  // //   getDaysInMonth(month, year).map((date) => {
-  // //     var foo = [];
-
-  // //     const randomValue = Math.floor(Math.random() * 100);
-  // //     for (var i = 0; i <= randomValue; i++) {
-  // //       foo.push(i);
-  // //     }
-
-  // //     newList = {
-  // //       ...newList,
-  // //       [date]: foo
-  // //     };
-
-  // //     var calDateList = [];
-  // //     Object.keys(newList).forEach((element) => {
-  // //       var listOfEventsOfTheSelectedDate = newList[element];
-  // //       let dateEventList = [];
-  // //       listOfEventsOfTheSelectedDate.forEach((event) => {
-  // //         dateEventList.push(event);
-  // //       });
-  // //       calDateList.push({ date: element, event: dateEventList });
-  // //     });
-  // //     setDateArray(calDateList);
-
-  // //     // scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
-  // //   });
-  // // }, []);
-
-  // // const scrollToDate = (date) => {
-  // //   firstScrollDone = true;
-  // //   console.log('date===>', date);
-  // //   console.log('calDatelist======>', dateArray.length);
-
-  // //   let index = dateArray?.findIndex((data) => data?.date === date);
-  // //   console.log('index', index);
-
-  // //   if (index > 0) {
-  // //     setTimeout(() => {
-  // //       console.log('index:::::', index);
-
-  // //       flatListRef?.current?.scrollToIndex({
-  // //         animation: true,
-  // //         index: index
-  // //       });
-  // //     }, 1000);
-  // //   }
-  // // };
-  // console.log('eventdetails', JSON.stringify(eventDetails));
 
   return (
     <FlatList
       data={eventDetails}
       initialNumToRender={eventDetails.length ?? 0}
       keyExtractor={(item) => item.date}
-      // getItemLayout={(data, index) => {
-      //   // console.log('itemHeights===========>>>>>', itemHeights);
-      //   const length = itemHeights[index];
-      //   const offset = itemHeights.slice(0, index).reduce((a, c) => a + c, 0);
-      //   return { length, offset, index };
-      // }}
       onScrollToIndexFailed={(info) => {
-        console.log('scrolling faid::::', info);
         const wait = new Promise((resolve) => setTimeout(resolve, 500));
         wait.then(() => {
           flatListRef.current?.scrollToIndex({

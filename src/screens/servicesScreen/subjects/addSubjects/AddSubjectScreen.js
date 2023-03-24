@@ -15,13 +15,16 @@ import {
   GET_All_MEETING,
   GET_All_SUBJECTS,
   GET_All_SUBJECTS_CATEGORY,
+  GET_ALL_SUBJECTS_STATUS,
   GET_COMMITTEES_BY_ROLE,
-  GET_FILE
+  GET_FILE,
+  GET_USER_PAYLOAD
 } from '../../../../graphql/query';
 import { UPDATE_SUBJECTS } from '../../../../graphql/mutation';
 import { SIZES } from '../../../../themes/Sizes';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
+import SubjectStatusDropdown from '../../../../component/subjectStatusDropdown/SubjectStatusDropdown';
 
 const AddSubjectScreen = () => {
   const navigation = useNavigation();
@@ -41,6 +44,8 @@ const AddSubjectScreen = () => {
   const [committees, setCommittee] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
+  const [user, setUser] = useState({});
+  const [statusTitleOption, setstatusTitleOption] = useState([]);
   const [subjectData, setSubjectData] = useState({
     title: isEdit ? subjectDetails?.subjectTitle : '',
     discription: isEdit ? subjectDetails?.description : '',
@@ -85,6 +90,182 @@ const AddSubjectScreen = () => {
       meetingId: 0
     };
   }
+
+  if (isEdit) {
+    const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+      onCompleted: (data) => {
+        let users = data.userPayload?.userCommitteesDetail?.filter((user) => {
+          if (user.organizationId == subjectDetails.committeeId) {
+            return user;
+          }
+        });
+
+        setUser(users);
+      }
+    });
+  }
+
+  useEffect(() => {
+    if (isEdit) {
+      getAllSubjectStatus({
+        variables: {
+          decision: false,
+          subject: true,
+          approveDecision: false,
+          momDecision: false
+        }
+      });
+    }
+  }, [user]);
+
+  const [getAllSubjectStatus] = useLazyQuery(GET_ALL_SUBJECTS_STATUS, {
+    // variables: {
+    //   decision: false,
+    //   subject: true,
+    //   approveDecision: false,
+    //   momDecision: false
+    // },
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data, error) => {
+      if (error) {
+        toast.error(error.message);
+      }
+      if (data) {
+        setstatusTitleOption(
+          data.subjectStatus.items.map((status) => {
+            if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Pre-Proposed';
+              })[0].statusId === subjectDetails.statusId
+            ) {
+              if (user[0]?.roleName == 'Head') {
+                return {
+                  key: status.statusId,
+                  value: status.statusTitle,
+                  disabled:
+                    status.statusTitle === 'Tentative' ||
+                    status.statusTitle === 'Pre-Proposed' ||
+                    status.statusTitle === 'Proposed' ||
+                    (status.statusTitle === 'Transferred' && true)
+                };
+              }
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Tentative';
+              })[0].statusId === subjectDetails.statusId
+            ) {
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Unassigned';
+              })[0].statusId === subjectDetails.statusId
+            ) {
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Proposed';
+              })[0].statusId === subjectDetails.statusId
+            ) {
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Transferred';
+              })[0].statusId === subjectDetails.statusId
+            ) {
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Unassigned' ||
+                  // status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  status.statusTitle === 'Approved' ||
+                  (status.statusTitle === 'Deleted' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Approved';
+              })[0].statusId === subjectDetails.statusId
+            ) {
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  status.statusTitle === 'Approved' ||
+                  (status.statusTitle === 'Deleted' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Deleted';
+              })[0].statusId === subjectDetails.statusId
+            ) {
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Unassigned' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  status.statusTitle === 'Approved' ||
+                  (status.statusTitle === 'Deleted' && true)
+              };
+            } else {
+              return {
+                key: status.statusId,
+                value: status.statusTitle,
+                disabled:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusId === subjectDetails.statusId
+              };
+            }
+          })
+        );
+      }
+    }
+  });
 
   subjectDetails?.attachFileIds?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
@@ -131,7 +312,7 @@ const AddSubjectScreen = () => {
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: false },
+    variables: { head: true, secretary: true, member: false, type: 2 },
     onCompleted: (data) => {
       if (data) {
         setCommittee(data?.committeesByRole?.items);
@@ -141,7 +322,7 @@ const AddSubjectScreen = () => {
       console.log('commitee error', data);
     }
   });
-  
+
   // fetch meetings
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,
@@ -194,7 +375,6 @@ const AddSubjectScreen = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log('update subject', data.updateSubject?.status);
       if (data?.updateSubject?.status?.statusCode == '200') {
         if (committee) {
           navigation.goBack();
@@ -302,6 +482,24 @@ const AddSubjectScreen = () => {
             onPress={() => navigation.navigate('AddSubjectCategory')}
           />
         </View>
+        {isEdit && (
+          <View style={{ marginTop: SIZES[24] }}>
+            <Text
+              style={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary,
+                marginBottom: 10
+              }}
+            >
+              SUBJECT STATUS
+            </Text>
+            <SubjectStatusDropdown
+              item={subjectDetails}
+              statusTitleOption={statusTitleOption}
+              meetingId={subjectData?.valueMeeting}
+            />
+          </View>
+        )}
 
         {/* attach files */}
         <AttachFiles
@@ -336,20 +534,6 @@ const AddSubjectScreen = () => {
           <Button
             title={'Save'}
             onPress={() => {
-              console.log({
-                subjectId: isEdit ? subjectDetails.subjectId : 0,
-                committeeId: subjectData.valueCommittee,
-                subjectTitle: subjectData.title,
-                description: subjectData.discription,
-                subjectCategoryId: subjectData.valueCategory,
-                draft: false,
-                attachFileIds: subjectData.filesId,
-                meetingId:
-                  subjectData.valueMeeting == null
-                    ? 0
-                    : subjectData.valueMeeting,
-                id: isLiveMeetingSubject ? 1 : 0
-              });
               addSubject({
                 variables: {
                   subject: {

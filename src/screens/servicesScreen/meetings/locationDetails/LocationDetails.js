@@ -28,7 +28,6 @@ const LocationDetails = () => {
   const route = useRoute();
   const { locationId, platform, locationType, role, isLiveMeeting } =
     route?.params;
-  console.log({ locationId, platform, locationType, role, isLiveMeeting });
   const [location, setLocation] = useState({});
 
   // get location by id
@@ -44,16 +43,12 @@ const LocationDetails = () => {
     },
 
     onCompleted: (data) => {
-      console.log('get location by id', data);
-      // setSubjectData(data?.subjects.items);
       setLocation(data.location);
     }
   });
   if (LocationError) {
     console.log('LocationError', LocationError);
   }
-
-  console.log('GET_ALL_LOCATION_BY_ID', GET_ALL_LOCATION_BY_ID);
 
   return (
     <SafeAreaView style={styles.container}>
