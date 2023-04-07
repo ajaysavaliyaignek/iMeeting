@@ -128,7 +128,7 @@ const AddTask = () => {
 
   const [updateTask, { data, loading: addTaskLoading, error: addTaskError }] =
     useMutation(UPDATE_TASK, {
-      refetchQueries: ['tasks', 'task'],
+      refetchQueries: ['tasks', 'task', 'counts'],
       onCompleted: (data) => {
         if (data) {
           if (data.updateTask.status.statusCode == '200') {
@@ -273,6 +273,7 @@ const AddTask = () => {
           />
           <Button
             title={'Save'}
+            isLoading={addTaskLoading}
             disable={
               titleTask == '' ||
               valueExecutor == null ||

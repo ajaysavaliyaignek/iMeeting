@@ -36,15 +36,16 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     right: SIZES[16],
     top: SIZES[28],
-    width: SIZES[24],
-    height: SIZES[24],
+    width: SIZES[26],
+    height: SIZES[26],
     alignItems: 'center',
     justifyContent: 'center'
   },
   discriptionView: {
     paddingVertical: SIZES[6],
     paddingHorizontal: SIZES[24],
-    borderRadius: SIZES[8]
+    borderRadius: SIZES[8],
+    width: '90%'
   },
   modalView: {
     position: 'absolute',

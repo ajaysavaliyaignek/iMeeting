@@ -121,8 +121,8 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     right: SIZES[16],
     top: SIZES[32],
-    width: 24,
-    height: 24,
+    width: SIZES[26],
+    height: SIZES[26],
     alignItems: 'center',
     justifyContent: 'center'
   },

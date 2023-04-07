@@ -273,9 +273,14 @@ const UserDetailsCard = ({
                   name={'Role'}
                   discription={
                     item.roleName == undefined
-                      ? item?.roles !== null &&
-                        item?.roles != undefined &&
-                        item?.roles[item?.organizationIds?.indexOf(committee)]
+                      ? (item?.roles !== null &&
+                          item?.roles != undefined &&
+                          committee !== null &&
+                          item?.roles[
+                            item?.organizationIds?.indexOf(committee)
+                          ]) ||
+                        (committee !== null &&
+                          item?.roles[item?.organizations?.indexOf(committee)])
                       : item.roleName
                   }
                 />
@@ -395,6 +400,7 @@ const UserDetailsCard = ({
             setVisibleIndex(!visibleIndex ? -1 : index);
           }}
           style={styles.dotsView}
+          activeOpacity={0.6}
         >
           <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
         </TouchableOpacity>

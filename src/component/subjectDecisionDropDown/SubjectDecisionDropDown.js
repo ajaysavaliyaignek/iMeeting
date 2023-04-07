@@ -31,7 +31,6 @@ const SubjectDecisionDropDown = ({
     },
     onCompleted: (data, error) => {
       if (data) {
-        // console.log('approve subject decision', data.decisions);
         setDecisionData(data?.decisions?.items[0]);
       }
       if (error) {

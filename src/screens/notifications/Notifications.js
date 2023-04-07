@@ -10,12 +10,16 @@ import NotificationCard from '../../component/Cards/notificationCard/Notificatio
 import Loader from '../../component/Loader/Loader';
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
+import { IconName } from '../../component';
+import { useNavigation } from '@react-navigation/native';
 
 const Notifications = () => {
+  const navigation = useNavigation();
   const [notifications, setNotifications] = useState([]);
   let notificationData = [];
 
-  const { loading } = useQuery(GET_ALL_NOTIFICATIONS, {
+  const { loading, error } = useQuery(GET_ALL_NOTIFICATIONS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       console.log('motifications', data.notifications);
       notificationData = data.notifications.items.map((item, index) => {
@@ -48,10 +52,30 @@ const Notifications = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header name={'Notifications'} />
+      <Header
+        name={'Notifications'}
+        leftIconName={IconName.Arrow_Left}
+        onLeftPress={() => {
+          navigation.goBack();
+        }}
+      />
       <View style={styles.subContainer}>
         {loading ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
+        ) : error ? (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+              {error.message == 'Network request failed'
+                ? 'No Internet connection'
+                : error.message}
+            </Text>
+          </View>
         ) : notifications.length > 0 ? (
           <FlatList
             data={notifications}

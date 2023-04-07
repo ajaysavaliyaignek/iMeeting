@@ -23,7 +23,7 @@ export const GET_NOTIFICATION_COUNT = gql`
   }
 `;
 export const GET_ALL_NOTIFICATIONS = gql`
-  query {
+  query notifications {
     notifications {
       items {
         archived
@@ -65,7 +65,7 @@ export const GET_STATISTICS = gql`
 `;
 
 export const GET_EVENT_COUNTS = gql`
-  query {
+  query counts {
     counts {
       meetingCounts
       appointmentCounts
@@ -306,7 +306,7 @@ export const GET_VOTING_HISTORY = gql`
 `;
 
 export const GET_MEETING_STATUS = gql`
-  query {
+  query meetingStatus {
     meetingStatus {
       items {
         meetingStatusId
@@ -438,7 +438,7 @@ export const GET_TASK_BY_ID = gql`
   }
 `;
 export const GET_TASK_PRIORITY = gql`
-  query {
+  query taskPriority {
     taskPriority {
       items {
         id
@@ -449,7 +449,7 @@ export const GET_TASK_PRIORITY = gql`
 `;
 
 export const GET_TASK_EXECUTORS = gql`
-  query {
+  query taskExecutor {
     taskExecutor {
       executorIds
       executorNames
@@ -518,7 +518,7 @@ export const GET_ANSWER = gql`
   }
 `;
 export const GET_USER_PAYLOAD = gql`
-  query {
+  query userPayload {
     userPayload {
       userId
       userName
@@ -1068,7 +1068,6 @@ export const GET_COMMITTEES_BY_ROLE = gql`
         organizationId
         parentCommitteeId
         setUpDate
-
         status {
           entitys
           statusCode
@@ -1152,6 +1151,7 @@ export const GET_All_MEETING = gql`
         description
         endDate
         locationId
+        locationName
         meetingId
         meetingStatusId
         meetingTitle
@@ -1200,6 +1200,7 @@ export const GET_MEETING_BY_ID = gql`
       attachFileIds
       availableId
       committeeId
+      committeeTitle
       attendanceFeedback
       attendanceFeedbackDate
       subjectSuggestion
@@ -1210,6 +1211,7 @@ export const GET_MEETING_BY_ID = gql`
       meetingId
       meetingStatusId
       meetingTitle
+      meetingStatusTitle
       organizationIds
       platformlink
       platformId

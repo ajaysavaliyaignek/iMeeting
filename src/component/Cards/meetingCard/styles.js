@@ -35,9 +35,9 @@ export const styles = StyleSheet.create({
   dotsView: {
     position: 'absolute',
     right: SIZES[18],
-    top: SIZES[32],
-    width: SIZES[24],
-    height: SIZES[24],
+    top: SIZES[24],
+    width: SIZES[26],
+    height: SIZES[26],
     alignItems: 'center',
     justifyContent: 'center'
   },

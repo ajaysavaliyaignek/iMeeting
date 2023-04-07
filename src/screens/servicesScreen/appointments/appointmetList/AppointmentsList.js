@@ -164,7 +164,7 @@ const AppointmentsList = () => {
             </Text>
           </View>
         ) : Appointment.loading ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
         ) : (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>

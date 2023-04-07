@@ -21,11 +21,16 @@ export const getHighlightedText = (txt, searchText, styleTitle) => {
               }
             ]}
             numberOfLines={1}
+            ellipsizeMode="tail"
           >
             {part}
           </Text>
         ) : (
-          <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
+          <Text
+            style={[styles.txtCommitteeTitle, styleTitle]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {part}
           </Text>
         )
@@ -39,5 +44,6 @@ const styles = StyleSheet.create({
     ...Fonts.PoppinsBold[20],
     color: Colors.bold,
     marginLeft: SIZES[12]
+    // fontFamily: 'Poppins-Bold'
   }
 });

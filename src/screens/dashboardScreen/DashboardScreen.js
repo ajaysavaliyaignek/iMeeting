@@ -32,10 +32,11 @@ import CommitteeList from './committeeList/CommitteeList';
 const DashboardScreen = () => {
   const navigation = useNavigation();
   const [counts, setCounts] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const {} = useQuery(GET_EVENT_COUNTS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
-      console.log('events count', data);
       setCounts(data.counts);
     },
     onError: (data) => {
@@ -151,7 +152,10 @@ const DashboardScreen = () => {
 
         {/* committes  */}
         <Text style={styles.txtCommittees}>Committees</Text>
-        <CommitteeList />
+        <CommitteeList
+          activeIndex={activeIndex}
+          setActiveIndex={setActiveIndex}
+        />
       </ScrollView>
     </SafeAreaView>
   );

@@ -78,8 +78,6 @@ const downloadFile = async (fileUrl, setIsDownloaded) => {
           RNFetchBlob.ios.openDocument(RootDir);
         }
       } else {
-        console.log('file path2', RootDir);
-
         RNFetchBlob.android.actionViewIntent(RootDir);
         await FileViewer.open(RootDir, { showOpenWithDialog: true });
       }

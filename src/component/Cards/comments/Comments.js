@@ -219,11 +219,14 @@ const Comments = ({
             style={{
               position: 'absolute',
               right: SIZES[6],
-              top: SIZES[16]
+              top: SIZES[16],
+              height: SIZES[26],
+              width: SIZES[26]
             }}
             onPress={() => {
               setOpenModel(!openModel);
             }}
+            activeOpacity={0.6}
           >
             <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
           </TouchableOpacity>

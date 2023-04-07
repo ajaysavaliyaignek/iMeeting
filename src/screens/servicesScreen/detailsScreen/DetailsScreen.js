@@ -344,7 +344,7 @@ const DetailsScreen = () => {
               </View>
               <Divider style={styles.divider} />
               {loadingGetMeetings ? (
-                <Loader color={Colors.primary} />
+                <Loader color={Colors.primary} size={'large'} />
               ) : errorGetMeetings ? (
                 <View
                   style={{
@@ -372,6 +372,7 @@ const DetailsScreen = () => {
                   }}
                   renderItem={({ item, index }) => (
                     <MeetingsCard
+                      key={index.toString()}
                       item={item}
                       index={index}
                       text={searchText}
@@ -408,7 +409,12 @@ const DetailsScreen = () => {
               setSearchText={setSearchText}
               download={true}
               onPressView={(item) => {
-                navigation.navigate('SubjectDetails', { item });
+                navigation.navigate('LiveApproveMeetingSubjectDetails', {
+                  item: item,
+                  meetingData: null,
+                  isMeeting: false,
+                  isMom: true
+                });
               }}
               isDecisionSubject={false}
               isSubjectStatus={true}

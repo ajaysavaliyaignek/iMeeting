@@ -26,7 +26,6 @@ const NotificationCard = ({ item, index, onComponentOpen }) => {
       { query: GET_NOTIFICATION_COUNT }
     ],
     onCompleted: (data) => {
-      console.log('update notification', data.updateNotification.status);
       if (data.updateNotification.status.statusCode == 200) {
         ref.current.close();
       }
@@ -45,6 +44,9 @@ const NotificationCard = ({ item, index, onComponentOpen }) => {
     ],
     onCompleted: (data) => {
       console.log('delete notification', data.deleteNotification.status);
+      if (data.deleteNotification.status.statusCode == 200) {
+        ref.current.close();
+      }
     },
     onError: (data) => {
       console.log('delete notification error', data.message);

@@ -269,7 +269,10 @@ const TasksList = () => {
                         item: item
                       });
                     } else {
-                      navigation.navigate('TaskDetails', { item });
+                      navigation.navigate('TaskDetails', {
+                        item,
+                        isLiveMeeting: false
+                      });
                     }
                   }}
                   setVisibleIndex={setVisibleIndex}
@@ -316,7 +319,7 @@ const TasksList = () => {
             </Text>
           </View>
         ) : Tasks.loading ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
         ) : (
           <View
             style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}

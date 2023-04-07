@@ -34,7 +34,7 @@ const CommentCard = ({
     refetchQueries: [
       {
         query: GET_All_COMMENTS_THREAD,
-        variables: { commentCategoryId: commentThreadId }
+        variables: { commentCategoryId: commentThreadId, sort: '' }
       }
     ],
     onCompleted: (data) => {
@@ -51,7 +51,7 @@ const CommentCard = ({
     <TouchableOpacity
       style={{ marginVertical: SIZES[28], flex: 1 }}
       key={index}
-      onPress={() => setOpenModel(false)}
+      onPress={() => setValueIndex(-1)}
       activeOpacity={1}
     >
       <Comments
@@ -105,7 +105,7 @@ const CommentCard = ({
                   variables: {
                     comment: {
                       comment: commentText,
-
+                      parentCommentId: 0,
                       commentId: item.commentId
                     }
                   }
@@ -115,7 +115,7 @@ const CommentCard = ({
                   variables: {
                     comment: {
                       comment: commentText,
-
+                      commentId: 0,
                       parentCommentId: item.commentId
                     }
                   }

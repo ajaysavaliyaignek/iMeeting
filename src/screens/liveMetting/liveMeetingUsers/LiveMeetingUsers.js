@@ -12,6 +12,7 @@ import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
 import { Fonts } from '../../../themes';
 import { useNavigation } from '@react-navigation/native';
 import Avatar from '../../../component/Avatar/Avatar';
+import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   const navigation = useNavigation();
@@ -88,7 +89,15 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
       }}
       activeOpacity={1}
     >
-      <View style={styles.searchContainer}>
+      <SerachAndButtoncomponent
+        isButtonShow={false}
+        role={'Member'}
+        onChangeText={(text) => {
+          searchFilterUsers(text);
+        }}
+        value={searchText}
+      />
+      {/* <View style={styles.searchContainer}>
         <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
         <TextInput
           style={styles.textInput}
@@ -99,7 +108,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
         <TouchableOpacity onPress={() => startRecording()}>
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
         </TouchableOpacity>
-      </View>
+      </View> */}
       <View style={styles.btnContainer}>
         <Button
           title={'All'}

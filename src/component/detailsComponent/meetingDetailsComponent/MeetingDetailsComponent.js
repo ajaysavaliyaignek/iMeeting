@@ -45,7 +45,6 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   const [user, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
   const [tabCounts, setTabCounts] = useState({});
-  console.log('meeting item', item);
 
   //Get meeting attachments
   item?.attachFileIds?.map((id) => {
@@ -64,6 +63,7 @@ const DetailsComponent = ({ item, isLiveMeetingDetails }) => {
   });
 
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       setAnswer(data.answer);
     }

@@ -5,15 +5,21 @@ import { useNavigation } from '@react-navigation/native';
 import { useMutation } from '@apollo/client';
 
 import { styles } from './styles';
-import { SIZES } from '../../themes/Sizes';
 import { Colors } from '../../themes/Colors';
 import RNPoll from '../../component/poll/RNPoll';
 import { GET_VOTING_DETAILS } from '../../graphql/query';
 import { UPDATE_USER_ANSWER } from '../../graphql/mutation';
 import { getHighlightedText } from '../highlitedText/HighlitedText';
 import VotingQueAnsComponent from '../votingQueAnsComponent/VotingQueAnsComponent';
+import { SIZES } from '../../themes/Sizes';
 
-const VotingDetailsComponent = ({ item, index, meetingData, searchText }) => {
+const VotingDetailsComponent = ({
+  item,
+  index,
+  meetingData,
+  searchText,
+  
+}) => {
   const navigation = useNavigation();
   const [answerIds, setAnswerIds] = useState([]);
   const [disable, setDisable] = useState(false);

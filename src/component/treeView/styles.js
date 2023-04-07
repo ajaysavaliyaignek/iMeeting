@@ -15,6 +15,10 @@ export const styles = StyleSheet.create({
     marginBottom: SIZES[16]
   },
   iconContainer: {
-    marginRight: SIZES[16]
+    marginRight: SIZES[12],
+    height: SIZES[24],
+    width: SIZES[24],
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });

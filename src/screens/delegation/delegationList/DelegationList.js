@@ -20,6 +20,7 @@ const DelegationList = ({
   const [delegations, setDelegations] = useState([]);
 
   const getAllDelegations = useQuery(GET_ALL_DELEGATIONS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       startDate: '',
       endDate: '',
@@ -69,7 +70,21 @@ const DelegationList = ({
   return (
     <View style={{ flex: 1 }}>
       {getAllDelegations.loading ? (
-        <Loader color={Colors.primary} />
+        <Loader color={Colors.primary} size={'large'} />
+      ) : getAllDelegations.error ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+            {getAllDelegations.error.message == 'Network request failed'
+              ? 'No Internet connection'
+              : getAllDelegations.error.message}
+          </Text>
+        </View>
       ) : delegations.length > 0 ? (
         <FlatList
           data={delegations}

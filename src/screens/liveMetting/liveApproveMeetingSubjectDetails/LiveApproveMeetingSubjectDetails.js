@@ -202,7 +202,8 @@ const LiveApproveMeetingSubjectDetails = () => {
           <LiveMeetingSubjectDecision
             meetingData={meetingData}
             item={item}
-            isMom={false}
+            isMom={isMom}
+            subjectDecision={true}
           />
         )}
         {activeTab == 'Approve Decisions' && (
@@ -210,10 +211,11 @@ const LiveApproveMeetingSubjectDetails = () => {
             meetingData={meetingData}
             item={item}
             isMom={isMom}
+            subjectDecision={false}
           />
         )}
       </View>
-      {meetingData?.yourRoleName !== 'Member' && !isMom && (
+      {item.status.entitys.isDisable == 'true' && (
         <View
           style={{
             backgroundColor: Colors.white,

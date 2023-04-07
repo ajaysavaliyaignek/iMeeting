@@ -21,6 +21,7 @@ const ChartLegends = ({
         paddingHorizontal: Platform.isPad ? Normalize(0) : SIZES[16],
         marginBottom: SIZES[16]
       }}
+      disabled={percentage == `0.00%` ? true : false}
       onPress={() => {
         setOnSelect(item);
       }}
@@ -76,9 +77,10 @@ const ChartLegends = ({
               marginRight: SIZES[24]
             }}
           >
-            {percentage}
+            {percentage == `${NaN}%` ? '0.00%' : percentage}
           </Text>
           <Checkbox
+            // disabled={percentage == `0.00%` ? true : false}
             value={item?.isSelected}
             color={Colors.primary}
             onValueChange={(value) => {

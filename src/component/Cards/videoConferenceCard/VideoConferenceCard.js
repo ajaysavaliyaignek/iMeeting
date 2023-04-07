@@ -4,7 +4,8 @@ import {
   TouchableOpacity,
   Platform,
   ToastAndroid,
-  Alert
+  Alert,
+  Linking
 } from 'react-native';
 import React from 'react';
 import { Divider } from 'react-native-paper';
@@ -88,9 +89,15 @@ const VideoConferenceCard = ({
             }
           ]}
         >
-          <Text style={[styles.discription, style]} numberOfLines={1}>
-            {discription}
-          </Text>
+          <TouchableOpacity
+            style={{ width: isLink ? '85%' : '90%' }}
+            disabled={isLink ? false : true}
+            onPress={() => Linking.openURL(discription)}
+          >
+            <Text style={[styles.discription, style]} numberOfLines={1}>
+              {discription}
+            </Text>
+          </TouchableOpacity>
           {isLink && (
             <TouchableOpacity
               style={{ marginLeft: SIZES[12] }}
@@ -146,7 +153,7 @@ const VideoConferenceCard = ({
         <RowData
           name={'Committee'}
           discription={item.committeeName}
-          style={{ width: '80%' }}
+          // style={{ width: '90%' }}
         />
         <RowData name={'Your role'} discription={item.yourRoleName} />
         <RowData
@@ -162,8 +169,7 @@ const VideoConferenceCard = ({
           isLink={true}
           style={{
             ...Fonts.PoppinsSemiBold[14],
-            color: Colors.primary,
-            width: '80%'
+            color: Colors.primary
           }}
         />
       </View>
@@ -173,6 +179,7 @@ const VideoConferenceCard = ({
       <TouchableOpacity
         onPress={() => setVisibleIndex(visibleIndex == -1 ? index : -1)}
         style={styles.dotsView}
+        activeOpacity={0.6}
       >
         <Icon name={IconName.Dots} height={16} width={6} />
       </TouchableOpacity>

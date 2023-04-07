@@ -69,5 +69,9 @@ export const styles = StyleSheet.create({
     ...Fonts.PoppinsBold[24],
     color: Colors.bold,
     marginBottom: SIZES[16]
+  },
+  tinyLogo: {
+    height: 20,
+    width: 20
   }
 });

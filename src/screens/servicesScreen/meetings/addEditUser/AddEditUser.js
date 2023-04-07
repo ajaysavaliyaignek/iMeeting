@@ -7,8 +7,9 @@ import { SIZES } from '../../../../themes/Sizes';
 import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
 import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
+import SerachAndButtoncomponent from '../../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
-const AddEditUser = ({ generaldData, setGeneralData }) => {
+const AddEditUser = ({ generaldData, setGeneralData, type }) => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState([]);
@@ -71,10 +72,10 @@ const AddEditUser = ({ generaldData, setGeneralData }) => {
         return itemData.indexOf(textData) > -1;
       });
       setSearchText(text);
-      setPreviousUser(newData);
+      setGeneralData({ ...generaldData, previousUser: newData });
     } else {
       setSearchText(text);
-      setPreviousUser(filterData);
+      setGeneralData({ ...generaldData, previousUser: filterData });
     }
   };
 
@@ -108,19 +109,15 @@ const AddEditUser = ({ generaldData, setGeneralData }) => {
       activeOpacity={1}
     >
       <Text style={styles.txtAddSubjectTitle}>Users</Text>
-      <View style={styles.searchContainer}>
-        <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-        <TextInput
-          style={styles.textInput}
-          placeholder={'Search'}
-          onChangeText={(text) => {
-            searchFilterUsers(text);
-          }}
-        />
-        <TouchableOpacity onPress={() => startRecording()}>
-          <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
-        </TouchableOpacity>
-      </View>
+      <SerachAndButtoncomponent
+        isButtonShow={false}
+        role={'Member'}
+        onChangeText={(text) => {
+          searchFilterUsers(text);
+        }}
+        value={searchText}
+      />
+
       <TouchableOpacity
         style={styles.committeeView}
         activeOpacity={0.5}
@@ -147,7 +144,8 @@ const AddEditUser = ({ generaldData, setGeneralData }) => {
           navigation.navigate('SelectUsers', {
             committee: generaldData?.valueCommitee,
             previousUser: generaldData?.previousUser,
-            onUpdateSelection: onUpdateSelection
+            onUpdateSelection: onUpdateSelection,
+            type
           })
         }
       >

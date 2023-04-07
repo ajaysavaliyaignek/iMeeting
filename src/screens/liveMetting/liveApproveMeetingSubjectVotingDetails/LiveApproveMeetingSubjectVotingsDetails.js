@@ -17,6 +17,7 @@ import VotingQueAnsComponent from '../../../component/votingQueAnsComponent/Voti
 import { Colors } from '../../../themes/Colors';
 import Loader from '../../../component/Loader/Loader';
 import { Fonts } from '../../../themes';
+import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const LiveApproveMeetingSubjectVotingsDetails = ({
   meetingData,
@@ -37,7 +38,12 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
     };
   } else {
     queryParams = {
-      meetingId: meetingData?.meetingId,
+      meetingId:
+        meetingData !== null
+          ? meetingData?.meetingId
+          : SubjectData.meetingId !== null
+          ? SubjectData.meetingId
+          : 0,
       type: 1,
       searchValue: searchText,
       subjectId: SubjectData?.subjectId
@@ -60,18 +66,13 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-        <TextInput
-          style={styles.textInput}
-          placeholder={'Search'}
-          onChangeText={(text) => setSearchText(text)}
-        />
-        <TouchableOpacity onPress={() => {}}>
-          <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
-        </TouchableOpacity>
-      </View>
-      <Divider style={styles.divider} />
+      <SerachAndButtoncomponent
+        isButtonShow={false}
+        role={'Member'}
+        onChangeText={setSearchText}
+        value={searchText}
+      />
+
       <View style={{ paddingHorizontal: SIZES[16], flex: 1 }}>
         {votingDetails?.length > 0 ? (
           <FlatList
@@ -86,6 +87,7 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
                   item={item}
                   searchText={searchText}
                   setDisable={() => {}}
+                  isVotingDetails={true}
                 />
               );
             }}
@@ -106,7 +108,7 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
           <View
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
           >
-            <Loader color={Colors.primary} />
+            <Loader color={Colors.primary} size={'large'} />
           </View>
         ) : (
           votingDetails?.length <= 0 && (

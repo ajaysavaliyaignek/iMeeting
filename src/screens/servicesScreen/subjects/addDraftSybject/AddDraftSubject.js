@@ -49,8 +49,6 @@ const AddDraftSubject = () => {
   const [meetings, setMeetings] = useState([]);
   let fileId = [];
 
-  // fetch file
-  const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =

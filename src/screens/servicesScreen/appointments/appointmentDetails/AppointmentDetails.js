@@ -66,6 +66,7 @@ const AppointmentsDetails = () => {
   });
 
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       setAnswer(data.answer);
     }

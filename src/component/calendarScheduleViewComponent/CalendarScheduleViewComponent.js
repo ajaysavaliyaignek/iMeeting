@@ -62,6 +62,7 @@ const CalendarScheduleViewComponent = () => {
   }, []);
 
   const [getCalenderEvents, { loading }] = useLazyQuery(GET_CALENDER_EVENTS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data?.calendarEventsMobile?.events != {}) {
         previousList = [];
@@ -244,7 +245,7 @@ const CalendarScheduleViewComponent = () => {
       />
 
       {loading && !firstScrollDone ? (
-        <Loader color={Colors.primary} />
+        <Loader color={Colors.primary} size={ "large"} />
       ) : (
         eventDetails?.length > 0 && (
           <FlatList

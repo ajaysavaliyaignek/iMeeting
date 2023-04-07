@@ -29,16 +29,8 @@ const AddEditDelegation = () => {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [generaldData, setGeneralData] = useState({
     valueCommitee: isEdit ? delegationData.committeeId : null,
-    startDate: isEdit
-      ? `${moment(delegationData.startDate, 'YYYY-MM-DD hh:mm A').format(
-          'DD MMM YYYY'
-        )}`
-      : new Date(),
-    endDate: isEdit
-      ? `${moment(delegationData.endDate, 'YYYY-MM-DD hh:mm A').format(
-          'DD MMM YYYY'
-        )}`
-      : generaldData?.startDate,
+    startDate: isEdit ? delegationData.startDate : new Date(),
+    endDate: isEdit ? delegationData.endDate : generaldData?.startDate,
     whoReplaces: isEdit ? delegationData.transferredUserId : null
   });
   const [eventTypes, setEventTypes] = useState([]);
@@ -47,9 +39,10 @@ const AddEditDelegation = () => {
   const { loading: UsersLoading, error: UsersError } = useQuery(GET_All_USERS, {
     fetchPolicy: 'cache-and-network',
     variables: {
-      isDeleted: true,
+      isDeleted: false,
       externalUser: false,
       searchValue: ''
+      // type: 6
     },
     onCompleted: (data) => {
       setUsers(data?.committeeMembersList.items);
@@ -95,7 +88,10 @@ const AddEditDelegation = () => {
       refetchQueries: ['delegations'],
       onCompleted: (data) => {
         if (data.updateDelegation.status.statusCode == '200') {
-          navigation.goBack();
+          navigation.navigate('Details', {
+            title: 'Delegations',
+            active: '2'
+          });
         }
       },
       onError: (data) => console.log('update delegation error', data)
@@ -154,8 +150,6 @@ const AddEditDelegation = () => {
     }
   ]);
 
-  console.log({ eventTypes: eventTypes.join(',') });
-
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -169,7 +163,7 @@ const AddEditDelegation = () => {
         <Text style={styles.txtAddDelegationTitle}>
           {isEdit ? 'Edit delegation' : 'Add delegation'}
         </Text>
-        {CommitteeLoading && <Loader color={Colors.primary} />}
+        {CommitteeLoading && <Loader color={Colors.primary} size={'small'} />}
 
         {/* choose committe */}
         <DropDownPicker

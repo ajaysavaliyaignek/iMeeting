@@ -154,6 +154,7 @@ const SubjectCard = ({
         <TouchableOpacity
           onPress={() => setValueIndex(valueIndex == -1 ? index : -1)}
           style={styles.dotsView}
+          activeOpacity={0.6}
         >
           <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
         </TouchableOpacity>

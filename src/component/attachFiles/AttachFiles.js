@@ -97,7 +97,7 @@ const AttachFiles = ({
         <Text style={styles.txtAttachFile}>ATTACH FILE</Text>
       )}
       {fileResponse?.length == 0 && loading ? (
-        <Loader color={Colors.primary} />
+        <Loader color={Colors.primary} size={ "small"} />
       ) : fileResponse?.length == 0 && error ? (
         <Text style={styles.txtError}>{error}</Text>
       ) : (

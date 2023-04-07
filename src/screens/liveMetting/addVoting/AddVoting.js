@@ -189,6 +189,7 @@ const AddVoting = () => {
         >
           <Text style={styles.txtLabel}>Private</Text>
           <Switch
+            disabled={isAddVotingScreen ? false : true}
             value={switchPrivate}
             onValueChange={() => {
               setSwitchPrivate(!switchPrivate);
@@ -239,7 +240,7 @@ const AddVoting = () => {
           />
           <Button
             title={'Save'}
-            // isLoading={addVotingLoading}
+            isLoading={addVotingLoading}
             onPress={() => {
               addVoting({
                 variables: {

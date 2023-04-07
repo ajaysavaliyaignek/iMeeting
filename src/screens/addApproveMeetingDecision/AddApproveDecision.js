@@ -41,7 +41,6 @@ const AddApproveDecision = () => {
     },
 
     onCompleted: (data) => {
-      console.log('decision status', data.subjectStatus.items);
       // setSubjectList(data?.subjects.items);
       setDecisionItems(data.subjectStatus.items);
 

@@ -152,13 +152,12 @@ const AddEditMeetingAppointmentVideoConference = () => {
   }
 
   // for get meeting and appointment data by id
-  console.log({ mutationParams });
 
   if (type == 'Meeting' && isEdit) {
     const {
       data,
       error: MeetingError,
-      loading
+      loading: meetingLoading
     } = useQuery(GET_MEETING_BY_ID, {
       fetchPolicy: 'cache-and-network',
       variables: {
@@ -286,22 +285,33 @@ const AddEditMeetingAppointmentVideoConference = () => {
     });
   }
   // mutation for add and edit meeting
-  const [addMeeting, { data, loading: addMeetingLoading, error }] = useMutation(
+  const [addMeeting, { data, loading: loadingMeeting, error }] = useMutation(
     UPDATE_MEETING,
     {
       // export const GET_All_SUBJECTS = gql`
       refetchQueries: [
-        {
-          query: GET_All_MEETING,
-          variables: {
-            onlyMyMeeting: false,
-            committeeIds: '',
-            screen: 0,
-            searchValue: '',
-            page: -1,
-            pageSize: -1
-          }
-        }
+        'meetings',
+        'counts'
+        // {
+        //   query: GET_All_MEETING,
+        //   variables: {
+        //     onlyMyMeeting: false,
+        //     committeeIds: '',
+        //     screen: 0,
+        //     searchValue: '',
+        //     page: -1,
+        //     pageSize: -1,
+        //     sort: '',
+        //     date: ''
+
+        //     // onlyMyMeeting: false,
+        //     // committeeIds: '',
+        //     // screen: 0,
+        //     // searchValue: '',
+        //     // page: -1,
+        //     // pageSize: -1
+        //   }
+        // }
       ],
       onCompleted: (data) => {
         console.log('update meeting', data);
@@ -319,7 +329,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
   );
 
   // function for add and edit appointment
-  const [addAppointment, { loading: updateAppointmentLoading }] = useMutation(
+  const [addAppointment, { loading: loadingAppointment }] = useMutation(
     UPDATE_APPOINTMENT,
     {
       // export const GET_All_SUBJECTS = gql`
@@ -327,7 +337,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
         {
           query: GET_All_APPOINTMENT,
           variables: { searchValue: '', page: -1, pageSize: -1 }
-        }
+        },
+        'counts'
       ],
       onCompleted: (data) => {
         if (data.updateAppointment.status.statusCode == '200') {
@@ -343,7 +354,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
   );
 
   // function for add and edit video conference
-  const [addVideoConference, { loading: updateVideoConference }] = useMutation(
+  const [addVideoConference, { loading: loadingVideoConference }] = useMutation(
     UPDATE_VIDEO_CONFERENCE,
     {
       // export const GET_All_SUBJECTS = gql`
@@ -357,7 +368,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
             searchValue: '',
             sort: ''
           }
-        }
+        },
+        'counts'
       ],
       onCompleted: (data) => {
         if (data.updateVideoConference.status.statusCode == '200') {
@@ -471,9 +483,11 @@ const AddEditMeetingAppointmentVideoConference = () => {
                 }}
                 isLoading={
                   type == 'Meeting'
-                    ? addMeetingLoading
+                    ? loadingMeeting
                     : type == 'Appointment'
-                    ? updateAppointmentLoading
+                    ? loadingAppointment
+                    : type == 'VideoConference'
+                    ? loadingVideoConference
                     : false
                 }
                 layoutStyle={[
@@ -482,8 +496,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                     opacity:
                       type !== 'VideoConference' && curentPosition == 0
                         ? generaldData?.title !== '' &&
-                          generaldData?.discription !== '' &&
-                          generaldData?.valueCommitee != null
+                          generaldData?.discription !== ''
                           ? 1
                           : 0.5
                         : curentPosition == 2
@@ -510,8 +523,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                 disable={
                   type !== 'VideoConference' && curentPosition == 0
                     ? generaldData?.title !== '' &&
-                      generaldData?.discription !== '' &&
-                      generaldData?.valueCommitee != null
+                      generaldData?.discription !== ''
                       ? false
                       : true
                     : curentPosition == 2

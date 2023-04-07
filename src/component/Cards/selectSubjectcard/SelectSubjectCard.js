@@ -78,6 +78,7 @@ const SelectSubjectCard = ({
       <TouchableOpacity
         onPress={() => setVisibleIndex(!visibleIndex ? -1 : index)}
         style={styles.dotsView}
+        activeOpacity={0.6}
       >
         <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>

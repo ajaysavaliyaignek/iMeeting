@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Alert,
   ToastAndroid,
-  Platform
+  Platform,
+  Linking
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
@@ -38,6 +39,7 @@ const VideoConferenceDetails = () => {
 
   // get answer
   const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       setAnswer(data.answer);
     },
@@ -129,15 +131,21 @@ const VideoConferenceDetails = () => {
                 width: '60%'
               }}
             >
-              <Text
-                style={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.primary
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL(platformlink);
                 }}
-                numberOfLines={1}
               >
-                {platformlink}
-              </Text>
+                <Text
+                  style={{
+                    ...Fonts.PoppinsSemiBold[14],
+                    color: Colors.primary
+                  }}
+                  numberOfLines={1}
+                >
+                  {platformlink}
+                </Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 style={{ marginLeft: SIZES[12] }}
                 onPress={() => {

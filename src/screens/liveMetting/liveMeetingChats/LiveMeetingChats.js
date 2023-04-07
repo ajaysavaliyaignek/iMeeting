@@ -189,7 +189,7 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
             </Text>
           </View>
         ) : getAllChats.loading ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
         ) : (
           <View
             style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}

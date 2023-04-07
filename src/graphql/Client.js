@@ -47,12 +47,12 @@ export const Client = () => {
 
   const client = new ApolloClient({
     link: ApolloLink.from([authLink, httpLink]),
-    cache: new InMemoryCache(),
-    defaultOptions: {
-      watchQuery: {
-        fetchPolicy: 'network-only'
-      }
-    }
+    cache: new InMemoryCache()
+    // defaultOptions: {
+    //   watchQuery: {
+    //     fetchPolicy: 'network-only'
+    //   }
+    // }
   });
   return client;
 };

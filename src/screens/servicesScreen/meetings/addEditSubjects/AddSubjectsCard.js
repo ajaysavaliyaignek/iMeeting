@@ -220,6 +220,7 @@ const AddSubjectsCard = ({
         <TouchableOpacity
           onPress={() => setVisibleIndex(visibleIndex == -1 ? index : -1)}
           style={styles.dotsView}
+          activeOpacity={0.6}
         >
           <Icon name={IconName.Dots} height={16} width={6} />
         </TouchableOpacity>

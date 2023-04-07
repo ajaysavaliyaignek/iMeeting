@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { Fonts } from '../../../../themes';
 import { Colors } from '../../../../themes/Colors';
 import { SIZES } from '../../../../themes/Sizes';
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
 
     // marginTop: 160
     position: 'absolute',
-    bottom: 92,
+    bottom: Platform.OS == 'android' ? 110 : 92,
     height: 400,
     width: '100%'
   },

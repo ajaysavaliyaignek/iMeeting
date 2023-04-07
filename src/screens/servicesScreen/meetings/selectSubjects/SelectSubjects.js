@@ -21,6 +21,7 @@ import { Colors } from '../../../../themes/Colors';
 import { GET_All_SUBJECTS } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
 import { UserContext } from '../../../../context';
+import SerachAndButtoncomponent from '../../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const SelectSubjects = () => {
   const navigation = useNavigation();
@@ -53,6 +54,7 @@ const SelectSubjects = () => {
     },
 
     onCompleted: (data) => {
+      console.log({ data: data?.subjects.items });
       subjects = data?.subjects.items.map((item, index) => {
         let previousUserIndex = previosSubjects?.findIndex(
           (user) => user.subjectId === item.subjectId
@@ -118,40 +120,17 @@ const SelectSubjects = () => {
           })
         }
       />
+
       <View style={styles.subContainer}>
-        <View style={styles.searchContainer}>
-          <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={'Search'}
-            onChangeText={(text) => setSearchText(text)}
-          />
-          <TouchableOpacity onPress={() => startRecording()}>
-            <Icon
-              name={IconName.Speaker}
-              height={SIZES[15]}
-              width={SIZES[10]}
-            />
-          </TouchableOpacity>
-        </View>
-        {/* <TouchableOpacity
-          style={styles.committeeView}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Role')}
-        >
-          <Text style={styles.txtCommittee}>Role</Text>
-          <View style={styles.btnCommittees}>
-            <Text style={styles.txtBtnCommittees}>All</Text>
-            <Icon
-              name={IconName.Arrow_Right}
-              height={SIZES[12]}
-              width={SIZES[6]}
-            />
-          </View>
-        </TouchableOpacity> */}
-        <Divider style={styles.divider} />
+        <SerachAndButtoncomponent
+          isButtonShow={false}
+          role={'Member'}
+          onChangeText={(text) => setSearchText(text)}
+          value={searchText}
+        />
+
         {SubjectsLoading ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
         ) : SubjectsError ? (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text>{SubjectsError.message}</Text>

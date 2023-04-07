@@ -11,7 +11,7 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 import DocumentPicker from 'react-native-document-picker';
 import { Divider } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 import { styles } from './styles';
@@ -25,8 +25,11 @@ import { UPDATE_COMMITTEE_USER } from '../../../../graphql/mutation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GET_All_USERS } from '../../../../graphql/query';
 import RNFetchBlob from 'rn-fetch-blob';
+import { Fonts } from '../../../../themes';
 
 const AddExternalUser = () => {
+  const route = useRoute();
+  const { type } = route?.params;
   const navigation = useNavigation();
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
@@ -40,6 +43,7 @@ const AddExternalUser = () => {
   const [profileImage, setprofileImage] = useState('');
   const [user, setUser] = useState(null);
   const [base64Url, setBase64Url] = useState(null);
+  const [error, setError] = useState('');
 
   const [
     addExternalUser,
@@ -50,12 +54,14 @@ const AddExternalUser = () => {
     }
   ] = useMutation(UPDATE_COMMITTEE_USER, {
     refetchQueries: [
-      {
-        query: GET_All_USERS,
-        variables: { isDeleted: true, externalUser: true, searchValue: '' }
-      }
+      'committeeMembersList'
+      // {
+      //   query: GET_All_USERS,
+      //   variables: { isDeleted: false, externalUser: true, searchValue: '' }
+      // }
     ],
     onCompleted: (data) => {
+      console.log({ data: data.updateCommitteeMember });
       if (data.updateCommitteeMember.status.statusCode == '200') {
         navigation.goBack();
         setEmail('');
@@ -65,12 +71,12 @@ const AddExternalUser = () => {
         setNumber('');
         setOrganization('');
       }
+    },
+    onError: (data) => {
+      console.log('addExternalUserError', data.message);
+      setError('Add External User Error.');
     }
   });
-
-  if (addExternalUserError) {
-    console.log('addExternalUserError', addExternalUserError);
-  }
 
   useEffect(() => {
     getUser();
@@ -107,6 +113,17 @@ const AddExternalUser = () => {
       console.log(err);
     }
   }, []);
+
+  function emailValidation() {
+    const regex =
+      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    if (!email || regex.test(email) === false) {
+      setError('Email is not valid');
+
+      return false;
+    }
+    return true;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -177,11 +194,25 @@ const AddExternalUser = () => {
         <View style={styles.titleContainer}>
           <Text style={styles.txtTitle}>E-MAIL</Text>
           <TextInput
+            onEndEditing={() => {
+              if (emailValidation()) {
+                setError('');
+              }
+            }}
             keyboardType="email-address"
             style={styles.textInput}
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={(text) => {
+              setEmail(text);
+            }}
           />
+          {error == 'Email is not valid' && (
+            <Text
+              style={{ ...Fonts.PoppinsSemiBold[14], color: Colors.Rejected }}
+            >
+              {error == 'Email is not valid' && error}
+            </Text>
+          )}
         </View>
 
         {/* NUMBER */}
@@ -227,6 +258,15 @@ const AddExternalUser = () => {
           justifyContent: 'flex-end'
         }}
       >
+        {error !== '' && (
+          <View style={{ alignItems: 'center', paddingBottom: 30 }}>
+            <Text
+              style={{ ...Fonts.PoppinsSemiBold[14], color: Colors.Rejected }}
+            >
+              {error == 'Add External User Error.' && error}
+            </Text>
+          </View>
+        )}
         {/* Divider */}
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}>
@@ -238,36 +278,61 @@ const AddExternalUser = () => {
           />
           <Button
             title={'Save'}
+            isLoading={addExternalUserLoading}
             onPress={() => {
-              addExternalUser({
-                variables: {
-                  committeeMember: {
-                    attachFiles: [],
-                    emails: [email],
-                    externalUser: true,
-                    externalUserOrganization: organization,
-                    familyName: lastName,
-                    firstName: firstName,
-                    googleCalendarSync: false,
-                    organizationIds: [],
-                    organizations: [],
-                    outlookCalendarSync: false,
-                    phoneNumber: number,
-                    privateDetails: privateDetails,
-                    profilePicture: base64Url,
-                    roles: [],
-                    secondName: secondName,
-                    sendSMS: sensSMS,
-                    thirdName: '',
-                    title: '',
-                    userId: 0
+              if (emailValidation()) {
+                addExternalUser({
+                  variables: {
+                    committeeMember: {
+                      attachFiles: [],
+                      emails: [email],
+                      externalUser: true,
+                      externalUserOrganization: organization,
+                      familyName: lastName,
+                      firstName: firstName,
+                      googleCalendarSync: false,
+                      organizationIds: [],
+                      organizations: [],
+                      outlookCalendarSync: false,
+                      phoneNumber: number,
+                      privateDetails: privateDetails,
+                      profilePicture: base64Url,
+                      roles: [],
+                      secondName: secondName,
+                      sendSMS: sensSMS,
+                      thirdName: '',
+                      title: '',
+                      userId: 0
+                    }
                   }
-                }
-              });
+                });
+              }
+
               // navigation.navigate('AddMeetingUser')
             }}
-            layoutStyle={[styles.nextBtnLayout]}
+            layoutStyle={[
+              styles.nextBtnLayout,
+              {
+                opacity:
+                  firstName !== '' ||
+                  secondName !== '' ||
+                  lastName !== '' ||
+                  email !== '' ||
+                  number !== ''
+                    ? 1
+                    : 0.5
+              }
+            ]}
             textStyle={styles.txtNextBtn}
+            disable={
+              firstName !== '' ||
+              secondName !== '' ||
+              lastName !== '' ||
+              email !== '' ||
+              number !== ''
+                ? false
+                : true
+            }
           />
         </View>
       </View>

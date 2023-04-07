@@ -22,7 +22,11 @@ const EditDeleteModal = ({
   return (
     <View style={styles.container}>
       {isViewable && (
-        <TouchableOpacity style={styles.btnView} onPress={onPressView}>
+        <TouchableOpacity
+          style={styles.btnView}
+          onPress={onPressView}
+          activeOpacity={0.6}
+        >
           <Text style={styles.txtEditBtn}>View</Text>
           <Icon
             name={IconName.Eye_Primary}
@@ -34,7 +38,11 @@ const EditDeleteModal = ({
       {editable && subjectStatus !== 'Deleted' && (
         <View>
           {isViewable && <Divider style={styles.divider} />}
-          <TouchableOpacity style={styles.btnView} onPress={onPressEdit}>
+          <TouchableOpacity
+            style={styles.btnView}
+            onPress={onPressEdit}
+            activeOpacity={0.6}
+          >
             <Text style={styles.txtEditBtn}>Edit</Text>
             <Icon name={IconName.Edit} height={SIZES[18]} width={SIZES[18]} />
           </TouchableOpacity>
@@ -43,7 +51,11 @@ const EditDeleteModal = ({
       {download && (
         <View>
           <Divider style={styles.divider} />
-          <TouchableOpacity style={styles.btnView} onPress={onPressDownload}>
+          <TouchableOpacity
+            style={styles.btnView}
+            onPress={onPressDownload}
+            activeOpacity={0.6}
+          >
             <Text style={styles.txtEditBtn}>Download</Text>
             <Icon
               name={IconName.Download_Primary}
@@ -56,7 +68,11 @@ const EditDeleteModal = ({
       {subjectStatus !== 'Deleted' && deleted && (
         <View>
           <Divider style={styles.divider} />
-          <TouchableOpacity style={styles.btnView} onPress={onPressDelete}>
+          <TouchableOpacity
+            style={styles.btnView}
+            onPress={onPressDelete}
+            activeOpacity={0.6}
+          >
             <Text style={styles.txtDeleteBtn}>Delete</Text>
             <Icon name={IconName.Delete} height={SIZES[20]} width={SIZES[18]} />
           </TouchableOpacity>

@@ -36,7 +36,6 @@ export const screenRender = (
           generaldData={generaldData}
           setGeneralData={setGeneralData}
           details={details}
-          
         />
       );
       break;
@@ -46,6 +45,7 @@ export const screenRender = (
         <AddMeetingUser
           generaldData={generaldData}
           setGeneralData={setGeneralData}
+          type={type}
         />
       );
 

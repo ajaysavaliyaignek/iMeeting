@@ -24,7 +24,14 @@ const _Button = ({
       style={[style.layout, { backgroundColor: Colors.primary }, layoutStyle]}
     >
       {isLoading ? (
-        <Loader color={Colors.white} />
+        <Loader
+          color={
+            title == 'Send' || title == 'Approve'
+              ? Colors.primary
+              : Colors.white
+          }
+          size={'small'}
+        />
       ) : (
         <View style={{ flexDirection: 'row' }}>
           {iconName && (

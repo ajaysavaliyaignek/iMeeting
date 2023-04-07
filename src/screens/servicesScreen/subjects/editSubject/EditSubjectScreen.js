@@ -77,6 +77,7 @@ const EditSubjectScreen = () => {
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =
     useQuery(GET_All_SUBJECTS_CATEGORY, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         if (data) {
           setCategory(data.subjectCategories.items);
@@ -92,6 +93,7 @@ const EditSubjectScreen = () => {
   const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
     GET_All_COMMITTEE,
     {
+      fetchPolicy: 'cache-and-network',
       variables: { isDeleted: false },
       onCompleted: (data) => {
         if (data) {
@@ -108,6 +110,7 @@ const EditSubjectScreen = () => {
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,
     {
+      fetchPolicy: 'cache-and-network',
       variables: { onlyMyMeeting: false, screen: 1 },
       onCompleted: (data) => {
         if (data) {
@@ -164,7 +167,7 @@ const EditSubjectScreen = () => {
 
       <View style={styles.container}>
         {SubjectCategoryLoading ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'small'} />
         ) : (
           <ScrollView
             style={styles.subContainer}

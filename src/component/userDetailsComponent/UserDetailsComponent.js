@@ -63,7 +63,7 @@ const UserDetailsComponent = ({
         />
       ) : (
         <View style={styles.noSelectedContainer}>
-          <Text style={styles.txtNoUsers}>No selected Users</Text>
+          <Text style={styles.txtNoUsers}>Users Not Found.</Text>
         </View>
       )}
     </View>

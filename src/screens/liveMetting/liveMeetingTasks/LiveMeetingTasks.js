@@ -60,7 +60,7 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
     }
   });
 
-  const [TasksData, { Tasks }] = useLazyQuery(GET_ALL_TASKS, {
+  const [TasksData, Tasks] = useLazyQuery(GET_ALL_TASKS, {
     fetchPolicy: 'cache-and-network',
 
     onCompleted: (data) => {
@@ -163,7 +163,10 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
                 setVisibleIndex={setVisibleIndex}
                 text={searchText}
                 onPressView={() => {
-                  navigation.navigate('TaskDetails', { item });
+                  navigation.navigate('TaskDetails', {
+                    item,
+                    isLiveMeeting: true
+                  });
                   setVisibleIndex(-1);
                 }}
                 editable={false}
@@ -191,12 +194,14 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
         <View
           style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
         >
-          <Text
-            style={{ ...Fonts.PoppinsSemiBold[20], color: Colors.primary }}
-          ></Text>
+          <Text style={{ ...Fonts.PoppinsSemiBold[20], color: Colors.primary }}>
+            {Tasks.error.message == 'Network request failed'
+              ? 'No Internet connection'
+              : Tasks.error.message}
+          </Text>
         </View>
-      ) : Tasks?.loading ? (
-        <Loader color={Colors.primary} />
+      ) : Tasks?.loading || TaskType.loading ? (
+        <Loader color={Colors.primary} size={'large'} />
       ) : (
         <View
           style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}

@@ -37,7 +37,7 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(118, 118, 128, 0.12)',
     borderRadius: SIZES[10],
     marginHorizontal: SIZES[16],
-    marginBottom: SIZES[16],
+    marginVertical: SIZES[16],
     padding: SIZES[2],
     justifyContent: 'space-between'
   },

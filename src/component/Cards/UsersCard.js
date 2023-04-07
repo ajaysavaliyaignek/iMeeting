@@ -31,7 +31,7 @@ const UsersCard = ({
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
-        // onPress: () => console.log('delete Pressed'),
+
         style: 'destructive'
       },
       {
@@ -114,6 +114,7 @@ const UsersCard = ({
         <TouchableOpacity
           onPress={() => setEditModal(!editModal)}
           style={styles.dotsView}
+          activeOpacity={0.6}
         >
           <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
         </TouchableOpacity>
@@ -168,8 +169,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: SIZES[16],
     top: SIZES[32],
-    width: SIZES[24],
-    height: SIZES[24],
+    width: SIZES[26],
+    height: SIZES[26],
     alignItems: 'center',
     justifyContent: 'center'
   },

@@ -1,5 +1,5 @@
-import { View, Text } from 'react-native';
-import React from 'react';
+import { View, Text, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import {
   LineSegment,
   VictoryAxis,
@@ -9,19 +9,104 @@ import {
   VictoryStack,
   VictoryTheme
 } from 'victory-native';
+import moment from 'moment';
+import { useQuery } from '@apollo/client';
 
 import { Fonts } from '../../themes';
 import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
-import {
-  committeeArrayy,
-  CommitteeDataArrray
-} from '../statisticComponents/statisticMeetingStatusComponent/BarChartData';
-import { ScrollView } from 'react-native';
+import { GET_STATISTICS } from '../../graphql/query';
+import ChartLegends from '../chartLegends/ChartLegends';
+import Loader from '../Loader/Loader';
 
-const BarCharts = ({ chartColor, title, barchartCommittees, barchartData }) => {
+const BarCharts = ({
+  title,
+  type,
+  selectedCommittees,
+  startDate,
+  endDate,
+  selectedUsers,
+  setSelectedUsers
+}) => {
+  const [barchartColor, setBarChartColor] = useState([]);
+  const [barcharLegends, setBarChartLegends] = useState([]);
+  const [barchartCommittees, setBarChartCommittees] = useState([]);
+  const [barchartData, setBarChartData] = useState([]);
+  const [barChartselectedStatus, setBarChartSelectedStatus] = useState([]);
+  const [userIds, setUserIds] = useState([]);
+  const [userName, setUserName] = useState([]);
+  let newbarCharLegendsData;
+  let ids = [];
+  let name = [];
+
+  useEffect(() => {
+    ids = selectedUsers?.map((item) => item.userId);
+    name = selectedUsers?.map((item) => item.userName);
+    setUserIds(ids);
+    setUserName(name);
+  }, [selectedUsers]);
+
+  // // query for bar chart
+  const { loading } = useQuery(GET_STATISTICS, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      type: type,
+      graphType: 10,
+      committeeIds: selectedCommittees.join(','),
+      attendanceStatusIds:
+        type == 12 || type == 11 ? barChartselectedStatus.join(',') : '',
+      startDate: startDate !== '' ? moment(startDate).format('YYYY-MM-DD') : '',
+      endDate: endDate !== '' ? moment(endDate).format('YYYY-MM-DD') : '',
+      statusIds: type == 1 || type == 2 ? barChartselectedStatus.join(',') : '',
+      userIds: type == 11 ? userIds.join(',') : ''
+    },
+    onCompleted: (data) => {
+      setBarChartColor(data.statistics.statisticColors);
+      setBarChartCommittees(data.statistics.statisticCommittees);
+      setBarChartData(data.statistics.statisticContent);
+      let newBarchartcolor = (newbarCharLegendsData =
+        data.statistics.statisticStatus.map((item, index) => {
+          let isSelected = false;
+          let previousUserIndex = barChartselectedStatus?.findIndex(
+            (user) => user === item.statusId
+          );
+
+          if (previousUserIndex >= 0) {
+            isSelected = true;
+          }
+          return { ...item, isSelected };
+        }));
+
+      console.log({ barcharLegends: data.statistics.statisticStatus });
+
+      if (newbarCharLegendsData) {
+        setBarChartLegends(newbarCharLegendsData);
+      }
+    },
+    onError: (data) => {
+      console.log('get bar chart data for meeting status error', data.message);
+    }
+  });
+
+  const setOnBarChartSelect = (item) => {
+    barcharLegends.map((data) => {
+      if (data.statusId === item.statusId) {
+        data.isSelected = !data.isSelected;
+      }
+    });
+
+    setBarChartLegends([...barcharLegends]);
+    let selectedStatusList = [];
+    barcharLegends?.map((data) => {
+      if (data?.isSelected) {
+        selectedStatusList.push(data.statusId);
+      }
+    });
+
+    setBarChartSelectedStatus(selectedStatusList);
+  };
   return (
-    <View style={{ marginBottom: SIZES[16], flex: 1 }}>
+    <View style={{ marginBottom: SIZES[16] }}>
       <Text
         style={{
           ...Fonts.PoppinsBold[20],
@@ -33,13 +118,19 @@ const BarCharts = ({ chartColor, title, barchartCommittees, barchartData }) => {
       >
         {title}
       </Text>
-      <View>
+      {loading && Platform.OS == 'android' ? (
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Loader color={Colors.primary} size={'small'} />
+        </View>
+      ) : barchartData.length > 0 ? (
         <VictoryChart
           domainPadding={SIZES[24]}
-          // width={SIZES[350]}
+          width={SIZES[350]}
           height={SIZES[600]}
-          theme={VictoryTheme.material}
-          padding={{ bottom: 150, right: 20, left: 40, top: 20 }}
+          // theme={VictoryTheme.material}
+          padding={{ bottom: 200, right: 20, left: 40, top: 20 }}
         >
           <VictoryAxis
             tickValues={barchartCommittees}
@@ -56,9 +147,9 @@ const BarCharts = ({ chartColor, title, barchartCommittees, barchartData }) => {
               />
             }
           />
+
           <VictoryAxis
             dependentAxis
-            // tickValues={[1, 2, 3, 4, 5, 6]}
             tickFormat={(x) => `${x}`}
             style={{
               tickLabels: {
@@ -78,20 +169,40 @@ const BarCharts = ({ chartColor, title, barchartCommittees, barchartData }) => {
               />
             }
           />
-          <VictoryStack colorScale={chartColor}>
+
+          <VictoryStack colorScale={barchartColor}>
             {barchartData?.map((item, index) => {
               return (
                 <VictoryBar
+                  key={index.toString()}
                   data={item}
                   x="x"
                   y="y"
-                  cornerRadius={{ top: SIZES[4], bottom: SIZES[4] }}
-                  barWidth={SIZES[32]}
+                  cornerRadius={{ top: 4, bottom: 4 }}
+                  barWidth={32}
                 />
               );
             })}
           </VictoryStack>
         </VictoryChart>
+      ) : (
+        <View>
+          <Text>No data found.</Text>
+        </View>
+      )}
+      <View style={{ paddingTop: SIZES[16] }}>
+        {barcharLegends?.map((chart, index) => {
+          return (
+            <ChartLegends
+              key={index.toString()}
+              backgroundColor={chart.backgroundColor}
+              name={chart.statusTitle}
+              percentage={chart.percentage == '' ? '' : `${chart.percentage}%`}
+              item={chart}
+              setOnSelect={setOnBarChartSelect}
+            />
+          );
+        })}
       </View>
     </View>
   );

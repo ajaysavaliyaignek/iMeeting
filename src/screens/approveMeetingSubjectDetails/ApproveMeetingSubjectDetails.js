@@ -20,7 +20,12 @@ const ApproveMeetingSubjectDetails = ({ meetingData }) => {
       <SubjectListComponent
         isLiveMeetingSubject={true}
         isApproveMeetingSubject={true}
-        committeeIds={''}
+        committeeIds={
+          meetingData.committeeId !== null ||
+          meetingData.committeeId !== undefined
+            ? `${meetingData.committeeId}`
+            : ''
+        }
         meetingId={meetingData.meetingId}
         meetingData={meetingData}
         deleted={false}

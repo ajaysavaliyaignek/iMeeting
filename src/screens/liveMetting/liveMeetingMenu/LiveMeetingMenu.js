@@ -94,6 +94,7 @@ const LiveMeetingMenu = () => {
     },
     onCompleted: (data) => {
       if (data) {
+        console.log(data.meeting);
         setMeeting(data.meeting);
         // setRole(data.meeting.yourRoleName);
       }
@@ -429,19 +430,27 @@ const LiveMeetingMenu = () => {
                 <TouchableOpacity
                   style={styles.alertBtn}
                   onPress={() => {
-                    const filterStatus = meetingStatus?.filter((status) => {
-                      if (status.meetingStatusTitle == 'Soft-Closed') {
-                        return status;
-                      }
-                    });
-                    updateMeetingStatus({
-                      variables: {
-                        meeting: {
-                          meetingId: item?.meetingId,
-                          meetingStatusId: filterStatus[0]?.meetingStatusId
+                    if (meeting?.meetingStatusTitle !== 'Soft-Closed') {
+                      const filterStatus = meetingStatus?.filter((status) => {
+                        if (status.meetingStatusTitle == 'Soft-Closed') {
+                          return status;
                         }
-                      }
-                    });
+                      });
+                      updateMeetingStatus({
+                        variables: {
+                          meeting: {
+                            meetingId: item?.meetingId,
+                            meetingStatusId: filterStatus[0]?.meetingStatusId
+                          }
+                        }
+                      });
+                    } else {
+                      navigation.navigate('Details', {
+                        title: 'Meetings',
+                        active: '0'
+                      });
+                      setOpenModal(false);
+                    }
                   }}
                 >
                   <Text

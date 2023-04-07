@@ -12,7 +12,6 @@ import { Divider } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
 
-
 import Header from '../../component/header/Header';
 import { Icon, IconName } from '../../component';
 import { SIZES } from '../../themes/Sizes';
@@ -32,11 +31,9 @@ const Subjects = () => {
   const [subject, setSubject] = useState([]);
   const [filterData, setFilterData] = useState([]);
   const [valueIndex, setValueIndex] = useState(-1);
-  
+
   // let subjects = [];
   let queryParams = [];
-
-  
 
   if (meetingData?.yourRoleName == 'Member') {
     queryParams = {
@@ -122,32 +119,7 @@ const Subjects = () => {
             role={'Member'}
             containerStyle={{ marginHorizontal: 0 }}
           />
-          {/* <View style={styles.searchContainer}>
-            <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-            <TextInput
-              value={searchText}
-              style={styles.textInput}
-              placeholder={'Search'}
-              onChangeText={(text) => searchFilterUsers(text)}
-            />
-            {!start ? (
-              <TouchableOpacity onPress={startRecording}>
-                <Icon
-                  name={IconName.Speaker}
-                  height={SIZES[15]}
-                  width={SIZES[10]}
-                />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={stopRecording}>
-                <Icon
-                  name={IconName.Close}
-                  height={SIZES[15]}
-                  width={SIZES[10]}
-                />
-              </TouchableOpacity>
-            )}
-          </View> */}
+
           <View style={styles.deadlineContainer}>
             <Text style={styles.txtDeadlineTitle}>
               RECIEVING SUBJECTS DEADLINE
@@ -251,6 +223,7 @@ const styles = StyleSheet.create({
     height: 1
   },
   txtDeadlineTitle: {
+    width: '60%',
     ...Fonts.PoppinsRegular[14],
     color: Colors.secondary
   },

@@ -26,30 +26,9 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
   const { setSelectedUsers, setSelectedSubjects, setMeetingsData } =
     useContext(UserContext);
 
-  const [location, setLocation] = useState('');
   const [openIndex, setOpenIndex] = useState(-1);
   const [role, setRole] = useState(item.yourRoleName);
   const [showModal, setShowModal] = useState(false);
-
-  const {
-    loading: loadingLocation,
-    error: errorLocation,
-    data: dataLocation
-  } = useQuery(GET_ALL_LOCATION_BY_ID, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      locationId: item.locationId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setLocation(data?.location.title);
-      }
-    }
-  });
-
-  if (errorLocation) {
-    console.log('errorLocation', errorLocation);
-  }
 
   const [deleteMeeting, { data, loading, error }] = useMutation(
     DELETE_MEETING,
@@ -121,13 +100,18 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
     <TouchableOpacity
       activeOpacity={1}
       onPress={() => setVisibleIndex(-1)}
-      key={index}
+      key={index.toString()}
+      style={{ flex: 1 }}
     >
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
       <View style={styles.committeeDetailView}>
-        {getHighlightedText(item.meetingTitle, text)}
+        {getHighlightedText(
+          item.meetingTitle,
+          text,
+          (styleTitle = { width: '100%' })
+        )}
         {/* <Text style={styles.txtCommitteeTitle} numberOfLines={1}>
           {item.title}
         </Text> */}
@@ -138,7 +122,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
             item.setTime
           }`}
         />
-        <RowData name={'Location'} discription={location} />
+        <RowData name={'Location'} discription={item.locationName} />
         <RowData
           name={'Status'}
           discription={item.meetingStatusTitle}
@@ -165,6 +149,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
           setShowModal(!showModal);
         }}
         style={styles.dotsView}
+        activeOpacity={0.6}
       >
         <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>

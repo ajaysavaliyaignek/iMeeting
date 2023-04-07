@@ -64,6 +64,7 @@ const LiveMeetingVotings = ({
           setSearchText(text);
         }}
       />
+
       {votingDetails?.length > 0 ? (
         <FlatList
           data={votingDetails}
@@ -94,7 +95,7 @@ const LiveMeetingVotings = ({
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
         </View>
       ) : (
         votingDetails?.length <= 0 && (

@@ -16,6 +16,7 @@ import { Icon, IconName } from '../../../../component';
 import { SIZES } from '../../../../themes/Sizes';
 import { UserContext } from '../../../../context';
 import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
+import SerachAndButtoncomponent from '../../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const Users = () => {
   const navigation = useNavigation();
@@ -39,37 +40,6 @@ const Users = () => {
     }
   };
 
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStartHandler = (e) => {
-    console.log('startHandler', e);
-  };
-
-  const onSpeechEndHandler = (e) => {
-    console.log('onSpeechEndHandler', e);
-  };
-
-  const onSpeechResultsHandler = (e) => {
-    console.log('onSpeechResultsHandler', e);
-    let text = e.value[0];
-    setSearchText(text);
-  };
-  const startRecording = async () => {
-    try {
-      await Voice.start('en-US');
-    } catch (error) {
-      console.log('voice error', error);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -78,22 +48,13 @@ const Users = () => {
         onLeftPress={() => navigation.goBack()}
       />
       <View style={styles.subContainer}>
-        <View style={styles.searchContainer}>
-          <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={'Search'}
-            onChangeText={(text) => searchFilterUsers(text)}
-          />
-          <TouchableOpacity onPress={() => startRecording()}>
-            <Icon
-              name={IconName.Speaker}
-              height={SIZES[15]}
-              width={SIZES[10]}
-            />
-          </TouchableOpacity>
-        </View>
-        <Divider style={styles.divider} />
+        <SerachAndButtoncomponent
+          isButtonShow={false}
+          role={'Member'}
+          onChangeText={(text) => searchFilterUsers(text)}
+          value={searchText}
+        />
+
         <UserDetailsComponent
           users={filterData}
           isUserRequired={true}

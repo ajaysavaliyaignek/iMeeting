@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Dropdown } from 'react-native-element-dropdown';
 import { SelectList } from 'react-native-dropdown-select-list';
@@ -17,7 +17,13 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
   const [UpdateMeetingStatus, { loading, error, data }] = useMutation(
     UPDATE_MEETING_STATUS,
     {
-      refetchQueries: ['meetings']
+      refetchQueries: ['meetings'],
+      onCompleted: (data) => {
+        console.log(
+          'update meeting status',
+          data.updateMeetingStatus.status.statusCode
+        );
+      }
     }
   );
 
@@ -36,9 +42,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusTitle === 'Cancelled' ||
                   item.meetingStatusTitle === 'Closed' ||
                   item.meetingStatusTitle === 'Deleted' ||
@@ -54,9 +60,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusTitle === 'Cancelled' ||
                   item.meetingStatusTitle === 'Closed' ||
                   item.meetingStatusTitle === 'Deleted' ||
@@ -72,9 +78,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusId === statusId ||
                   item.meetingStatusTitle === 'Cancelled' ||
                   item.meetingStatusTitle === 'Closed' ||
@@ -91,9 +97,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusTitle === 'Closed' ||
                   item.meetingStatusTitle === 'Live' ||
                   item.meetingStatusTitle === 'Soft-Closed' ||
@@ -106,9 +112,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusTitle === 'Closed' ||
                   item.meetingStatusId === statusId ||
                   item.meetingStatusTitle === 'Soft-Closed' ||
@@ -120,9 +126,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusId === statusId ||
                   item.meetingStatusTitle === 'Cancelled' ||
                   item.meetingStatusTitle === 'Closed' ||
@@ -139,9 +145,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusTitle === 'Closed' ||
                   item.meetingStatusTitle === 'Live' ||
                   item.meetingStatusTitle === 'Pre-Scheduled' ||
@@ -155,9 +161,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               })[0].meetingStatusId === statusId
             ) {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable:
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled:
                   item.meetingStatusId === statusId ||
                   item.meetingStatusTitle === 'Cancelled' ||
                   item.meetingStatusTitle === 'Closed' ||
@@ -168,9 +174,9 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
               };
             } else {
               return {
-                value: item.meetingStatusId,
-                label: item.meetingStatusTitle,
-                isDisable: item.meetingStatusId === statusId
+                key: item.meetingStatusId,
+                value: item.meetingStatusTitle,
+                disabled: item.meetingStatusId === statusId
               };
             }
           })
@@ -235,57 +241,56 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
     <View
       style={{
         flex: 1,
-        paddingLeft: SIZES[4],
-        backgroundColor:
-          item.meetingStatusTitle == 'Deleted'
-            ? '#ffc8be'
-            : item.meetingStatusTitle == 'Live'
-            ? '#5fda5f80'
-            : item.meetingStatusTitle == 'Tentative'
-            ? '#deb887'
-            : item.meetingStatusTitle == 'Cancelled'
-            ? '#ffcac1'
-            : item.meetingStatusTitle == 'Closed'
-            ? '#ffc8be'
-            : item.meetingStatusTitle == 'Pre-Scheduled'
-            ? '#b4dcff'
-            : item.meetingStatusTitle == 'Scheduled'
-            ? '#bff5f7'
-            : item.meetingStatusTitle == 'Soft-Closed'
-            ? '#4f7585'
-            : Colors.white,
-        borderRadius: SIZES[4],
-        paddingBottom: SIZES[6],
-        borderBottomWidth: SIZES[1],
-        borderBottomColor:
-          item.meetingStatusTitle == 'Deleted'
-            ? '#ff6347'
-            : item.meetingStatusTitle == 'Live'
-            ? '#008000'
-            : item.meetingStatusTitle == 'Tentative'
-            ? '#89530d'
-            : item.meetingStatusTitle == 'Cancelled'
-            ? '#ff6347'
-            : item.meetingStatusTitle == 'Closed'
-            ? '#ff6347'
-            : item.meetingStatusTitle == 'Pre-Scheduled'
-            ? '#337ab7'
-            : item.meetingStatusTitle == 'Scheduled'
-            ? '#5f9ea0'
-            : item.meetingStatusTitle == 'Soft-Closed'
-            ? '#87ceeb'
-            : Colors.bold
+        paddingLeft: SIZES[4]
+        // backgroundColor:
+        //   item.meetingStatusTitle == 'Deleted'
+        //     ? '#ffc8be'
+        //     : item.meetingStatusTitle == 'Live'
+        //     ? '#5fda5f80'
+        //     : item.meetingStatusTitle == 'Tentative'
+        //     ? '#deb887'
+        //     : item.meetingStatusTitle == 'Cancelled'
+        //     ? '#ffcac1'
+        //     : item.meetingStatusTitle == 'Closed'
+        //     ? '#ffc8be'
+        //     : item.meetingStatusTitle == 'Pre-Scheduled'
+        //     ? '#b4dcff'
+        //     : item.meetingStatusTitle == 'Scheduled'
+        //     ? '#bff5f7'
+        //     : item.meetingStatusTitle == 'Soft-Closed'
+        //     ? '#4f7585'
+        //     : Colors.white,
+        // borderRadius: SIZES[4],
+        // paddingBottom: SIZES[6],
+        // borderBottomWidth: SIZES[1],
+        // borderBottomColor:
+        //   item.meetingStatusTitle == 'Deleted'
+        //     ? '#ff6347'
+        //     : item.meetingStatusTitle == 'Live'
+        //     ? '#008000'
+        //     : item.meetingStatusTitle == 'Tentative'
+        //     ? '#89530d'
+        //     : item.meetingStatusTitle == 'Cancelled'
+        //     ? '#ff6347'
+        //     : item.meetingStatusTitle == 'Closed'
+        //     ? '#ff6347'
+        //     : item.meetingStatusTitle == 'Pre-Scheduled'
+        //     ? '#337ab7'
+        //     : item.meetingStatusTitle == 'Scheduled'
+        //     ? '#5f9ea0'
+        //     : item.meetingStatusTitle == 'Soft-Closed'
+        //     ? '#87ceeb'
+        //     : Colors.bold
       }}
     >
-      {/* <SelectList
+      <SelectList
+        maxHeight={120}
         setSelected={(val) => {
-          updateSpeaker({
+          UpdateMeetingStatus({
             variables: {
-              userDetail: {
-                userId: item.userId,
-                meetingId: meetingData?.meetingId,
-                duration: item.duration,
-                status: val
+              meeting: {
+                meetingId: item.meetingId,
+                meetingStatusId: val
               }
             }
           });
@@ -312,10 +317,11 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
           ...Fonts.PoppinsRegular[14]
         }}
         data={meetingStatusOption}
-        save="value"
+        save="key"
         search={false}
-        placeholder={item.status}
+        placeholder={valueStatus}
         boxStyles={{
+          display: 'flex',
           borderRadius: SIZES[8],
           borderColor:
             item.meetingStatusTitle == 'Deleted'
@@ -357,8 +363,8 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
         }}
         dropdownTextStyles={{ ...Fonts.PoppinsRegular[14] }}
         disabledTextStyles={{ ...Fonts.PoppinsRegular[14] }}
-      /> */}
-      <Dropdown
+      />
+      {/* <Dropdown
         style={{
           flex: 1,
           paddingLeft: '30%'
@@ -447,7 +453,7 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
         }}
         renderItem={(item) => renderItem(item)}
         // visibleSelectedItem={false}
-      />
+      /> */}
     </View>
   );
 };

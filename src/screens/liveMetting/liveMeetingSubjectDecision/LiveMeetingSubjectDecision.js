@@ -11,17 +11,20 @@ import { Colors } from '../../../themes/Colors';
 import { SIZES } from '../../../themes/Sizes';
 import { Button } from '../../../component/button/Button';
 import { Fonts } from '../../../themes';
+import Loader from '../../../component/Loader/Loader';
 
 const LiveMeetingSubjectDecision = ({
   meetingData,
   item: subjectData,
   isMom,
-  isMeeting
+  isMeeting,
+  subjectDecision
 }) => {
   const navigation = useNavigation();
   const [decisionData, setDecisionData] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
   let queryParams;
+  console.log({ meetingData });
 
   if (isMom) {
     queryParams = {
@@ -29,7 +32,7 @@ const LiveMeetingSubjectDecision = ({
       page: -1,
       pageSize: -1,
       meetingId: 0,
-      momDecision: true
+      momDecision: subjectDecision ? false : true
     };
   } else if (isMeeting) {
     queryParams = {
@@ -97,13 +100,20 @@ const LiveMeetingSubjectDecision = ({
 
   return (
     <View style={styles.container}>
-      {decisionData.length > 0 ? (
+      {getDecision.loading ? (
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Loader color={Colors.primary} size={'large'} />
+        </View>
+      ) : decisionData.length > 0 ? (
         <FlatList
           data={decisionData}
           keyExtractor={(index) => {
             index.toString();
           }}
           renderItem={({ item, index }) => {
+            console.log({ decision: item });
             return (
               <View style={{ paddingVertical: 16 }}>
                 <View
@@ -117,38 +127,40 @@ const LiveMeetingSubjectDecision = ({
                     item?.dateOfCreation
                   ).format('DD MMMM,YYYY')}`}</Text>
 
-                  <Button
-                    title={'Edit'}
-                    layoutStyle={{
-                      backgroundColor: Colors.white,
-                      borderBottomWidth: 1,
-                      borderBottomColor: Colors.primary,
-                      paddingVertical: 0
-                    }}
-                    textStyle={{ color: Colors.primary }}
-                    onPress={() => {
-                      isMom
-                        ? navigation.navigate('AddApproveDecision', {
-                            subjectsData: subjectData,
-                            isEdit: true,
-                            item: item
-                          })
-                        : isMeeting
-                        ? navigation.navigate('AddMinutesOfMeetingDecision', {
-                            isEdit: true,
-                            momDecisionData: item,
-                            meetingData: meetingData,
-                            decisionId: item.decisionId
-                          })
-                        : navigation.navigate('AddEditDecision', {
-                            meetingDetails: meetingData,
-                            decisionId: item.decisionId,
-                            isEdit: true,
-                            decisionData: null,
-                            subjectId: subjectData?.subjectId
-                          });
-                    }}
-                  />
+                  {!isMom && meetingData.committeeTitle == item.committeeName && (
+                    <Button
+                      title={'Edit'}
+                      layoutStyle={{
+                        backgroundColor: Colors.white,
+                        borderBottomWidth: 1,
+                        borderBottomColor: Colors.primary,
+                        paddingVertical: 0
+                      }}
+                      textStyle={{ color: Colors.primary }}
+                      onPress={() => {
+                        !subjectDecision && !isMeeting
+                          ? navigation.navigate('AddApproveDecision', {
+                              subjectsData: subjectData,
+                              isEdit: true,
+                              item: item
+                            })
+                          : isMeeting
+                          ? navigation.navigate('AddMinutesOfMeetingDecision', {
+                              isEdit: true,
+                              momDecisionData: item,
+                              meetingData: meetingData,
+                              decisionId: item.decisionId
+                            })
+                          : navigation.navigate('AddEditDecision', {
+                              meetingDetails: meetingData,
+                              decisionId: item.decisionId,
+                              isEdit: true,
+                              decisionData: null,
+                              subjectId: subjectData?.subjectId
+                            });
+                      }}
+                    />
+                  )}
                 </View>
                 {!isMeeting ? (
                   <Details
@@ -248,7 +260,7 @@ const LiveMeetingSubjectDecision = ({
             meetingData?.meetingStatusTitle !== 'Closed' && (
               <Button
                 title={
-                  isMom
+                  !subjectDecision && !isMeeting
                     ? 'Add approve decision'
                     : isMeeting
                     ? 'Add minutes of meeting decision'
@@ -257,7 +269,7 @@ const LiveMeetingSubjectDecision = ({
                 layoutStyle={styles.cancelBtnLayout}
                 textStyle={styles.txtCancelButton}
                 onPress={() => {
-                  isMom
+                  !subjectDecision && !isMeeting
                     ? navigation.navigate('AddApproveDecision', {
                         subjectsData: subjectData,
                         isEdit: false,

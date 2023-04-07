@@ -4,7 +4,9 @@ import {
   SafeAreaView,
   StyleSheet,
   PermissionsAndroid,
-  Platform
+  Platform,
+  Alert,
+  TouchableOpacity
 } from 'react-native';
 import React, { useState } from 'react';
 import FileViewer from 'react-native-file-viewer';
@@ -27,8 +29,10 @@ import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker'
 const SubjectDownload = () => {
   const route = useRoute();
   const { item, downloadType } = route?.params;
- const navigation = useNavigation();
+
+  const navigation = useNavigation();
   const [valueType, setValueType] = useState(null);
+  const [downloadError, setDownloadError] = useState('');
   const [items, setItems] = useState([
     { label: 'PDF', value: 'PDF' },
     { label: 'ZIP', value: 'ZIP' }
@@ -37,7 +41,18 @@ const SubjectDownload = () => {
   const [isCommentsSwitchOn, setIsCommentsSwitchOn] = useState(false);
 
   const checkPermission = async () => {
-   
+    console.log({
+      attachFile: isAttachFileSwitchOn,
+      comments: isCommentsSwitchOn,
+      format: valueType,
+      id:
+        downloadType == 'Subject'
+          ? +item?.subjectId
+          : downloadType == 'Task'
+          ? item?.taskId
+          : 0,
+      type: downloadType == 'Subject' ? 2 : downloadType == 'Task' ? 3 : 0
+    });
     if (Platform.OS === 'ios') {
       downloadFiles({
         variables: {
@@ -97,10 +112,14 @@ const SubjectDownload = () => {
     }
   };
 
-  const [downloadFiles, { loading, data }] = useLazyQuery(
+  const [downloadFiles, { loading, data, error }] = useLazyQuery(
     GET_ZIP_PDF_DOWNLOAD,
     {
+      fetchPolicy: 'cache-and-network',
       onCompleted: async (data, error) => {
+        showToast('Downloading file...', {
+          duration: 10
+        });
         let base64Str = data?.report?.fileData?.base64;
 
         let fPath = Platform.select({
@@ -123,24 +142,24 @@ const SubjectDownload = () => {
         if (Platform.OS == 'ios') {
           await RNFetchBlob.fs.createFile(fPath, base64Str, 'base64');
         } else {
-    
-
           await RNFetchBlob.fs.writeFile(fPath, base64Str, 'base64');
         }
 
         if (Platform.OS == 'ios') {
           RNFetchBlob.ios.openDocument(fPath);
         } else {
-
           RNFetchBlob.android.actionViewIntent(fPath);
           await FileViewer.open(fPath, { showOpenWithDialog: true });
         }
+      },
+      onError: (data) => {
+        console.log('download file error', data.message);
+        setDownloadError(data.message);
       },
 
       fetchPolicy: 'cache-and-network'
     }
   );
- 
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -149,7 +168,13 @@ const SubjectDownload = () => {
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
-      <View style={styles.subContainer}>
+      <TouchableOpacity
+        style={styles.subContainer}
+        activeOpacity={1}
+        onPress={() => {
+          setDownloadError('');
+        }}
+      >
         <Text style={styles.txtDownloadTitle}>Download</Text>
 
         <DropDownPicker
@@ -164,7 +189,10 @@ const SubjectDownload = () => {
           <Text style={styles.txtLabel}>Attach files</Text>
           <Switch
             value={isAttachFileSwitchOn}
-            onValueChange={() => setIsAttachFileSwitchOn(!isAttachFileSwitchOn)}
+            onValueChange={() => {
+              setIsAttachFileSwitchOn(!isAttachFileSwitchOn);
+              setDownloadError('');
+            }}
             color={Colors.switch}
           />
         </View>
@@ -172,18 +200,30 @@ const SubjectDownload = () => {
           <Text style={styles.txtLabel}>Comments</Text>
           <Switch
             value={isCommentsSwitchOn}
-            onValueChange={() => setIsCommentsSwitchOn(!isCommentsSwitchOn)}
+            onValueChange={() => {
+              setIsCommentsSwitchOn(!isCommentsSwitchOn);
+              setDownloadError('');
+            }}
             color={'#81AB96'}
           />
         </View>
         <GToastContainer paddingBottom={30} />
-      </View>
+      </TouchableOpacity>
       <View
         style={{
           backgroundColor: Colors.white,
           justifyContent: 'flex-end'
         }}
       >
+        {downloadError !== '' && (
+          <View style={{ alignItems: 'center', paddingBottom: 30 }}>
+            <Text
+              style={{ ...Fonts.PoppinsSemiBold[14], color: Colors.Rejected }}
+            >
+              Download failed.
+            </Text>
+          </View>
+        )}
         {/* Divider */}
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}>
@@ -198,9 +238,6 @@ const SubjectDownload = () => {
             disable={valueType ? false : true}
             title={'Save'}
             onPress={() => {
-              showToast('Downloading file...', {
-                duration: 10
-              });
               checkPermission();
             }}
             layoutStyle={[

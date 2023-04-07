@@ -22,6 +22,7 @@ import AddSubjectsCard from './AddSubjectsCard';
 import { GET_All_SUBJECTS } from '../../../../graphql/query';
 import { Fonts } from '../../../../themes';
 import moment from 'moment';
+import SerachAndButtoncomponent from '../../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const AddEditSubjects = ({
   generaldData,
@@ -30,6 +31,7 @@ const AddEditSubjects = ({
   visibleIndex,
   setVisibleIndex
 }) => {
+  console.log({ generaldData });
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [filterData, setFilterData] = useState([]);
@@ -169,23 +171,12 @@ const AddEditSubjects = ({
     <View style={styles.container}>
       <View style={styles.subContainer}>
         <Text style={styles.txtAddSubjectTitle}>Subjects</Text>
-
-        <View style={styles.searchContainer}>
-          <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={'Search'}
-            onChangeText={(text) => searchFilterSubject(text)}
-          />
-          <TouchableOpacity>
-            <Icon
-              name={IconName.Speaker}
-              height={SIZES[15]}
-              width={SIZES[10]}
-            />
-          </TouchableOpacity>
-        </View>
-        <Divider style={styles.divider} />
+        <SerachAndButtoncomponent
+          isButtonShow={false}
+          role={'Member'}
+          onChangeText={(text) => searchFilterSubject(text)}
+          value={searchText}
+        />
 
         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
           {generaldData?.previousSubject?.length > 0 ? (

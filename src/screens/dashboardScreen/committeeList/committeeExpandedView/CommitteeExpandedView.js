@@ -7,16 +7,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
-import CheckboxTree from 'react-native-checkbox-tree';
 import { Divider } from 'react-native-paper';
-// import TreeView from 'react-native-final-tree-view';
 
-import { Icon, IconName } from '../../../../component';
+import { IconName } from '../../../../component';
 import { Button } from '../../../../component/button/Button';
-import CheckBox from '../../../../component/checkBox/CheckBox';
 import Header from '../../../../component/header/Header';
 import Loader from '../../../../component/Loader/Loader';
 import TreeView from '../../../../component/treeView/TreeView';
@@ -28,9 +24,15 @@ import { SIZES } from '../../../../themes/Sizes';
 const CommitteeExpandedView = () => {
   const [data, setData] = useState([]);
   const route = useRoute();
-  const { setSelectedCommittees, valueType, setSelectedUsers } = route.params;
-  const [committees, setCommittees] = useState([]);
-  const [users, setUsers] = useState([]);
+  const {
+    selectedCommittees,
+    setSelectedCommittees,
+    valueType,
+    setSelectedUsers,
+    selectedUsers
+  } = route.params;
+  const [committees, setCommittees] = useState(selectedCommittees);
+  const [users, setUsers] = useState(selectedUsers);
   const ref = useRef();
   const navigation = useNavigation();
   const [expandedItems, setExpandedItems] = useState([]);
@@ -44,9 +46,9 @@ const CommitteeExpandedView = () => {
   };
 
   const { loading } = useQuery(GET_MAP_COMMITTEES, {
+    fetchPolicy: 'cache-and-network',
     variables: { type: 15 },
     onCompleted: (data) => {
-      console.log('get map committee', data.mapCommittees.items);
       setData(data.mapCommittees.items);
     },
     onError: (data) => {
@@ -104,7 +106,7 @@ const CommitteeExpandedView = () => {
       <View style={styles.subContainer}>
         <Text style={styles.txtTitle}>Committee</Text>
         {loading ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
         ) : data.length > 0 ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <FlatList
@@ -112,6 +114,8 @@ const CommitteeExpandedView = () => {
               renderItem={({ item, index }) => {
                 return (
                   <TreeView
+                    selectedUsers={selectedUsers}
+                    selectedCommittees={selectedCommittees}
                     key={item.committeeId}
                     item={item}
                     onToggle={(expanded) => handleToggle(item.committeeTitle)}

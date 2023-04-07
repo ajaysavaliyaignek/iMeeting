@@ -35,7 +35,7 @@ import Loader from '../../../../component/Loader/Loader';
 const TaskDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { item } = route?.params;
+  const { item, isLiveMeeting } = route?.params;
   const [meetingName, setMeetingName] = useState('');
   const [subjectName, setSubjectName] = useState('');
   const [fileResponse, setFileResponse] = useState([]);
@@ -99,6 +99,7 @@ const TaskDetails = () => {
   }
 
   const getTaskById = useQuery(GET_TASK_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: { id: item.taskId },
     onCompleted: (data) => {
       if (data) {
@@ -206,7 +207,7 @@ const TaskDetails = () => {
         }}
       />
       {getTaskById.loading ? (
-        <Loader color={Colors.primary} />
+        <Loader color={Colors.primary} size={'large'} />
       ) : taskDetails ? (
         <ScrollView style={styles.subContainer}>
           <View style={{ marginTop: SIZES[24], marginBottom: SIZES[16] }}>
@@ -364,7 +365,7 @@ const TaskDetails = () => {
           )}
         </ScrollView>
       ) : null}
-      {item?.isHead && item?.taskStatus !== 'Deleted' && (
+      {item?.isHead && item?.taskStatus !== 'Deleted' && !isLiveMeeting && (
         <View
           style={{
             backgroundColor: Colors.white,

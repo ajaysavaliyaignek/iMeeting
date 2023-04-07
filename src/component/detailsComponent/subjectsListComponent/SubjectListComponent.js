@@ -112,7 +112,7 @@ const SubjectListComponent = ({
       // onPress={() => setEditModal(false)}
     >
       {SubjectsLoading ? (
-        <Loader color={Colors.primary} />
+        <Loader color={Colors.primary} size={'large'} />
       ) : SubjectsError ? (
         <View
           style={{

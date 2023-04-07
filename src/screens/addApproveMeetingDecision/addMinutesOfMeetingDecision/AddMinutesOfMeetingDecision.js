@@ -26,9 +26,12 @@ const AddMinutesOfMeetingDecision = () => {
   const [meetingStatus, setMeetingStatus] = useState([]);
   const [decision, setDecision] = useState('');
   let showFinalApproveButton =
-    meetingData.status.entitys.organizationName == meetingData.committeeTitle;
+    meetingData?.status.entitys.organizationName == meetingData?.committeeTitle;
   // getMeetingSubjects for meeting
-  console.log('meeting data from add mom', meetingData);
+  console.log({
+    org: meetingData.status.entitys.organizationName,
+    meeting: meetingData
+  });
   const getMeetingSubjects = useQuery(GET_MEETING_STATUS, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
@@ -62,7 +65,6 @@ const AddMinutesOfMeetingDecision = () => {
   ] = useMutation(UPDATE_DECISION, {
     refetchQueries: ['decisions'],
     onCompleted: (data) => {
-      console.log('update minutes of meeting Decision', data);
       if (data) {
         if (data?.updateDecision?.status?.statusCode == '200') {
           if (decision == 'Send' || decision == 'Approve') {
@@ -172,6 +174,9 @@ const AddMinutesOfMeetingDecision = () => {
                 }
               });
             }}
+            isLoading={
+              decision !== '' && decision == 'Send' && addDecisionLoading
+            }
             layoutStyle={[
               styles.cancelBtnLayout,
               {
@@ -207,6 +212,9 @@ const AddMinutesOfMeetingDecision = () => {
                 }
               });
             }}
+            isLoading={
+              decision !== '' && decision == 'Approve' && addDecisionLoading
+            }
             layoutStyle={[
               styles.cancelBtnLayout,
               {
@@ -225,7 +233,11 @@ const AddMinutesOfMeetingDecision = () => {
                   ? true
                   : false
               }
-              isLoading={addDecisionLoading}
+              isLoading={
+                decision !== '' &&
+                decision == 'Final approve' &&
+                addDecisionLoading
+              }
               onPress={() => {
                 setDecision('Final approve');
                 updateDecision({

@@ -50,6 +50,7 @@ const CalendarScheduleViewComponentNew = () => {
     }, 1000);
   };
   const [getCalenderEvents, { loading }] = useLazyQuery(GET_CALENDER_EVENTS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data?.calendarEventsMobile?.events != {}) {
         previousList = [];

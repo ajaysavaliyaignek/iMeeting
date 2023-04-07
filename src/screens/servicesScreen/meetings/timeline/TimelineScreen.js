@@ -119,6 +119,7 @@ const TimelineScreen = () => {
           // maxToRenderPerBatch={3}
           contentContainerStyle={{ paddingVertical: SIZES[8] }}
           initialNumToRender={3}
+          keyExtractor={(index) => index.toString()}
           data={item.title.events}
           renderItem={({ item, index }) => {
             return (
@@ -129,7 +130,7 @@ const TimelineScreen = () => {
                   marginLeft: SIZES[4],
                   marginBottom: SIZES[4]
                 }}
-                key={index}
+                key={index.toString()}
               >
                 <Avatar source={item.portraitURL} size={SIZES[24]} />
                 <Text
@@ -335,6 +336,9 @@ const TimelineScreen = () => {
             </Text>
             <ScrollView>
               {event?.events.map((item, index) => {
+                {
+                  /* console.log(items); */
+                }
                 return (
                   <TouchableOpacity
                     onPress={() => {
@@ -343,15 +347,11 @@ const TimelineScreen = () => {
                     style={[
                       styles.userContainer,
                       {
-                        backgroundColor:
-                          event?.events.length == 1 ? event?.color : item.color,
-                        borderLeftColor:
-                          event?.events.length == 1
-                            ? event?.borderColor
-                            : item.borderColor
+                        backgroundColor: items[0]?.color,
+                        borderLeftColor: items[0]?.borderColor
                       }
                     ]}
-                    key={index}
+                    key={index.toString()}
                   >
                     <View style={styles.userDataContainer}>
                       <View style={styles.userInfoContainer}>

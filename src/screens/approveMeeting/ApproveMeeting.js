@@ -24,8 +24,7 @@ const ApproveMeeting = () => {
   const { item, meetingData, isMeeting } = route?.params;
   const [activeTab, setActiveTab] = useState('Details');
   const [meeting, setMeeting] = useState(null);
-  console.log('item', item);
-  // console.log('meetingData', meetingData);
+
   // get meeting by iod
   const GetMeetingById = useQuery(GET_MEETING_BY_ID, {
     fetchPolicy: 'cache-and-network',
@@ -81,6 +80,7 @@ const ApproveMeeting = () => {
             meetingData={meeting}
             item={item}
             isMeeting={true}
+            subjectDecision={false}
           />
         )}
       </View>

@@ -7,8 +7,21 @@ import Normalize from '../../themes/mixins';
 import { Fonts } from '../../themes';
 import { getHighlightedText } from '../highlitedText/HighlitedText';
 import moment from 'moment';
+import EditDeleteModal from '../EditDeleteModal';
+import IconName from '../Icon/iconName';
+import { useNavigation } from '@react-navigation/native';
+import Icon from '../Icon';
+import { SIZES } from '../../themes/Sizes';
 
-const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
+const CommitteesCard = ({
+  item,
+  index,
+  searchText,
+  isProfileCommittee,
+  activeIndex,
+  setActiveIndex
+}) => {
+  const navigation = useNavigation();
   // committee row view
   const RowData = ({ name, discription }) => {
     return (
@@ -23,21 +36,25 @@ const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
 
   return (
     <TouchableOpacity
-      activeOpacity={1}
-      // onPress={() => setEditModal(false)}
+      // activeOpacity={1}
+      onPress={() => setActiveIndex(-1)}
       key={index}
+      activeOpacity={1}
     >
       {!isProfileCommittee && <Divider style={styles.divider} />}
       {/* committee details */}
-      <TouchableOpacity
-        style={styles.committeeDetailView}
+      <View
+        style={[
+          styles.committeeDetailView,
+          { opacity: item.isDisable ? 0.5 : 1 }
+        ]}
         // onPress={() => navigation.navigate('CommitteeDetails')}
-        activeOpacity={0.5}
+        // activeOpacity={0.5}
       >
         {getHighlightedText(
           item?.committeeTitle,
           searchText,
-          (styleTitle = { width: '100%' })
+          (styleTitle = { width: '92%' })
         )}
         {/* <Text style={styles.txtCommitteeTitle}>{item?.committeeTitle}</Text> */}
 
@@ -55,11 +72,11 @@ const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
             )}
           />
         )}
-      </TouchableOpacity>
+      </View>
 
       {/* dotsView */}
-      {/* <TouchableOpacity
-        onPress={() => setEditModal(!editModal)}
+      <TouchableOpacity
+        onPress={() => setActiveIndex(activeIndex == -1 ? index : -1)}
         style={styles.dotsView}
       >
         <Icon
@@ -67,25 +84,20 @@ const CommitteesCard = ({ item, index, searchText, isProfileCommittee }) => {
           height={Normalize(16)}
           width={Normalize(6)}
         />
-      </TouchableOpacity> */}
-      {/* {editModal && (
-        <View
-          style={{
-            backgroundColor: '#f8f8f8',
-            position: 'absolute',
-            top: Normalize(48),
-            right: Normalize(18),
-            padding: Normalize(16)
-          }}
-        >
-          <TouchableOpacity>
-            <Text>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text>Delete</Text>
-          </TouchableOpacity>
+      </TouchableOpacity>
+      {activeIndex == index && (
+        <View style={styles.modalView}>
+          <EditDeleteModal
+            editable={false}
+            deleted={false}
+            isViewable={true}
+            onPressView={() => {
+              navigation.navigate('CommitteeDetails', { item });
+              setActiveIndex(-1);
+            }}
+          />
         </View>
-      )} */}
+      )}
       <Divider style={styles.divider} />
     </TouchableOpacity>
   );
@@ -115,8 +127,8 @@ const styles = StyleSheet.create({
   },
   committeeDetailView: {
     paddingVertical: Normalize(24),
-    paddingHorizontal: Normalize(16),
-    width: '90%'
+    paddingHorizontal: Normalize(16)
+    // width: '90%'
   },
   txtCommitteeTitle: {
     ...Fonts.PoppinsBold[20],
@@ -124,7 +136,17 @@ const styles = StyleSheet.create({
   },
   dotsView: {
     position: 'absolute',
-    right: Normalize(16),
-    top: Normalize(32)
+    right: SIZES[12],
+    top: SIZES[24],
+    height: SIZES[26],
+    width: SIZES[26],
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  modalView: {
+    position: 'absolute',
+    top: SIZES[60],
+    right: SIZES[8],
+    zIndex: 20
   }
 });

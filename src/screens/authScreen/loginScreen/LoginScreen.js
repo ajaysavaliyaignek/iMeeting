@@ -18,9 +18,7 @@ import Input from '../../../component/Input/Input';
 import { GET_AUTH } from '../../../graphql/query';
 import { SIZES } from '../../../themes/Sizes';
 import { styles } from './styles';
-import Loader from '../../../component/Loader/Loader';
 import { UserContext } from '../../../context';
-import { Colors } from '../../../themes/Colors';
 
 const LoginScreen = ({ navigation }) => {
   const [url, setUrl] = useState('');
@@ -36,6 +34,7 @@ const LoginScreen = ({ navigation }) => {
   // Query for get client id and client secret
   // For this query need company url
   const [getAuth, { loading, data }] = useLazyQuery(GET_AUTH, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       // set client id
       setClientId(data.oAuth2Application.clientId);
@@ -198,7 +197,7 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  console.log('error', error);
+  
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView

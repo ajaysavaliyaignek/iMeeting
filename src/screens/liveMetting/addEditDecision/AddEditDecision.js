@@ -151,11 +151,10 @@ const AddEditDecision = () => {
 
   const [
     updateDecision,
-    { data, loading: addTaskLoading, error: addTaskError }
+    { data, loading: addDecisionLoading, error: addDecisionError }
   ] = useMutation(UPDATE_DECISION, {
     refetchQueries: ['decisions', 'subjects'],
     onCompleted: (data) => {
-      console.log('updateDecision mom', data.updateDecision.status);
       if (data) {
         if (data.updateDecision.status.statusCode == '200') {
           navigation.goBack();
@@ -268,7 +267,7 @@ const AddEditDecision = () => {
                 ? true
                 : false
             }
-            // isLoading={addVotingLoading}
+            isLoading={addDecisionLoading}
             onPress={() => {
               updateDecision({
                 variables: {

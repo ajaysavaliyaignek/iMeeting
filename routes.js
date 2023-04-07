@@ -75,16 +75,16 @@ const Stack = createStackNavigator();
 
 const MainBottomTab = () => {
   const { height, width } = useWindowDimensions();
-  const [count, setCount] = useState(0);
-  const { loading } = useQuery(GET_NOTIFICATION_COUNT, {
-    onCompleted: (data) => {
-      console.log('motifications count', data.notificationsCount);
-      setCount(data.notificationsCount.count);
-    },
-    onError: (data) => {
-      console.log('get all notification count error', data.message);
-    }
-  });
+  // const [count, setCount] = useState(0);
+  // const { loading } = useQuery(GET_NOTIFICATION_COUNT, {
+  //   fetchPolicy: 'cache-and-network',
+  //   onCompleted: (data) => {
+  //     setCount(data.notificationsCount.count);
+  //   },
+  //   onError: (data) => {
+  //     console.log('get all notification count error', data.message);
+  //   }
+  // });
 
   return (
     <bottomTab.Navigator
@@ -230,7 +230,7 @@ const MainBottomTab = () => {
         }}
         component={CalenderScreen}
       />
-      <bottomTab.Screen
+      {/* <bottomTab.Screen
         name="Notification"
         options={{
           tabBarIcon: ({ focused }) => {
@@ -270,8 +270,29 @@ const MainBottomTab = () => {
                   Notifications
                 </Text>
                 {count > 0 && (
-                  <View style={{ position: 'absolute', top: 0, right: 14 }}>
-                    <Text style={{ color: Colors.primary }}>
+                  <View
+                    style={{
+                      borderColor: focused ? Colors.white : null,
+                      borderWidth: focused ? 1 : null,
+                      height: SIZES[16],
+                      width: SIZES[16],
+                      borderRadius: SIZES[8],
+                      backgroundColor: Colors.primary,
+                      position: 'absolute',
+                      top: 0,
+                      right: 16,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 1
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: Colors.white,
+                        ...Fonts.PoppinsSemiBold[12],
+                        fontSize: 9
+                      }}
+                    >
                       {count < 10 ? `0${count}` : count}
                     </Text>
                   </View>
@@ -283,7 +304,7 @@ const MainBottomTab = () => {
           tabBarLabelStyle: { ...Fonts.PoppinsRegular[10] }
         }}
         component={Notifications}
-      />
+      /> */}
       <bottomTab.Screen
         name="ProfileStack"
         options={{
@@ -418,6 +439,7 @@ const MainStack = ({ initialRouteName }) => {
         name="CommitteeExpandedView"
         component={CommitteeExpandedView}
       />
+      <Stack.Screen name="Notifications" component={Notifications} />
     </Stack.Navigator>
   );
 };

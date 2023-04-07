@@ -42,8 +42,6 @@ const StatisticScreen = () => {
   ]);
   const [selectedCommittees, setSelectedCommittees] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  console.log('selectedCommittees', selectedCommittees);
-  console.log('selectedUsers', selectedUsers);
 
   function onDateChange(date, type) {
     if (type === 'END_DATE') {
@@ -86,7 +84,9 @@ const StatisticScreen = () => {
             navigation.navigate('CommitteeExpandedView', {
               setSelectedCommittees: setSelectedCommittees,
               setSelectedUsers,
-              valueType
+              valueType,
+              selectedCommittees,
+              selectedUsers
             });
           }}
         >
@@ -176,6 +176,7 @@ const StatisticScreen = () => {
             startDate={startDate}
             endDate={endDate}
             selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
           />
         )}
         {activeTab === 'status' && valueType == 'meeting' && (

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Header from '../../component/header/Header';
 import { IconName } from '../../component';
@@ -8,9 +8,67 @@ import { Colors } from '../../themes/Colors';
 import Normalize from '../../themes/mixins';
 import { Fonts } from '../../themes';
 import FilesCard from '../../component/Cards/FilesCard';
+import { SafeAreaView } from 'react-native';
+import moment from 'moment';
+import { useQuery } from '@apollo/client';
+import { GET_COMMITTEE_MEMBER_BY_ID, GET_FILE } from '../../graphql/query';
+import { Divider } from 'react-native-paper';
+import UserDetailsComponent from '../../component/userDetailsComponent/UserDetailsComponent';
+import { SIZES } from '../../themes/Sizes';
 
 const CommitteesDetails = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { item } = route.params;
+  const [fileResponse, setFileResponse] = useState([]);
+  const [userDetails, setUserDetails] = useState([]);
+  console.log({ item });
+
+  item?.attachDocumentIds?.map((id) => {
+    const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
+      variables: {
+        fileEntryId: id
+      },
+      onCompleted: (data) => {
+        if (data) {
+          setFileResponse((prev) => {
+            const pevDaa = prev?.filter((ite) => {
+              return ite.fileEnteryId !== data.fileEnteryId;
+            });
+            return [...pevDaa, data.uploadedFile];
+          });
+        }
+      }
+    });
+    if (error) {
+      console.log('file error', error);
+    }
+  });
+
+  item?.userIds?.map((id) => {
+    const { loading, error } = useQuery(GET_COMMITTEE_MEMBER_BY_ID, {
+      fetchPolicy: 'cache-and-network',
+      variables: {
+        userId: id
+      },
+      onCompleted: (data) => {
+        if (data) {
+          setUserDetails((prev) => {
+            const pevDaa = prev?.filter((ite) => {
+              return ite.userId !== data.committeeMemberById.userId;
+            });
+            return [...pevDaa, data.committeeMemberById];
+          });
+        }
+      }
+    });
+    if (error) {
+      console.log('get user error', error);
+    }
+  });
+
+  console.log({ userDetails });
 
   const generalDetails = (title, discription) => {
     return (
@@ -22,7 +80,7 @@ const CommitteesDetails = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       {/* header */}
       <Header
         name={'Committee details'}
@@ -32,41 +90,70 @@ const CommitteesDetails = () => {
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <Text style={styles.txtTitle}>General</Text>
-        {generalDetails(
-          'Committee title',
-          'Advisory Committee on Financial Management'
-        )}
-        {generalDetails('Committee ID', '32 943')}
-        {generalDetails('Committee category', 'AMC')}
-        {generalDetails(
-          'Discription ',
-          'We need to discuss what should be the main page and we have morw question'
-        )}
+        {generalDetails('Committee title', item.committeeTitle)}
+        {generalDetails('Committee ID', item.committeeId)}
+        {generalDetails('Committee category', item.categoryTitle)}
+        {generalDetails('Discription ', item.description)}
         <Text style={styles.txtTitle}>Date</Text>
         <View style={styles.subView}>
           <Text style={styles.txtSubDetails}>Setup date</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.txtSubDiscription}>23 Feb,2022</Text>
-            <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
-              Hijry{'  '} 30.06.1443
+            <Text style={styles.txtSubDiscription}>
+              {moment(item.setUpDate, 'YYYY-MM-DD').format('DD MMM, YYYY')}
             </Text>
+            {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
+              Hijry{'  '} 30.06.1443
+            </Text> */}
           </View>
         </View>
         <View style={styles.subView}>
           <Text style={styles.txtSubDetails}>Expiry date</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.txtSubDiscription}>24 Feb,2022</Text>
-            <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
-              Hijry{'  '} 30.06.1453
+            <Text style={styles.txtSubDiscription}>
+              {moment(item.expirationDate, 'YYYY-MM-DD').format('DD MMM, YYYY')}
             </Text>
+            {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
+              Hijry{'  '} 30.06.1453
+            </Text> */}
           </View>
         </View>
-        <Text style={styles.txtAttachedTitle}>ATTACHED FILES</Text>
-        <FilesCard filePath={'videoQuestion...mov'} fileSize={'837 KB'} />
-        <FilesCard filePath={'archi...zip'} fileSize={'837 KB'} />
-        <Text style={styles.txtTitle}>Users</Text>
+        {fileResponse?.length > 0 && (
+          <AttachFiles
+            fileResponse={fileResponse}
+            setFileResponse={setFileResponse}
+            showAttachButton={false}
+            deleted={false}
+            download={true}
+            isShowAttchTitle={true}
+          />
+        )}
+        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
+        <View style={{ marginHorizontal: SIZES[16] }}>
+          <Text style={styles.txtTitle}>Users</Text>
+        </View>
+        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
+        <UserDetailsComponent
+          users={userDetails}
+          isGeneralUser={true}
+          committee={item.committeeTitle}
+          // onChecked={setOnAllUserClick}
+          isCheckboxView={false}
+          // visibleIndex={visibleIndex}
+          // setVisibleIndex={setVisibleIndex}
+          openPopup={false}
+          searchText={''}
+        />
+        {/* <UserDetailsComponent
+          users={userDetails}
+          isUserRequired={true}
+          isSwitchOnRow={true}
+          isSwichDisabled={true}
+          searchText={''}
+          visibleIndex={-1}
+          setVisibleIndex={() => {}}
+        /> */}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -103,5 +190,10 @@ const styles = StyleSheet.create({
     color: Colors.secondary,
     marginTop: Normalize(40),
     marginBottom: Normalize(22)
+  },
+  divider: {
+    width: '100%',
+    color: Colors.line,
+    height: 1
   }
 });

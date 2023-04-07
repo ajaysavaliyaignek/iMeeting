@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SIZES } from '../../themes/Sizes';
 import CheckBox from '../checkBox/CheckBox';
@@ -12,16 +12,25 @@ const TreeView = ({
   onToggle,
   togglecheck,
   valueType,
-  toggleUsersCheckBox
+  toggleUsersCheckBox,
+  selectedCommittees,
+  selectedUsers
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [checked, setChecked] = useState(false);
-  console.log('item', item);
-  console.log('valueType', valueType);
+
   const handleToggle = () => {
     setExpanded(!expanded);
     onToggle && onToggle(!expanded);
   };
+
+  useEffect(() => {
+    selectedCommittees?.map((committee) => {
+      if (committee == item.committeeId) {
+        setChecked(true);
+      }
+    });
+  }, []);
 
   return (
     <View style={{ marginTop: 16 }}>
@@ -40,7 +49,6 @@ const TreeView = ({
             onValueChange={(value) => {
               setChecked(value);
               togglecheck(value, item);
-              console.log('value', value);
             }}
           />
         )}
@@ -57,6 +65,8 @@ const TreeView = ({
               togglecheck={togglecheck}
               valueType={valueType}
               toggleUsersCheckBox={toggleUsersCheckBox}
+              selectedCommittees={selectedCommittees}
+              selectedUsers={selectedUsers}
             />
           ))}
           {item?.userNames?.length > 0 &&
@@ -67,8 +77,9 @@ const TreeView = ({
                 <UserCommittee
                   user={user}
                   index={index}
-                      toggleUsersCheckBox={toggleUsersCheckBox}
-                      item={item}
+                  toggleUsersCheckBox={toggleUsersCheckBox}
+                  item={item}
+                  selectedUsers={selectedUsers}
                 />
               );
             })}

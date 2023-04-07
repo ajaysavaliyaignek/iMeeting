@@ -7,13 +7,16 @@ import {
   Keyboard
 } from 'react-native';
 import React, { useState } from 'react';
-import DropDownPicker from 'react-native-dropdown-picker';
+// import DropDownPicker from 'react-native-dropdown-picker';
 import { useMutation, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 
-// import DropDownPicker from '../../../component/DropDownPicker/DropDownPicker';
-import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
+import DropDownPicker from '../../../component/DropDownPicker/DropDownPicker';
+import {
+  GET_All_SUBJECTS,
+  GET_LIVE_MEETING_USERS
+} from '../../../graphql/query';
 import Header from '../../../component/header/Header';
 import { IconName } from '../../../component';
 import { styles } from './styles';
@@ -29,7 +32,14 @@ const AddSpeaker = () => {
   const navigation = useNavigation();
   const { meetingId, activeScreen, speaker } = route?.params;
   const [users, setUsers] = useState([]);
+  const [subjectList, setSubjectList] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openSubject, setOpenSubject] = useState(false);
+  const [valueSubject, setValueSubject] = useState(
+    // activeScreen !== 'AddSpeaker' ? speaker.subjectId
+    //   :
+    null
+  );
   const [valueUser, setValueUser] = useState(
     activeScreen == 'AddSpeaker' ? null : speaker?.userId
   );
@@ -52,7 +62,37 @@ const AddSpeaker = () => {
     }
   });
 
-  const [updateSpeaker] = useMutation(UPDATE_SPEAKER, {
+  // get subjects for dropdown
+  const {
+    loading: SubjectsLoading,
+    error: SubjectsError,
+    data: SubjectsData
+  } = useQuery(GET_All_SUBJECTS, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      committeeIds: '',
+      searchValue: '',
+      screen: 2,
+      page: -1,
+      pageSize: -1,
+      meetingId: meetingId
+    },
+
+    onCompleted: (data) => {
+      const subjectList = data.subjects.items?.map((item) => ({
+        label: item.subjectTitle,
+        value: item.subjectId
+      }));
+      setSubjectList(subjectList);
+
+      // setSubjectData(data?.subjects.items);
+    },
+    onError: (data) => {
+      console.log('subjects error---', data.message);
+    }
+  });
+
+  const [updateSpeaker, { loading }] = useMutation(UPDATE_SPEAKER, {
     refetchQueries: [
       {
         query: GET_LIVE_MEETING_USERS,
@@ -86,7 +126,17 @@ const AddSpeaker = () => {
               setOpen(false);
             }}
           >
-            <Text style={styles.txtTitle}>SELECT USER</Text>
+            <DropDownPicker
+              title={'SELECT USER'}
+              data={users?.map((item) => ({
+                label: item.userName,
+                value: item.userId
+              }))}
+              setData={setValueUser}
+              value={valueUser}
+              placeholder={''}
+            />
+            {/* <Text style={styles.txtTitle}>SELECT USER</Text>
             <DropDownPicker
               disabled={activeScreen == 'AddSpeaker' ? false : true}
               items={users?.map((item) => ({
@@ -101,8 +151,30 @@ const AddSpeaker = () => {
               style={{ borderWidth: 0, paddingLeft: 0 }}
               placeholder={''}
               disabledItemLabelStyle={{ color: Colors.line }}
+            /> */}
+
+            {/* <Divider style={styles.divider} />
+            <Text style={[styles.txtTitle, { marginTop: SIZES[24] }]}>
+              SELECT SUBJECT
+            </Text>
+            <DropDownPicker
+              items={subjectList}
+              value={valueSubject}
+              setValue={setValueSubject}
+              open={openSubject}
+              setOpen={setOpenSubject}
+              style={{ borderWidth: 0, paddingLeft: 0 }}
+              placeholder={''}
+              disabledItemLabelStyle={{ color: Colors.line }}
             />
-            <Divider style={styles.divider} />
+            <Divider style={styles.divider} /> */}
+            <DropDownPicker
+              title={'SELECT SUBJECT'}
+              data={subjectList}
+              setData={setValueSubject}
+              value={valueSubject}
+              placeholder={''}
+            />
 
             <View style={styles.timeContainer}>
               <Text style={styles.txtTitle}>TIME - IN - MINUTES</Text>
@@ -186,6 +258,12 @@ const AddSpeaker = () => {
             />
             <Button
               title={'Add speaker'}
+              isLoading={loading}
+              disable={
+                valueSubject === null || valueUser === null || time == ''
+                  ? true
+                  : false
+              }
               onPress={() => {
                 updateSpeaker({
                   variables: {
@@ -199,9 +277,12 @@ const AddSpeaker = () => {
                 });
               }}
               layoutStyle={[
-                // {
-                //     opacity: title === "" || discription === "" ? 0.5 : null,
-                // },
+                {
+                  opacity:
+                    valueSubject === null || valueUser === null || time == ''
+                      ? 0.5
+                      : 1
+                },
                 styles.nextBtnLayout
               ]}
               textStyle={styles.txtNextBtn}
@@ -224,6 +305,7 @@ const AddSpeaker = () => {
                 updateSpeaker({
                   variables: {
                     userDetail: {
+                      subjectId: valueSubject,
                       userId: valueUser,
                       meetingId: meetingId,
                       duration: time,
@@ -232,10 +314,18 @@ const AddSpeaker = () => {
                   }
                 });
               }}
+              disable={
+                valueSubject === null || valueUser === null || time == ''
+                  ? true
+                  : false
+              }
               layoutStyle={[
-                // {
-                //     opacity: title === "" || discription === "" ? 0.5 : null,
-                // },
+                {
+                  opacity:
+                    valueSubject === null || valueUser === null || time == ''
+                      ? 0.5
+                      : 1
+                },
                 styles.nextBtnLayout,
                 { width: '100%' }
               ]}

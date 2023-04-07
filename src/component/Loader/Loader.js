@@ -2,7 +2,7 @@ import { View, ActivityIndicator } from 'react-native';
 import React from 'react';
 import { Colors } from '../../themes/Colors';
 
-const Loader = ({ layOutStyle, color }) => {
+const Loader = ({ layOutStyle, color, size }) => {
   return (
     <View
       style={[
@@ -10,7 +10,7 @@ const Loader = ({ layOutStyle, color }) => {
         layOutStyle
       ]}
     >
-      <ActivityIndicator color={color} size="large" />
+      <ActivityIndicator color={color} size={size} />
     </View>
   );
 };

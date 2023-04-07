@@ -29,6 +29,7 @@ const VideoConferenceList = () => {
   const [videoConferences, setVideoConferences] = useState([]);
 
   const getAllVideoConferences = useQuery(GET_ALL_VIDEO_CONFERENCES, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       date: '',
       page: -1,
@@ -85,6 +86,7 @@ const VideoConferenceList = () => {
                 details: null
               });
             }}
+            style={styles.addButton}
           >
             <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />
           </TouchableOpacity>
@@ -129,7 +131,21 @@ const VideoConferenceList = () => {
           <View></View>
         )}
         {getAllVideoConferences.loading ? (
-          <Loader />
+          <Loader color={Colors.primary} size={'large'} />
+        ) : getAllVideoConferences.error ? (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
+              {getAllVideoConferences.error.message == 'Network request failed'
+                ? 'No Internet connection'
+                : getAllVideoConferences.error.message}
+            </Text>
+          </View>
         ) : videoConferences.length > 0 ? (
           <FlatList
             data={videoConferences}

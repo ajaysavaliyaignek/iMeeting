@@ -1,12 +1,13 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Voice from '@react-native-community/voice';
+import { Divider } from 'react-native-paper';
+
 import { styles } from './styles';
 import IconName from '../Icon/iconName';
 import Icon from '../Icon';
 import { SIZES } from '../../themes/Sizes';
 import { Button } from '../button/Button';
-import { Divider } from 'react-native-paper';
 
 const SerachAndButtoncomponent = ({
   onChangeText,
@@ -69,7 +70,15 @@ const SerachAndButtoncomponent = ({
           onChangeText={onChangeText}
         />
         {!start ? (
-          <TouchableOpacity onPress={startRecording}>
+          <TouchableOpacity
+            onPress={startRecording}
+            style={{
+              height: SIZES[20],
+              width: SIZES[20],
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <Icon
               name={IconName.Speaker}
               height={SIZES[15]}
@@ -77,7 +86,15 @@ const SerachAndButtoncomponent = ({
             />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={stopRecording}>
+          <TouchableOpacity
+            onPress={stopRecording}
+            style={{
+              height: SIZES[20],
+              width: SIZES[20],
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <Icon name={IconName.Close} height={SIZES[15]} width={SIZES[10]} />
           </TouchableOpacity>
         )}

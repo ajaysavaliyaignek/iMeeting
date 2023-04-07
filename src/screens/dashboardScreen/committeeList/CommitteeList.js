@@ -9,7 +9,7 @@ import Loader from '../../../component/Loader/Loader';
 import { Colors } from '../../../themes/Colors';
 import { Fonts } from '../../../themes';
 
-const CommitteeList = ({ isProfileCommittee }) => {
+const CommitteeList = ({ isProfileCommittee, activeIndex, setActiveIndex }) => {
   const [committees, setCommittees] = useState([]);
   const [filterCommittees, setFilterCommittees] = useState([]);
   const [searchText, setSearchText] = useState('');
@@ -20,7 +20,7 @@ const CommitteeList = ({ isProfileCommittee }) => {
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
     fetchPolicy: 'cache-and-network',
-    variables: { head: true, secretary: true, member: true ,type:8},
+    variables: { head: true, secretary: true, member: true, type: 8 },
     onCompleted: (data) => {
       if (data) {
         setCommittees(data?.committeesByRole?.items);
@@ -57,7 +57,7 @@ const CommitteeList = ({ isProfileCommittee }) => {
         />
       )}
       {CommitteeLoading ? (
-        <Loader color={Colors.primary} />
+        <Loader color={Colors.primary} size={'large'} />
       ) : committees.length > 0 ? (
         <FlatList
           data={committees}
@@ -69,6 +69,8 @@ const CommitteeList = ({ isProfileCommittee }) => {
                 index={index}
                 searchText={searchText}
                 isProfileCommittee={isProfileCommittee}
+                activeIndex={activeIndex}
+                setActiveIndex={setActiveIndex}
               />
             );
           }}

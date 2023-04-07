@@ -18,6 +18,7 @@ import TasksDetailsCard from '../../../component/Cards/tasksDetailsCard/TasksDet
 import { Fonts } from '../../../themes';
 import { Colors } from '../../../themes/Colors';
 import Loader from '../../../component/Loader/Loader';
+import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const LiveApproveMeetingSubjectTaskDetails = ({
   meetingData,
@@ -43,11 +44,18 @@ const LiveApproveMeetingSubjectTaskDetails = ({
           variables: {
             searchValue: searchText,
             onlyMyTask: false,
-            meetingId: meetingData?.meetingId,
-            subjectId: 0,
+            meetingId:
+              meetingData !== null
+                ? meetingData?.meetingId
+                : subjectData.meetingId !== null
+                ? subjectData.meetingId
+                : 0,
+            subjectId:
+              subjectData.subjectId == undefined ? 0 : subjectData.subjectId,
             taskTypeIds: filterTaskType[0]?.id?.toString(),
             page: -1,
-            pageSize: -1
+            pageSize: -1,
+            sort: ''
           }
         });
       }
@@ -57,10 +65,11 @@ const LiveApproveMeetingSubjectTaskDetails = ({
     }
   });
 
-  const [TasksData, { Tasks }] = useLazyQuery(GET_ALL_TASKS, {
+  const [TasksData, Tasks] = useLazyQuery(GET_ALL_TASKS, {
     fetchPolicy: 'cache-and-network',
 
     onCompleted: (data) => {
+      console.log({ task: data?.tasks.items });
       setTasksData(data?.tasks.items);
     },
     onError: (data) => {
@@ -69,18 +78,13 @@ const LiveApproveMeetingSubjectTaskDetails = ({
   });
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.searchContainer}>
-        <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-        <TextInput
-          style={styles.textInput}
-          placeholder={'Search'}
-          onChangeText={(text) => setSearchText(text)}
-        />
-        <TouchableOpacity onPress={() => {}}>
-          <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
-        </TouchableOpacity>
-      </View>
-      <Divider style={styles.divider} />
+      <SerachAndButtoncomponent
+        isButtonShow={false}
+        role={'Member'}
+        onChangeText={setSearchText}
+        value={searchText}
+      />
+
       {tasksData?.length > 0 ? (
         <FlatList
           data={tasksData}
@@ -112,11 +116,13 @@ const LiveApproveMeetingSubjectTaskDetails = ({
           style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
         >
           <Text style={{ ...Fonts.PoppinsSemiBold[20], color: Colors.primary }}>
-            {Tasks?.error?.message}
+            {Tasks.error.message == 'Network request failed'
+              ? 'No Internet connection'
+              : Tasks.error.message}
           </Text>
         </View>
       ) : Tasks?.loading ? (
-        <Loader color={Colors.primary} />
+        <Loader color={Colors.primary} size={'large'} />
       ) : (
         <View
           style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}

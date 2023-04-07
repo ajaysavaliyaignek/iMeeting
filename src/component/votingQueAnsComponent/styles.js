@@ -10,5 +10,17 @@ export const styles = StyleSheet.create({
   },
   questionContainer: {
     paddingVertical: SIZES[18]
+  },
+  txtEditBtn: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.primary
+  },
+  editBtn: {
+    borderBottomWidth: SIZES[1],
+    borderBottomColor: Colors.primary,
+
+    width: '30%',
+    alignSelf: 'flex-end',
+    alignItems: 'center'
   }
 });

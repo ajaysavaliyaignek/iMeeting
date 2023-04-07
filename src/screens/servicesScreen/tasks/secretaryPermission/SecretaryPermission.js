@@ -53,6 +53,7 @@ const SecretaryPermission = () => {
   const [getTaskSecretaryPermission, {}] = useLazyQuery(
     GET_TASK_SECRETARY_PERMISSION,
     {
+      fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         if (data) {
           setSecretoryPermission(data.taskSecretaryPermission);
@@ -69,6 +70,7 @@ const SecretaryPermission = () => {
     }
   );
   const [getRoles] = useLazyQuery(GET_ROLES, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data) {
         newRoles = data.roleList.roles.map((role, index) => {

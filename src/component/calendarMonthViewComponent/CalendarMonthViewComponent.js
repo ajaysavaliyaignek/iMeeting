@@ -65,6 +65,7 @@ const CalendarMonthViewComponent = () => {
   }, [begin]);
 
   const [getCalenderEvents] = useLazyQuery(GET_CALENDER_EVENTS, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data?.calendarEventsMobile?.events !== {}) {
         var key = Object.keys(data?.calendarEventsMobile?.events);

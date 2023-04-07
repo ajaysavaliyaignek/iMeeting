@@ -142,9 +142,6 @@ const SubjectDetailsComponent = ({
               />
               <TouchableOpacity
                 onPress={() => {
-                  console.log('commenttext', commenttext);
-                  console.log('parentCommentId', comments.commentId);
-
                   if (commentId == null) {
                     addComment({
                       variables: {

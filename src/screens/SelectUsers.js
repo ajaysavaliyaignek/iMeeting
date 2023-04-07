@@ -9,10 +9,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { useQuery } from '@apollo/client';
-import Voice from '@react-native-community/voice';
 
 import Header from '../component/header/Header';
-import { Icon, IconName } from '../component';
+import { IconName } from '../component';
 import { SIZES } from '../themes/Sizes';
 import { Colors } from '../themes/Colors';
 import { Fonts } from '../themes';
@@ -20,11 +19,13 @@ import { Button } from '../component/button/Button';
 import { GET_All_USERS } from '../graphql/query';
 import Loader from '../component/Loader/Loader';
 import UserDetailsComponent from '../component/userDetailsComponent/UserDetailsComponent';
+import SerachAndButtoncomponent from '../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
 const SelectUsers = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { committee, previousUser, onUpdateSelection } = route?.params;
+  const { committee, previousUser, onUpdateSelection, type } = route?.params;
+  console.log({ committee });
   //set all user to the list
   const [allUsers, setAllUsers] = useState();
   const [externalUser, setExternalUser] = useState();
@@ -35,36 +36,6 @@ const SelectUsers = () => {
   const [visibleIndex, setVisibleIndex] = useState(-1);
   var usersData = [];
   var externalUserData = [];
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStartHandler = (e) => {
-    console.log('startHandler', e);
-  };
-
-  const onSpeechEndHandler = (e) => {
-    console.log('onSpeechEndHandler', e);
-  };
-
-  const onSpeechResultsHandler = (e) => {
-    console.log('onSpeechResultsHandler', e);
-    let text = e.value[0];
-    setSearchText(text);
-  };
-  const startRecording = async () => {
-    try {
-      await Voice.start('en-US');
-    } catch (error) {
-      console.log('voice error', error);
-    }
-  };
 
   const setOnAllUserClick = (item) => {
     allUsers.map((user) => {
@@ -119,10 +90,20 @@ const SelectUsers = () => {
   const { loading: UsersLoading, error: UsersError } = useQuery(GET_All_USERS, {
     fetchPolicy: 'cache-and-network',
     variables: {
-      isDeleted: true,
+      isDeleted: false,
       externalUser: false,
       searchValue: searchText,
-      organizationId: committee
+      organizationId:
+        // committee == null ? 0 :
+        committee
+      // type:
+      //   type == 'Meeting'
+      //     ? 1
+      //     : type == 'Appointment'
+      //     ? 4
+      //     : type == 'VideoConference'
+      //     ? 5
+      //     : 6
     },
     onCompleted: (data) => {
       usersData = data?.committeeMembersList.items.map((item, index) => {
@@ -150,9 +131,18 @@ const SelectUsers = () => {
     {
       fetchPolicy: 'cache-and-network',
       variables: {
-        isDeleted: true,
+        isDeleted: false,
         externalUser: true,
-        searchValue: searchText
+        searchValue: searchText,
+        organizationId: 0
+        // type:
+        //   type == 'Meeting'
+        //     ? 1
+        //     : type == 'Appointment'
+        //     ? 4
+        //     : type == 'VideoConference'
+        //     ? 5
+        //     : 6
       },
       onCompleted: (data) => {
         externalUserData = data?.committeeMembersList.items.map(
@@ -176,13 +166,12 @@ const SelectUsers = () => {
         // if (data) {
         //   setExternalUser(data?.committeeMembersList.items);
         // }
+      },
+      onError: (data) => {
+        console.log('externalUsersError error', data.message);
       }
     }
   );
-
-  if (externalUsersError) {
-    console.log('externalUsersError error', externalUsersError);
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -193,30 +182,19 @@ const SelectUsers = () => {
         onLeftPress={() => navigation.goBack()}
       />
       <View style={styles.subContainer}>
-        <View style={styles.searchContainer}>
-          <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={'Search'}
-            placeholderTextColor={Colors.secondary}
-            onChangeText={
-              (text) =>
-                activeTab == '0'
-                  ? setSearchText(text)
-                  : activeTab == '1'
-                  ? setSearchText(text)
-                  : null
-              // searchFilterUsers(text, user, setSearchText, setFilterData)
-            }
-          />
-          <TouchableOpacity onPress={() => startRecording()}>
-            <Icon
-              name={IconName.Speaker}
-              height={SIZES[15]}
-              width={SIZES[10]}
-            />
-          </TouchableOpacity>
-        </View>
+        <SerachAndButtoncomponent
+          isButtonShow={false}
+          role={'Member'}
+          onChangeText={(text) =>
+            activeTab == '0'
+              ? setSearchText(text)
+              : activeTab == '1'
+              ? setSearchText(text)
+              : null
+          }
+          value={searchText}
+        />
+
         <View style={styles.btnContainer}>
           <Button
             title={'Users'}
@@ -251,7 +229,7 @@ const SelectUsers = () => {
           <View style={{ flex: 1 }}>
             <Divider style={styles.divider} />
             {UsersLoading ? (
-              <Loader />
+              <Loader color={Colors.primary} size={'large'} />
             ) : (
               <UserDetailsComponent
                 users={allUsers}
@@ -275,11 +253,11 @@ const SelectUsers = () => {
               title={'Add external user'}
               layoutStyle={styles.btnExternalUser}
               textStyle={styles.txtBtnExternal}
-              onPress={() => navigation.navigate('AddExternalUser')}
+              onPress={() => navigation.navigate('AddExternalUser', { type })}
             />
             <Divider style={styles.divider} />
             {externalUsersLoading ? (
-              <Loader />
+              <Loader color={Colors.primary} size={'large'} />
             ) : (
               <UserDetailsComponent
                 users={externalUser}
@@ -377,7 +355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(118, 118, 128, 0.12)',
     borderRadius: SIZES[10],
-    marginBottom: SIZES[16],
+    marginVertical: SIZES[16],
     padding: SIZES[2],
     justifyContent: 'space-between',
     marginHorizontal: SIZES[16]

@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, Alert } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 
@@ -11,6 +11,9 @@ import { Button } from '../../../component/button/Button';
 import moment from 'moment';
 import { useMutation } from '@apollo/client';
 import { DELETE_DELEGATION } from '../../../graphql/mutation';
+import CheckBox from '../../../component/checkBox/CheckBox';
+import { Fonts } from '../../../themes';
+import { SIZES } from '../../../themes/Sizes';
 
 const DelegationDetails = () => {
   const navigation = useNavigation();
@@ -51,6 +54,29 @@ const DelegationDetails = () => {
     ]);
   };
 
+  const [types, setTypes] = useState([
+    {
+      type: 1,
+      title: 'Meeting',
+      isCheked: delegationData?.types.split(',').includes('1') ? true : false
+    },
+    {
+      type: 4,
+      title: 'Appointment',
+      isCheked: delegationData?.types.split(',').includes('4') ? true : false
+    },
+    {
+      type: 3,
+      title: 'Task',
+      isCheked: delegationData?.types.split(',').includes('3') ? true : false
+    },
+    {
+      type: 5,
+      title: 'Video conference',
+      isCheked: delegationData?.types.split(',').includes('5') ? true : false
+    }
+  ]);
+
   const GeneralDetails = ({ title, discription }) => {
     return (
       <View style={styles.subView}>
@@ -88,6 +114,32 @@ const DelegationDetails = () => {
           title={'Users'}
           discription={delegationData.transferredUserName}
         />
+      </View>
+
+      <View
+        style={{
+          backgroundColor: Colors.white,
+          paddingHorizontal: SIZES[16],
+          paddingBottom: SIZES[16]
+        }}
+      >
+        {types.map((type, index) => {
+          return (
+            <View
+              style={{
+                marginTop: SIZES[24],
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <Text style={{ ...Fonts.PoppinsRegular[14], color: Colors.bold }}>
+                {type.title}
+              </Text>
+              <CheckBox value={type.isCheked} disabled={true} />
+            </View>
+          );
+        })}
       </View>
 
       {!delegationData.isDisable && (

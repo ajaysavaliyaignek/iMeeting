@@ -93,6 +93,7 @@ const AddSubjectScreen = () => {
 
   if (isEdit) {
     const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         let users = data.userPayload?.userCommitteesDetail?.filter((user) => {
           if (user.organizationId == subjectDetails.committeeId) {
@@ -119,12 +120,6 @@ const AddSubjectScreen = () => {
   }, [user]);
 
   const [getAllSubjectStatus] = useLazyQuery(GET_ALL_SUBJECTS_STATUS, {
-    // variables: {
-    //   decision: false,
-    //   subject: true,
-    //   approveDecision: false,
-    //   momDecision: false
-    // },
     fetchPolicy: 'cache-and-network',
     onCompleted: (data, error) => {
       if (error) {
@@ -533,6 +528,7 @@ const AddSubjectScreen = () => {
           />
           <Button
             title={'Save'}
+            isLoading={loading}
             onPress={() => {
               addSubject({
                 variables: {

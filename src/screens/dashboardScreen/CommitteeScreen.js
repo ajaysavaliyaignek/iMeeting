@@ -46,7 +46,7 @@ const CommitteeScreen = () => {
   const { loading: CommitteeLoadingByRole, error: CommitteeErrorByRole } =
     useQuery(GET_COMMITTEES_BY_ROLE, {
       fetchPolicy: 'cache-and-network',
-      variables: { head: true, secretary: true, member: true,type:8 },
+      variables: { head: true, secretary: true, member: true, type: 8 },
       onCompleted: (data) => {
         if (data) {
           filterCommittee = data?.committeesByRole.items.map((item, index) => {
@@ -107,7 +107,7 @@ const CommitteeScreen = () => {
           Committees
         </Text>
         {CommitteeLoadingByRole ? (
-          <Loader color={Colors.primary} />
+          <Loader color={Colors.primary} size={'large'} />
         ) : CommitteeErrorByRole ? (
           <View
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}

@@ -38,9 +38,9 @@ const SubjectsCard = ({
   const [statusTitleOption, setstatusTitleOption] = useState([]);
   const [user, setUser] = useState({});
   const [decisionData, setDecisionData] = useState([]);
-  
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       let users = data.userPayload?.userCommitteesDetail?.filter((user) => {
         if (user.organizationId == item.committeeId) {
@@ -64,12 +64,6 @@ const SubjectsCard = ({
   }, [user]);
 
   const [getAllSubjectStatus] = useLazyQuery(GET_ALL_SUBJECTS_STATUS, {
-    // variables: {
-    //   decision: false,
-    //   subject: true,
-    //   approveDecision: false,
-    //   momDecision: false
-    // },
     fetchPolicy: 'cache-and-network',
     onCompleted: (data, error) => {
       if (error) {
@@ -295,7 +289,7 @@ const SubjectsCard = ({
             subjectId={item.subjectId}
             decisionData={decisionData}
             setDecisionData={setDecisionData}
-            isMomDecision={is}
+            isMomDecision={isMomDecision}
             item={item}
             meetingData={meetingData}
           />
@@ -332,7 +326,11 @@ const SubjectsCard = ({
           }}
           activeOpacity={0.5}
         >
-          {getHighlightedText(item.subjectTitle, searchText)}
+          {getHighlightedText(
+            item.subjectTitle,
+            searchText,
+            (styleTitle = { width: '100%' })
+          )}
           {/* {getHighlightedText(item.subjectTitle)} */}
 
           {/* subject details */}
@@ -394,7 +392,11 @@ const SubjectsCard = ({
           }}
           activeOpacity={0.5}
         >
-          {getHighlightedText(item.subjectTitle, searchText)}
+          {getHighlightedText(
+            item.subjectTitle,
+            searchText,
+            (styleTitle = { width: '100%' })
+          )}
           {/* {getHighlightedText(item.subjectTitle)} */}
           {/* subject details */}
 
@@ -415,7 +417,11 @@ const SubjectsCard = ({
           }}
           activeOpacity={0.5}
         >
-          {getHighlightedText(item.subjectTitle, searchText)}
+          {getHighlightedText(
+            item.subjectTitle,
+            searchText,
+            (styleTitle = { width: '100%' })
+          )}
           {/* {getHighlightedText(item.subjectTitle)} */}
           {/* subject details */}
           <RowData name={'Category'} discription={item.subjectCategoryName} />
@@ -435,6 +441,7 @@ const SubjectsCard = ({
       <TouchableOpacity
         onPress={() => setVisibleIndex(visibleIndex == -1 ? index : -1)}
         style={styles.dotsView}
+        activeOpacity={0.6}
       >
         <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>

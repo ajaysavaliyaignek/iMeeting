@@ -55,5 +55,11 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginLeft: SIZES[16]
+  },
+  addButton: {
+    height: SIZES[24],
+    width: SIZES[24],
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
