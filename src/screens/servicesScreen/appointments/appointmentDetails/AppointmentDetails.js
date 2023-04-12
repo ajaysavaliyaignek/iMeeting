@@ -314,7 +314,8 @@ const AppointmentsDetails = () => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   width: '70%',
-                  marginBottom: fileResponse?.length > 0 ? 0 : SIZES[24]
+                  marginBottom: fileResponse?.length > 0 ? 0 : SIZES[24],
+                  marginTop: 8
                 }}
               >
                 <TouchableOpacity

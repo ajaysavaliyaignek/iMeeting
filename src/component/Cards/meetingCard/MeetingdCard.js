@@ -35,17 +35,18 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
     {
       // export const GET_All_SUBJECTS = gql`
       refetchQueries: [
-        {
-          query: GET_All_MEETING,
-          variables: {
-            onlyMyMeeting: false,
-            committeeIds: '',
-            screen: 0,
-            searchValue: '',
-            page: -1,
-            pageSize: -1
-          }
-        }
+        'meetings'
+        // {
+        //   query: GET_All_MEETING,
+        //   variables: {
+        //     onlyMyMeeting: false,
+        //     committeeIds: '',
+        //     screen: 0,
+        //     searchValue: '',
+        //     page: -1,
+        //     pageSize: -1
+        //   }
+        // }
       ],
       onCompleted: (data) => {
         console.log('delete meeting', data.deleteMeeting.status);

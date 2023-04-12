@@ -80,14 +80,14 @@ const CommitteeExpandedView = () => {
     if (value) {
       setUsers((prev) => {
         const pevDaa = prev?.filter((ite) => {
-          return ite !== item;
+          return ite.userId !== item.userId;
         });
         return [...pevDaa, item];
       });
     } else {
       setUsers((prev) => {
         const pevDaa = prev?.filter((ite) => {
-          return ite !== item;
+          return ite.userId !== item.userId;
         });
         return [...pevDaa];
       });

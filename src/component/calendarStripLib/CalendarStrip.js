@@ -283,7 +283,7 @@ class CalendarStrip extends Component {
     return (
       <View style={styles.container} {...this._panResponder.panHandlers}>
         {this._renderHeader()}
-
+        <View></View>
         <Weeks isChinese={isChinese} weekStartsOn={weekStartsOn} />
 
         <FlatList

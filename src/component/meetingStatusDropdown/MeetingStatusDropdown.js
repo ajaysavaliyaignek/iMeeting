@@ -9,11 +9,35 @@ import { SIZES } from '../../themes/Sizes';
 import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
 import { UPDATE_MEETING_STATUS } from '../../graphql/mutation';
+import Icon from '../Icon';
+import IconName from '../Icon/iconName';
+import { Path, Svg } from 'react-native-svg';
 
 const MeetingStatusDropdown = ({ item, statusId }) => {
   const [meetingStatusOption, setmeetingStatusOption] = useState([]);
   const [valueStatus, setValueStatus] = useState(item.meetingStatusTitle);
 
+  // function SelectIcon({ stroke }) {
+  //   return (
+  //     <Svg
+  //       xmlns="http://www.w3.org/2000/svg"
+  //       width="10"
+  //       height="8"
+  //       viewBox="0 0 14 8"
+  //       fill="none"
+  //       // style={{ marginTop: 4 }}
+  //     >
+  //       <Path
+  //         d="M1 1L7 7L13 1"
+  //         stroke={stroke}
+  //         strokeWidth="1.5"
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //       />
+  //     </Svg>
+  //   );
+  // }
+  // con
   const [UpdateMeetingStatus, { loading, error, data }] = useMutation(
     UPDATE_MEETING_STATUS,
     {
@@ -185,102 +209,10 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
     }
   });
 
-  const renderItem = (items) => {
-    return (
-      <TouchableOpacity
-        style={[styles.item, { opacity: items.isDisable ? 0.1 : 1 }]}
-        disabled={items.isDisable}
-        onPress={() => {
-          if (items.isDisable) {
-            setValueStatus(item.meetingStatusTitle);
-            return;
-          } else {
-            setValueStatus(items.label);
-            UpdateMeetingStatus({
-              variables: {
-                meeting: {
-                  meetingId: item.meetingId,
-                  meetingStatusId: items.value
-                }
-              }
-            });
-          }
-        }}
-      >
-        <Text
-          style={[
-            styles.textItem,
-            {
-              color:
-                items.label == 'Deleted'
-                  ? '#ff6347'
-                  : items.label == 'Live'
-                  ? '#008000'
-                  : items.label == 'Tentative'
-                  ? ' #89530d'
-                  : items.label == 'Cancelled'
-                  ? '#ff6347'
-                  : items.label == 'Closed'
-                  ? '#ff6347'
-                  : items.label == 'Pre-Scheduled'
-                  ? '#337ab7'
-                  : items.label == 'Scheduled'
-                  ? '#5f9ea0'
-                  : items.label == 'Soft-Closed'
-                  ? '#87ceeb'
-                  : Colors.bold
-            }
-          ]}
-        >
-          {items.label}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
   return (
     <View
       style={{
-        flex: 1,
-        paddingLeft: SIZES[4]
-        // backgroundColor:
-        //   item.meetingStatusTitle == 'Deleted'
-        //     ? '#ffc8be'
-        //     : item.meetingStatusTitle == 'Live'
-        //     ? '#5fda5f80'
-        //     : item.meetingStatusTitle == 'Tentative'
-        //     ? '#deb887'
-        //     : item.meetingStatusTitle == 'Cancelled'
-        //     ? '#ffcac1'
-        //     : item.meetingStatusTitle == 'Closed'
-        //     ? '#ffc8be'
-        //     : item.meetingStatusTitle == 'Pre-Scheduled'
-        //     ? '#b4dcff'
-        //     : item.meetingStatusTitle == 'Scheduled'
-        //     ? '#bff5f7'
-        //     : item.meetingStatusTitle == 'Soft-Closed'
-        //     ? '#4f7585'
-        //     : Colors.white,
-        // borderRadius: SIZES[4],
-        // paddingBottom: SIZES[6],
-        // borderBottomWidth: SIZES[1],
-        // borderBottomColor:
-        //   item.meetingStatusTitle == 'Deleted'
-        //     ? '#ff6347'
-        //     : item.meetingStatusTitle == 'Live'
-        //     ? '#008000'
-        //     : item.meetingStatusTitle == 'Tentative'
-        //     ? '#89530d'
-        //     : item.meetingStatusTitle == 'Cancelled'
-        //     ? '#ff6347'
-        //     : item.meetingStatusTitle == 'Closed'
-        //     ? '#ff6347'
-        //     : item.meetingStatusTitle == 'Pre-Scheduled'
-        //     ? '#337ab7'
-        //     : item.meetingStatusTitle == 'Scheduled'
-        //     ? '#5f9ea0'
-        //     : item.meetingStatusTitle == 'Soft-Closed'
-        //     ? '#87ceeb'
-        //     : Colors.bold
+        paddingLeft: SIZES[16]
       }}
     >
       <SelectList
@@ -295,6 +227,29 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
             }
           });
         }}
+        // arrowicon={
+        //   <SelectIcon
+        //     stroke={
+        //       item.meetingStatusTitle == 'Deleted'
+        //         ? '#ff6347'
+        //         : item.meetingStatusTitle == 'Live'
+        //         ? '#008000'
+        //         : item.meetingStatusTitle == 'Tentative'
+        //         ? '#89530d'
+        //         : item.meetingStatusTitle == 'Cancelled'
+        //         ? '#ff6347'
+        //         : item.meetingStatusTitle == 'Closed'
+        //         ? '#ff6347'
+        //         : item.meetingStatusTitle == 'Pre-Scheduled'
+        //         ? '#337ab7'
+        //         : item.meetingStatusTitle == 'Scheduled'
+        //         ? '#5f9ea0'
+        //         : item.meetingStatusTitle == 'Soft-Closed'
+        //         ? '#87ceeb'
+        //         : Colors.bold
+        //     }
+        //   />
+        // }
         inputStyles={{
           color:
             item.meetingStatusTitle == 'Deleted'
@@ -322,25 +277,10 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
         placeholder={valueStatus}
         boxStyles={{
           display: 'flex',
+          // alignSelf: 'center',
+          width: 200,
           borderRadius: SIZES[8],
-          borderColor:
-            item.meetingStatusTitle == 'Deleted'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Live'
-              ? '#008000'
-              : item.meetingStatusTitle == 'Tentative'
-              ? '#89530d'
-              : item.meetingStatusTitle == 'Cancelled'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Closed'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Pre-Scheduled'
-              ? '#337ab7'
-              : item.meetingStatusTitle == 'Scheduled'
-              ? '#5f9ea0'
-              : item.meetingStatusTitle == 'Soft-Closed'
-              ? '#87ceeb'
-              : Colors.bold,
+          borderColor: Colors.white,
           alignItems: 'center',
           backgroundColor:
             item.meetingStatusTitle == 'Deleted'
@@ -364,96 +304,6 @@ const MeetingStatusDropdown = ({ item, statusId }) => {
         dropdownTextStyles={{ ...Fonts.PoppinsRegular[14] }}
         disabledTextStyles={{ ...Fonts.PoppinsRegular[14] }}
       />
-      {/* <Dropdown
-        style={{
-          flex: 1,
-          paddingLeft: '30%'
-        }}
-        itemTextStyle={{
-          ...Fonts.PoppinsRegular[14],
-          color: Colors.bold
-        }}
-        placeholder={valueStatus}
-        disable={
-          item.yourRoleName !== 'Member' && item.meetingStatusTitle !== 'Closed'
-            ? false
-            : true
-        }
-        placeholderStyle={{
-          color:
-            item.meetingStatusTitle == 'Deleted'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Live'
-              ? '#008000'
-              : item.meetingStatusTitle == 'Tentative'
-              ? '#89530d'
-              : item.meetingStatusTitle == 'Cancelled'
-              ? '#ff6347;'
-              : item.meetingStatusTitle == 'Closed'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Pre-Scheduled'
-              ? '#337ab7'
-              : item.meetingStatusTitle == 'Scheduled'
-              ? '#5f9ea0'
-              : item.meetingStatusTitle == 'Soft-Closed'
-              ? '#87ceeb'
-              : Colors.bold,
-          ...Fonts.PoppinsRegular[14]
-        }}
-        data={meetingStatusOption}
-        valueField="value"
-        labelField="label"
-        value={valueStatus}
-        iconColor={
-          item.meetingStatusTitle == 'Deleted'
-            ? '#ff6347'
-            : item.meetingStatusTitle == 'Live'
-            ? '#008000'
-            : item.meetingStatusTitle == 'Tentative'
-            ? '#89530d'
-            : item.meetingStatusTitle == 'Cancelled'
-            ? '#ff6347'
-            : item.meetingStatusTitle == 'Closed'
-            ? '#ff6347'
-            : item.meetingStatusTitle == 'Pre-Scheduled'
-            ? '#337ab7'
-            : item.meetingStatusTitle == 'Scheduled'
-            ? '#5f9ea0'
-            : item.meetingStatusTitle == 'Soft-Closed'
-            ? '#87ceeb'
-            : Colors.bold
-        }
-        onChange={(items) => {
-          if (items.isDisable) {
-            return;
-          } else {
-            setValueStatus(items.label);
-          }
-        }}
-        selectedTextStyle={{
-          color:
-            item.meetingStatusTitle == 'Deleted'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Live'
-              ? '#008000'
-              : item.meetingStatusTitle == 'Tentative'
-              ? '#89530d'
-              : item.meetingStatusTitle == 'Cancelled'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Closed'
-              ? '#ff6347'
-              : item.meetingStatusTitle == 'Pre-Scheduled'
-              ? '#337ab7'
-              : item.meetingStatusTitle == 'Scheduled'
-              ? '#5f9ea0'
-              : item.meetingStatusTitle == 'Soft-Closed'
-              ? '#87ceeb'
-              : Colors.bold,
-          ...Fonts.PoppinsRegular[14]
-        }}
-        renderItem={(item) => renderItem(item)}
-        // visibleSelectedItem={false}
-      /> */}
     </View>
   );
 };

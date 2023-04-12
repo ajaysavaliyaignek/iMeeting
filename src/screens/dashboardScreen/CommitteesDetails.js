@@ -15,6 +15,7 @@ import { GET_COMMITTEE_MEMBER_BY_ID, GET_FILE } from '../../graphql/query';
 import { Divider } from 'react-native-paper';
 import UserDetailsComponent from '../../component/userDetailsComponent/UserDetailsComponent';
 import { SIZES } from '../../themes/Sizes';
+import AttachFiles from '../../component/attachFiles/AttachFiles';
 
 const CommitteesDetails = () => {
   const navigation = useNavigation();
@@ -67,8 +68,6 @@ const CommitteesDetails = () => {
       console.log('get user error', error);
     }
   });
-
-  console.log({ userDetails });
 
   const generalDetails = (title, discription) => {
     return (

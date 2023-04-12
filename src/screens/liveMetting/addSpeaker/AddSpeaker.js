@@ -168,13 +168,13 @@ const AddSpeaker = () => {
               disabledItemLabelStyle={{ color: Colors.line }}
             />
             <Divider style={styles.divider} /> */}
-            <DropDownPicker
+            {/* <DropDownPicker
               title={'SELECT SUBJECT'}
               data={subjectList}
               setData={setValueSubject}
               value={valueSubject}
               placeholder={''}
-            />
+            /> */}
 
             <View style={styles.timeContainer}>
               <Text style={styles.txtTitle}>TIME - IN - MINUTES</Text>
@@ -259,11 +259,7 @@ const AddSpeaker = () => {
             <Button
               title={'Add speaker'}
               isLoading={loading}
-              disable={
-                valueSubject === null || valueUser === null || time == ''
-                  ? true
-                  : false
-              }
+              disable={valueUser === null || time == '' ? true : false}
               onPress={() => {
                 updateSpeaker({
                   variables: {
@@ -278,10 +274,7 @@ const AddSpeaker = () => {
               }}
               layoutStyle={[
                 {
-                  opacity:
-                    valueSubject === null || valueUser === null || time == ''
-                      ? 0.5
-                      : 1
+                  opacity: valueUser === null || time == '' ? 0.5 : 1
                 },
                 styles.nextBtnLayout
               ]}
@@ -305,7 +298,7 @@ const AddSpeaker = () => {
                 updateSpeaker({
                   variables: {
                     userDetail: {
-                      subjectId: valueSubject,
+                      // subjectId: valueSubject,
                       userId: valueUser,
                       meetingId: meetingId,
                       duration: time,
@@ -314,17 +307,10 @@ const AddSpeaker = () => {
                   }
                 });
               }}
-              disable={
-                valueSubject === null || valueUser === null || time == ''
-                  ? true
-                  : false
-              }
+              disable={valueUser === null || time == '' ? true : false}
               layoutStyle={[
                 {
-                  opacity:
-                    valueSubject === null || valueUser === null || time == ''
-                      ? 0.5
-                      : 1
+                  opacity: valueUser === null || time == '' ? 0.5 : 1
                 },
                 styles.nextBtnLayout,
                 { width: '100%' }

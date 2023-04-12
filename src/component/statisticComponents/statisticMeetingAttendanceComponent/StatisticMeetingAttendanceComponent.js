@@ -22,15 +22,19 @@ const StatisticMeetingAttendanceComponent = ({
         />
       </View>
       <View style={styles.chartContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <BarCharts
-            title={'Attendance'}
-            selectedCommittees={selectedCommittees}
-            startDate={startDate}
-            endDate={endDate}
-            type={12}
-          />
-        </ScrollView>
+        {/* <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flex: 1 }}
+        > */}
+        <BarCharts
+          title={'Attendance'}
+          selectedCommittees={selectedCommittees}
+          startDate={startDate}
+          endDate={endDate}
+          type={12}
+        />
+        {/* </ScrollView> */}
       </View>
     </ScrollView>
   );

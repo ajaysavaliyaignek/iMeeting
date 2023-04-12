@@ -59,7 +59,7 @@ const SubjectDetailsComponent = ({
       </View>
     );
   };
-
+  console.log({ comments });
   return (
     <ScrollView
       style={styles.subContainer}
@@ -101,16 +101,20 @@ const SubjectDetailsComponent = ({
               keyExtractor={(item, index) => {
                 return index.toString();
               }}
-              renderItem={({ item, index }) => (
-                <CommentCard
-                  item={item}
-                  commentThreadId={commentThreadId}
-                  index={index}
-                  setComment={setCommentText}
-                  setCommentId={setCommentId}
-                  commenttext={commenttext}
-                />
-              )}
+              renderItem={({ item, index }) => {
+                return (
+                  <CommentCard
+                    item={item}
+                    commentThreadId={commentThreadId}
+                    index={index}
+                    setComment={setCommentText}
+                    setCommentId={setCommentId}
+                    commenttext={commenttext}
+                    commentId={commentId}
+                    child={false}
+                  />
+                );
+              }}
             />
           </View>
 
@@ -142,26 +146,32 @@ const SubjectDetailsComponent = ({
               />
               <TouchableOpacity
                 onPress={() => {
-                  if (commentId == null) {
-                    addComment({
-                      variables: {
-                        comment: {
-                          comment: commenttext,
-                          commentId: 0,
-                          parentCommentId: comments.commentId
-                        }
-                      }
-                    });
-                  } else {
-                    addComment({
-                      variables: {
-                        comment: {
-                          comment: commenttext,
-                          commentId: commentId
-                        }
-                      }
-                    });
-                  }
+                  console.log({
+                    comment: commenttext,
+                    commentId: commentId,
+                    parentCommentId: comments?.commentId
+                  });
+                  // if (commentId == null) {
+                  //   addComment({
+                  //     variables: {
+                  //       comment: {
+                  //         comment: commenttext,
+                  //         commentId: 0,
+                  //         parentCommentId: comments?.commentId
+                  //       }
+                  //     }
+                  //   });
+                  // } else {
+                  //   addComment({
+                  //     variables: {
+                  //       comment: {
+                  //         comment: commenttext,
+                  //         commentId: commentId,
+                  //         parentCommentId: 0
+                  //       }
+                  //     }
+                  //   });
+                  // }
 
                   setCommentText('');
                 }}

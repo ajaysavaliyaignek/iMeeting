@@ -19,13 +19,14 @@ const CommentCard = ({
   index,
   setComment,
   setCommentId,
-  commenttext
+  commenttext,
+  child
 }) => {
   const [openReply, setOpenReply] = useState(false);
   const [replyEdit, setReplyEdit] = useState(false);
   const [reply, setReply] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [edit, setEdit] = useState(false);
+  const [edit, setEdit] = useState(true);
   const [childCommentId, setChildCommentId] = useState(null);
   const [parentCommentId, setParentCommentId] = useState(null);
   const [valueIndex, setValueIndex] = useState(-1);
@@ -40,6 +41,8 @@ const CommentCard = ({
     onCompleted: (data) => {
       if (data.addComment.status.statusCode == 200) {
         setChildCommentId(null);
+        setComment('');
+        setReply(false);
       }
     },
     onError: (data) => {
@@ -49,7 +52,7 @@ const CommentCard = ({
 
   return (
     <TouchableOpacity
-      style={{ marginVertical: SIZES[28], flex: 1 }}
+      style={{ marginTop: SIZES[28], flex: 1 }}
       key={index}
       onPress={() => setValueIndex(-1)}
       activeOpacity={1}
@@ -62,12 +65,13 @@ const CommentCard = ({
         replyEdit={replyEdit}
         setReplyEdit={setReplyEdit}
         commentThreadId={commentThreadId}
-        setCommentText={setComment || setCommentText}
+        setCommentText={setComment}
         showReply={true}
         valueIndex={valueIndex}
         setValueIndex={setValueIndex}
         setCommentId={setCommentId}
-        child={false}
+        child={child}
+        setEdit={setEdit}
       />
 
       {replyEdit && (
@@ -81,7 +85,7 @@ const CommentCard = ({
             flexDirection: 'row',
             alignItems: 'center',
             marginTop: SIZES[32],
-            marginBottom: SIZES[24],
+
             flex: 1
           }}
         >
@@ -94,17 +98,27 @@ const CommentCard = ({
             underlineColor={Colors.white}
             activeUnderlineColor={Colors.white}
             placeholder={'Reply'}
-            onChangeText={(text) => setCommentText(text)}
-            value={commentText || commenttext}
+            onChangeText={(text) => setComment(text)}
+            value={commenttext}
           />
           <TouchableOpacity
-            disabled={commentText !== '' ? false : true}
+            disabled={commenttext !== '' ? false : true}
             onPress={() => {
-              if (childCommentId != null) {
+              if (!replyEdit) {
                 addComment({
                   variables: {
                     comment: {
-                      comment: commentText,
+                      comment: commenttext,
+                      parentCommentId: 0,
+                      commentId: item.commentId
+                    }
+                  }
+                });
+              } else if (!edit) {
+                addComment({
+                  variables: {
+                    comment: {
+                      comment: commenttext,
                       parentCommentId: 0,
                       commentId: item.commentId
                     }
@@ -114,16 +128,13 @@ const CommentCard = ({
                 addComment({
                   variables: {
                     comment: {
-                      comment: commentText,
+                      comment: commenttext,
                       commentId: 0,
                       parentCommentId: item.commentId
                     }
                   }
                 });
               }
-
-              setCommentText('');
-              setReply(false);
             }}
           >
             <Icon name={IconName.Send} height={SIZES[22]} width={SIZES[20]} />
@@ -132,97 +143,22 @@ const CommentCard = ({
       )}
       {openReply && item.childComment.length > 0 && (
         <TouchableOpacity
-          style={{ marginLeft: SIZES[24], marginTop: SIZES[24], flex: 1 }}
+          style={{ marginLeft: !child ? SIZES[24] : null, flex: 1 }}
           onPress={() => setOpenChildModel(false)}
           activeOpacity={1}
         >
           {/* <CommentCard /> */}
-          {item.childComment.map((comment, index) => {
+          {item?.childComment?.map((comment, index) => {
             return (
-              <View style={{ flex: 1 }}>
-                <Comments
-                  childIndex={index}
-                  item={comment}
-                  setReply={setReply}
-                  reply={reply}
-                  commentThreadId={commentThreadId}
-                  setComment={setComment}
-                  setOpenReply={setOpenReply}
-                  openReply={openReply}
-                  showReply={false}
-                  valueIndex={valueIndex}
-                  setValueIndex={setValueIndex}
-                  setCommentText={setCommentText}
-                  setChildCommentId={setChildCommentId}
-                  child={true}
-                  setParentCommentId={setParentCommentId}
-                />
-
-                {reply && (
-                  <View
-                    style={{
-                      paddingVertical: SIZES[14],
-                      paddingHorizontal: SIZES[16],
-                      borderWidth: SIZES[1],
-                      borderColor: Colors.line,
-                      borderRadius: SIZES[8],
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginTop: SIZES[32],
-                      marginBottom: SIZES[24],
-                      flex: 1
-                    }}
-                  >
-                    <TextInput
-                      style={{
-                        flex: 1,
-                        height: SIZES[30],
-                        backgroundColor: Colors.white
-                      }}
-                      underlineColor={Colors.white}
-                      activeUnderlineColor={Colors.white}
-                      placeholder={'Reply'}
-                      onChangeText={(text) => setCommentText(text)}
-                      value={commentText}
-                    />
-                    <TouchableOpacity
-                      disabled={commentText !== '' ? false : true}
-                      onPress={() => {
-                        if (childCommentId != null) {
-                          addComment({
-                            variables: {
-                              comment: {
-                                comment: commentText,
-
-                                commentId: childCommentId
-                              }
-                            }
-                          });
-                        } else {
-                          addComment({
-                            variables: {
-                              comment: {
-                                comment: commentText,
-
-                                parentCommentId: item.commentId
-                              }
-                            }
-                          });
-                        }
-
-                        setCommentText('');
-                        setReply(false);
-                      }}
-                    >
-                      <Icon
-                        name={IconName.Send}
-                        height={SIZES[22]}
-                        width={SIZES[20]}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
+              <CommentCard
+                item={comment}
+                commentThreadId={commentThreadId}
+                index={index}
+                setComment={setComment}
+                setCommentId={setCommentId}
+                commenttext={commenttext}
+                child={true}
+              />
             );
           })}
         </TouchableOpacity>

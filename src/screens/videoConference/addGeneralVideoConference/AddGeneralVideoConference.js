@@ -27,22 +27,22 @@ const AddGeneralVideoConference = ({
   const [committee, setCommittee] = useState(null);
 
   // fetch commitees
-  // const {
-  //   loading: CommitteeLoading,
-  //   error: CommitteeError,
-  //   data: CommitteeData
-  // } = useQuery(GET_COMMITTEES_BY_ROLE, {
-  //   fetchPolicy: 'cache-and-network',
-  //   variables: { head: true, secretary: true, member: false, type: 5 },
-  //   onCompleted: (data) => {
-  //     if (data) {
-  //       setCommittee(data?.committeesByRole?.items);
-  //     }
-  //   },
-  //   onError: (data) => {
-  //     console.log('commitee error', data);
-  //   }
-  // });
+  const {
+    loading: CommitteeLoading,
+    error: CommitteeError,
+    data: CommitteeData
+  } = useQuery(GET_COMMITTEES_BY_ROLE, {
+    fetchPolicy: 'cache-and-network',
+    variables: { head: true, secretary: true, member: false, type: 5 },
+    onCompleted: (data) => {
+      if (data) {
+        setCommittee(data?.committeesByRole?.items);
+      }
+    },
+    onError: (data) => {
+      console.log('commitee error', data);
+    }
+  });
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.txtAddSubjectTitle}>General</Text>

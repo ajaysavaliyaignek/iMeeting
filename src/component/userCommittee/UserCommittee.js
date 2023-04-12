@@ -13,7 +13,7 @@ const UserCommittee = ({
   selectedUsers
 }) => {
   const [checked, setChecked] = useState(false);
-  console.log({ selectedUsers });
+
   useEffect(() => {
     selectedUsers?.map((user) => {
       if (user.userId == item?.userIds[index]) {

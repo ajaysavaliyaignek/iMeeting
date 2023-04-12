@@ -17,6 +17,7 @@ import { Colors } from '../../themes/Colors';
 import { selectColorAndIcon } from '../../screens/servicesScreen/addEditMeetingAppointmentVideoConference/screenRender';
 import { GET_CALENDER_EVENTS } from '../../graphql/query';
 import { SIZES } from '../../themes/Sizes';
+import Loader from '../Loader/Loader';
 let CalanderDate = moment();
 
 const CalendarMonthViewComponent = () => {
@@ -64,7 +65,7 @@ const CalendarMonthViewComponent = () => {
     });
   }, [begin]);
 
-  const [getCalenderEvents] = useLazyQuery(GET_CALENDER_EVENTS, {
+  const [getCalenderEvents, { loading }] = useLazyQuery(GET_CALENDER_EVENTS, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       if (data?.calendarEventsMobile?.events !== {}) {
@@ -117,6 +118,11 @@ const CalendarMonthViewComponent = () => {
 
   return (
     <View style={{ paddingHorizontal: SIZES[16] }}>
+      {loading && (
+        <View style={{ flex: 1, marginVertical: 16 }}>
+          <Loader color={Colors.primary} size={'small'} />
+        </View>
+      )}
       <CalendarHeader
         headerData={calendarDate}
         onPressArrowLeft={onPressArrowLeft}

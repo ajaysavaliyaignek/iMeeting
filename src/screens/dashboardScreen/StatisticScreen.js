@@ -3,7 +3,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView
+  SafeAreaView,
+  Platform
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
@@ -105,15 +106,56 @@ const StatisticScreen = () => {
             placeholder={''}
             setData={setValueType}
             value={valueType}
-            styleContainer={{ width: '48%', marginBottom: SIZES[16] }}
+            styleContainer={{ width: '48%' }}
           />
           <TouchableOpacity
             onPress={() => {
               setOpen(!open);
             }}
-            style={{ width: '48%', marginBottom: SIZES[16] }}
+            style={{
+              width: '48%',
+              marginTop: SIZES[16],
+              borderBottomWidth: SIZES[1],
+              borderBottomColor: Colors.line,
+              zIndex: 20
+            }}
           >
-            <DropDownPicker
+            <Text
+              style={{
+                ...Fonts.PoppinsRegular[12],
+                color: Colors.secondary
+                // paddingBottom: 10
+              }}
+            >
+              PERIOD
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: SIZES[12],
+                marginTop: Platform.OS == 'android' ? SIZES[8] : SIZES[14],
+                paddingRight: SIZES[10]
+                // marginTop: SIZES[6]
+              }}
+            >
+              <Text
+                style={{
+                  ...Fonts.PoppinsRegular[14],
+                  color: Colors.bold
+                }}
+              >
+                {valuePeriod}
+              </Text>
+              <Icon
+                name={IconName.Arrow_Down}
+                height={SIZES[10]}
+                width={SIZES[10]}
+              />
+            </View>
+            {/* <Divider style={[styles.divider]} /> */}
+            {/* <DropDownPicker
               title={'PERIOD'}
               data={itemsPeriod}
               placeholder={valuePeriod}
@@ -121,7 +163,7 @@ const StatisticScreen = () => {
               setData={setValuePeriod}
               value={valuePeriod}
               // styleContainer={{ width: '48%', marginBottom: SIZES[16] }}
-            />
+            /> */}
           </TouchableOpacity>
         </View>
         {open && (
@@ -246,7 +288,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    zIndex: 20
+    zIndex: 20,
+    marginBottom: SIZES[16]
   },
   dropdown: {
     height: SIZES[44],

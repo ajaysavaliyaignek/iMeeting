@@ -38,7 +38,8 @@ const Comments = ({
   child,
   setParentCommentId,
   mainValueIndex,
-  setMainValueIndex
+  setMainValueIndex,
+  setEdit
 }) => {
   const [openModel, setOpenModel] = useState(false);
 
@@ -54,7 +55,7 @@ const Comments = ({
     refetchQueries: [
       {
         query: GET_All_COMMENTS_THREAD,
-        variables: { commentCategoryId: commentThreadId }
+        variables: { commentCategoryId: commentThreadId, sort: '' }
       }
     ],
     onCompleted: (data) => {
@@ -90,13 +91,19 @@ const Comments = ({
               setOpenModel(false);
 
               if (child) {
-                setChildCommentId(item.commentId);
-                setCommentText(comment);
-                setParentCommentId(item.commentId);
-                setReply(true);
-              } else {
+                setReplyEdit(true);
                 setCommentText(comment);
                 setCommentId(item.commentId);
+                setEdit(false);
+                // setChildCommentId(item.commentId);
+                // setCommentText(comment);
+                // setParentCommentId(item.commentId);
+                // setReply(true);
+              } else {
+                // setReplyEdit(true);
+                setCommentText(comment);
+                setCommentId(item.commentId);
+                setEdit(false);
               }
             }}
           >
@@ -161,11 +168,11 @@ const Comments = ({
             <TouchableOpacity
               onPress={() => {
                 setOpenReply(!openReply);
-                if (child) {
-                  setReply(false);
-                } else {
-                  setReplyEdit(false);
-                }
+                // if (child) {
+                //   setReply(false);
+                // } else {
+                setReplyEdit(false);
+                // }
               }}
               style={{
                 flexDirection: 'row',
@@ -194,11 +201,11 @@ const Comments = ({
 
           <TouchableOpacity
             onPress={() => {
-              if (child) {
-                setReply(!reply);
-              } else {
-                setReplyEdit(!replyEdit);
-              }
+              // if (child) {
+              //   setReply(!reply);
+              // } else {
+              setReplyEdit(!replyEdit);
+              // }
             }}
             style={{ marginLeft: SIZES[14] }}
           >

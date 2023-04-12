@@ -5,16 +5,17 @@ import { ApolloProvider } from '@apollo/client';
 import { useColorScheme } from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SplashScreen from 'react-native-splash-screen';
 
 import MainStack from './routes';
 import { AppProvider } from './src/context';
 import { Client } from './src/graphql/Client';
-import * as SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
+    SplashScreen.hide();
     const getToken = () => {
       AsyncStorage.getItem('@token')
         .then((result) => {
@@ -28,10 +29,6 @@ const App = () => {
     };
     getToken();
   }, []);
-
-  // useEffect(() => {
-  //   setTimeout(() => SplashScreen.hide(), 1000); //hides the splash screen on app load.
-  // }, []);
 
   const darkTheme = {
     ...DefaultTheme,

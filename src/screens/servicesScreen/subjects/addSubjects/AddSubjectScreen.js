@@ -20,7 +20,10 @@ import {
   GET_FILE,
   GET_USER_PAYLOAD
 } from '../../../../graphql/query';
-import { UPDATE_SUBJECTS } from '../../../../graphql/mutation';
+import {
+  UPDATE_SUBJECTS,
+  UPDATE_SUBJECT_STATUS
+} from '../../../../graphql/mutation';
 import { SIZES } from '../../../../themes/Sizes';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
@@ -46,6 +49,10 @@ const AddSubjectScreen = () => {
   const [fileResponse, setFileResponse] = useState([]);
   const [user, setUser] = useState({});
   const [statusTitleOption, setstatusTitleOption] = useState([]);
+  const [errorUpdateStatus, setError] = useState('');
+  const [subjectStatus, setSubjectStatus] = useState(
+    isEdit ? subjectDetails?.statusTitle : null
+  );
   const [subjectData, setSubjectData] = useState({
     title: isEdit ? subjectDetails?.subjectTitle : '',
     discription: isEdit ? subjectDetails?.description : '',
@@ -63,6 +70,16 @@ const AddSubjectScreen = () => {
     filesId: []
   });
   let queryParams = [];
+  let subjectStatusId = [];
+
+  if (subjectStatus) {
+    subjectStatusId = statusTitleOption.filter((status) => {
+      if (status.value == subjectStatus) {
+        return status;
+      }
+    });
+  }
+
   if (committee && meetingId == null) {
     queryParams = {
       searchValue: '',
@@ -96,7 +113,7 @@ const AddSubjectScreen = () => {
       fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         let users = data.userPayload?.userCommitteesDetail?.filter((user) => {
-          if (user.organizationId == subjectDetails.committeeId) {
+          if (user.organizationId == subjectDetails?.committeeId) {
             return user;
           }
         });
@@ -131,7 +148,7 @@ const AddSubjectScreen = () => {
             if (
               data.subjectStatus.items.filter((e) => {
                 return e.statusTitle === 'Pre-Proposed';
-              })[0].statusId === subjectDetails.statusId
+              })[0].statusId === subjectDetails?.statusId
             ) {
               if (user[0]?.roleName == 'Head') {
                 return {
@@ -157,7 +174,7 @@ const AddSubjectScreen = () => {
             } else if (
               data.subjectStatus.items.filter((e) => {
                 return e.statusTitle === 'Tentative';
-              })[0].statusId === subjectDetails.statusId
+              })[0].statusId === subjectDetails?.statusId
             ) {
               return {
                 key: status.statusId,
@@ -171,7 +188,7 @@ const AddSubjectScreen = () => {
             } else if (
               data.subjectStatus.items.filter((e) => {
                 return e.statusTitle === 'Unassigned';
-              })[0].statusId === subjectDetails.statusId
+              })[0].statusId === subjectDetails?.statusId
             ) {
               return {
                 key: status.statusId,
@@ -186,7 +203,7 @@ const AddSubjectScreen = () => {
             } else if (
               data.subjectStatus.items.filter((e) => {
                 return e.statusTitle === 'Proposed';
-              })[0].statusId === subjectDetails.statusId
+              })[0].statusId === subjectDetails?.statusId
             ) {
               return {
                 key: status.statusId,
@@ -201,7 +218,7 @@ const AddSubjectScreen = () => {
             } else if (
               data.subjectStatus.items.filter((e) => {
                 return e.statusTitle === 'Transferred';
-              })[0].statusId === subjectDetails.statusId
+              })[0].statusId === subjectDetails?.statusId
             ) {
               return {
                 key: status.statusId,
@@ -218,7 +235,7 @@ const AddSubjectScreen = () => {
             } else if (
               data.subjectStatus.items.filter((e) => {
                 return e.statusTitle === 'Approved';
-              })[0].statusId === subjectDetails.statusId
+              })[0].statusId === subjectDetails?.statusId
             ) {
               return {
                 key: status.statusId,
@@ -233,7 +250,7 @@ const AddSubjectScreen = () => {
             } else if (
               data.subjectStatus.items.filter((e) => {
                 return e.statusTitle === 'Deleted';
-              })[0].statusId === subjectDetails.statusId
+              })[0].statusId === subjectDetails?.statusId
             ) {
               return {
                 key: status.statusId,
@@ -253,7 +270,7 @@ const AddSubjectScreen = () => {
                 value: status.statusTitle,
                 disabled:
                   status.statusTitle === 'Tentative' ||
-                  status.statusId === subjectDetails.statusId
+                  status.statusId === subjectDetails?.statusId
               };
             }
           })
@@ -317,7 +334,7 @@ const AddSubjectScreen = () => {
       console.log('commitee error', data);
     }
   });
-
+  console.log({ subjectDetails });
   // fetch meetings
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,
@@ -325,7 +342,14 @@ const AddSubjectScreen = () => {
       fetchPolicy: 'cache-and-network',
       variables: {
         onlyMyMeeting: false,
-        committeeIds: '',
+        committeeIds:
+          subjectData?.valueCommittee !== null &&
+          subjectDetails?.statusTitle !== 'Transferred'
+            ? `${subjectData?.valueCommittee}`
+            : subjectData?.valueCommittee !== null &&
+              subjectDetails?.statusTitle == 'Transferred'
+            ? subjectDetails?.status?.entitys?.organizationId
+            : '',
         screen: 1,
         searchValue: '',
         page: -1,
@@ -364,10 +388,11 @@ const AddSubjectScreen = () => {
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
     // export const GET_All_SUBJECTS = gql`
     refetchQueries: [
-      {
-        query: GET_All_SUBJECTS,
-        variables: queryParams
-      }
+      'subjects'
+      // {
+      //   query: GET_All_SUBJECTS,
+      //   variables: queryParams
+      // }
     ],
     onCompleted: (data) => {
       if (data?.updateSubject?.status?.statusCode == '200') {
@@ -386,6 +411,37 @@ const AddSubjectScreen = () => {
   if (error) {
     console.log('addsubject error--', error);
   }
+
+  const [updateSubjectStatus, { loading: updateSubjectStatusLoading }] =
+    useMutation(UPDATE_SUBJECT_STATUS, {
+      refetchQueries: [
+        {
+          query: GET_All_SUBJECTS,
+          variables: {
+            committeeIds: '',
+            searchValue: '',
+            screen: 0,
+            page: -1,
+            pageSize: -1
+          }
+        },
+        {
+          query: GET_ALL_SUBJECTS_STATUS,
+          variables: {
+            decision: false,
+            subject: true,
+            approveDecision: false,
+            momDecision: false
+          }
+        },
+        'subjects',
+        'meetings'
+      ],
+      onCompleted: (data) => {
+        console.log('update subject status', data.updateSubjectStatus.status);
+      },
+      onError: (data) => console.log('update subject status error', data)
+    });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -407,8 +463,16 @@ const AddSubjectScreen = () => {
             label: item.committeeTitle,
             value: item.organizationId
           }))}
-          disable={committee ? true : isEdit ? true : false}
-          placeholder={''}
+          disable={
+            committee
+              ? true
+              : isEdit && subjectDetails?.statusTitle == 'Transferred'
+              ? true
+              : isEdit
+              ? false
+              : false
+          }
+          placeholder={'' || subjectDetails?.committeeName}
           setData={(item) =>
             setSubjectData({ ...subjectData, valueCommittee: item })
           }
@@ -424,11 +488,12 @@ const AddSubjectScreen = () => {
           }))}
           disable={committee ? true : false}
           placeholder={committee != null ? meetingName : ''}
-          setData={(item) =>
-            setSubjectData({ ...subjectData, valueMeeting: item })
-          }
+          setData={(item) => {
+            setSubjectData({ ...subjectData, valueMeeting: item });
+            setError('');
+          }}
           title={'SELECT MEETING'}
-          value={subjectData.valueMeeting}
+          value={subjectData?.valueMeeting}
         />
         {/* title */}
         <View style={styles.titleContainer}>
@@ -492,6 +557,9 @@ const AddSubjectScreen = () => {
               item={subjectDetails}
               statusTitleOption={statusTitleOption}
               meetingId={subjectData?.valueMeeting}
+              setSubjectStatus={setSubjectStatus}
+              setSubjectData={setSubjectData}
+              subjectData={subjectData}
             />
           </View>
         )}
@@ -517,6 +585,15 @@ const AddSubjectScreen = () => {
           justifyContent: 'flex-end'
         }}
       >
+        {errorUpdateStatus !== '' && (
+          <View style={{ alignItems: 'center', paddingBottom: 30 }}>
+            <Text
+              style={{ ...Fonts.PoppinsSemiBold[14], color: Colors.Rejected }}
+            >
+              {errorUpdateStatus}
+            </Text>
+          </View>
+        )}
         {/* Divider */}
         <Divider style={styles.divider} />
         <View style={styles.buttonContainer}>
@@ -528,42 +605,61 @@ const AddSubjectScreen = () => {
           />
           <Button
             title={'Save'}
-            isLoading={loading}
+            isLoading={loading || updateSubjectStatusLoading}
             onPress={() => {
-              addSubject({
-                variables: {
-                  subject: {
-                    subjectId: isEdit ? subjectDetails.subjectId : 0,
-                    committeeId: subjectData.valueCommittee,
-                    subjectTitle: subjectData.title,
-                    description: subjectData.discription,
-                    subjectCategoryId: subjectData.valueCategory,
-                    draft: false,
-                    attachFileIds: subjectData.filesId,
-                    meetingId:
-                      subjectData.valueMeeting == null
-                        ? 0
-                        : subjectData.valueMeeting,
-                    id: isLiveMeetingSubject ? 1 : 0
-                  }
+              if (
+                subjectStatus == 'Pre-Proposed' &&
+                subjectData?.valueMeeting == null
+              ) {
+                setError('Please select meeting.');
+              } else {
+                if (isEdit) {
+                  updateSubjectStatus({
+                    variables: {
+                      subject: {
+                        subjectId: subjectDetails?.subjectId,
+                        statusId: subjectStatusId[0]?.key,
+                        meetingId: subjectData?.valueMeeting
+                      }
+                    }
+                  });
                 }
-              });
+
+                addSubject({
+                  variables: {
+                    subject: {
+                      subjectId: isEdit ? subjectDetails?.subjectId : 0,
+                      committeeId: subjectData?.valueCommittee,
+                      subjectTitle: subjectData?.title,
+                      description: subjectData?.discription,
+                      subjectCategoryId: subjectData?.valueCategory,
+                      draft: false,
+                      attachFileIds: subjectData?.filesId,
+                      meetingId:
+                        subjectData?.valueMeeting == null
+                          ? 0
+                          : subjectData?.valueMeeting,
+                      id: isLiveMeetingSubject ? 1 : 0
+                    }
+                  }
+                });
+              }
             }}
             disable={
-              subjectData.title === '' ||
-              subjectData.discription === '' ||
-              subjectData.valueCommittee == null ||
-              subjectData.valueCategory == null
+              subjectData?.title === '' ||
+              subjectData?.discription === '' ||
+              subjectData?.valueCommittee == null ||
+              subjectData?.valueCategory == null
                 ? true
                 : false
             }
             layoutStyle={[
               {
                 opacity:
-                  subjectData.title === '' ||
-                  subjectData.discription === '' ||
-                  subjectData.valueCommittee == null ||
-                  subjectData.valueCategory == null
+                  subjectData?.title === '' ||
+                  subjectData?.discription === '' ||
+                  subjectData?.valueCommittee == null ||
+                  subjectData?.valueCategory == null
                     ? 0.5
                     : null
               },

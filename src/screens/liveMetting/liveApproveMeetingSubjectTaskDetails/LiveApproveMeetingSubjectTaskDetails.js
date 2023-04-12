@@ -28,7 +28,6 @@ const LiveApproveMeetingSubjectTaskDetails = ({
   const [searchText, setSearchText] = useState('');
   const [tasksData, setTasksData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  console.log('subjectData', subjectData);
 
   const TaskType = useQuery(GET_TASK_TYPES, {
     fetchPolicy: 'cache-and-network',

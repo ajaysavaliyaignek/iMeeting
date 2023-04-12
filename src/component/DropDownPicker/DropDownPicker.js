@@ -23,7 +23,6 @@ const DropDownPicker = ({
       <Text style={styles.txtTitle}>{title}</Text>
       <Dropdown
         disable={disable}
-        
         selectedTextStyle={styles.txtDropdown}
         placeholderStyle={styles.txtDropdown}
         textStyle={styles.txtDropdown}
