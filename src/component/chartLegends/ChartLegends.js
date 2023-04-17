@@ -32,7 +32,8 @@ const ChartLegends = ({
           flexDirection: 'row',
           alignItems: 'center',
 
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          marginBottom: SIZES[16]
         }}
       >
         <View
@@ -72,7 +73,7 @@ const ChartLegends = ({
         >
           <Text
             style={{
-              ...Fonts.PoppinsRegular[14],
+              ...Fonts.PoppinsSemiBold[14],
               color: Colors.bold,
               marginRight: SIZES[24]
             }}

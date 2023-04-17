@@ -15,6 +15,7 @@ import { GET_COMMITTEE_MEMBER_BY_ID, GET_FILE } from '../../graphql/query';
 import { Divider } from 'react-native-paper';
 import UserDetailsComponent from '../../component/userDetailsComponent/UserDetailsComponent';
 import { SIZES } from '../../themes/Sizes';
+import AttachFiles from '../../component/attachFiles/AttachFiles';
 
 const CommitteesDetails = () => {
   const navigation = useNavigation();
@@ -68,8 +69,6 @@ const CommitteesDetails = () => {
     }
   });
 
-  console.log({ userDetails });
-
   const generalDetails = (title, discription) => {
     return (
       <View style={styles.subView}>
@@ -89,60 +88,69 @@ const CommitteesDetails = () => {
       />
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Text style={styles.txtTitle}>General</Text>
-        {generalDetails('Committee title', item.committeeTitle)}
-        {generalDetails('Committee ID', item.committeeId)}
-        {generalDetails('Committee category', item.categoryTitle)}
-        {generalDetails('Discription ', item.description)}
-        <Text style={styles.txtTitle}>Date</Text>
-        <View style={styles.subView}>
-          <Text style={styles.txtSubDetails}>Setup date</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.txtSubDiscription}>
-              {moment(item.setUpDate, 'YYYY-MM-DD').format('DD MMM, YYYY')}
-            </Text>
-            {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
+        <View style={{ paddingHorizontal: SIZES[16] }}>
+          <Text style={styles.txtTitle}>General</Text>
+          {generalDetails('Committee title', item.committeeTitle)}
+          {generalDetails('Committee ID', item.committeeId)}
+          {generalDetails('Committee category', item.categoryTitle)}
+          {generalDetails('Discription ', item.description)}
+          <Text style={styles.txtTitle}>Date</Text>
+          <View style={styles.subView}>
+            <Text style={styles.txtSubDetails}>Setup date</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.txtSubDiscription}>
+                {moment(item.setUpDate, 'YYYY-MM-DD').format('DD MMM, YYYY')}
+              </Text>
+              {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
               Hijry{'  '} 30.06.1443
             </Text> */}
+            </View>
           </View>
-        </View>
-        <View style={styles.subView}>
-          <Text style={styles.txtSubDetails}>Expiry date</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.txtSubDiscription}>
-              {moment(item.expirationDate, 'YYYY-MM-DD').format('DD MMM, YYYY')}
-            </Text>
-            {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
+          <View style={styles.subView}>
+            <Text style={styles.txtSubDetails}>Expiry date</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.txtSubDiscription}>
+                {moment(item.expirationDate, 'YYYY-MM-DD').format(
+                  'DD MMM, YYYY'
+                )}
+              </Text>
+              {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
               Hijry{'  '} 30.06.1453
             </Text> */}
+            </View>
           </View>
+          {fileResponse?.length > 0 && (
+            <AttachFiles
+              fileResponse={fileResponse}
+              setFileResponse={setFileResponse}
+              showAttachButton={false}
+              deleted={false}
+              download={true}
+              isShowAttchTitle={true}
+            />
+          )}
         </View>
-        {fileResponse?.length > 0 && (
-          <AttachFiles
-            fileResponse={fileResponse}
-            setFileResponse={setFileResponse}
-            showAttachButton={false}
-            deleted={false}
-            download={true}
-            isShowAttchTitle={true}
-          />
+
+        {userDetails.length > 0 && (
+          <View>
+            <Text style={[styles.txtTitle, { paddingHorizontal: SIZES[16] }]}>
+              Users
+            </Text>
+
+            <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
+            <UserDetailsComponent
+              users={userDetails}
+              isGeneralUser={true}
+              committee={item.committeeTitle}
+              // onChecked={setOnAllUserClick}
+              isCheckboxView={false}
+              // visibleIndex={visibleIndex}
+              // setVisibleIndex={setVisibleIndex}
+              openPopup={false}
+              searchText={''}
+            />
+          </View>
         )}
-        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
-        <View style={{ marginHorizontal: SIZES[16] }}>
-          <Text style={styles.txtTitle}>Users</Text>
-        </View>
-        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
-        <UserDetailsComponent
-          users={userDetails}
-          isGeneralUser={true}
-          committee={item.committeeTitle}
-          // onChecked={setOnAllUserClick}
-          isCheckboxView={false}
-          // visibleIndex={visibleIndex}
-          // setVisibleIndex={setVisibleIndex}
-          openPopup={false}
-          searchText={''}
-        />
         {/* <UserDetailsComponent
           users={userDetails}
           isUserRequired={true}
@@ -163,13 +171,12 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
     width: '100%',
-    height: '100%',
-    paddingHorizontal: Normalize(16)
+    height: '100%'
   },
   txtTitle: {
     ...Fonts.PoppinsBold[20],
     color: Colors.bold,
-    marginTop: Normalize(24)
+    marginTop: SIZES[40]
   },
 
   subView: {

@@ -99,9 +99,8 @@ const PieChart = ({
       console.log('statistic data error', data.message);
     }
   });
-  console.log({ chartData });
+
   const setOnSelect = (item) => {
-    console.log({ item });
     if (type == 11) {
       charLegends.map((data) => {
         if (data.x.split('\n')[1] === item.x.split('\n')[1]) {
@@ -153,7 +152,7 @@ const PieChart = ({
           <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
             {error.message == 'Network request failed'
               ? 'No Internet connection'
-              : error.message}
+              : 'Something went wrong.'}
           </Text>
         </View>
       ) : (
@@ -170,7 +169,15 @@ const PieChart = ({
             {title}
           </Text>
           {loading && Platform.OS == 'android' ? (
-            <Loader color={Colors.primary} size={'small'} />
+            <View
+              style={{
+                height: 300,
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Loader color={Colors.primary} size={'small'} />
+            </View>
           ) : chartData.length > 0 ? (
             <VictoryPie
               labelPosition={'centroid'}
@@ -189,8 +196,15 @@ const PieChart = ({
               colorScale={chartColor}
             />
           ) : (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <Text>No data found.</Text>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 600
+              }}
+            >
+              <Text style={{ ...Fonts.PoppinsBold[20] }}>No data found.</Text>
             </View>
           )}
           <View

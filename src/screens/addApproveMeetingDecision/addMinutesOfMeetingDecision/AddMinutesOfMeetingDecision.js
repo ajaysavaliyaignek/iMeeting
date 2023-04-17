@@ -28,10 +28,7 @@ const AddMinutesOfMeetingDecision = () => {
   let showFinalApproveButton =
     meetingData?.status.entitys.organizationName == meetingData?.committeeTitle;
   // getMeetingSubjects for meeting
-  console.log({
-    org: meetingData.status.entitys.organizationName,
-    meeting: meetingData
-  });
+
   const getMeetingSubjects = useQuery(GET_MEETING_STATUS, {
     fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {

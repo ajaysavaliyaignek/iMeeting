@@ -10,92 +10,37 @@ import { GET_All_SUBJECTS, GET_ALL_SUBJECTS_STATUS } from '../../graphql/query';
 import { SelectList } from 'react-native-dropdown-select-list';
 import Icon from '../Icon';
 import IconName from '../Icon/iconName';
+import { Path, Svg } from 'react-native-svg';
 
 const SubjectStatusDropdown = ({
   statusTitleOption,
   item,
   setValueStatus,
-  meetingId
+  meetingId,
+  setSubjectStatus,
+  setSubjectData,
+  subjectData
 }) => {
-  const [updateSubjectStatus] = useMutation(UPDATE_SUBJECT_STATUS, {
-    refetchQueries: [
-      {
-        query: GET_All_SUBJECTS,
-        variables: {
-          committeeIds: '',
-          searchValue: '',
-          screen: 0,
-          page: -1,
-          pageSize: -1
-        }
-      },
-      {
-        query: GET_ALL_SUBJECTS_STATUS,
-        variables: {
-          decision: false,
-          subject: true,
-          approveDecision: false,
-          momDecision: false
-        }
-      },
-      'subjects',
-      'meetings'
-    ],
-    onCompleted: (data) => {
-      console.log('update subject status', data.updateSubjectStatus.status);
-    },
-    onError: (data) => console.log('update subject status error', data)
-  });
-  const renderItem = (items) => {
-    return (
-      <TouchableOpacity
-        style={[styles.item, { opacity: items.isDisable == 'true' ? 0.1 : 1 }]}
-        disabled={items.isDisable}
-        onPress={() => {
-          if (items.isDisable) {
-            // setValueStatus(item.statusId);
-          } else {
-            // setValueStatusTitle(items.label);
-            // setValueStatus(items.value);
-            updateSubjectStatus({
-              variables: {
-                subject: {
-                  subjectId: item.subjectId,
-                  statusId: items.value
-                }
-              }
-            });
-          }
-        }}
-      >
-        <Text
-          style={[
-            styles.textItem,
-            {
-              color:
-                items.label == 'Deleted'
-                  ? '#ff6347'
-                  : items.label == 'Pre-Proposed'
-                  ? '#337ab7'
-                  : items.label == 'Tentative'
-                  ? ' #89530d;'
-                  : items.label == 'Approved'
-                  ? 'rgba(129, 171, 150, 1)'
-                  : items.label == 'Transferred'
-                  ? 'rgba(231, 157, 115, 1)'
-                  : items.label == 'Proposed'
-                  ? 'rgb(101, 142, 180, 1)'
-                  : items.label == 'Unassigned'
-                  ? 'rgb(101, 142, 180, 1)'
-                  : Colors.bold
-            }
-          ]}
-        >
-          {items.label}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
+  // function SelectIcon({ stroke }) {
+  //   return (
+  //     <Svg
+  //       xmlns="http://www.w3.org/2000/svg"
+  //       width="14"
+  //       height="8"
+  //       viewBox="0 0 14 8"
+  //       fill="none"
+  //     >
+  //       <Path
+  //         d="M1 1L7 7L13 1"
+  //         stroke={stroke}
+  //         strokeWidth="1.5"
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //       />
+  //     </Svg>
+  //   );
+  // }
+
   return (
     <View
       style={{
@@ -108,20 +53,43 @@ const SubjectStatusDropdown = ({
     >
       {item.status.entitys.isDisable == 'true' ? (
         <SelectList
-          // arrowicon={() => {
-          //   return <Icon name={IconName.Arrow_Down} />;
-          // }}
+          // arrowicon={
+          //   <SelectIcon
+          //     stroke={
+          //       item.statusTitle == 'Deleted'
+          //         ? '#ff6347'
+          //         : item.statusTitle == 'Pre-Proposed'
+          //         ? '#337ab7'
+          //         : item.statusTitle == 'Tentative'
+          //         ? '#89530d'
+          //         : item.statusTitle == 'Approved'
+          //         ? 'rgba(129, 171, 150, 1)'
+          //         : item.statusTitle == 'Transferred'
+          //         ? 'rgba(231, 157, 115, 1)'
+          //         : item.statusTitle == 'Proposed'
+          //         ? 'rgb(101, 142, 180, 1)'
+          //         : item.statusTitle == 'Unassigned'
+          //         ? 'rgb(101, 142, 180, 1)'
+          //         : Colors.bold
+          //     }
+          //   />
+          // }
           maxHeight={200}
           setSelected={(val) => {
-            updateSubjectStatus({
-              variables: {
-                subject: {
-                  subjectId: item.subjectId,
-                  statusId: val,
-                  meetingId: meetingId
-                }
-              }
-            });
+            setSubjectStatus(val);
+            if (val == 'Pre-Proposed') {
+              setSubjectData({ ...subjectData, valueMeeting: null });
+            }
+
+            // updateSubjectStatus({
+            //   variables: {
+            //     subject: {
+            //       subjectId: item.subjectId,
+            //       statusId: val,
+            //       meetingId: meetingId
+            //     }
+            //   }
+            // });
           }}
           inputStyles={{
             color:
@@ -130,7 +98,7 @@ const SubjectStatusDropdown = ({
                 : item.statusTitle == 'Pre-Proposed'
                 ? '#337ab7'
                 : item.statusTitle == 'Tentative'
-                ? ' #89530d'
+                ? '#89530d'
                 : item.statusTitle == 'Approved'
                 ? 'rgba(129, 171, 150, 1)'
                 : item.statusTitle == 'Transferred'
@@ -143,7 +111,7 @@ const SubjectStatusDropdown = ({
             ...Fonts.PoppinsRegular[14]
           }}
           data={statusTitleOption}
-          save="key"
+          save="value"
           search={false}
           placeholder={item.statusTitle}
           boxStyles={{
@@ -154,7 +122,7 @@ const SubjectStatusDropdown = ({
                 : item.statusTitle == 'Pre-Proposed'
                 ? '#337ab7'
                 : item.statusTitle == 'Tentative'
-                ? ' #89530d'
+                ? '#89530d'
                 : item.statusTitle == 'Approved'
                 ? 'rgba(129, 171, 150, 1)'
                 : item.statusTitle == 'Transferred'
@@ -197,7 +165,7 @@ const SubjectStatusDropdown = ({
                 : item.statusTitle == 'Pre-Proposed'
                 ? '#337ab7'
                 : item.statusTitle == 'Tentative'
-                ? ' #89530d'
+                ? '#89530d'
                 : item.statusTitle == 'Approved'
                 ? 'rgba(129, 171, 150, 1)'
                 : item.statusTitle == 'Transferred'

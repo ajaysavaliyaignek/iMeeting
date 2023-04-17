@@ -121,7 +121,7 @@ const TaskDetails = () => {
       {
         query: GET_All_COMMENTS_THREAD,
 
-        variables: { commentCategoryId: commentThreadId }
+        variables: { commentCategoryId: commentThreadId, sort: '' }
       }
     ],
     onCompleted: (data) => {
@@ -141,19 +141,19 @@ const TaskDetails = () => {
     data: CommentsData
   } = useQuery(GET_All_COMMENTS_THREAD, {
     fetchPolicy: 'cache-and-network',
-    variables: { commentCategoryId: commentThreadId },
+    variables: { commentCategoryId: commentThreadId, sort: '' },
     onCompleted: (data) => {
       if (data) {
         setComments(data.comments.items[0]);
       } else {
         console.log('no comments');
       }
+    },
+    onError: (data) => {
+      console.log('CommentsError error', data.message);
     }
   });
 
-  if (CommentsError) {
-    console.log('CommentsError error', CommentsError);
-  }
   const GeneralDetails = ({ title, discription }) => {
     return (
       <View style={styles.subView}>

@@ -860,7 +860,7 @@ export const GET_All_SUBJECTS = gql`
         statusTitle
         statusId
         meetingId
-
+        commentThreadId
         status {
           entitys
           statusCode

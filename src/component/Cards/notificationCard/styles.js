@@ -10,7 +10,8 @@ export const styles = StyleSheet.create({
     height: 1
   },
   container: {
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginVertical: SIZES[8]
   },
   txtNotification: {
     marginVertical: SIZES[16],

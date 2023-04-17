@@ -197,7 +197,7 @@ const LiveMeetingTasks = ({ item: meetingData, socketEventUpdateMessage }) => {
           <Text style={{ ...Fonts.PoppinsSemiBold[20], color: Colors.primary }}>
             {Tasks.error.message == 'Network request failed'
               ? 'No Internet connection'
-              : Tasks.error.message}
+              : "Something went wrong."}
           </Text>
         </View>
       ) : Tasks?.loading || TaskType.loading ? (

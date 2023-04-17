@@ -143,7 +143,7 @@ const VideoConferenceList = () => {
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
               {getAllVideoConferences.error.message == 'Network request failed'
                 ? 'No Internet connection'
-                : getAllVideoConferences.error.message}
+                : 'Something went wrong.'}
             </Text>
           </View>
         ) : videoConferences.length > 0 ? (

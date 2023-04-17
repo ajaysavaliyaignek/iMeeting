@@ -102,7 +102,7 @@ const ProfileDetails = () => {
           <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
             {error.message == 'Network request failed'
               ? 'No Internet connection'
-              : error.message}
+              : 'Something went wrong.'}
           </Text>
         </View>
       ) : (

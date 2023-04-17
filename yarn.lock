@@ -6916,6 +6916,13 @@
     "@svgr/plugin-svgo" "^6.1.2"
     "path-dirname" "^1.0.2"
 
+"react-native-svg-uri@^1.2.3":
+  "integrity" "sha512-yECSYs6KgX8XZj0IV3Z2fTOkldmtnG1dEDNoRXvJjPnQPTEzQ2VS1NXIgxukuGSN2jourVOvKLhhRo75QmRTaw=="
+  "resolved" "https://registry.npmjs.org/react-native-svg-uri/-/react-native-svg-uri-1.2.3.tgz"
+  "version" "1.2.3"
+  dependencies:
+    "xmldom" "^0.1.22"
+
 "react-native-svg@^13.1.0":
   "integrity" "sha512-drYa+0piaQ27xFEp1MxRBSu6eHbR37qQITKTHNOmPv1NhPUyZ5tH4ICWe7aTLlB2u6KEhpSHl63HJi3jpZFtvw=="
   "resolved" "https://registry.npmjs.org/react-native-svg/-/react-native-svg-13.1.0.tgz"
@@ -8845,6 +8852,11 @@
   "integrity" "sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw=="
   "resolved" "https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz"
   "version" "2.2.0"
+
+"xmldom@^0.1.22":
+  "integrity" "sha512-yS2uJflVQs6n+CyjHoaBmVSqIDevTAWrzMmjG1Gc7h1qQ7uVozNhEPJAwZXWyGQ/Gafo3fCwrcaokezLPupVyQ=="
+  "resolved" "https://registry.npmjs.org/xmldom/-/xmldom-0.1.31.tgz"
+  "version" "0.1.31"
 
 "xtend@^4.0.0", "xtend@~4.0.1":
   "integrity" "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ=="

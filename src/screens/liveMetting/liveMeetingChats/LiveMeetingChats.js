@@ -185,7 +185,7 @@ const LiveMeetingChats = ({ item: meetingData, socketEventUpdateMessage }) => {
             >
               {getAllChats.error.message == 'Network request failed'
                 ? 'No Internet connection'
-                : getAllChats.error.message}
+                : "Something went wrong."}
             </Text>
           </View>
         ) : getAllChats.loading ? (

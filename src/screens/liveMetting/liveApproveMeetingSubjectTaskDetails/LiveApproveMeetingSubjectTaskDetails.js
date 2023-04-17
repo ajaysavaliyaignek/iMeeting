@@ -28,7 +28,6 @@ const LiveApproveMeetingSubjectTaskDetails = ({
   const [searchText, setSearchText] = useState('');
   const [tasksData, setTasksData] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(-1);
-  console.log('subjectData', subjectData);
 
   const TaskType = useQuery(GET_TASK_TYPES, {
     fetchPolicy: 'cache-and-network',
@@ -118,7 +117,7 @@ const LiveApproveMeetingSubjectTaskDetails = ({
           <Text style={{ ...Fonts.PoppinsSemiBold[20], color: Colors.primary }}>
             {Tasks.error.message == 'Network request failed'
               ? 'No Internet connection'
-              : Tasks.error.message}
+              : "Something went wrong."}
           </Text>
         </View>
       ) : Tasks?.loading ? (

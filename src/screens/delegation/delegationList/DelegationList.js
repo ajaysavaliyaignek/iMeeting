@@ -82,7 +82,7 @@ const DelegationList = ({
           <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
             {getAllDelegations.error.message == 'Network request failed'
               ? 'No Internet connection'
-              : getAllDelegations.error.message}
+              : "Something went wrong."}
           </Text>
         </View>
       ) : delegations.length > 0 ? (

@@ -25,7 +25,7 @@ const SelectUsers = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { committee, previousUser, onUpdateSelection, type } = route?.params;
-  console.log({ committee });
+
   //set all user to the list
   const [allUsers, setAllUsers] = useState();
   const [externalUser, setExternalUser] = useState();

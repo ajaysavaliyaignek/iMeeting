@@ -1,7 +1,7 @@
 import { View, SafeAreaView, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { Divider } from 'react-native-paper';
 
 import { styles } from './styles';
@@ -33,6 +33,8 @@ const LiveApproveMeetingSubjectDetails = () => {
   const [commenttext, setCommentText] = useState('');
   const [commentId, setCommentId] = useState(null);
 
+  console.log({ item: item.status });
+
   // get subject by id
   const {
     loading: SubjectLoading,
@@ -44,6 +46,12 @@ const LiveApproveMeetingSubjectDetails = () => {
     onCompleted: (data, error) => {
       if (data) {
         setCommentThreadId(data.subject.commentThreadId);
+        getComments({
+          variables: {
+            commentCategoryId: data.subject.commentThreadId,
+            sort: ''
+          }
+        });
       }
       if (error) {
         console.log('subject error', error.message);
@@ -52,13 +60,12 @@ const LiveApproveMeetingSubjectDetails = () => {
   });
 
   // get comment thread id
-  const {
-    loading: CommentsLoading,
-    error: CommentsError,
-    data: CommentsData
-  } = useQuery(GET_All_COMMENTS_THREAD, {
+  const [
+    getComments,
+    { loading: CommentsLoading, error: CommentsError, data: CommentsData }
+  ] = useLazyQuery(GET_All_COMMENTS_THREAD, {
     fetchPolicy: 'cache-and-network',
-    variables: { commentCategoryId: commentThreadId },
+
     onCompleted: (data) => {
       if (data) {
         setComments(data.comments.items[0]);
@@ -81,7 +88,7 @@ const LiveApproveMeetingSubjectDetails = () => {
       {
         query: GET_All_COMMENTS_THREAD,
 
-        variables: { commentCategoryId: commentThreadId }
+        variables: { commentCategoryId: commentThreadId, sort: '' }
       }
     ],
     onCompleted: (data) => {

@@ -1,4 +1,4 @@
-import { View, Text, Platform } from 'react-native';
+import { View, Text, Platform, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {
   LineSegment,
@@ -61,9 +61,9 @@ const BarCharts = ({
       userIds: type == 11 ? userIds.join(',') : ''
     },
     onCompleted: (data) => {
-      setBarChartColor(data.statistics.statisticColors);
-      setBarChartCommittees(data.statistics.statisticCommittees);
-      setBarChartData(data.statistics.statisticContent);
+      setBarChartColor(data?.statistics?.statisticColors);
+      setBarChartCommittees(data?.statistics?.statisticCommittees);
+      setBarChartData(data?.statistics?.statisticContent);
       let newBarchartcolor = (newbarCharLegendsData =
         data.statistics.statisticStatus.map((item, index) => {
           let isSelected = false;
@@ -76,8 +76,6 @@ const BarCharts = ({
           }
           return { ...item, isSelected };
         }));
-
-      console.log({ barcharLegends: data.statistics.statisticStatus });
 
       if (newbarCharLegendsData) {
         setBarChartLegends(newbarCharLegendsData);
@@ -120,74 +118,88 @@ const BarCharts = ({
       </Text>
       {loading && Platform.OS == 'android' ? (
         <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 600
+          }}
         >
           <Loader color={Colors.primary} size={'small'} />
         </View>
       ) : barchartData.length > 0 ? (
-        <VictoryChart
-          domainPadding={SIZES[24]}
-          width={SIZES[350]}
-          height={SIZES[600]}
-          // theme={VictoryTheme.material}
-          padding={{ bottom: 200, right: 20, left: 40, top: 20 }}
-        >
-          <VictoryAxis
-            tickValues={barchartCommittees}
-            gridComponent={<LineSegment />}
-            tickLabelComponent={
-              <VictoryLabel
-                angle={90}
-                verticalAnchor="middle"
-                textAnchor="start"
-                style={{
-                  ...Fonts.PoppinsRegular[14],
-                  color: Colors.bold
-                }}
-              />
-            }
-          />
-
-          <VictoryAxis
-            dependentAxis
-            tickFormat={(x) => `${x}`}
-            style={{
-              tickLabels: {
-                ...Fonts.PoppinsRegular[14],
-                color: Colors.bold,
-                textAnchor: 'start'
-              }
-            }}
-            tickLabelComponent={
-              <VictoryLabel
-                verticalAnchor="middle"
-                textAnchor="end"
-                style={{
-                  ...Fonts.PoppinsRegular[14],
-                  color: Colors.bold
-                }}
-              />
-            }
-          />
-
-          <VictoryStack colorScale={barchartColor}>
-            {barchartData?.map((item, index) => {
-              return (
-                <VictoryBar
-                  key={index.toString()}
-                  data={item}
-                  x="x"
-                  y="y"
-                  cornerRadius={{ top: 4, bottom: 4 }}
-                  barWidth={32}
+        <ScrollView>
+          <VictoryChart
+            domainPadding={SIZES[24]}
+            width={SIZES[350]}
+            height={SIZES[600]}
+            // theme={VictoryTheme.material}
+            padding={{ bottom: 200, right: 20, left: 40, top: 20 }}
+          >
+            <VictoryAxis
+              tickValues={barchartCommittees}
+              gridComponent={<LineSegment />}
+              tickLabelComponent={
+                <VictoryLabel
+                  angle={90}
+                  verticalAnchor="middle"
+                  textAnchor="start"
+                  style={{
+                    ...Fonts.PoppinsRegular[14],
+                    color: Colors.bold
+                  }}
                 />
-              );
-            })}
-          </VictoryStack>
-        </VictoryChart>
+              }
+            />
+
+            <VictoryAxis
+              dependentAxis
+              tickFormat={(x) => `${x}`}
+              style={{
+                tickLabels: {
+                  ...Fonts.PoppinsRegular[14],
+                  color: Colors.bold,
+                  textAnchor: 'start'
+                }
+              }}
+              tickLabelComponent={
+                <VictoryLabel
+                  verticalAnchor="middle"
+                  textAnchor="end"
+                  style={{
+                    ...Fonts.PoppinsRegular[14],
+                    color: Colors.bold
+                  }}
+                />
+              }
+            />
+
+            <VictoryStack colorScale={barchartColor}>
+              {barchartData?.map((item, index) => {
+                return (
+                  <VictoryBar
+                    key={index.toString()}
+                    data={item}
+                    x="x"
+                    y="y"
+                    cornerRadius={{ top: 4, bottom: 4 }}
+                    barWidth={32}
+                  />
+                );
+              })}
+            </VictoryStack>
+          </VictoryChart>
+        </ScrollView>
       ) : (
-        <View>
-          <Text>No data found.</Text>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 600
+          }}
+        >
+          <Text style={{ ...Fonts.PoppinsBold[20] }}>No data found.</Text>
         </View>
       )}
       <View style={{ paddingTop: SIZES[16] }}>

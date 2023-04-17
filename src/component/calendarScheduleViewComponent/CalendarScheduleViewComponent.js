@@ -56,9 +56,9 @@ const CalendarScheduleViewComponent = () => {
         }
       });
     }
-    // if (eventDetails?.length > 0) {
-    //   scrollToDate(moment(new Date()).format('YYYY-MM-DD'));
-    // }
+    if (eventDetails?.length > 0) {
+      scrollList(parseInt(moment(new Date()).format('DD')) - 1);
+    }
   }, []);
 
   const [getCalenderEvents, { loading }] = useLazyQuery(GET_CALENDER_EVENTS, {
@@ -245,7 +245,7 @@ const CalendarScheduleViewComponent = () => {
       />
 
       {loading && !firstScrollDone ? (
-        <Loader color={Colors.primary} size={ "large"} />
+        <Loader color={Colors.primary} size={'large'} />
       ) : (
         eventDetails?.length > 0 && (
           <FlatList
