@@ -260,9 +260,8 @@ const AddSpeaker = () => {
               title={'Add speaker'}
               isLoading={loading}
               disable={
-                valueSubject === null || valueUser === null || time == ''
-                  ? true
-                  : false
+                // valueSubject === null ||
+                valueUser === null || time == '' ? true : false
               }
               onPress={() => {
                 updateSpeaker({
@@ -279,9 +278,8 @@ const AddSpeaker = () => {
               layoutStyle={[
                 {
                   opacity:
-                    valueSubject === null || valueUser === null || time == ''
-                      ? 0.5
-                      : 1
+                    // valueSubject === null ||
+                    valueUser === null || time == '' ? 0.5 : 1
                 },
                 styles.nextBtnLayout
               ]}
@@ -305,7 +303,7 @@ const AddSpeaker = () => {
                 updateSpeaker({
                   variables: {
                     userDetail: {
-                      subjectId: valueSubject,
+                      // subjectId: valueSubject,
                       userId: valueUser,
                       meetingId: meetingId,
                       duration: time,
@@ -315,16 +313,14 @@ const AddSpeaker = () => {
                 });
               }}
               disable={
-                valueSubject === null || valueUser === null || time == ''
-                  ? true
-                  : false
+                // valueSubject === null ||
+                valueUser === null || time == '' ? true : false
               }
               layoutStyle={[
                 {
                   opacity:
-                    valueSubject === null || valueUser === null || time == ''
-                      ? 0.5
-                      : 1
+                    // valueSubject === null ||
+                    valueUser === null || time == '' ? 0.5 : 1
                 },
                 styles.nextBtnLayout,
                 { width: '100%' }

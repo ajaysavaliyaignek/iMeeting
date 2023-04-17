@@ -156,7 +156,9 @@ const AppointmentsList = () => {
             }}
           />
         ) : Appointment.error ? (
-          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <View
+            style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
+          >
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
               {Appointment?.error?.message == 'Network request failed'
                 ? 'No Internet connection'
@@ -166,7 +168,9 @@ const AppointmentsList = () => {
         ) : Appointment.loading ? (
           <Loader color={Colors.primary} size={'large'} />
         ) : (
-          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <View
+            style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
+          >
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
               No appointment found
             </Text>

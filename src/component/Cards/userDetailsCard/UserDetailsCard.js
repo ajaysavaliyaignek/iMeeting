@@ -109,6 +109,7 @@ const UserDetailsCard = ({
           >
             {meetingData?.yourRoleName !== 'Member' ? (
               <SelectList
+                maxHeight={120}
                 setSelected={(val) => {
                   updateSpeaker({
                     variables: {
@@ -227,7 +228,7 @@ const UserDetailsCard = ({
       // activeOpacity={0.8}
       style={[
         Platform.OS !== 'android' ? { zIndex: 1 } : null,
-        { elevation: 10 }
+        { elevation: 10, flex: 1 }
       ]}
       onPress={() => {
         setVisibleIndex(-1);

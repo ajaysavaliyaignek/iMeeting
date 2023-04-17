@@ -102,28 +102,30 @@ const AddEditGeneralScreen = ({
     >
       <Text style={styles.txtAddSubjectTitle}>General</Text>
       <View style={{ flex: 1 }}>
-        {/* {type !== 'Appointment' && ( */}
-        <View>
-          {CommitteeLoading && <Loader color={Colors.primary} size={'small'} />}
+        {type !== 'Appointment' && (
+          <View>
+            {CommitteeLoading && (
+              <Loader color={Colors.primary} size={'small'} />
+            )}
 
-          {/* choose committe */}
-          <DropDownPicker
-            data={committee?.map((comm) => ({
-              label: comm.committeeTitle,
-              value: comm.organizationId
-            }))}
-            disable={details == null ? false : true}
-            placeholder={''}
-            setData={(item) => {
-              setGeneralData((prev) => {
-                return { ...prev, valueCommitee: item };
-              });
-            }}
-            title={'CHOOSE COMMITTEE'}
-            value={generaldData?.valueCommitee}
-          />
-        </View>
-        {/* )} */}
+            {/* choose committe */}
+            <DropDownPicker
+              data={committee?.map((comm) => ({
+                label: comm.committeeTitle,
+                value: comm.organizationId
+              }))}
+              disable={details == null ? false : true}
+              placeholder={''}
+              setData={(item) => {
+                setGeneralData((prev) => {
+                  return { ...prev, valueCommitee: item };
+                });
+              }}
+              title={'CHOOSE COMMITTEE'}
+              value={generaldData?.valueCommitee}
+            />
+          </View>
+        )}
 
         <View style={styles.discriptionContainer}>
           <Text style={styles.txtTitle}>TITLE</Text>

@@ -7,12 +7,13 @@ import { styles } from './styles';
 import { Divider } from 'react-native-paper';
 import { Colors } from '../../../themes/Colors';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
-import { useApolloClient, useQuery } from '@apollo/client';
+import { useApolloClient, useLazyQuery, useQuery } from '@apollo/client';
 import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
 import { Fonts } from '../../../themes';
 import { useNavigation } from '@react-navigation/native';
 import Avatar from '../../../component/Avatar/Avatar';
 import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
+import SpeakerDetails from '../../../component/speakerDetails/SpeakerDetails';
 
 const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   const navigation = useNavigation();
@@ -24,22 +25,26 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   const [filterUserData, setFilterUserData] = useState(item.userDetails);
   const [speakerData, setSpeekerData] = useState([]);
   const [filterSpeakerData, setFilterSpeakerData] = useState([]);
+  const [duration, setDuration] = useState('');
   const client = useApolloClient();
 
-  const getMeetingUser = useQuery(GET_LIVE_MEETING_USERS, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      meetingId: item.meetingId,
-      isSpeaker: true
-    },
-    onCompleted: (data) => {
-      setSpeekerData(data.liveMeetingUsers.userDetails);
-      setFilterSpeakerData(data.liveMeetingUsers.userDetails);
-    },
-    onError: (data) => {
-      console.log('GET_LIVE_MEETING_USERS error', data.message);
+  const [getSpeakerData, getMeetingUser] = useLazyQuery(
+    GET_LIVE_MEETING_USERS,
+    {
+      fetchPolicy: 'cache-and-network',
+      variables: {
+        meetingId: item.meetingId,
+        isSpeaker: true
+      },
+      onCompleted: (data) => {
+        setSpeekerData(data.liveMeetingUsers.userDetails);
+        setFilterSpeakerData(data.liveMeetingUsers.userDetails);
+      },
+      onError: (data) => {
+        console.log('GET_LIVE_MEETING_USERS error', data.message);
+      }
     }
-  });
+  );
 
   const searchFilterUsers = (text) => {
     if (text) {
@@ -66,13 +71,13 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
     }
   }, [socketEventUpdateMessage]);
 
-  let liveSpeaker = speakerData?.filter((speaker) => {
-    if (speaker.status == 'Speaking') {
-      return speaker;
-    } else {
-      return;
-    }
-  });
+  useEffect(() => {
+    // const interval = setInterval(() => {
+    getSpeakerData({ meetingId: item.meetingId, isSpeaker: true });
+    // }, 1000);
+    // setDuration(liveSpeaker[0]?.speakingDuration);
+    // return () => clearInterval(interval);
+  }, []);
 
   const navigateToEditSpeaker = (items) => {
     navigation.navigate('AddSpeaker', {
@@ -183,40 +188,13 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
             onPressEdit={navigateToEditSpeaker}
             meetingData={item}
           />
-          {liveSpeaker.length > 0 && (
-            <View style={styles.activeSpeakerContainer}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  width: '40%'
-                }}
-              >
-                <Avatar name={liveSpeaker[0]?.userName} size={SIZES[32]} />
-                <View style={styles.nameContainer}>
-                  <Text style={styles.txtName} numberOfLines={1}>
-                    {liveSpeaker[0]?.userName}
-                  </Text>
-                  <Text style={styles.txtSpeaker}>Speaker</Text>
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.txtRunningTime}>
-                  {liveSpeaker[0]?.speakingDuration} /{' '}
-                  <Text style={styles.txtTimeDuration}>
-                    {`${liveSpeaker[0]?.duration}:00`}
-                  </Text>
-                </Text>
-                <View style={styles.iconView}>
-                  <Icon
-                    name={IconName.Arrow_Right}
-                    height={SIZES[12]}
-                    width={SIZES[6]}
-                  />
-                </View>
-              </View>
-            </View>
-          )}
+          {
+            <SpeakerDetails
+              speakerData={speakerData}
+              getSpeakerData={getSpeakerData}
+              item={item}
+            />
+          }
         </View>
       )}
       {/* <UserDetailsComponent users={item.userDetails} /> */}

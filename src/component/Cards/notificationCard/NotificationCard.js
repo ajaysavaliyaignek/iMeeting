@@ -83,7 +83,7 @@ const NotificationCard = ({ item, index, onComponentOpen }) => {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-
+          marginRight: SIZES[16],
           transform: [{ scale: scale }]
         }}
       >

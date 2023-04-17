@@ -28,7 +28,8 @@ export const styles = StyleSheet.create({
   committeeDetailView: {
     paddingVertical: SIZES[24],
     paddingHorizontal: SIZES[16],
-    width: '100%'
+    width: '100%',
+    maxHeight: 5000
   },
   txtCommitteeTitle: {
     ...Fonts.PoppinsBold[20],

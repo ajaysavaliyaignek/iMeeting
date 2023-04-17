@@ -47,7 +47,7 @@ const AddGeneralVideoConference = ({
     <ScrollView style={styles.container}>
       <Text style={styles.txtAddSubjectTitle}>General</Text>
       {/* choose committe */}
-      <DropDownPicker
+      {/* <DropDownPicker
         data={committee?.map((comm) => ({
           label: comm.committeeTitle,
           value: comm.organizationId
@@ -61,7 +61,7 @@ const AddGeneralVideoConference = ({
         }}
         title={'CHOOSE COMMITTEE'}
         value={generaldData?.valueCommitee}
-      />
+      /> */}
       {/* dropdown video conference */}
       <DropDownPicker
         data={[

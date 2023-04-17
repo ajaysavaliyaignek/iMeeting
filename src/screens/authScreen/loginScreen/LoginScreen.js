@@ -197,7 +197,6 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
