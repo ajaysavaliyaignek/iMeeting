@@ -52,7 +52,7 @@ const downloadFile = async (fileUrl, setIsDownloaded) => {
     fileCache: true,
     addAndroidDownloads: {
       path: RootDir,
-      description: 'downloading file...',
+      description: 'Downloading file...',
       notification: true,
       // useDownloadManager works with Android only
       useDownloadManager: true

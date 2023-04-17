@@ -61,9 +61,9 @@ const BarCharts = ({
       userIds: type == 11 ? userIds.join(',') : ''
     },
     onCompleted: (data) => {
-      setBarChartColor(data.statistics.statisticColors);
-      setBarChartCommittees(data.statistics.statisticCommittees);
-      setBarChartData(data.statistics.statisticContent);
+      setBarChartColor(data?.statistics?.statisticColors);
+      setBarChartCommittees(data?.statistics?.statisticCommittees);
+      setBarChartData(data?.statistics?.statisticContent);
       let newBarchartcolor = (newbarCharLegendsData =
         data.statistics.statisticStatus.map((item, index) => {
           let isSelected = false;

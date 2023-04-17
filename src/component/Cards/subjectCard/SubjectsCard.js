@@ -487,8 +487,7 @@ const SubjectsCard = ({
             }}
             download={download}
             editable={
-              isLiveMeetingSubject !== undefined ||
-              isApproveMeetingSubject !== undefined
+              isLiveMeetingSubject || isApproveMeetingSubject
                 ? false
                 : isDecisionSubject
                 ? decisionData?.statusTitle == null ||
@@ -500,8 +499,7 @@ const SubjectsCard = ({
                 : false
             }
             deleted={
-              isLiveMeetingSubject !== undefined ||
-              isApproveMeetingSubject !== undefined
+              isLiveMeetingSubject || isApproveMeetingSubject
                 ? false
                 : isDecisionSubject
                 ? false

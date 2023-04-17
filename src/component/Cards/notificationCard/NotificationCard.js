@@ -73,16 +73,18 @@ const NotificationCard = ({ item, index, onComponentOpen }) => {
 
   const renderRightActions = (progress, dragX) => {
     const scale = dragX.interpolate({
-      inputRange: item.archived == false ? [0, 150] : [0, 70],
-      outputRange: [0, 1],
+      inputRange: item.archived == false ? [-100, 0] : [-60, 0],
+      outputRange: [0.7, 0]
 
-      extrapolate: 'clamp'
+      // extrapolate: 'clamp'
     });
     return (
       <Animated.View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
+          marginRight: SIZES[16],
+          
 
           transform: [{ scale: scale }]
         }}
@@ -112,7 +114,7 @@ const NotificationCard = ({ item, index, onComponentOpen }) => {
       <Divider style={styles.divider} />
       <Swipeable
         ref={ref}
-        renderLeftActions={renderRightActions}
+        renderRightActions={renderRightActions}
         //   leftThreshold={100}
         rightThreshold={0}
         onSwipeableOpen={() => {

@@ -101,7 +101,7 @@ const LiveApproveMeetingSubjectVotingsDetails = ({
             >
               {getVotingDetails?.error?.message == 'Network request failed'
                 ? 'No Internet connection'
-                : getVotingDetails?.error?.message}
+                : 'Something went wrong.'}
             </Text>
           </View>
         ) : getVotingDetails?.loading ? (

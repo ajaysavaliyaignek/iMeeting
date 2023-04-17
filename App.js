@@ -17,8 +17,10 @@ const App = () => {
   useEffect(() => {
     SplashScreen.hide();
     const getToken = () => {
+      debugger;
       AsyncStorage.getItem('@token')
         .then((result) => {
+          debugger;
           if (result) {
             setToken('MainBottomTab');
           } else {

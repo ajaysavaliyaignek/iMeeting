@@ -358,7 +358,7 @@ const DetailsScreen = () => {
                   >
                     {errorGetMeetings.message == 'Network request failed'
                       ? 'No Internet connection'
-                      : errorGetMeetings.message}
+                      : 'Something went wrong.'}
                   </Text>
                 </View>
               ) : filterMeetingData.length > 0 ? (

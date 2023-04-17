@@ -124,7 +124,7 @@ const SubjectListComponent = ({
           <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
             {SubjectsError.message == 'Network request failed'
               ? 'No Internet connection'
-              : SubjectsError.message}
+              : "Something went wrong."}
           </Text>
         </View>
       ) : filterData.length > 0 ? (

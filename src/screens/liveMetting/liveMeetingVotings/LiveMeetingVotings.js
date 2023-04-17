@@ -88,7 +88,7 @@ const LiveMeetingVotings = ({
           <Text style={{ ...Fonts.PoppinsSemiBold[20], color: Colors.primary }}>
             {getVotingDetails?.error?.message == 'Network request failed'
               ? 'No Internet connection'
-              : getVotingDetails?.error?.message}
+              : 'Something went wrong.'}
           </Text>
         </View>
       ) : getVotingDetails?.loading ? (

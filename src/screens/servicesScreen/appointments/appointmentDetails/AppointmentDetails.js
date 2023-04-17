@@ -370,20 +370,24 @@ const AppointmentsDetails = () => {
             />
           )}
         </View>
-        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
-        <View style={{ marginTop: SIZES[40], marginHorizontal: SIZES[16] }}>
-          <Text style={styles.txtTitle}>Users</Text>
-        </View>
-        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
-        <UserDetailsComponent
-          users={appointment?.userDetails}
-          isUserRequired={true}
-          isSwitchOnRow={true}
-          isSwichDisabled={true}
-          searchText={''}
-          visibleIndex={-1}
-          setVisibleIndex={() => {}}
-        />
+
+        {appointment?.userDetails?.length > 0 && (
+          <View>
+            <View style={{ marginTop: SIZES[16], marginHorizontal: SIZES[16] }}>
+              <Text style={styles.txtTitle}>Users</Text>
+            </View>
+            <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
+            <UserDetailsComponent
+              users={appointment?.userDetails}
+              isUserRequired={true}
+              isSwitchOnRow={true}
+              isSwichDisabled={true}
+              searchText={''}
+              visibleIndex={-1}
+              setVisibleIndex={() => {}}
+            />
+          </View>
+        )}
       </ScrollView>
       {role == 'Head' || role == 'Secretary' ? (
         <View style={styles.bottomContainer}>

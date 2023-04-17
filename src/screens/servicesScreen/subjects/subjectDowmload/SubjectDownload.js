@@ -131,7 +131,7 @@ const SubjectDownload = () => {
           fileCache: true,
           addAndroidDownloads: {
             path: fPath,
-            description: 'downloading file...',
+            description: 'Downloading file...',
             notification: true,
             // useDownloadManager works with Android only
             useDownloadManager: true
