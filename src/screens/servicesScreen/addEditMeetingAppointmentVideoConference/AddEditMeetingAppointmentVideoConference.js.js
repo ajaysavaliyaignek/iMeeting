@@ -166,6 +166,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
       onCompleted: (data) => {
         if (data) {
           let meeting = data?.meeting;
+          console.log(meeting?.attendanceFeedbackDate, meeting?.deadlineDate);
           setGeneralData({
             title: meeting?.meetingTitle,
             discription: meeting?.description,
@@ -187,13 +188,21 @@ const AddEditMeetingAppointmentVideoConference = () => {
             valueVideoConference: meeting?.platformlink?.includes('google')
               ? 1
               : 2,
-            calendarValue: moment(meeting?.deadlineDate).format('YYYY-MM-DD'),
+            calendarValue: meeting?.deadlineDate
+              ? moment(meeting?.deadlineDate).format('YYYY-MM-DD')
+              : moment(
+                  `${meeting?.endDate}, ${meeting?.endTime}`,
+                  'YYYY-MM-DD, hh:mm a'
+                ).format('YYYY-MM-DD'),
             previousSubject: [],
             subjectSuggestion: meeting.subjectSuggestion,
             attendanceFeedback: meeting.attendanceFeedback,
-            attendanceFeedbackDate: moment(
-              meeting?.attendanceFeedbackDate
-            ).format('YYYY-MM-DD')
+            attendanceFeedbackDate: meeting?.attendanceFeedbackDate
+              ? moment(meeting?.attendanceFeedbackDate).format('YYYY-MM-DD')
+              : moment(
+                  `${meeting?.endDate}, ${meeting?.endTime}`,
+                  'YYYY-MM-DD, hh:mm a'
+                ).format('YYYY-MM-DD')
           });
         }
       },

@@ -78,7 +78,7 @@ export const styles = StyleSheet.create({
   },
 
   mainBoxView: {
-    paddingVertical: 16,
+    paddingTop: 16,
     backgroundColor: Colors.white,
     shadowColor: Colors.gray,
     shadowOffset: {
@@ -93,7 +93,7 @@ export const styles = StyleSheet.create({
     // marginTop: 160
     position: 'absolute',
     bottom: '30%',
-    height: SIZES[265],
+    // height: SIZES[265],
     width: SIZES[280]
   },
   txtClose: {

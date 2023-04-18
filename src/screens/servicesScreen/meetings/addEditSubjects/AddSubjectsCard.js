@@ -28,6 +28,7 @@ const AddSubjectsCard = ({
   isPreviousSubject,
   isNewSubject
 }) => {
+  console.log('item', item);
   const navigation = useNavigation();
   const [valueStatus, setValueStatus] = useState(
     item.statusTitle == 'Approved'
@@ -136,7 +137,57 @@ const AddSubjectsCard = ({
             }}
           >
             <Text style={styles.txtSubjectsTitle}>Status</Text>
-            <DropDownPicker
+            <View
+              style={[
+                styles.discriptionView,
+                {
+                  backgroundColor:
+                    item.statusTitle == 'Deleted'
+                      ? '#ffc8be'
+                      : item.statusTitle == 'Pre-Proposed'
+                      ? '#b4dcff'
+                      : item.statusTitle == 'Tentative'
+                      ? '#deb887'
+                      : item.statusTitle == 'Approved'
+                      ? 'rgba(129, 171, 150, 0.1)'
+                      : item.statusTitle == 'Transferred'
+                      ? 'rgba(231, 157, 115, 0.1)'
+                      : item.statusTitle == 'Proposed'
+                      ? 'rgb(101, 142, 180, 0.1)'
+                      : item.statusTitle == 'Unassigned'
+                      ? 'rgb(101, 142, 180, 0.1)'
+                      : Colors.white,
+                  marginLeft: 8
+                }
+              ]}
+            >
+              <Text
+                style={[
+                  styles.discription,
+                  {
+                    color:
+                      item.statusTitle == 'Deleted'
+                        ? '#ff6347'
+                        : item.statusTitle == 'Pre-Proposed'
+                        ? '#337ab7'
+                        : item.statusTitle == 'Tentative'
+                        ? ' #89530d;'
+                        : item.statusTitle == 'Approved'
+                        ? 'rgba(129, 171, 150, 1)'
+                        : item.statusTitle == 'Transferred'
+                        ? 'rgba(231, 157, 115, 1)'
+                        : item.statusTitle == 'Proposed'
+                        ? 'rgb(101, 142, 180, 1)'
+                        : item.statusTitle == 'Unassigned'
+                        ? 'rgb(101, 142, 180, 1)'
+                        : Colors.bold
+                  }
+                ]}
+              >
+                {item.statusTitle}
+              </Text>
+            </View>
+            {/* <DropDownPicker
               listMode="MODAL"
               open={openIndex == index}
               value={valueStatus}
@@ -212,7 +263,7 @@ const AddSubjectsCard = ({
                       : Colors.Transfered
                 }
               ]}
-            />
+            /> */}
           </View>
         </View>
 

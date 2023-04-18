@@ -381,14 +381,14 @@ const LiveMeetingMenu = () => {
           <View
             style={[
               styles.mainBoxView,
-              {
-                height:
-                  item.yourRoleName !== 'Member'
-                    ? Platform.OS == 'ios'
-                      ? 265
-                      : 320
-                    : SIZES[220]
-              }
+              // {
+              //   height:
+              //     item.yourRoleName !== 'Member'
+              //       ? Platform.OS == 'ios'
+              //         ? 265
+              //         : 320
+              //       : SIZES[220]
+              // }
             ]}
           >
             <View style={styles.textContainer}>

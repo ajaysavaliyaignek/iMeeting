@@ -159,18 +159,60 @@ const MeetingDetails = () => {
         {role == 'Head' || role == 'Secretary' ? (
           <View style={styles.bottomContainer}>
             <Divider style={styles.divider} />
-            {item.meetingStatusTitle !== 'Deleted' && (
-              <View style={styles.btnContainer}>
-                {item.meetingStatusTitle !== 'Closed' && (
+            {item.meetingStatusTitle !== 'Deleted' &&
+              item.meetingStatusTitle !== 'Cancelled' && (
+                <View style={styles.btnContainer}>
+                  {item.meetingStatusTitle !== 'Closed' && (
+                    <Button
+                      title={'Edit'}
+                      layoutStyle={[
+                        styles.btnLayout,
+                        {
+                          backgroundColor: '#F3F6F9',
+                          width:
+                            item.meetingStatusTitle == 'Closed'
+                              ? '100%'
+                              : !isLive && !isSoftClose
+                              ? '48%'
+                              : isLive && !isSoftClose
+                              ? '30%'
+                              : '23%'
+                        }
+                      ]}
+                      textStyle={{
+                        ...Fonts.PoppinsSemiBold[14],
+                        color: Colors.primary
+                      }}
+                      onPress={() => {
+                        navigation.navigate(
+                          'AddEditMeetingAppointmentVideoConference',
+                          {
+                            screenName: 'Edit meeting',
+                            type: 'Meeting',
+                            screensArray: [
+                              'general',
+                              'users',
+                              'dateandtime',
+                              'location',
+                              'subjects'
+                            ],
+                            isEdit: true,
+                            details: item
+                          }
+                        );
+                        setMeetingsData([]);
+                      }}
+                    />
+                  )}
                   <Button
-                    title={'Edit'}
+                    title={'Delete'}
                     layoutStyle={[
                       styles.btnLayout,
                       {
-                        backgroundColor: '#F3F6F9',
+                        backgroundColor: '#DD7878',
                         width:
                           item.meetingStatusTitle == 'Closed'
-                            ? '100%'
+                            ? '48%'
                             : !isLive && !isSoftClose
                             ? '48%'
                             : isLive && !isSoftClose
@@ -178,117 +220,79 @@ const MeetingDetails = () => {
                             : '23%'
                       }
                     ]}
-                    textStyle={{
-                      ...Fonts.PoppinsSemiBold[14],
-                      color: Colors.primary
-                    }}
-                    onPress={() => {
-                      navigation.navigate(
-                        'AddEditMeetingAppointmentVideoConference',
+                    onPress={onDeleteHandler}
+                  />
+                  {isLive && (
+                    <Button
+                      title={'Start'}
+                      layoutStyle={[
+                        styles.btnLayout,
                         {
-                          screenName: 'Edit meeting',
-                          type: 'Meeting',
-                          screensArray: [
-                            'general',
-                            'users',
-                            'dateandtime',
-                            'location',
-                            'subjects'
-                          ],
-                          isEdit: true,
-                          details: item
+                          width:
+                            isLive && !isSoftClose
+                              ? '30%'
+                              : isLive && isSoftClose
+                              ? '23%'
+                              : null
                         }
-                      );
-                      setMeetingsData([]);
-                    }}
-                  />
-                )}
-                <Button
-                  title={'Delete'}
-                  layoutStyle={[
-                    styles.btnLayout,
-                    {
-                      backgroundColor: '#DD7878',
-                      width:
-                        item.meetingStatusTitle == 'Closed'
-                          ? '48%'
-                          : !isLive && !isSoftClose
-                          ? '48%'
-                          : isLive && !isSoftClose
-                          ? '30%'
-                          : '23%'
-                    }
-                  ]}
-                  onPress={onDeleteHandler}
-                />
-                {isLive && (
-                  <Button
-                    title={'Start'}
-                    layoutStyle={[
-                      styles.btnLayout,
-                      {
-                        width:
-                          isLive && !isSoftClose
-                            ? '30%'
-                            : isLive && isSoftClose
-                            ? '23%'
-                            : null
-                      }
-                    ]}
-                    onPress={() => {
-                      if (
-                        item.meetingStatusTitle !== 'Soft-Closed' &&
-                        item.meetingStatusTitle !== 'Live'
-                      ) {
-                        const filterStatus = meetingStatus?.filter((status) => {
-                          if (
-                            status.meetingStatusTitle == 'Live' ||
-                            status.meetingStatusTitle == 'Live'
-                          ) {
-                            return status;
-                          }
-                        });
-
-                        updateMeetingStatus({
-                          variables: {
-                            meeting: {
-                              meetingId: item?.meetingId,
-                              meetingStatusId: filterStatus[0]?.meetingStatusId
+                      ]}
+                      onPress={() => {
+                        if (
+                          item.meetingStatusTitle !== 'Soft-Closed' &&
+                          item.meetingStatusTitle !== 'Live'
+                        ) {
+                          const filterStatus = meetingStatus?.filter(
+                            (status) => {
+                              if (
+                                status.meetingStatusTitle == 'Live' ||
+                                status.meetingStatusTitle == 'Live'
+                              ) {
+                                return status;
+                              }
                             }
-                          }
+                          );
+
+                          updateMeetingStatus({
+                            variables: {
+                              meeting: {
+                                meetingId: item?.meetingId,
+                                meetingStatusId:
+                                  filterStatus[0]?.meetingStatusId
+                              }
+                            }
+                          });
+                        } else {
+                          navigation.navigate('LiveMeetingMenu', {
+                            item,
+                            meetingStatus: meetingStatus
+                          });
+                        }
+                      }}
+                    />
+                  )}
+                  {isSoftClose && (
+                    <Button
+                      title={'Approve meeting'}
+                      layoutStyle={[
+                        styles.btnLayout,
+                        {
+                          width:
+                            item.meetingStatusTitle == 'Closed'
+                              ? '48%'
+                              : isLive
+                              ? '30%'
+                              : '23%'
+                        }
+                      ]}
+                      onPress={() => {
+                        navigation.navigate('ApproveMeeting', {
+                          item: item
                         });
-                      } else {
-                        navigation.navigate('LiveMeetingMenu', {
-                          item,
-                          meetingStatus: meetingStatus
-                        });
-                      }
-                    }}
-                  />
-                )}
-                {isSoftClose && (
-                  <Button
-                    title={'Approve meeting'}
-                    layoutStyle={[
-                      styles.btnLayout,
-                      {
-                        width:
-                          item.meetingStatusTitle == 'Closed'
-                            ? '48%'
-                            : isLive
-                            ? '30%'
-                            : '23%'
-                      }
-                    ]}
-                    onPress={() => {
-                      navigation.navigate('ApproveMeeting', {
-                        item: item
-                      });
-                    }}
-                  />
-                )}
-              </View>
-            )}
+                      }}
+                    />
+                  )}
+                </View>
+              )}
           </View>
         ) : (
           <View style={{ padding: SIZES[16] }}>

@@ -76,9 +76,9 @@ const CalendarMonthViewComponent = () => {
 
         let eventvalue = Value.map((val, index) => {
           var newEvent = val?.map((value) => {
-            let darkColor = selectColorAndIcon(value.item_type).darkColor;
-            let lightColor = selectColorAndIcon(value.item_type).lightColor;
-            let tickIcon = selectColorAndIcon(value.item_type).tickIcon;
+            let darkColor = selectColorAndIcon(value.item_type)?.darkColor;
+            let lightColor = selectColorAndIcon(value.item_type)?.lightColor;
+            let tickIcon = selectColorAndIcon(value.item_type)?.tickIcon;
             return { ...value, darkColor, lightColor, tickIcon };
           });
           return { ...val, ...newEvent };
