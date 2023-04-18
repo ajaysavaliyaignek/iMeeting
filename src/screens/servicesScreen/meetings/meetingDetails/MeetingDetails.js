@@ -292,7 +292,7 @@ const MeetingDetails = () => {
           </View>
         ) : (
           <View style={{ padding: SIZES[16] }}>
-            {item.meetingStatusTitle == 'Live' && (
+            {isLive && (
               <Button
                 title={'Start'}
                 layoutStyle={[styles.btnLayout, { width: '100%' }]}

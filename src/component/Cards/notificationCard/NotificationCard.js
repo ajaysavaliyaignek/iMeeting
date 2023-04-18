@@ -2,11 +2,11 @@ import { View, Text, Animated } from 'react-native';
 import React, { useEffect, useRef } from 'react';
 import { Divider } from 'react-native-paper';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useMutation } from '@apollo/client';
 
 import { styles } from './styles';
-import { RectButton, TouchableOpacity } from 'react-native-gesture-handler';
 import { SIZES } from '../../../themes/Sizes';
-import { useMutation } from '@apollo/client';
 import {
   DELETE_NOTIFICATIONS,
   UPDATE_NOTIFICATION
@@ -84,7 +84,8 @@ const NotificationCard = ({ item, index, onComponentOpen }) => {
           flexDirection: 'row',
           alignItems: 'center',
           marginRight: SIZES[16],
-          transform: [{ scale: scale }]
+          transform: [{ scale: scale }],
+          width: item.archived == false ? '45%' : null
         }}
       >
         {item.archived == false && (
@@ -92,11 +93,11 @@ const NotificationCard = ({ item, index, onComponentOpen }) => {
             style={styles.cancelBtnLayout}
             onPress={onPressRead}
           >
-            <Text style={[styles.txtCancelButton]}>Read</Text>
+            <Text style={styles.txtCancelButton}>Read</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity style={styles.nextBtnLayout} onPress={onPressDelete}>
-          <Text style={[styles.txtNextBtn]}>Delete</Text>
+          <Text style={styles.txtNextBtn}>Delete</Text>
         </TouchableOpacity>
       </Animated.View>
     );

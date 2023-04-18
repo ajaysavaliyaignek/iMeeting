@@ -1,17 +1,16 @@
-import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { Divider } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { useApolloClient, useLazyQuery, useQuery } from '@apollo/client';
+
 import { SIZES } from '../../../themes/Sizes';
-import { Icon, IconName } from '../../../component';
 import { Button } from '../../../component/button/Button';
 import { styles } from './styles';
-import { Divider } from 'react-native-paper';
 import { Colors } from '../../../themes/Colors';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
-import { useApolloClient, useLazyQuery, useQuery } from '@apollo/client';
 import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
 import { Fonts } from '../../../themes';
-import { useNavigation } from '@react-navigation/native';
-import Avatar from '../../../component/Avatar/Avatar';
 import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 import SpeakerDetails from '../../../component/speakerDetails/SpeakerDetails';
 

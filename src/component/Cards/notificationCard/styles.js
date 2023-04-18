@@ -11,24 +11,20 @@ export const styles = StyleSheet.create({
   },
   container: {
     justifyContent: 'center',
-    marginVertical: SIZES[8]
+    marginVertical: SIZES[8],
+    marginRight: SIZES[16]
   },
   txtNotification: {
     marginVertical: SIZES[16],
     ...Fonts.PoppinsSemiBold[14],
     color: Colors.bold
   },
-  //   buttonContainer: {
-  //     flexDirection: 'row'
-  //     // justifyContent: 'space-between'
-  //   },
+
   cancelBtnLayout: {
     backgroundColor: '#F3F6F9',
     paddingVertical: SIZES[16],
     paddingHorizontal: SIZES[16],
     borderRadius: SIZES[4]
-    // marginVertical: SIZES[12],
-    // width: '30%'
   },
   txtCancelButton: {
     ...Fonts.PoppinsSemiBold[12],

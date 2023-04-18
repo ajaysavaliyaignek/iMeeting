@@ -1,12 +1,13 @@
 import { View, Text, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { useApolloClient, useLazyQuery } from '@apollo/client';
+
 import { Colors } from '../../themes/Colors';
 import { SIZES } from '../../themes/Sizes';
 import { Fonts } from '../../themes';
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon';
 import IconName from '../Icon/iconName';
-import { useApolloClient, useLazyQuery } from '@apollo/client';
 import { GET_LIVE_MEETING_USERS } from '../../graphql/query';
 
 const SpeakerDetails = ({ speakerData, item }) => {

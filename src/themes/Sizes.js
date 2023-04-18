@@ -45,11 +45,13 @@ export const SIZES = {
   170: Normalize(170),
   186: Normalize(186),
   220: Normalize(220),
+  240: Normalize(240),
   250: Normalize(250),
   260: Normalize(260),
   264: Normalize(264),
   265: Normalize(265),
   280: Normalize(280),
+  290: Normalize(290),
   350: Normalize(350),
   400: Normalize(400),
   600: Normalize(600)

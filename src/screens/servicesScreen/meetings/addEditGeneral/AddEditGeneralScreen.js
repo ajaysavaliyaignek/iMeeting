@@ -31,8 +31,6 @@ const AddEditGeneralScreen = ({
       ? 5
       : null;
 
-  console.log('committeeRoleType', committeeRoleType);
-
   details?.attachFileIds?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
       fetchPolicy: 'cache-and-network',

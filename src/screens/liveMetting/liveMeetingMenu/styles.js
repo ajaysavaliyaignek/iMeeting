@@ -73,12 +73,11 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     paddingHorizontal: 8,
-
     backgroundColor: 'rgba(100, 100, 100, 0.7)'
   },
 
   mainBoxView: {
-    paddingVertical: 16,
+    paddingTop: 16,
     backgroundColor: Colors.white,
     shadowColor: Colors.gray,
     shadowOffset: {
@@ -89,11 +88,8 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     borderRadius: 14,
-
-    // marginTop: 160
     position: 'absolute',
-    bottom: '30%',
-    height: SIZES[265],
+    bottom: '33%',
     width: SIZES[280]
   },
   txtClose: {

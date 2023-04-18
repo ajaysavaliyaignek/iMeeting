@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
-  Platform
+  Platform,
+  useWindowDimensions
 } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -52,7 +53,8 @@ const LiveMeetingMenu = () => {
   const [tabCounts, setTabCounts] = useState({});
   const client = useApolloClient();
   const socketEventUpdate = useRef(null);
-
+  const { width, height } = useWindowDimensions();
+  console.log({ height });
   useEffect(() => {
     socketEventUpdate.current = new WebSocket(
       `wss://${companyUrl}//o/live-meeting?meetingId=${item?.meetingId}`
@@ -378,19 +380,7 @@ const LiveMeetingMenu = () => {
         }}
       >
         <View style={styles.modal}>
-          <View
-            style={[
-              styles.mainBoxView,
-              {
-                height:
-                  item.yourRoleName !== 'Member'
-                    ? Platform.OS == 'ios'
-                      ? 265
-                      : 320
-                    : SIZES[220]
-              }
-            ]}
-          >
+          <View style={styles.mainBoxView}>
             <View style={styles.textContainer}>
               <Text style={styles.txtClose}>Close</Text>
               <Text style={styles.txtWarn}>
