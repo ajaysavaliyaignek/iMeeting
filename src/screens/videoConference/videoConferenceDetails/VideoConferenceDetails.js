@@ -10,7 +10,7 @@ import {
   Linking
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import moment from 'moment';
 import { Divider } from 'react-native-paper';
 import momentDurationFormatSetup from 'moment-duration-format';
@@ -27,13 +27,16 @@ import { Fonts } from '../../../themes';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
 import { GET_ANSWER, GET_USER_PAYLOAD } from '../../../graphql/query';
 import { DELETE_VIDEO_CONFERENCE } from '../../../graphql/mutation';
+import { UserContext } from '../../../context';
 
 const VideoConferenceDetails = () => {
   const navigation = useNavigation();
   momentDurationFormatSetup(moment);
+  const { user } = useContext(UserContext);
   const route = useRoute();
   const { item } = route?.params;
-  const [user, setUser] = useState(null);
+  console.log({ item });
+  const [userId, setUser] = useState(null);
   const [answer, setAnswer] = useState(null);
   const [role, setRole] = useState(item.yourRoleName);
 
@@ -188,16 +191,18 @@ const VideoConferenceDetails = () => {
         <View style={styles.detailsContainer}>
           {/* general details */}
           <Text style={styles.txtTitle}>General</Text>
-          {details(
-            'Vi-nce platform',
-            item.platformName,
-            true,
-            item.platformlink
-          )}
-          {details('Your role', item.yourRoleName)}
-          {details('Title', item.videoConferenceTitle)}
-          {details('Description', item.videoConferenceDescription)}
-          {details('Creator', item.creatorName)}
+          {item?.platformlink !== null &&
+            item?.platformlink !== '' &&
+            details(
+              'Vi-nce platform',
+              item?.platformName,
+              true,
+              item?.platformlink
+            )}
+          {details('Your role', item?.yourRoleName)}
+          {details('Title', item?.videoConferenceTitle)}
+          {details('Description', item?.videoConferenceDescription)}
+          {details('Creator', item?.creatorName)}
         </View>
 
         {/* date and time details */}
@@ -250,7 +255,7 @@ const VideoConferenceDetails = () => {
                     borderBottomColor: Colors.primary
                   }}
                   onPress={() =>
-                    navigation.navigate('YourAnswer', { item, userID: user })
+                    navigation.navigate('YourAnswer', { item, userID: userId })
                   }
                 >
                   <Text
@@ -286,61 +291,64 @@ const VideoConferenceDetails = () => {
             />
           </View>
         )}
-        {/* <View style={{ marginTop: SIZES[24], marginHorizontal: SIZES[16] }}>
-          <Text style={styles.txtTitle}>Users</Text>
-        </View>
-        <Divider style={[styles.divider, { marginTop: SIZES[24] }]} />
-        <UserDetailsComponent
-          users={item?.userDetails}
-          isUserRequired={true}
-          isSwitchOnRow={true}
-          isSwichDisabled={true}
-          searchText={''}
-          visibleIndex={-1}
-          setVisibleIndex={() => {}}
-        /> */}
       </ScrollView>
-
       {/* edit delete button */}
-      {role == 'Head' || role == 'Secretary' ? (
-        <View style={styles.bottomContainer}>
-          <Divider style={styles.divider} />
-          {!item.isDisable && (
-            <View style={styles.btnContainer}>
-              <Button
-                title={'Edit'}
-                layoutStyle={[styles.btnLayout, { backgroundColor: '#F3F6F9' }]}
-                textStyle={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.primary
-                }}
-                onPress={() =>
-                  navigation.navigate(
-                    'AddEditMeetingAppointmentVideoConference',
-                    {
-                      screenName: 'Edit video conference',
-                      type: 'VideoConference',
-                      screensArray: [
-                        'generalVideoConference',
-                        'users',
-                        'dateandtime'
-                      ],
-                      isEdit: true,
-                      details: item
-                    }
-                  )
-                }
-              />
-              <Button
-                title={'Delete'}
-                layoutStyle={[styles.btnLayout, { backgroundColor: '#DD7878' }]}
-                onPress={() => onDeleteHandler(item.videoConferenceId)}
-              />
-              <Button title={'Start'} layoutStyle={[styles.btnLayout]} />
-            </View>
-          )}
-        </View>
-      ) : null}
+      <View style={styles.bottomContainer}>
+        <Divider style={styles.divider} />
+        {!item.isDisable && item?.creatorName == user?.userName ? (
+          <View style={styles.btnContainer}>
+            <Button
+              title={'Edit'}
+              layoutStyle={[styles.btnLayout, { backgroundColor: '#F3F6F9' }]}
+              textStyle={{
+                ...Fonts.PoppinsSemiBold[14],
+                color: Colors.primary
+              }}
+              onPress={() =>
+                navigation.navigate(
+                  'AddEditMeetingAppointmentVideoConference',
+                  {
+                    screenName: 'Edit video conference',
+                    type: 'VideoConference',
+                    screensArray: [
+                      'generalVideoConference',
+                      'users',
+                      'dateandtime'
+                    ],
+                    isEdit: true,
+                    details: item
+                  }
+                )
+              }
+            />
+            <Button
+              title={'Delete'}
+              layoutStyle={[styles.btnLayout, { backgroundColor: '#DD7878' }]}
+              onPress={() => onDeleteHandler(item.videoConferenceId)}
+            />
+            <Button
+              title={'Start'}
+              layoutStyle={[styles.btnLayout]}
+              onPress={() => {
+                Linking.openURL(item?.platformlink);
+              }}
+            />
+          </View>
+        ) : (
+          !item.isDisable && (
+            <Button
+              title={'Start'}
+              layoutStyle={[
+                styles.btnLayout,
+                { width: '100%', marginTop: SIZES[16] }
+              ]}
+              onPress={() => {
+                Linking.openURL(item?.platformlink);
+              }}
+            />
+          )
+        )}
+      </View>
     </SafeAreaView>
   );
 };
