@@ -41,8 +41,9 @@ const AddEditDelegation = () => {
     variables: {
       isDeleted: false,
       externalUser: false,
-      searchValue: ''
-      // type: 6
+      searchValue: '',
+      type: 6,
+      organizationIds: ''
     },
     onCompleted: (data) => {
       setUsers(data?.committeeMembersList.items);

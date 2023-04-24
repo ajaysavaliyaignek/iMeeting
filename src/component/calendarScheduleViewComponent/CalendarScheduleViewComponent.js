@@ -102,10 +102,10 @@ const CalendarScheduleViewComponent = () => {
           var listOfEventsOfTheSelectedDate = newList[element];
           let dateEventList = [];
 
-          listOfEventsOfTheSelectedDate.forEach((event) => {
-            let darkColor = selectColorAndIcon(event.item_type).darkColor;
-            let lightColor = selectColorAndIcon(event.item_type).lightColor;
-            let tickIcon = selectColorAndIcon(event.item_type).tickIcon;
+          listOfEventsOfTheSelectedDate?.forEach((event) => {
+            let darkColor = selectColorAndIcon(event.item_type)?.darkColor;
+            let lightColor = selectColorAndIcon(event.item_type)?.lightColor;
+            let tickIcon = selectColorAndIcon(event?.item_type)?.tickIcon;
             dateEventList.push({
               ...event,
               darkColor,

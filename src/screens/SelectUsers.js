@@ -93,17 +93,15 @@ const SelectUsers = () => {
       isDeleted: false,
       externalUser: false,
       searchValue: searchText,
-      organizationId:
-        // committee == null ? 0 :
-        committee
-      // type:
-      //   type == 'Meeting'
-      //     ? 1
-      //     : type == 'Appointment'
-      //     ? 4
-      //     : type == 'VideoConference'
-      //     ? 5
-      //     : 6
+      organizationIds: committee == null ? '' : `${committee}`,
+      type:
+        type == 'Meeting'
+          ? 1
+          : type == 'Appointment'
+          ? 4
+          : type == 'VideoConference'
+          ? 5
+          : 6
     },
     onCompleted: (data) => {
       usersData = data?.committeeMembersList.items.map((item, index) => {
@@ -134,15 +132,15 @@ const SelectUsers = () => {
         isDeleted: false,
         externalUser: true,
         searchValue: searchText,
-        organizationId: 0
-        // type:
-        //   type == 'Meeting'
-        //     ? 1
-        //     : type == 'Appointment'
-        //     ? 4
-        //     : type == 'VideoConference'
-        //     ? 5
-        //     : 6
+        organizationIds: committee == null ? '' : `${committee}`,
+        type:
+          type == 'Meeting'
+            ? 1
+            : type == 'Appointment'
+            ? 4
+            : type == 'VideoConference'
+            ? 5
+            : 6
       },
       onCompleted: (data) => {
         externalUserData = data?.committeeMembersList.items.map(

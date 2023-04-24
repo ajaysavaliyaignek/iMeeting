@@ -750,8 +750,9 @@ export const GET_All_USERS = gql`
     $searchValue: String
     $sort: String
     $externalUser: Boolean
-    $organizationId: Long
+    $organizationIds: String
     $isDeleted: Boolean
+    $type: Int
   ) {
     committeeMembersList(
       page: $page
@@ -760,8 +761,9 @@ export const GET_All_USERS = gql`
       searchValue: $searchValue
       sort: $sort
       externalUser: $externalUser
-      organizationId: $organizationId
+      organizationIds: $organizationIds
       isDeleted: $isDeleted
+      type: $type
     ) {
       items {
         userId
