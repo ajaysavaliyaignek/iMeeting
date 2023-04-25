@@ -380,7 +380,7 @@ const LiveMeetingMenu = () => {
         }}
       >
         <View style={styles.modal}>
-          <View style={styles.mainBoxView}>
+          <View style={[styles.mainBoxView]}>
             <View style={styles.textContainer}>
               <Text style={styles.txtClose}>Close</Text>
               <Text style={styles.txtWarn}>

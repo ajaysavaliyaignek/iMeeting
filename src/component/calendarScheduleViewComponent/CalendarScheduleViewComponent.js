@@ -1,4 +1,4 @@
-import { View, FlatList, useWindowDimensions } from 'react-native';
+import { View, FlatList } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 import { useLazyQuery } from '@apollo/client';
@@ -6,7 +6,6 @@ import { useLazyQuery } from '@apollo/client';
 import { Colors } from '../../themes/Colors';
 import { GET_CALENDER_EVENTS } from '../../graphql/query';
 import { selectColorAndIcon } from '../../screens/servicesScreen/addEditMeetingAppointmentVideoConference/screenRender';
-import { Fonts } from '../../themes';
 import { SIZES } from '../../themes/Sizes';
 import CalenderdayEventsComponent from '../calenderDayEventsComponent/CalenderdayEventsComponent';
 import Loader from '../Loader/Loader';
@@ -102,10 +101,10 @@ const CalendarScheduleViewComponent = () => {
           var listOfEventsOfTheSelectedDate = newList[element];
           let dateEventList = [];
 
-          listOfEventsOfTheSelectedDate?.forEach((event) => {
+          listOfEventsOfTheSelectedDate.forEach((event) => {
             let darkColor = selectColorAndIcon(event.item_type)?.darkColor;
             let lightColor = selectColorAndIcon(event.item_type)?.lightColor;
-            let tickIcon = selectColorAndIcon(event?.item_type)?.tickIcon;
+            let tickIcon = selectColorAndIcon(event.item_type)?.tickIcon;
             dateEventList.push({
               ...event,
               darkColor,

@@ -67,9 +67,11 @@ const CommitteesCard = ({
         {!isProfileCommittee && (
           <RowData
             name={'Date'}
-            discription={moment(item.setUpDate, 'YYYY-MM-DD').format(
-              'DD MMM YYYY'
-            )}
+            discription={
+              item.setUpDate !== ''
+                ? moment(item.setUpDate, 'YYYY-MM-DD').format('DD MMM YYYY')
+                : '-'
+            }
           />
         )}
       </View>

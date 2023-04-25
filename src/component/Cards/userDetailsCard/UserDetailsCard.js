@@ -224,7 +224,7 @@ const UserDetailsCard = ({
   };
 
   return (
-    <Pressable
+    <View
       // activeOpacity={0.8}
       style={[
         Platform.OS !== 'android' ? { zIndex: 1 } : null,
@@ -425,7 +425,7 @@ const UserDetailsCard = ({
         </View>
       )}
       <Divider style={styles.divider} />
-    </Pressable>
+    </View>
   );
 };
 

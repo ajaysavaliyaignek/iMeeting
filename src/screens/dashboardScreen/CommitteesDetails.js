@@ -99,7 +99,9 @@ const CommitteesDetails = () => {
             <Text style={styles.txtSubDetails}>Setup date</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={styles.txtSubDiscription}>
-                {moment(item.setUpDate, 'YYYY-MM-DD').format('DD MMM, YYYY')}
+                {item.setUpDate !== ''
+                  ? moment(item.setUpDate, 'YYYY-MM-DD').format('DD MMM, YYYY')
+                  : '-'}
               </Text>
               {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
               Hijry{'  '} 30.06.1443
@@ -110,9 +112,11 @@ const CommitteesDetails = () => {
             <Text style={styles.txtSubDetails}>Expiry date</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={styles.txtSubDiscription}>
-                {moment(item.expirationDate, 'YYYY-MM-DD').format(
-                  'DD MMM, YYYY'
-                )}
+                {item.expirationDate !== ''
+                  ? moment(item.expirationDate, 'YYYY-MM-DD').format(
+                      'DD MMM, YYYY'
+                    )
+                  : '-'}
               </Text>
               {/* <Text style={[styles.txtSubDetails, { marginLeft: Normalize(32) }]}>
               Hijry{'  '} 30.06.1453

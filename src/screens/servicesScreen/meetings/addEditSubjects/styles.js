@@ -9,6 +9,15 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     flex: 1
   },
+  discription: {
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold
+  },
+  discriptionView: {
+    paddingVertical: SIZES[6],
+    paddingHorizontal: SIZES[24],
+    borderRadius: SIZES[8]
+  },
   txtAddSubjectTitle: {
     ...Fonts.PoppinsBold[24],
     color: Colors.bold,

@@ -46,10 +46,10 @@ const AddEditDelegation = () => {
       organizationIds: ''
     },
     onCompleted: (data) => {
-      setUsers(data?.committeeMembersList.items);
+      setUsers(data?.committeeMembersList?.items);
     },
     onError: (data) => {
-      console.log('get all user error', data.message);
+      console.log('get all user error', data?.message);
     }
   });
 

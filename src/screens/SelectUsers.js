@@ -1,11 +1,5 @@
-import {
-  View,
-  SafeAreaView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity
-} from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { View, SafeAreaView, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { useQuery } from '@apollo/client';
@@ -38,7 +32,7 @@ const SelectUsers = () => {
   var externalUserData = [];
 
   const setOnAllUserClick = (item) => {
-    allUsers.map((user) => {
+    allUsers?.map((user) => {
       if (user.userId === item.userId) {
         user.isSelected = !user.isSelected;
       }
@@ -47,7 +41,7 @@ const SelectUsers = () => {
   };
 
   const setOnExternalUserClick = (item) => {
-    externalUser.map((user) => {
+    externalUser?.map((user) => {
       if (user.userId === item.userId) {
         user.isSelected = !user.isSelected;
       }
@@ -56,7 +50,7 @@ const SelectUsers = () => {
   };
 
   const setAllUserSelected = () => {
-    allUsers.map((user) => {
+    allUsers?.map((user) => {
       user.isSelected = true;
     });
     setAllUsers([...allUsers]);

@@ -89,7 +89,7 @@ export const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 14,
     position: 'absolute',
-    bottom: '33%',
+    bottom: '30%',
     width: SIZES[280]
   },
   txtClose: {

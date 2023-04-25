@@ -189,11 +189,18 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
             subjectStatus={item.meetingStatusTitle}
             editable={
               (role == 'Head' || role == 'Secretary') &&
-              item.meetingStatusTitle !== 'Closed'
+              item.meetingStatusTitle !== 'Closed' &&
+              item.meetingStatusTitle !== 'Cancelled'
                 ? true
                 : false
             }
-            deleted={role == 'Head' || role == 'Secretary' ? true : false}
+            deleted={
+              (role == 'Head' || role == 'Secretary') &&
+              item.meetingStatusTitle !== 'Cancelled'
+                ? true
+                : false
+            }
+            download={true}
             isViewable={true}
           />
         </View>

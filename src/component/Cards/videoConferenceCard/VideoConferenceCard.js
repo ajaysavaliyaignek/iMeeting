@@ -7,7 +7,7 @@ import {
   Alert,
   Linking
 } from 'react-native';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Divider } from 'react-native-paper';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -23,6 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import { DELETE_VIDEO_CONFERENCE } from '../../../graphql/mutation';
 import { useMutation } from '@apollo/client';
+import { UserContext } from '../../../context';
 
 const VideoConferenceCard = ({
   item,
@@ -32,6 +33,9 @@ const VideoConferenceCard = ({
   searchText
 }) => {
   const navigation = useNavigation();
+  const { user } = useContext(UserContext);
+  // console.log({ user });
+  // console.log({ item });
 
   const [deleteVideoConference] = useMutation(DELETE_VIDEO_CONFERENCE, {
     refetchQueries: ['videoConferences', 'videoConference'],
@@ -214,10 +218,18 @@ const VideoConferenceCard = ({
               setVisibleIndex(-1);
             }}
             editable={
-              item.yourRoleName == 'Member' || item.isDisable ? false : true
+              item.yourRoleName == 'Member' ||
+              item.creatorName !== user?.userName ||
+              item.isDisable
+                ? false
+                : true
             }
             deleted={
-              item.yourRoleName == 'Member' || item.isDisable ? false : true
+              item.yourRoleName == 'Member' ||
+              item.creatorName !== user?.userName ||
+              item.isDisable
+                ? false
+                : true
             }
             isViewable={true}
           />
