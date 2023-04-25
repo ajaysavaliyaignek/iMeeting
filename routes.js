@@ -55,7 +55,7 @@ import EditMeetingSubjects from './src/screens/servicesScreen/meetings/editMeeti
 import YourAnswer from './src/screens/servicesScreen/meetings/yourAnswer/YourAnswer';
 import Subjects from './src/screens/servicesScreen/Subjects';
 import AddDraftSubject from './src/screens/servicesScreen/subjects/addDraftSybject/AddDraftSubject';
-import EditAppointmentDateAndTime from './src/screens/servicesScreen/appointments/EditAppointmentDateAndTime/EditAppointmentDateAndTime';
+// import EditAppointmentDateAndTime from './src/screens/servicesScreen/appointments/EditAppointmentDateAndTime/EditAppointmentDateAndTime';
 import EditAppointmentGeneral from './src/screens/servicesScreen/appointments/EditAppointmentGeneral/EditAppointmentGeneral';
 import EditAppointmentLocation from './src/screens/servicesScreen/appointments/EditAppointmentLocation/EditAppointmentLocation';
 import EditAppointmentUsers from './src/screens/servicesScreen/appointments/EditAppointmentUsers/EditAppointmentUsers';
@@ -329,10 +329,10 @@ const MainStack = ({ initialRouteName }) => {
         name="AddAppointmentDateAndTime"
         component={AddAppointmentDateAndTime}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="EditAppointmentDateAndTime"
         component={EditAppointmentDateAndTime}
-      />
+      /> */}
       <Stack.Screen
         name="AddAppointmentLocation"
         component={AddAppointmentLocation}
