@@ -95,7 +95,7 @@ const CommentCard = ({
           <TextInput
             style={{
               flex: 1,
-              height: SIZES[30],
+
               backgroundColor: Colors.white
             }}
             underlineColor={Colors.white}

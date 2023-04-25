@@ -36,7 +36,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(118, 118, 128, 0.12)',
     borderRadius: SIZES[10],
-    margin: SIZES[16],
+    marginHorizontal: SIZES[16],
+    marginBottom: SIZES[16],
     padding: SIZES[2],
     justifyContent: 'space-between'
   },
@@ -47,5 +48,39 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: SIZES[8]
   },
-  txtBtnServices: { ...Fonts.PoppinsSemiBold[12], color: Colors.bold }
+  txtBtnServices: { ...Fonts.PoppinsSemiBold[12], color: Colors.bold },
+  activeSpeakerContainer: {
+    backgroundColor: Colors.gray,
+    padding: SIZES[14],
+    marginHorizontal: SIZES[16],
+    flexDirection: 'row',
+    marginBottom: SIZES[8],
+    borderRadius: SIZES[12],
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  nameContainer: {
+    marginLeft: SIZES[8],
+    marginTop: SIZES[10]
+  },
+  txtName: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.bold
+  },
+  txtSpeaker: {
+    ...Fonts.PoppinsRegular[12],
+    color: Colors.secondary
+  },
+  iconView: {
+    marginLeft: SIZES[21],
+    justifyContent: 'flex-end'
+  },
+  txtRunningTime: {
+    ...Fonts.PoppinsSemiBold[20],
+    color: Colors.bold
+  },
+  txtTimeDuration: {
+    ...Fonts.PoppinsSemiBold[20],
+    color: Colors.secondary
+  }
 });

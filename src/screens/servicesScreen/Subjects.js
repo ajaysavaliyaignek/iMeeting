@@ -20,17 +20,69 @@ import { Colors } from '../../themes/Colors';
 import { Fonts } from '../../themes';
 import SubjectCard from '../../component/Cards/subjectCard/SubjectCard';
 import { Button } from '../../component/button/Button';
-import { GET_SUBJECT_BY_ID } from '../../graphql/query';
+import { GET_All_SUBJECTS, GET_SUBJECT_BY_ID } from '../../graphql/query';
+import moment from 'moment';
 
 const Subjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { subjects, role, deadlinedDate } = route?.params;
+  const { meetingData, deadlinedDate } = route?.params;
   const [searchText, setSearchText] = useState('');
-  const [subject, setSubject] = useState(subjects);
-  const [filterData, setFilterData] = useState(subjects);
+  const [subject, setSubject] = useState([]);
+  const [filterData, setFilterData] = useState([]);
   const [valueIndex, setValueIndex] = useState(-1);
   // let subjects = [];
+  let queryParams = [];
+
+  if (meetingData?.yourRoleName == 'Member') {
+    queryParams = {
+      committeeIds: '',
+      searchValue: searchText,
+      screen: 0,
+      page: -1,
+      pageSize: -1,
+      meetingId: meetingData?.meetingId,
+      isDraft: true
+    };
+  } else {
+    queryParams = {
+      committeeIds: '',
+      searchValue: searchText,
+      screen: 0,
+      page: -1,
+      pageSize: -1,
+      meetingId: meetingData?.meetingId,
+      isDraft: false
+    };
+  }
+
+  // get ALL SUBJECTS
+  const {
+    loading: SubjectsLoading,
+    error: SubjectsError,
+    data: SubjectsData
+  } = useQuery(GET_All_SUBJECTS, {
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      committeeIds: '',
+      searchValue: searchText,
+      screen: 0,
+      page: -1,
+      pageSize: -1,
+      meetingId: meetingData?.meetingId,
+      isDraft: false
+    },
+
+    onCompleted: (data) => {
+      setSubject(data?.subjects.items);
+      setFilterData(data?.subjects.items);
+      console.log('subjects', data?.subjects.items);
+    }
+  });
+
+  if (SubjectsError) {
+    console.log('subjects error---', SubjectsError);
+  }
 
   const searchFilterUsers = (text) => {
     if (text) {
@@ -77,49 +129,50 @@ const Subjects = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.deadlineContainer}>
-            <Text style={styles.txtDeadlineTitle}>Deadline suggesting</Text>
-            {role == 'Head' || role == 'Secretory' ? (
-              <TouchableOpacity
-                style={styles.chooseDateContainer}
-                onPress={() => navigation.navigate('DeadlineSuggestion')}
-                disabled={true}
-              >
-                <View
-                  style={{
-                    borderBottomWidth: SIZES[1],
-                    borderBottomColor: Colors.primary,
-                    marginRight: SIZES[14]
-                  }}
-                >
-                  <Text style={styles.txtChooseDate}>{deadlinedDate}</Text>
-                </View>
+            <Text style={styles.txtDeadlineTitle}>
+              RECIEVING SUBJECTS DEADLINE
+            </Text>
 
-                <Icon
-                  name={IconName.Calendar_Focused}
-                  height={SIZES[20]}
-                  width={SIZES[18]}
-                />
-              </TouchableOpacity>
-            ) : (
-              <Text
+            <TouchableOpacity
+              style={styles.chooseDateContainer}
+              onPress={() => navigation.navigate('DeadlineSuggestion')}
+              disabled={true}
+            >
+              <View
                 style={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.bold,
-                  marginLeft: SIZES[8]
+                  borderBottomWidth: SIZES[1],
+                  borderBottomColor: Colors.primary,
+                  marginRight: SIZES[14]
                 }}
               >
-                5-11 September
-              </Text>
-            )}
+                <Text style={styles.txtChooseDate}>
+                  {meetingData?.deadlineDate}
+                </Text>
+              </View>
+
+              <Icon
+                name={IconName.Calendar_Focused}
+                height={SIZES[20]}
+                width={SIZES[18]}
+              />
+            </TouchableOpacity>
           </View>
-          {role == 'Head' || role == 'Secretory' ? null : (
-            <Button
-              title="Add draft subject"
-              layoutStyle={styles.cancelBtnLayout}
-              textStyle={styles.txtCancelButton}
-              onPress={() => navigation.navigate('AddDraftSubject')}
-            />
-          )}
+          {meetingData?.yourRoleName == 'Member' &&
+            moment(meetingData?.deadlineDate).isSameOrAfter(
+              moment(new Date()).format('YYYY-MM-DD')
+            ) &&
+            meetingData.subjectSuggestion && (
+              <Button
+                title="Add draft subject"
+                layoutStyle={styles.cancelBtnLayout}
+                textStyle={styles.txtCancelButton}
+                onPress={() =>
+                  navigation.navigate('AddDraftSubject', {
+                    meetingId: meetingData?.meetingId
+                  })
+                }
+              />
+            )}
           <Divider style={styles.divider} />
           <FlatList
             data={subject}
@@ -131,7 +184,7 @@ const Subjects = () => {
                 item={item}
                 index={index}
                 searchText={searchText}
-                role={role}
+                role={meetingData?.yourRoleName}
                 valueIndex={valueIndex}
                 setValueIndex={setValueIndex}
                 showdots={false}
@@ -162,8 +215,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES[10],
     backgroundColor: Colors.gray,
     borderRadius: SIZES[10],
-    marginVertical: SIZES[22],
-    height: SIZES[36]
+    marginVertical: SIZES[22]
+    // height: SIZES[36]
   },
   textInput: {
     ...Fonts.PoppinsRegular[14],

@@ -28,7 +28,6 @@ import { useQuery } from '@apollo/client';
 import { GET_TIMELINE_REVIEW } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
 import EventCalendar from 'react-native-events-calendar';
-import { Data } from 'victory-core';
 
 const TimelineScreen = () => {
   const { width, height } = useWindowDimensions();
@@ -37,30 +36,54 @@ const TimelineScreen = () => {
   const route = useRoute();
   const { selectedUsers } = route?.params;
   // console.log(' from timeline', selectedUsers);
-  const userId = selectedUsers?.map((user) => user.userId.toString()).join(',');
-  console.log('userId', userId);
+  let userId = [];
 
   const [date, setDate] = useState(new Date());
   const [selected, setSelected] = useState(false);
   const [event, setEvents] = useState(null);
   const [items, setItems] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [timelineUser, setTimelineUser] = useState([]);
+  const [selectUser, setSelectuser] = useState([]);
+  const [userIds, setUserIds] = useState([]);
+  console.log('selectUser', selectUser);
+
+  useEffect(() => {
+    let selectForTimeline = selectedUsers.map((user) => {
+      let isSelectedForTimeline = true;
+      return { ...user, isSelectedForTimeline };
+    });
+    if (selectForTimeline) {
+      setTimelineUser(selectForTimeline);
+      setSelectuser(selectForTimeline);
+    }
+    // setTimelineUser(selectForTimeline);
+  }, []);
+
+  useEffect(() => {
+    const userId = selectUser?.map((com) => {
+      return com.userId;
+    });
+    setUserIds(userId?.join());
+  }, [selectUser]);
+
+  console.log('userIds', { userid: userIds });
 
   const { data, error, loading } = useQuery(GET_TIMELINE_REVIEW, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       startTime: `${moment(date).format('YYYY-MM-DD')} 00:00 AM `,
       endTime: `${moment(date).format('YYYY-MM-DD')} 11:59 PM `,
       date: moment(date).format('YYYY-MM-DD'),
-      requiredUserIds: userId,
+      requiredUserIds: userIds,
       optionalUserIds: '',
       timeStart: '00:00 AM',
       timeEnd: '11:59 PM'
     },
     onCompleted: (data) => {
-      console.log('timeline review data', data.timeReviewMobile.userEvents);
       Object.keys(data.timeReviewMobile.userEvents).forEach(function (key) {
         var value = data.timeReviewMobile.userEvents[key];
-        console.log('key', value);
+
         setEvents(value);
         // ...
       });
@@ -70,17 +93,6 @@ const TimelineScreen = () => {
     }
   });
 
-  const onEventClick = React.useCallback((event) => {
-    console.log('pressed event', event.event.title);
-    // toast({
-    //   message: event.event.title
-    // });
-  }, []);
-
-  console.log('events', event);
-  console.log('startTime', event?.startTime);
-  console.log('endTime', event?.endTime);
-
   useEffect(() => {
     if (event !== null) {
       setItems([
@@ -88,9 +100,7 @@ const TimelineScreen = () => {
           title: event,
           startDate: moment(event?.startTime, 'YYYY-MM-DD hh:mm A'),
           endDate: moment(event?.endTime, 'YYYY-MM-DD hh:mm A'),
-          //2022-12-02 07:58 AM
-          // startDate: moment('2022-12-01 03:54 PM', 'YYYY-MM-DD hh:mm a'),
-          // endDate: moment('2022-12-02 07:58 AM', 'YYYY-MM-DD hh:mm a'),
+
           color: '#FDF5F1',
           borderColor: '#E79D73'
         }
@@ -98,16 +108,7 @@ const TimelineScreen = () => {
     }
   }, [event]);
 
-  let datesWhitelist = [
-    {
-      start: moment(),
-      end: moment().add(3, 'days') // total 4 days enabled
-    }
-  ];
-  let datesBlacklist = [moment().add(1, 'days')];
-
   function MyItemCard({ style, item, dayIndex, daysTotal }) {
-    console.log('item from timeline', item);
     return (
       <TouchableOpacity
         style={{
@@ -128,7 +129,6 @@ const TimelineScreen = () => {
           initialNumToRender={3}
           data={item.title.events}
           renderItem={({ item, index }) => {
-            console.log('item ', item);
             return (
               <View
                 style={{
@@ -153,33 +153,6 @@ const TimelineScreen = () => {
             );
           }}
         />
-        {/* {item.title.map((ite, index) => {
-            return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginLeft: SIZES[4],
-                  marginBottom: SIZES[4]
-                }}
-                key={index}
-              >
-                <Avatar
-                  source={'https://picsum.photos/200/300'}
-                  size={SIZES[24]}
-                />
-                <Text
-                  style={{
-                    ...Fonts.PoppinsSemiBold[14],
-                    color: Colors.bold,
-                    marginLeft: SIZES[8]
-                  }}
-                >
-                  {ite.title}
-                </Text>
-              </View>
-            );
-          })} */}
 
         <Text
           style={{
@@ -221,6 +194,8 @@ const TimelineScreen = () => {
     }
   ];
 
+  console.log(event);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -234,12 +209,20 @@ const TimelineScreen = () => {
         <TouchableOpacity
           style={styles.usersView}
           activeOpacity={0.5}
-          onPress={() => navigation.navigate('SelectUser', { selectedUsers })}
+          onPress={() =>
+            navigation.navigate('SelectUser', {
+              selectedUsers: timelineUser,
+              setTimelineUser: setTimelineUser,
+
+              selectUser,
+              setSelectuser
+            })
+          }
         >
           <Text style={styles.txtUsers}>Users</Text>
           <View style={styles.btnCommittees}>
             <Text style={styles.txtBtnCommittees}>
-              Selected {selectedUsers?.length} users
+              Selected {selectUser?.length} users
             </Text>
             <Icon
               name={IconName.Arrow_Right}
@@ -293,7 +276,7 @@ const TimelineScreen = () => {
             zIndex: 20
           }}
         />
-        {loading && <Loader />}
+        {loading && <Loader color={Colors.primary} />}
         <Text
           style={{
             ...Fonts.PoppinsBold[20],
@@ -327,6 +310,7 @@ const TimelineScreen = () => {
             date={date} // optional
             // range={range} // optional
             // width={width - 40}
+            theme={{ text: Colors.bold }}
             hideNowLine={true}
             linesLeftInset={-5}
             linesTopOffset={20}

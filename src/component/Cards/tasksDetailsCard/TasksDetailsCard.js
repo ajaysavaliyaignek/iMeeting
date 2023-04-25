@@ -15,7 +15,15 @@ const TasksDetailsCard = ({
   index,
   visibleIndex,
   setVisibleIndex,
-  text
+  text,
+  editable,
+  onPressEdit,
+  isDeleteable,
+  onPressDelete,
+  isSubjectTask,
+  onPressView,
+  download,
+  onPressDownload
 }) => {
   const RowData = ({ name, discription, style, styleText, layoutStyle }) => {
     return (
@@ -39,75 +47,121 @@ const TasksDetailsCard = ({
     >
       {index == 0 ? null : <Divider style={styles.divider} />}
       {/* committee details */}
-      <View style={styles.committeeDetailView}>
-        {getHighlightedText(item.title, text)}
+      {!isSubjectTask ? (
+        <View style={styles.committeeDetailView}>
+          {getHighlightedText(item.title, text)}
 
-        <RowData
-          name={'Type'}
-          discription={item.taskType}
-          style={{
-            height: SIZES[8],
-            width: SIZES[8],
-            borderRadius: SIZES[4],
-            backgroundColor:
-              item.taskType == 'Subject approval'
-                ? '#E6C54F'
-                : item.taskType == 'Minutes of Meeting approval'
-                ? '#C8ABCD'
-                : item.taskType == 'Meeting task'
-                ? '#81AB96'
-                : item.taskType == 'Confirm attendance'
-                ? '#E79D73'
-                : item.taskType == 'Video Conference meeting'
-                ? '#E79D73'
-                : item.taskType == 'Schedule an appointment response'
-                ? '#658EB4'
-                : '#E6C54F',
-            marginRight: SIZES[8]
-          }}
-        />
-        <RowData name={'Executor'} discription={item.executorName} />
-        <RowData
-          name={'Deadline'}
-          discription={moment(item.deadlineDate).format('DD MMM YYYY')}
-        />
-        <RowData name={'Priority'} discription={item.priority} />
-        <RowData
-          name={'Status'}
-          discription={item.taskStatus}
-          layoutStyle={{
-            backgroundColor:
-              item.taskStatus == 'Open'
-                ? 'rgba(101, 142, 180,0.1)'
-                : item.taskStatus == 'In progress'
-                ? 'rgba(101, 142, 180,0.1)'
-                : item.taskStatus == 'Completed'
-                ? 'rgba(129, 171, 150,0.1)'
-                : item.taskStatus == 'Closed'
-                ? 'rgba(221, 120, 120,0.1)'
-                : item.taskStatus == 'Deleted'
-                ? 'rgba(221, 120, 120,0.1)'
-                : 'rgba(101, 142, 180,0.1)',
-            paddingVertical: SIZES[6],
-            paddingHorizontal: SIZES[40],
-            borderRadius: SIZES[8]
-          }}
-          styleText={{
-            color:
-              item.taskStatus == 'Open'
-                ? '#658EB4'
-                : item.taskStatus == 'In progress'
-                ? '#658EB4'
-                : item.taskStatus == 'Completed'
-                ? '#81AB96'
-                : item.taskStatus == 'Closed'
-                ? '#DD7878'
-                : item.taskStatus == 'Deleted'
-                ? '#DD7878'
-                : '#658EB4'
-          }}
-        />
-      </View>
+          <RowData
+            name={'Type'}
+            discription={item.taskType}
+            style={{
+              height: SIZES[8],
+              width: SIZES[8],
+              borderRadius: SIZES[4],
+              backgroundColor:
+                item.taskType == 'Subject approval'
+                  ? '#E6C54F'
+                  : item.taskType == 'Minutes of Meeting approval'
+                  ? '#C8ABCD'
+                  : item.taskType == 'Meeting task'
+                  ? '#81AB96'
+                  : item.taskType == 'Confirm attendance'
+                  ? '#E79D73'
+                  : item.taskType == 'Video Conference meeting'
+                  ? '#E79D73'
+                  : item.taskType == 'Schedule an appointment response'
+                  ? '#658EB4'
+                  : '#E6C54F',
+              marginRight: SIZES[8]
+            }}
+          />
+          <RowData name={'Executor'} discription={item.executorName} />
+          <RowData
+            name={'Deadline'}
+            discription={moment(item.deadlineDate).format('DD MMM YYYY')}
+          />
+          <RowData name={'Priority'} discription={item.priority} />
+          <RowData
+            name={'Status'}
+            discription={item.taskStatus}
+            layoutStyle={{
+              backgroundColor:
+                item.taskStatus == 'Open'
+                  ? 'rgba(101, 142, 180,0.1)'
+                  : item.taskStatus == 'In progress'
+                  ? 'rgba(101, 142, 180,0.1)'
+                  : item.taskStatus == 'Completed'
+                  ? 'rgba(129, 171, 150,0.1)'
+                  : item.taskStatus == 'Closed'
+                  ? 'rgba(221, 120, 120,0.1)'
+                  : item.taskStatus == 'Deleted'
+                  ? 'rgba(221, 120, 120,0.1)'
+                  : 'rgba(101, 142, 180,0.1)',
+              paddingVertical: SIZES[6],
+              paddingHorizontal: SIZES[40],
+              borderRadius: SIZES[8]
+            }}
+            styleText={{
+              color:
+                item.taskStatus == 'Open'
+                  ? '#658EB4'
+                  : item.taskStatus == 'In progress'
+                  ? '#658EB4'
+                  : item.taskStatus == 'Completed'
+                  ? '#81AB96'
+                  : item.taskStatus == 'Closed'
+                  ? '#DD7878'
+                  : item.taskStatus == 'Deleted'
+                  ? '#DD7878'
+                  : '#658EB4'
+            }}
+          />
+        </View>
+      ) : (
+        <View style={styles.committeeDetailView}>
+          {getHighlightedText(item.title, text)}
+          <RowData name={'Executor'} discription={item.executorName} />
+          <RowData
+            name={'Deadline'}
+            discription={moment(item.deadlineDate).format('DD MMM YYYY')}
+          />
+          <RowData
+            name={'Status'}
+            discription={item.taskStatus}
+            layoutStyle={{
+              backgroundColor:
+                item.taskStatus == 'Open'
+                  ? 'rgba(101, 142, 180,0.1)'
+                  : item.taskStatus == 'In progress'
+                  ? 'rgba(101, 142, 180,0.1)'
+                  : item.taskStatus == 'Completed'
+                  ? 'rgba(129, 171, 150,0.1)'
+                  : item.taskStatus == 'Closed'
+                  ? 'rgba(221, 120, 120,0.1)'
+                  : item.taskStatus == 'Deleted'
+                  ? 'rgba(221, 120, 120,0.1)'
+                  : 'rgba(101, 142, 180,0.1)',
+              paddingVertical: SIZES[6],
+              paddingHorizontal: SIZES[40],
+              borderRadius: SIZES[8]
+            }}
+            styleText={{
+              color:
+                item.taskStatus == 'Open'
+                  ? '#658EB4'
+                  : item.taskStatus == 'In progress'
+                  ? '#658EB4'
+                  : item.taskStatus == 'Completed'
+                  ? '#81AB96'
+                  : item.taskStatus == 'Closed'
+                  ? '#DD7878'
+                  : item.taskStatus == 'Deleted'
+                  ? '#DD7878'
+                  : '#658EB4'
+            }}
+          />
+        </View>
+      )}
 
       {/* dotsView */}
 
@@ -121,10 +175,18 @@ const TasksDetailsCard = ({
       {visibleIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
-            // onPressDelete={onDeleteHandler}
+            download={download}
+            onPressDownload={onPressDownload}
+            onPressDelete={() => {
+              onPressDelete(item);
+              setVisibleIndex(-1);
+            }}
+            onPressView={onPressView}
             subjectStatus={'NoDeleted'}
-            // deleted={deleted}
-            // editable={editable}
+            deleted={isDeleteable}
+            editable={editable}
+            isViewable={true}
+            onPressEdit={() => onPressEdit(item)}
           />
         </View>
       )}

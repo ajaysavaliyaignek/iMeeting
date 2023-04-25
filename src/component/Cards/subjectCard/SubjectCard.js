@@ -115,7 +115,7 @@ const SubjectCard = ({
         {/* subject details */}
         <RowData name={'Category'} discription={item.subjectCategoryName} />
         <RowData name={'Creator'} discription={item.createrName} />
-        {role == 'Head' || role == 'Secretory' ? (
+        {role == 'Head' || role == 'Secretary' ? (
           <RowData
             name={'Status'}
             discription={item.statusTitle}
@@ -164,7 +164,10 @@ const SubjectCard = ({
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDownload={() => {
-              navigation.navigate('SubjectDownload', { item });
+              navigation.navigate('SubjectDownload', {
+                item,
+                downloadType: 'Subject'
+              });
               setValueIndex(-1);
             }}
             subjectStatus={item.statusTitle}
@@ -182,11 +185,12 @@ const SubjectCard = ({
             }}
             download={true}
             editable={
-              role == 'Head' || role == 'Secretory'
+              role == 'Head' || role == 'Secretary'
                 ? true
                 : false || (item.statusTitle == 'Deleted' && false)
             }
-            deleted={role == 'Head' || role == 'Secretory' ? true : false}
+            deleted={role == 'Head' || role == 'Secretary' ? true : false}
+            isViewable={true}
           />
         </View>
       )}

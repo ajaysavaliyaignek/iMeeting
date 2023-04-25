@@ -19,6 +19,7 @@ import { DELETE_MEETING } from '../../../graphql/mutation';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
 import { styles } from './styles';
 import { UserContext } from '../../../context';
+import MeetingStatusDropdown from '../../meetingStatusDropdown/MeetingStatusDropdown';
 
 const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
   const navigation = useNavigation();
@@ -34,6 +35,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
     error: errorLocation,
     data: dataLocation
   } = useQuery(GET_ALL_LOCATION_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       locationId: item.locationId
     },
@@ -101,13 +103,17 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
     ]);
   };
 
-  const RowData = ({ name, discription, style, btnStyle }) => {
+  const RowData = ({ name, discription, style, btnStyle, isDropDown }) => {
     return (
       <View style={styles.container}>
         <Text style={styles.txtCommitteeName}>{name}</Text>
-        <View style={[styles.discriptionView, btnStyle]}>
-          <Text style={[styles.discription, style]}>{discription}</Text>
-        </View>
+        {isDropDown ? (
+          <MeetingStatusDropdown item={item} statusId={item.meetingStatusId} />
+        ) : (
+          <View style={[styles.discriptionView, btnStyle]}>
+            <Text style={[styles.discription, style]}>{discription}</Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -137,6 +143,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
         <RowData
           name={'Status'}
           discription={item.meetingStatusTitle}
+          isDropDown={true}
           style={{
             color: Colors.bold,
             ...Fonts.PoppinsSemiBold[14]
@@ -180,11 +187,29 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
 
               setVisibleIndex(-1);
 
-              navigation.navigate('EditMeetingGeneral', { item });
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Edit meeting',
+                type: 'Meeting',
+                screensArray: [
+                  'general',
+                  'users',
+                  'dateandtime',
+                  'location',
+                  'subjects'
+                ],
+                isEdit: true,
+                details: item
+              });
             }}
             subjectStatus={item.meetingStatusTitle}
-            editable={role == 'Head' || role == 'Secretory' ? true : false}
-            deleted={role == 'Head' || role == 'Secretory' ? true : false}
+            editable={
+              (role == 'Head' || role == 'Secretary') &&
+              item.meetingStatusTitle !== 'Closed'
+                ? true
+                : false
+            }
+            deleted={role == 'Head' || role == 'Secretary' ? true : false}
+            isViewable={true}
           />
         </View>
       )}

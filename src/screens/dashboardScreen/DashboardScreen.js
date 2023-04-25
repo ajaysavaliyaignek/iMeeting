@@ -36,6 +36,7 @@ const DashboardScreen = () => {
     error: errorGetMeetings,
     data: dataGetMeetings
   } = useQuery(GET_All_MEETING, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       onlyMyMeeting: false,
       committeeIds: '',
@@ -56,6 +57,7 @@ const DashboardScreen = () => {
 
   // get ALL appointment
   const Appointment = useQuery(GET_All_APPOINTMENT, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       searchValue: '',
       page: -1,
@@ -71,6 +73,7 @@ const DashboardScreen = () => {
   });
 
   const Committes = useQuery(GET_All_COMMITTEE, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       page: -1,
       pageSize: -1,

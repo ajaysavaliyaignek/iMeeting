@@ -11,7 +11,8 @@ export const styles = StyleSheet.create({
     zIndex: 20
   },
   txtDropdown: {
-    ...Fonts.PoppinsRegular[14]
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold
   },
   arrowIcon: {
     height: SIZES[14],

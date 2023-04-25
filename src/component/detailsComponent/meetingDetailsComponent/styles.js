@@ -30,7 +30,8 @@ export const styles = StyleSheet.create({
     right: 0,
     bottom: 4,
     ...Fonts.PoppinsRegular[14],
-    color: '#AEB0B5'
+    color: '#AEB0B5',
+    width: '50%'
   },
   txtLink: {
     ...Fonts.PoppinsSemiBold[14],

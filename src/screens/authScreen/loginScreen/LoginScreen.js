@@ -9,7 +9,7 @@ import {
 import React, { useContext, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { Divider, TextInput } from 'react-native-paper';
-import { ApolloProvider, useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Icon, IconName } from '../../../component';
@@ -20,6 +20,7 @@ import { SIZES } from '../../../themes/Sizes';
 import { styles } from './styles';
 import Loader from '../../../component/Loader/Loader';
 import { UserContext } from '../../../context';
+import { Colors } from '../../../themes/Colors';
 
 const LoginScreen = ({ navigation }) => {
   const [url, setUrl] = useState('');
@@ -32,12 +33,19 @@ const LoginScreen = ({ navigation }) => {
   const [loadingLogin, setLoading] = useState(false);
   const { companyUrl, setCompanyUrl } = useContext(UserContext);
 
+  // Query for get client id and client secret
+  // For this query need company url
   const [getAuth, { loading, data }] = useLazyQuery(GET_AUTH, {
     onCompleted: (data) => {
       console.log(data);
+
+      // set client id
       setClientId(data.oAuth2Application.clientId);
+
+      // set Client secret
       setClientSecret(data.oAuth2Application.clientSecret);
       setError(data.error);
+      setError('');
       if (
         data.oAuth2Application.clientId == '' &&
         data.oAuth2Application.clientId == ''
@@ -53,16 +61,17 @@ const LoginScreen = ({ navigation }) => {
     }
   });
 
+  // For store user data in async storage
   const storeToken = async (user) => {
-    console.log('store data called-----');
     try {
       await AsyncStorage.setItem('@user', JSON.stringify(user));
     } catch (error) {
       console.log(error);
     }
   };
+
+  // For store company url in async storage
   const storeUrl = async (url) => {
-    console.log('store data called-----', url);
     if (!url) return;
     try {
       const savedToken = await AsyncStorage.setItem('@url', url);
@@ -71,8 +80,9 @@ const LoginScreen = ({ navigation }) => {
       console.log(error);
     }
   };
+
+  // For store token in async storage
   const storeUserToken = (token) => {
-    console.log('store data called-----');
     try {
       AsyncStorage.setItem('@token', token);
     } catch (error) {
@@ -80,6 +90,9 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  // For user login
+  // for login required  clientId,clientSecret,userName,password
+  // In this function we get user token
   const Login = async () => {
     setLoading(true);
     const formData = new URLSearchParams();
@@ -88,57 +101,65 @@ const LoginScreen = ({ navigation }) => {
     formData.append('grant_type', 'password');
     formData.append('username', userName);
     formData.append('password', password);
-    console.log('client_id', clientId.toString());
-    console.log('client_secret', clientSecret.toString());
-    console.log('grant_type', 'password');
-    console.log('username', userName);
-    console.log('password', password);
+
+    // get company url from asyncstorage
     const Companyurl = await AsyncStorage.getItem('@url');
-    console.log('comapny url from login', companyUrl);
 
     if (clientId !== '' && clientSecret !== '') {
-      fetch(`https://${Companyurl}//o/oauth2/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      })
-        .then((response) => response.json())
-        .then((responseData) => {
-          console.log('responseData-----', responseData);
-          if (responseData.error) {
-            setError(responseData.error);
-            setLoading(false);
-            console.log('login error', responseData.error);
-          } else {
-            const dataToken = responseData.access_token;
-            let user = {
-              userName: userName,
-              url: url,
-              clientId: clientId,
-              clientSecret: clientSecret,
-              dataToken: dataToken
-            };
-            console.log(user);
-            storeToken(user);
-            storeUserToken(dataToken);
-            navigation.navigate('MainBottomTab');
-            setUrl('');
-            setUserName('');
-            setPassword('');
-            setLoading(false);
+      try {
+        fetch(`https://${Companyurl}//o/oauth2/token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData.toString()
+        })
+          .then((response) => response.json())
+          .then((responseData) => {
+            console.log('responseData-----', responseData);
+            if (responseData.error) {
+              setError(responseData.error);
+              setLoading(false);
+              console.log('login error', responseData.error);
+            } else {
+              const dataToken = responseData.access_token;
+              let user = {
+                userName: userName,
+                url: url,
+                clientId: clientId,
+                clientSecret: clientSecret,
+                dataToken: dataToken
+              };
+              console.log(user);
+              storeToken(user);
+              storeUserToken(dataToken);
+              setError('');
 
-            const interval = setInterval(() => {
-              refreshToken();
-            }, responseData.expires_in);
+              // after login success it redirect to the services screen
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'MainBottomTab' }]
+              });
+              setUrl('');
+              setUserName('');
+              setPassword('');
+              setLoading(false);
 
-            return () => clearInterval(interval);
-          }
-        });
+              const interval = setInterval(() => {
+                refreshToken();
+              }, responseData.expires_in);
+
+              return () => clearInterval(interval);
+            }
+          });
+      } catch (error) {
+        console.log('login error', error);
+        setLoading(false);
+      }
     }
   };
 
+  // this function is used for refresh token when it expired
   const refreshToken = async () => {
     const formData = new URLSearchParams();
     formData.append('client_id', clientId);
@@ -146,12 +167,7 @@ const LoginScreen = ({ navigation }) => {
     formData.append('grant_type', 'password');
     formData.append('username', userName);
     formData.append('password', password);
-    // console.log('client_id', clientId.toString());
-    // console.log('client_secret', clientSecret.toString());
-    // console.log('grant_type', 'password');
-    // console.log('username', userName);
-    // console.log('password', password);
-    // console.log('url', url);
+
     const Companyurl = await AsyncStorage.getItem('@url');
 
     if (clientId !== '' && clientSecret !== '') {
@@ -181,6 +197,7 @@ const LoginScreen = ({ navigation }) => {
               };
               console.log(user);
               storeToken(user);
+
               storeUserToken(dataToken);
             }
           });
@@ -190,6 +207,7 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  console.log('error', error);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -198,17 +216,20 @@ const LoginScreen = ({ navigation }) => {
       >
         {/* header */}
         <Text style={styles.txtHeader}>Log in</Text>
+
+        {/* show error during login */}
         {error && (
           <View style={styles.errorView}>
             <Text style={{ color: 'red' }}>{error}</Text>
           </View>
         )}
 
-        {/* url-input */}
+        {/* company url-input */}
         <Input
           onChangeText={(text) => {
             setUrl(text);
           }}
+          keyboardType={'email-address'}
           onChange={() => {
             console.log('i am called', url);
             setCompanyUrl(url);
@@ -224,8 +245,8 @@ const LoginScreen = ({ navigation }) => {
                   <TouchableOpacity
                     onPress={() => setUrl('')}
                     style={{
-                      height: 24,
-                      width: 24,
+                      height: SIZES[24],
+                      width: SIZES[24],
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}
@@ -245,7 +266,12 @@ const LoginScreen = ({ navigation }) => {
 
         {/* username input */}
         <Input
-          onChangeText={(text) => setUserName(text)}
+          onChangeText={(text) => {
+            setUserName(text);
+            if (error !== '') {
+              setError('');
+            }
+          }}
           value={userName}
           label={'Username'}
           right={
@@ -268,7 +294,12 @@ const LoginScreen = ({ navigation }) => {
 
         {/* password input */}
         <Input
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={(text) => {
+            setPassword(text);
+            if (error !== '') {
+              setError('');
+            }
+          }}
           secureTextEntry={secureTextEntry}
           label={'Password'}
           value={password}
@@ -291,15 +322,6 @@ const LoginScreen = ({ navigation }) => {
         />
       </ScrollView>
 
-      {/* create account button */}
-      {/* <TouchableOpacity
-        onPress={() => navigation.push("CreateAccount")}
-        activeOpacity={0.5}
-        style={styles.createButtonContainer}
-      >
-        <Text style={styles.txtCreateAccount}>Create an account</Text>
-      </TouchableOpacity> */}
-
       <View
         style={{
           justifyContent: 'flex-end'
@@ -311,18 +333,26 @@ const LoginScreen = ({ navigation }) => {
         {/* login button */}
         <View style={styles.btnView}>
           {loadingLogin ? (
-            <Loader layOutStyle={{ paddingVertical: SIZES[10] }} />
+            <Loader
+              layOutStyle={{ paddingVertical: SIZES[10] }}
+              color={Colors.primary}
+            />
           ) : (
             <Button
               onPress={Login}
               title={'Log in'}
               disable={
-                url === '' || userName === '' || password === '' ? true : false
+                url === '' || userName === '' || password === '' || error !== ''
+                  ? true
+                  : false
               }
               layoutStyle={[
                 {
                   opacity:
-                    url === '' || userName === '' || password === ''
+                    url === '' ||
+                    userName === '' ||
+                    password === '' ||
+                    error !== ''
                       ? 0.5
                       : null
                 },
@@ -331,21 +361,6 @@ const LoginScreen = ({ navigation }) => {
               textStyle={styles.txtButton}
             />
           )}
-          {/* <Button
-            onPress={Login}
-            title={'Log in'}
-            disable={
-              url === '' || userName === '' || password === '' ? true : false
-            }
-            layoutStyle={[
-              {
-                opacity:
-                  url === '' || userName === '' || password === '' ? 0.5 : null
-              },
-              styles.loginButton
-            ]}
-            textStyle={styles.txtButton}
-          /> */}
         </View>
       </View>
     </SafeAreaView>

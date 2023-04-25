@@ -179,7 +179,7 @@ const EditSubjectScreen = () => {
 
       <View style={styles.container}>
         {SubjectCategoryLoading ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : (
           <ScrollView
             style={styles.subContainer}
@@ -253,6 +253,7 @@ const EditSubjectScreen = () => {
               }}
               deleted={true}
               download={true}
+              isShowAttchTitle={true}
             />
           </ScrollView>
         )}

@@ -56,5 +56,10 @@ export const styles = StyleSheet.create({
     ...Fonts.PoppinsRegular[14],
     color: Colors.bold
   },
-  btnCommittees: { flexDirection: 'row', alignItems: 'center' }
+  btnCommittees: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: SIZES[16]
+  }
 });

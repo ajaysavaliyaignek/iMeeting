@@ -2,19 +2,22 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
-import { Colors } from '../../../themes/Colors';
-import { Fonts } from '../../../themes';
 import Icon from '../../Icon';
 import IconName from '../../Icon/iconName';
 import { Divider } from 'react-native-paper';
 import EditDeleteModal from '../../EditDeleteModal';
 import { SIZES } from '../../../themes/Sizes';
-import { useMutation } from '@apollo/client';
-import { GET_All_SUBJECTS } from '../../../graphql/query';
+import { useMutation, useQuery } from '@apollo/client';
+import {
+  GET_All_SUBJECTS,
+  GET_ALL_SUBJECTS_STATUS,
+  GET_USER_PAYLOAD
+} from '../../../graphql/query';
 import { DELETE_SUBJECTS } from '../../../graphql/mutation';
 import { styles } from './styles';
-import { ModalContext } from '../../../context';
 import { getHighlightedText } from '../../highlitedText/HighlitedText';
+import SubjectDecisionDropDown from '../../subjectDecisionDropDown/SubjectDecisionDropDown';
+import SubjectStatusDropdown from '../../subjectStatusDropdown/SubjectStatusDropdown';
 
 const SubjectsCard = ({
   item,
@@ -25,9 +28,178 @@ const SubjectsCard = ({
   isSubjectStatus,
   download,
   deleted,
-  editable
+  editable,
+  onPressView,
+  isDecisionSubject,
+  onPressEdit,
+  meetingData
 }) => {
   const navigation = useNavigation();
+
+  const [statusTitleOption, setstatusTitleOption] = useState([]);
+  const [user, setUser] = useState([]);
+  const [decisionData, setDecisionData] = useState({});
+
+  const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    onCompleted: (data) => {
+      let users = data.userPayload?.userCommitteesDetail?.filter((user) => {
+        if (user.organizationId == item.committeeId) {
+          return user;
+        }
+      });
+
+      setUser(users);
+    }
+  });
+
+  const {} = useQuery(GET_ALL_SUBJECTS_STATUS, {
+    variables: {
+      decision: false,
+      subject: true,
+      approveDecision: false,
+      momDecision: false
+    },
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data, error) => {
+      if (error) {
+        toast.error(error.message);
+      }
+      if (data) {
+        setstatusTitleOption(
+          data.subjectStatus.items.map((status) => {
+            if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Pre-Proposed';
+              })[0].statusId === item.statusId
+            ) {
+              if (user[0]?.roleName == 'Head') {
+                return {
+                  value: status.statusId,
+                  label: status.statusTitle,
+                  isDisable:
+                    status.statusTitle === 'Tentative' ||
+                    status.statusTitle === 'Pre-Proposed' ||
+                    status.statusTitle === 'Proposed' ||
+                    (status.statusTitle === 'Transferred' && true)
+                };
+              }
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Tentative';
+              })[0].statusId === item.statusId
+            ) {
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Unassigned';
+              })[0].statusId === item.statusId
+            ) {
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Proposed';
+              })[0].statusId === item.statusId
+            ) {
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  (status.statusTitle === 'Approved' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Transferred';
+              })[0].statusId === item.statusId
+            ) {
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Unassigned' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  status.statusTitle === 'Approved' ||
+                  (status.statusTitle === 'Deleted' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Approved';
+              })[0].statusId === item.statusId
+            ) {
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  status.statusTitle === 'Approved' ||
+                  (status.statusTitle === 'Deleted' && true)
+              };
+            } else if (
+              data.subjectStatus.items.filter((e) => {
+                return e.statusTitle === 'Deleted';
+              })[0].statusId === item.statusId
+            ) {
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusTitle === 'Unassigned' ||
+                  status.statusTitle === 'Pre-Proposed' ||
+                  status.statusTitle === 'Proposed' ||
+                  status.statusTitle === 'Transferred' ||
+                  status.statusTitle === 'Approved' ||
+                  (status.statusTitle === 'Deleted' && true)
+              };
+            } else {
+              return {
+                value: status.statusId,
+                label: status.statusTitle,
+                isDisable:
+                  status.statusTitle === 'Tentative' ||
+                  status.statusId === item.statusId
+              };
+            }
+          })
+        );
+      }
+    }
+  });
 
   const [deleteSubject, { data, loading, error }] = useMutation(
     DELETE_SUBJECTS,
@@ -37,31 +209,32 @@ const SubjectsCard = ({
         {
           query: GET_All_SUBJECTS,
           variables: {
+            committeeIds: '',
             searchValue: '',
             screen: 0,
             page: -1,
             pageSize: -1
           }
         }
-      ]
+      ],
+      onCompleted: (data, error) => {
+        if (data) {
+          console.log('delete data', data.deleteSubject.status);
+        }
+        if (error) {
+          Alert.alert('Delete Subject Error', [
+            {
+              text: error,
+
+              style: 'default'
+            }
+          ]);
+        }
+      }
     }
   );
-  if (data) {
-    console.log('delete data', data.deleteSubject.status);
-  }
-  if (error) {
-    Alert.alert('Delete Subject Error', [
-      {
-        text: error,
-
-        style: 'default'
-      }
-    ]);
-  }
 
   const onDeleteHandler = (id) => {
-    console.log(id);
-
     Alert.alert('Delete Subject', 'Are you sure you want to delete this?', [
       {
         text: 'Delete',
@@ -92,19 +265,34 @@ const SubjectsCard = ({
     discription,
     backgroundColor,
     style,
-    marginLeft
+    marginLeft,
+    isDropDown,
+    isDecisionSubjectDropDown
   }) => {
     return (
       <View style={styles.container}>
         <Text style={styles.txtCommitteeName}>{name}</Text>
-        <View
-          style={[
-            styles.discriptionView,
-            { backgroundColor: backgroundColor, marginLeft: marginLeft }
-          ]}
-        >
-          <Text style={[styles.discription, style]}>{discription}</Text>
-        </View>
+        {isDropDown ? (
+          <SubjectStatusDropdown
+            item={item}
+            statusTitleOption={statusTitleOption}
+          />
+        ) : isDecisionSubjectDropDown ? (
+          <SubjectDecisionDropDown
+            subjectId={item.subjectId}
+            decisionData={decisionData}
+            setDecisionData={setDecisionData}
+          />
+        ) : (
+          <View
+            style={[
+              styles.discriptionView,
+              { backgroundColor: backgroundColor, marginLeft: marginLeft }
+            ]}
+          >
+            <Text style={[styles.discription, style]}>{discription}</Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -119,64 +307,64 @@ const SubjectsCard = ({
       {index !== 0 && <Divider style={styles.divider} />}
 
       {/* committee details */}
-      <View
-        style={styles.committeeDetailView}
-        onPress={() => {
-          // navigation.navigate("SubjectDetails");
-          setEditModal(false);
-        }}
-        activeOpacity={0.5}
-      >
-        {getHighlightedText(item.subjectTitle, searchText)}
-        {/* {getHighlightedText(item.subjectTitle)} */}
+      {!isDecisionSubject ? (
+        <View
+          style={styles.committeeDetailView}
+          onPress={() => {
+            // navigation.navigate("SubjectDetails");
+            setEditModal(false);
+          }}
+          activeOpacity={0.5}
+        >
+          {getHighlightedText(item.subjectTitle, searchText)}
+          {/* {getHighlightedText(item.subjectTitle)} */}
 
-        {/* subject details */}
-        <RowData name={'ID'} discription={item.subjectId} />
-        <RowData name={'Category'} discription={item.subjectCategoryName} />
-        <RowData name={'Creator'} discription={item.createrName} />
-        {isSubjectStatus && (
+          {/* subject details */}
+          <RowData name={'ID'} discription={item.subjectId} />
+          <RowData name={'Category'} discription={item.subjectCategoryName} />
+          <RowData name={'Creator'} discription={item.createrName} />
+          {isSubjectStatus && (
+            <RowData
+              name={'Status'}
+              isDropDown={true}
+              discription={item.statusTitle}
+              marginLeft={24}
+              isDecisionSubjectDropDown={false}
+            />
+          )}
+        </View>
+      ) : (
+        <View
+          style={styles.committeeDetailView}
+          onPress={() => {
+            // navigation.navigate("SubjectDetails");
+            setEditModal(false);
+          }}
+          activeOpacity={0.5}
+        >
+          {getHighlightedText(item.subjectTitle, searchText)}
+          {/* {getHighlightedText(item.subjectTitle)} */}
+          {/* subject details */}
+          <RowData name={'Category'} discription={item.subjectCategoryName} />
+          <RowData name={'Creator'} discription={item.createrName} />
+
           <RowData
-            name={'Status'}
+            name={'Decision'}
             discription={item.statusTitle}
-            backgroundColor={
-              item.statusTitle === 'Approved'
-                ? Colors.BG_Approved
-                : item.statusTitle === 'Verified'
-                ? Colors.BG_Verified
-                : item.statusTitle === 'Rejected'
-                ? Colors.BG_Rejected
-                : item.statusTitle === 'Deleted'
-                ? Colors.BG_Rejected
-                : item.statusTitle === 'Pending'
-                ? Colors.BG_Pending
-                : Colors.BG_Transferred
-            }
-            style={{
-              color:
-                item.statusTitle === 'Approved'
-                  ? Colors.Approved
-                  : item.statusTitle === 'Verified'
-                  ? Colors.Verified
-                  : item.statusTitle === 'Rejected'
-                  ? Colors.Rejected
-                  : item.statusTitle === 'Deleted'
-                  ? Colors.Rejected
-                  : item.statusTitle === 'Pending'
-                  ? Colors.Pending
-                  : Colors.Transfered
-            }}
             marginLeft={24}
+            isDecisionSubjectDropDown={true}
           />
-        )}
-      </View>
+        </View>
+      )}
 
       {/* dotsView */}
       <TouchableOpacity
-        onPress={() => setVisibleIndex(!visibleIndex ? -1 : index)}
+        onPress={() => setVisibleIndex(visibleIndex == -1 ? index : -1)}
         style={styles.dotsView}
       >
         <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
+
       {visibleIndex == index && (
         <View style={styles.modalView}>
           <EditDeleteModal
@@ -184,22 +372,45 @@ const SubjectsCard = ({
               navigation.navigate('SubjectDownload', { item });
               setVisibleIndex(-1);
             }}
-            subjectStatus={item.statusTitle}
+            subjectStatus={isDecisionSubject ? 'NoDeleted' : item.statusTitle}
             onPressDelete={() => {
               onDeleteHandler(item.subjectId);
               setVisibleIndex(-1);
             }}
             onPressEdit={() => {
-              navigation.navigate('EditSubject', { item });
+              if (isDecisionSubject) {
+                navigation.navigate('AddEditDecision', {
+                  meetingDetails: meetingData,
+                  isEdit: true,
+                  decisionId: decisionData?.decisionId,
+                  subjectId: item.subjectId
+                });
+              } else {
+                navigation.navigate('AddSubject', {
+                  committee: null,
+                  isEdit: true,
+                  subjectDetails: item,
+                  screenName: 'Edit subject'
+                });
+              }
+
               setVisibleIndex(-1);
             }}
             onPressView={() => {
-              navigation.navigate('SubjectDetails', { item });
+              onPressView(item);
+
               setVisibleIndex(-1);
             }}
             download={download}
-            editable={editable}
-            deleted={deleted}
+            editable={
+              isDecisionSubject
+                ? decisionData?.statusTitle == null
+                  ? false
+                  : true
+                : item.status.isDisable
+            }
+            deleted={isDecisionSubject ? false : item.status.isDisable}
+            isViewable={isDecisionSubject ? false : true}
           />
         </View>
       )}

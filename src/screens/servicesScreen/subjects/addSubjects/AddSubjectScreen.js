@@ -16,6 +16,7 @@ import {
   GET_All_MEETING,
   GET_All_SUBJECTS,
   GET_All_SUBJECTS_CATEGORY,
+  GET_COMMITTEES_BY_ROLE,
   GET_COMMITTEE_BY_ID,
   GET_FILE
 } from '../../../../graphql/query';
@@ -27,26 +28,52 @@ import AttachFiles from '../../../../component/attachFiles/AttachFiles';
 const AddSubjectScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { committee } = route?.params;
-  console.log('committee from add subjects', committee);
-  const [title, setTitle] = useState('');
-  const [discription, setDescription] = useState('');
-  const [valueCategory, setValueCategory] = useState(null);
-  const [valueCommittee, setValueCommittee] = useState(committee || null);
-  const [valueMeeting, setValueMeeting] = useState(0);
-  const [fileResponse, setFileResponse] = useState([]);
-  const [filesId, setFilesId] = useState([]);
+  const {
+    committee,
+    isEdit,
+    subjectDetails,
+    screenName,
+    meetingName,
+    meetingId,
+    isLiveMeetingSubject
+  } = route?.params;
+
   const [token, setToken] = useState('');
   const [category, setCategory] = useState([]);
   const [committees, setCommittee] = useState([]);
   const [meetings, setMeetings] = useState([]);
-  const [committeeData, setCommitteeData] = useState([]);
+  const [fileResponse, setFileResponse] = useState([]);
+  const [subjectData, setSubjectData] = useState({
+    title: isEdit ? subjectDetails?.subjectTitle : '',
+    discription: isEdit ? subjectDetails?.description : '',
+    valueCommittee: isEdit
+      ? subjectDetails?.committeeId
+      : committee != null
+      ? committee
+      : null,
+    valueMeeting: isEdit
+      ? subjectDetails?.meetingId
+      : meetingId
+      ? meetingId
+      : 0,
+    valueCategory: isEdit ? subjectDetails?.subjectCategoryId : null,
+    filesId: []
+  });
   let queryParams = [];
-  if (committee) {
+  if (committee && meetingId == null) {
     queryParams = {
       searchValue: '',
       screen: 1,
-      committeeIds: committee.toString()
+      committeeIds: `${committee}`
+    };
+  } else if (meetingId) {
+    queryParams = {
+      committeeIds: '',
+      searchValue: '',
+      screen: 0,
+      page: -1,
+      pageSize: -1,
+      meetingId: meetingId
     };
   } else {
     queryParams = {
@@ -61,12 +88,34 @@ const AddSubjectScreen = () => {
   // fetch file
   const [fetchFile, getFile] = useLazyQuery(GET_FILE);
 
+  subjectDetails?.attachFileIds?.map((id) => {
+    const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
+      variables: {
+        fileEntryId: id
+      },
+      onCompleted: (data) => {
+        if (data) {
+          setFileResponse((prev) => {
+            const pevDaa = prev.filter((ite) => {
+              return ite.fileEnteryId !== data.fileEnteryId;
+            });
+            return [...pevDaa, data.uploadedFile];
+          });
+        }
+      }
+    });
+    if (error) {
+      console.log('file error', error);
+    }
+  });
+
   // fetch subject category
   const { loading: SubjectCategoryLoading, error: SubjeCategoryError } =
     useQuery(GET_All_SUBJECTS_CATEGORY, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: (data) => {
         if (data) {
-          console.log('subject category', data.subjectCategories.items);
           setCategory(data.subjectCategories.items);
         }
       }
@@ -77,30 +126,31 @@ const AddSubjectScreen = () => {
   }
 
   // fetch commitees
-  const { loading: CommitteeLoading, error: CommitteeError } = useQuery(
-    GET_All_COMMITTEE,
-    {
-      variables: { isDeleted: true },
-      onCompleted: (data) => {
-        if (data) {
-          console.log('committees', data?.committees.items);
-          setCommittee(data.committees.items);
-        }
+  // fetch commitees
+  const {
+    loading: CommitteeLoading,
+    error: CommitteeError,
+    data: CommitteeData
+  } = useQuery(GET_COMMITTEES_BY_ROLE, {
+    fetchPolicy: 'cache-and-network',
+    variables: { head: true, secretary: true, member: false },
+    onCompleted: (data) => {
+      if (data) {
+        setCommittee(data?.committeesByRole?.items);
       }
+    },
+    onError: (data) => {
+      console.log('commitee error', data);
     }
-  );
-  if (CommitteeError) {
-    console.log('commitee error', CommitteeError);
-  }
-
+  });
   // fetch meetings
   const { loading: MeetingLoading, error: MeetingError } = useQuery(
     GET_All_MEETING,
     {
+      fetchPolicy: 'cache-and-network',
       variables: { onlyMyMeeting: false, screen: 1 },
       onCompleted: (data) => {
         if (data) {
-          console.log('meetings', data?.meetings.items);
           setMeetings(data.meetings.items);
         }
       }
@@ -122,9 +172,9 @@ const AddSubjectScreen = () => {
   };
 
   useEffect(() => {
-    const fileId = fileResponse.map((file) => file.fileEnteryId);
+    const fileId = fileResponse?.map((file) => file.fileEnteryId);
 
-    setFilesId(fileId);
+    setSubjectData({ ...subjectData, filesId: fileId });
   }, [fileResponse]);
 
   const [addSubject, { data, loading, error }] = useMutation(UPDATE_SUBJECTS, {
@@ -136,8 +186,8 @@ const AddSubjectScreen = () => {
       }
     ],
     onCompleted: (data) => {
-      console.log(data);
-      if (data.updateSubject.status[0].statusCode == '200') {
+      console.log('update subject', data.updateSubject?.status);
+      if (data?.updateSubject?.status[0]?.statusCode == '200') {
         if (committee) {
           navigation.goBack();
         } else {
@@ -154,25 +204,10 @@ const AddSubjectScreen = () => {
     console.log('addsubject error--', error);
   }
 
-  const Committee = useQuery(GET_COMMITTEE_BY_ID, {
-    variables: {
-      organizationId: committee
-    },
-    onCompleted: (data) => {
-      console.log('get committee by id', data);
-      if (data) {
-        setCommitteeData(data.committee);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get committee by id', data);
-    }
-  });
-
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        name={'Add subject'}
+        name={screenName}
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
@@ -182,18 +217,20 @@ const AddSubjectScreen = () => {
         nestedScrollEnabled={true}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.txtAddSubjectTitle}>Add subject</Text>
+        <Text style={styles.txtAddSubjectTitle}>{screenName}</Text>
         {/* select committee */}
         <DropDownPicker
           data={committees?.map((item) => ({
             label: item.committeeTitle,
             value: item.organizationId
           }))}
-          disable={committee ? true : false}
+          disable={committee ? true : isEdit ? true : false}
           placeholder={''}
-          setData={setValueCommittee}
+          setData={(item) =>
+            setSubjectData({ ...subjectData, valueCommittee: item })
+          }
           title={'SELECT COMMITTEE'}
-          value={valueCommittee}
+          value={subjectData.valueCommittee}
         />
 
         {/* select meeting */}
@@ -203,25 +240,33 @@ const AddSubjectScreen = () => {
             value: item.meetingId
           }))}
           disable={committee ? true : false}
-          placeholder={''}
-          setData={setValueMeeting}
+          placeholder={committee != null ? meetingName : ''}
+          setData={(item) =>
+            setSubjectData({ ...subjectData, valueMeeting: item })
+          }
           title={'SELECT MEETING'}
-          value={valueMeeting}
+          value={subjectData.valueMeeting}
         />
         {/* title */}
         <View style={styles.titleContainer}>
           <Text style={styles.txtTitle}>TITLE</Text>
           <TextInput
+            value={subjectData?.title}
             style={styles.textInput}
-            onChangeText={(text) => setTitle(text)}
+            onChangeText={(text) =>
+              setSubjectData({ ...subjectData, title: text })
+            }
           />
         </View>
         <View style={styles.discriptionContainer}>
           <Text style={styles.txtTitle}>DESCRIPTION</Text>
           <TextInput
+            value={subjectData?.discription}
             style={styles.textInput}
             multiline={true}
-            onChangeText={(text) => setDescription(text)}
+            onChangeText={(text) =>
+              setSubjectData({ ...subjectData, discription: text })
+            }
           />
         </View>
         <View>
@@ -233,9 +278,11 @@ const AddSubjectScreen = () => {
             }))}
             disable={false}
             placeholder={''}
-            setData={setValueCategory}
+            setData={(item) =>
+              setSubjectData({ ...subjectData, valueCategory: item })
+            }
             title={'SUBJECT CATEGORY'}
-            value={valueCategory}
+            value={subjectData?.valueCategory}
           />
           <Button
             title={'Add category'}
@@ -259,6 +306,7 @@ const AddSubjectScreen = () => {
           }}
           deleted={true}
           download={true}
+          isShowAttchTitle={true}
         />
       </ScrollView>
 
@@ -280,29 +328,53 @@ const AddSubjectScreen = () => {
           <Button
             title={'Save'}
             onPress={() => {
+              console.log({
+                subjectId: isEdit ? subjectDetails.subjectId : 0,
+                committeeId: subjectData.valueCommittee,
+                subjectTitle: subjectData.title,
+                description: subjectData.discription,
+                subjectCategoryId: subjectData.valueCategory,
+                draft: false,
+                attachFileIds: subjectData.filesId,
+                meetingId: subjectData.valueMeeting,
+                id: 0
+              });
               addSubject({
                 variables: {
                   subject: {
-                    subjectId: 0,
-                    committeeId: valueCommittee,
-                    subjectTitle: title,
-                    description: discription,
-                    subjectCategoryId: valueCategory,
+                    subjectId: isEdit ? subjectDetails.subjectId : 0,
+                    committeeId: subjectData.valueCommittee,
+                    subjectTitle: subjectData.title,
+                    description: subjectData.discription,
+                    subjectCategoryId: subjectData.valueCategory,
                     draft: false,
-                    attachFileIds: filesId,
-                    meetingId: valueMeeting,
-                    id: 0
+                    attachFileIds: subjectData.filesId,
+                    meetingId:
+                      subjectData.valueMeeting == null
+                        ? 0
+                        : subjectData.valueMeeting,
+                    id: isLiveMeetingSubject ? 1 : 0
                   }
-                },
-                onCompleted: (data) => {
-                  console.log(data.updateSubject);
                 }
               });
             }}
-            disable={title === '' || discription === '' ? true : false}
+            disable={
+              subjectData.title === '' ||
+              subjectData.discription === '' ||
+              subjectData.valueCommittee == null ||
+              subjectData.valueCategory == null
+                ? true
+                : false
+            }
             layoutStyle={[
               {
-                opacity: title === '' || discription === '' ? 0.5 : null
+                opacity:
+                  subjectData.title === '' ||
+                  subjectData.discription === '' ||
+                  subjectData.valueCommittee == null ||
+                  subjectData.valueCategory == null
+                    ? 0.5
+                    : null
               },
               styles.nextBtnLayout
             ]}

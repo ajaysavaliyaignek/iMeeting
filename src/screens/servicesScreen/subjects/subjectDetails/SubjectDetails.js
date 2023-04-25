@@ -28,6 +28,8 @@ import {
 } from '../../../../graphql/query';
 import { DELETE_SUBJECTS, UPDATE_COMMENT } from '../../../../graphql/mutation';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
+import moment from 'moment';
+import SubjectDetailsComponent from '../../../../component/subjectDetailsComponent/SubjectDetailsComponent';
 
 const SubjectDetails = () => {
   const navigation = useNavigation();
@@ -37,39 +39,16 @@ const SubjectDetails = () => {
 
   const [fileId, setFileId] = useState(item?.attachFileIds);
   const [commentThreadId, setCommentThreadId] = useState(null);
-  const [fileResponse, setFileResponse] = useState([]);
   const [comments, setComments] = useState([]);
   const [commenttext, setCommentText] = useState('');
   const [commentId, setCommentId] = useState(null);
-  const keyboardVerticalOffset = Platform.OS === 'ios' ? -350 : -600;
-  const profilePicture = comments?.profilePicture;
-
-  fileId?.map((id) => {
-    const { loading, error } = useQuery(GET_FILE, {
-      variables: {
-        fileEntryId: id
-      },
-      onCompleted: (data) => {
-        setFileResponse((prev) => {
-          console.log('prev', prev);
-          if (prev.fileEnteryId !== id) {
-            return [...prev, data.uploadedFile];
-          }
-        });
-      }
-    });
-    if (error) {
-      console.log('file error', error);
-    }
-  });
-
-  console.log('file response', fileResponse);
 
   const {
     loading: SubjectLoading,
     error: SubjectError,
     data: SubjectsData
   } = useQuery(GET_SUBJECT_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: { subjectId: item.subjectId },
     onCompleted: (data) => {
       console.log('subject data', data);
@@ -94,6 +73,7 @@ const SubjectDetails = () => {
     error: CommentsError,
     data: CommentsData
   } = useQuery(GET_All_COMMENTS_THREAD, {
+    fetchPolicy: 'cache-and-network',
     variables: { commentCategoryId: commentThreadId },
     onCompleted: (data) => {
       if (data) {
@@ -186,15 +166,6 @@ const SubjectDetails = () => {
     ]);
   };
 
-  const generalDetails = (title, discription) => {
-    return (
-      <View style={styles.subView}>
-        <Text style={styles.txtSubDetails}>{title}</Text>
-        <Text style={styles.txtSubDiscription}>{discription}</Text>
-      </View>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -203,139 +174,45 @@ const SubjectDetails = () => {
         onLeftPress={() => navigation.goBack()}
       />
 
-      <ScrollView
-        style={styles.subContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.txtTitle}>General</Text>
-        {generalDetails('Title', item.subjectTitle)}
-        {generalDetails('Discription', item.description)}
-        {generalDetails('Subject category', item.subjectCategoryName)}
-        {generalDetails('Committeee ', item.committeeName)}
-        {generalDetails('Creator', item.createrName)}
-        {generalDetails('Date of creation', item.dateOfCreation)}
+      <SubjectDetailsComponent
+        item={item}
+        addComment={addComment}
+        commentId={commentId}
+        setCommentId={setCommentId}
+        commenttext={commenttext}
+        setCommentText={setCommentText}
+        commentThreadId={commentThreadId}
+        comments={comments}
+        setComments={setComments}
+      />
 
-        {/* attach file */}
-
-        {fileResponse?.length > 0 && (
-          <AttachFiles
-            fileResponse={fileResponse}
-            setFileResponse={setFileResponse}
-            showAttachButton={false}
-            deleted={false}
-            download={true}
-          />
-        )}
-
-        {/* comments     */}
-        <Text style={styles.txtcommentsTitle}>Comments</Text>
-
-        <View>
-          <FlatList
-            data={comments?.childComment}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item, index) => {
-              return index.toString();
-            }}
-            renderItem={({ item, index }) => (
-              <CommentCard
-                item={item}
-                commentThreadId={commentThreadId}
-                index={index}
-                setComment={setCommentText}
-                setCommentId={setCommentId}
-                commenttext={commenttext}
-              />
-            )}
-          />
-        </View>
-
-        {
-          <View
-            style={{
-              paddingVertical: SIZES[14],
-              paddingHorizontal: SIZES[16],
-              borderWidth: SIZES[1],
-              borderColor: Colors.line,
-              borderRadius: SIZES[8],
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: SIZES[32],
-              marginBottom: SIZES[24]
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                height: SIZES[30],
-                backgroundColor: Colors.white
-              }}
-              value={commenttext}
-              underlineColor={Colors.white}
-              activeUnderlineColor={Colors.white}
-              placeholder={'Your comment'}
-              onChangeText={(text) => setCommentText(text)}
+      {item.status.isDisable && (
+        <View
+          style={{
+            backgroundColor: Colors.white,
+            justifyContent: 'flex-end'
+          }}
+        >
+          {/* Divider */}
+          <Divider style={styles.divider} />
+          <View style={styles.buttonContainer}>
+            <Button
+              title={'Edit'}
+              onPress={() => navigation.navigate('EditSubject', { item })}
+              layoutStyle={styles.cancelBtnLayout}
+              textStyle={styles.txtCancelButton}
             />
-            <TouchableOpacity
+            <Button
+              title={'Delete'}
               onPress={() => {
-                console.log('commenttext', commenttext);
-                console.log('parentCommentId', commentThreadId);
-                console.log('commentId', commentId);
-                if (commentId == null) {
-                  addComment({
-                    variables: {
-                      comment: {
-                        comment: commenttext,
-                        commentId: 0,
-                        parentCommentId: comments.commentId
-                      }
-                    }
-                  });
-                } else {
-                  addComment({
-                    variables: {
-                      comment: {
-                        comment: commenttext,
-                        commentId: commentId
-                      }
-                    }
-                  });
-                }
-
-                setCommentText('');
+                onDeleteHandler(item.subjectId);
               }}
-            >
-              <Icon name={IconName.Send} height={SIZES[22]} width={SIZES[20]} />
-            </TouchableOpacity>
+              layoutStyle={[styles.nextBtnLayout]}
+              textStyle={styles.txtNextBtn}
+            />
           </View>
-        }
-      </ScrollView>
-
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Divider */}
-        <Divider style={styles.divider} />
-        <View style={styles.buttonContainer}>
-          <Button
-            title={'Edit'}
-            onPress={() => navigation.navigate('EditSubject', { item })}
-            layoutStyle={styles.cancelBtnLayout}
-            textStyle={styles.txtCancelButton}
-          />
-          <Button
-            title={'Delete'}
-            onPress={() => {
-              onDeleteHandler(item.subjectId);
-            }}
-            layoutStyle={[styles.nextBtnLayout]}
-            textStyle={styles.txtNextBtn}
-          />
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };

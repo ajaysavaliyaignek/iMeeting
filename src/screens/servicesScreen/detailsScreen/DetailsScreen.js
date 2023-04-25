@@ -63,6 +63,7 @@ const DetailsScreen = () => {
     error: errorGetMeetings,
     data: dataGetMeetings
   } = useQuery(GET_All_MEETING, {
+    // fetchPolicy: 'no-cache',
     variables: {
       onlyMyMeeting: onlyMyMeetings,
       committeeIds: committeeId,
@@ -92,7 +93,15 @@ const DetailsScreen = () => {
         activeOpacity={1}
       >
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{
+              height: SIZES[24],
+              width: SIZES[24],
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <Icon
               name={IconName.Arrow_Left}
               height={SIZES[14]}
@@ -117,10 +126,37 @@ const DetailsScreen = () => {
                   setSelectedUsers([]);
                   setMeetingsData([]);
                   setSelectedSubjects([]);
-                  navigation.navigate('AddMeetingGeneral');
+                  navigation.navigate(
+                    'AddEditMeetingAppointmentVideoConference',
+                    {
+                      screenName: 'Add meeting',
+                      type: 'Meeting',
+                      screensArray: [
+                        'general',
+                        'users',
+                        'dateandtime',
+                        'location',
+                        'subjects'
+                      ],
+                      isEdit: false,
+                      details: null
+                    }
+                  );
                 } else if (activeTab === '1') {
-                  navigation.navigate('AddSubject', { committee: null });
+                  navigation.navigate('AddSubject', {
+                    committee: null,
+                    isEdit: false,
+                    subjectDetails: null,
+                    screenName: 'Add subject'
+                  });
                 }
+              }}
+              activeOpacity={0.5}
+              style={{
+                height: SIZES[24],
+                width: SIZES[24],
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
               <Icon name={IconName.Plus} height={SIZES[14]} width={SIZES[14]} />
@@ -288,7 +324,7 @@ const DetailsScreen = () => {
               </View>
               <Divider style={styles.divider} />
               {loadingGetMeetings ? (
-                <Loader />
+                <Loader color={Colors.primary} />
               ) : errorGetMeetings ? (
                 <View
                   style={{
@@ -300,7 +336,9 @@ const DetailsScreen = () => {
                   <Text
                     style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}
                   >
-                    {errorGetMeetings.message}
+                    {errorGetMeetings.message == 'Network request failed'
+                      ? 'No Internet connection'
+                      : errorGetMeetings.message}
                   </Text>
                 </View>
               ) : filterMeetingData.length > 0 ? (
@@ -347,9 +385,12 @@ const DetailsScreen = () => {
               meetingId={null}
               committeeIds={committeeId}
               searchText={searchText}
-              isSubjectStatus={true}
-              deleted={true}
+              setSearchText={setSearchText}
               download={true}
+              onPressView={(item) => {
+                navigation.navigate('SubjectDetails', { item });
+              }}
+              isSubjectStatus={true}
             />
           )}
         </View>

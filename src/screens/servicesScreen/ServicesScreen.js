@@ -7,7 +7,7 @@ import {
   Alert,
   BackHandler
 } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import Header from '../../component/header/Header';
 import { Colors } from '../../themes/Colors';
@@ -15,30 +15,55 @@ import DashboardCard from '../../component/Cards/ServicesCard';
 import { IconName } from '../../component';
 import { SIZES } from '../../themes/Sizes';
 import { styles } from './styles';
+import { GET_USER_PAYLOAD } from '../../graphql/query';
+import { useQuery } from '@apollo/client';
+import { UserContext } from '../../context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ServicesScreen = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
+  const { companyUrl, setCompanyUrl, setUser } = useContext(UserContext);
+
+  const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data) => {
+      console.log('userPayload', data.userPayload);
+      setUser(data.userPayload);
+    }
+  });
 
   useEffect(() => {
-    const backAction = () => {
-      Alert.alert('Hold on!', 'Are you sure you want to exit app?', [
-        {
-          text: 'Cancel',
-          onPress: () => null,
-          style: 'cancel'
-        },
-        { text: 'YES', onPress: () => BackHandler.exitApp() }
-      ]);
-      return true;
+    const getUrl = () => {
+      AsyncStorage.getItem('@url').then((data) => {
+        console.log('url', data);
+
+        setCompanyUrl(data);
+      });
     };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction
-    );
-
-    return () => backHandler.remove();
+    getUrl();
   }, []);
+
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     Alert.alert('Hold on!', 'Are you sure you want to exit app?', [
+  //       {
+  //         text: 'Cancel',
+  //         onPress: () => null,
+  //         style: 'cancel'
+  //       },
+  //       { text: 'YES', onPress: () => BackHandler.exitApp() }
+  //     ]);
+  //     return true;
+  //   };
+
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction
+  //   );
+
+  //   return () => backHandler.remove();
+  // }, []);
 
   return (
     <SafeAreaView style={styles.container}>

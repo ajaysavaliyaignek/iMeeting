@@ -26,6 +26,7 @@ import {
   GET_ALL_LOCATION,
   GET_ALL_LOCATION_BY_ID
 } from '../../../../graphql/query';
+import { Fonts } from '../../../../themes';
 
 const AddLocation = () => {
   const navigation = useNavigation();
@@ -44,11 +45,7 @@ const AddLocation = () => {
     UPDATE_LOCATION,
     {
       refetchQueries: [
-        { query: GET_ALL_LOCATION, variables: { locationType: locationType } },
-        {
-          query: GET_ALL_LOCATION_BY_ID,
-          variables: { locationType: locationType }
-        }
+        { query: GET_ALL_LOCATION, variables: { locationType: locationType } }
       ],
       onCompleted: (data) => {
         if (data) {
@@ -156,7 +153,11 @@ const AddLocation = () => {
           >
             <TextInput
               onChangeText={(text) => setLinkText(text)}
-              style={{ flex: 1 }}
+              style={{
+                flex: 1,
+                ...Fonts.PoppinsRegular[14],
+                color: Colors.bold
+              }}
             />
             <TouchableOpacity
               onPress={() => {
@@ -223,7 +224,7 @@ const AddLocation = () => {
                 'title',
                 title,
                 'locationType',
-                2
+                locationType
               );
               addLocation({
                 variables: {

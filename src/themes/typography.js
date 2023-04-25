@@ -8,6 +8,10 @@ export const FontNames = {
 
 const typography = {
   PoppinsBold: {
+    14: {
+      fontFamily: FontNames.PoppinsBold,
+      fontSize: SIZES[14]
+    },
     20: {
       fontFamily: FontNames.PoppinsBold,
       fontSize: SIZES[20]

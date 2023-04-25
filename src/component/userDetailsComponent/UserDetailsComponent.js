@@ -21,9 +21,11 @@ const UserDetailsComponent = ({
   visibleIndex,
   setVisibleIndex,
   isDeletable,
-  onPressDelete
+  onPressDelete,
+  editable,
+  onPressEdit,
+  meetingData
 }) => {
-  console.log('users', users);
   return (
     <View style={styles.container}>
       {users?.length > 0 ? (
@@ -52,6 +54,9 @@ const UserDetailsComponent = ({
                 setVisibleIndex={setVisibleIndex}
                 isDeletable={isDeletable}
                 onPressDelete={onPressDelete}
+                editable={editable}
+                onPressEdit={onPressEdit}
+                meetingData={meetingData}
               />
             );
           }}

@@ -7,17 +7,49 @@ import Avatar from '../../../../component/Avatar/Avatar';
 import { SIZES } from '../../../../themes/Sizes';
 import CheckBox from '../../../../component/checkBox/CheckBox';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import TimeLineSelectUserComponent from './TimeLineSelectUserComponent';
+import { Divider } from 'react-native-paper';
+import { Button } from '../../../../component/button/Button';
+import { Colors } from '../../../../themes/Colors';
 
 const SelectUser = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { selectedUsers } = route?.params;
-  console.log('selected users from time line select user', selectedUsers);
+  const { selectedUsers, setSelectuser } = route?.params;
+
   const [requiredSwitchOn, setRequiredSwitchOn] = useState(false);
   const [optionalSwitchOn, setOptionalSwitchOn] = useState(false);
   const [optionalCheckbox, setOptionalCheckBox] = useState(false);
   const [requiredUsers, setRequiredUsers] = useState([]);
   const [optionalUser, setOptionalUser] = useState([]);
+
+  const setSelectedUser = () => {
+    const selectedUserList = [];
+    selectedUsers.map((user) => {
+      if (user.isSelectedForTimeline) {
+        selectedUserList.push(user);
+        // console.log('selectCommittee', selectCommittee);
+      }
+    });
+
+    setSelectuser(selectedUserList);
+    navigation.goBack();
+  };
+
+  const onChecked = (item) => {
+    requiredUsers?.map((user) => {
+      if (user.userId === item.userId) {
+        user.isSelectedForTimeline = !user.isSelectedForTimeline;
+      }
+    });
+    setRequiredUsers([...requiredUsers]);
+    optionalUser?.map((user) => {
+      if (user.userId === item.userId) {
+        user.isSelectedForTimeline = !user.isSelectedForTimeline;
+      }
+    });
+    setOptionalUser([...optionalUser]);
+  };
 
   useEffect(() => {
     selectedUsers?.map((user) => {
@@ -36,13 +68,6 @@ const SelectUser = () => {
     });
     // setRequiredUsers([...requiredUsers]);
   }, [selectedUsers]);
-  console.log('======required=======', requiredUsers);
-  // useEffect(() => {
-  //   optionalUser?.map((user) => {
-  //     user?.isRequired == false;
-  //   });
-  //   setOptionalUser([...optionalUser]);
-  // }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,28 +91,11 @@ const SelectUser = () => {
           </View>
           {requiredUsers?.map((user, index) => {
             return (
-              <View style={styles.userContainer} key={index}>
-                <View style={styles.switchContainer}>
-                  <Avatar
-                    name={
-                      user.firstName == undefined
-                        ? user.userName
-                        : user.firstName
-                    }
-                    source={user.profileImage}
-                    size={SIZES[34]}
-                  />
-                  <Text style={styles.txtUserName}>
-                    {user.firstName == undefined
-                      ? user.userName
-                      : `${user.firstName} ${user.familyName}`}
-                  </Text>
-                </View>
-                <CheckBox
-                  value={true}
-                  onValueChange={() => setOptionalCheckBox(!optionalCheckbox)}
-                />
-              </View>
+              <TimeLineSelectUserComponent
+                user={user}
+                index={index}
+                onChecked={onChecked}
+              />
             );
           })}
         </View>
@@ -104,30 +112,38 @@ const SelectUser = () => {
           </View>
           {optionalUser?.map((user, index) => {
             return (
-              <View style={styles.userContainer} key={index}>
-                <View style={styles.switchContainer}>
-                  <Avatar
-                    name={
-                      user.firstName == undefined
-                        ? user.userName
-                        : user.firstName
-                    }
-                    source={user.profileImage}
-                    size={SIZES[34]}
-                  />
-                  <Text style={styles.txtUserName}>
-                    {user.firstName == undefined
-                      ? user.userName
-                      : `${user.firstName} ${user.familyName}`}
-                  </Text>
-                </View>
-                <CheckBox
-                  value={false}
-                  onValueChange={() => setOptionalCheckBox(!optionalCheckbox)}
-                />
-              </View>
+              <TimeLineSelectUserComponent
+                user={user}
+                index={index}
+                onChecked={onChecked}
+              />
             );
           })}
+        </View>
+      </View>
+      <View
+        style={{
+          backgroundColor: Colors.white,
+          justifyContent: 'flex-end'
+        }}
+      >
+        {/* Divider */}
+        <Divider style={styles.divider} />
+        <View style={styles.buttonContainer}>
+          <Button
+            title={'Cancel'}
+            onPress={() => navigation.goBack()}
+            layoutStyle={styles.cancelBtnLayout}
+            textStyle={styles.txtCancelButton}
+          />
+          <Button
+            title={'Save'}
+            onPress={() => {
+              setSelectedUser();
+            }}
+            layoutStyle={styles.nextBtnLayout}
+            textStyle={styles.txtNextBtn}
+          />
         </View>
       </View>
     </SafeAreaView>

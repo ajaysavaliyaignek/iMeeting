@@ -16,7 +16,7 @@ let CalanderDate = moment();
 const DeadlineSuggestion = () => {
   const calendarRef = React.useRef();
   const route = useRoute();
-  const { setCalendarValue } = route?.params;
+  const { setCalendarValue, generaldData,isTaskdeadline } = route?.params;
   const navigation = useNavigation();
   const [calendarDate, setCalendarDate] = useState(
     CalanderDate.format('YYYY-MM-DD')
@@ -46,29 +46,40 @@ const DeadlineSuggestion = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        name={'Deadline suggestion'}
+        name={'Recieving subjects deadline'}
         rightIconName={IconName.Close}
         onRightPress={() => navigation.goBack()}
       />
       <View style={styles.subContainer}>
-        <Text style={styles.txtAddSubjectTitle}>Deadline suggestion</Text>
+        <Text style={styles.txtAddSubjectTitle}>
+          Recieving subjects deadline
+        </Text>
         <Calendar
           markingType="custom"
           hideArrows={true}
           current={calendarDate}
+          key={calendarDate}
+          date={'2023-02-15'}
+          // current={calendarDate}
           onDayPress={(date) => {
             console.log('date', date.dateString);
-            setCalendarValue(date.dateString);
+            setCalendarValue((prev) => {
+              return { ...prev, calendarValue: date.dateString };
+            });
             navigation.goBack();
           }}
-          monthFormat={'yyyy MM'}
+          minDate={!isTaskdeadline?new Date(generaldData?.startDateTime):new Date()}
+          maxDate={!isTaskdeadline?new Date(generaldData?.endDateTime).setDate(
+            generaldData?.endDateTime.getDate() - 1
+          ):null}
+          // monthFormat={'YYYY-MM-DD'}
           enableSwipeMonths={true}
           theme={{
             backgroundColor: 'red',
             calendarBackground: '#ffffff',
             todayTextColor: Colors.primary,
             dayTextColor: '#222222',
-            textDisabledColor: Colors.white,
+            textDisabledColor: Colors.line,
             monthTextColor: '#57B9BB',
             arrowColor: '#57B9BB',
             textDayFontWeight: '300',
@@ -87,22 +98,10 @@ const DeadlineSuggestion = () => {
                 onPressArrowLeft={onPressArrowLeft}
                 onPressArrowRight={onPressArrowRight}
                 horizontal={horizontal}
+                isDeadlineSuggetion={true}
               />
             );
           }}
-          //   style={{
-          //     paddingLeft: 0,
-          //     paddingRight: 0
-          //   }}
-
-          // markedDates={{
-          //   '2022-10-19': { soldOut: false, blocked: false, inventory: 2 },
-          //   '2019-02-24': { soldOut: false, blocked: false, inventory: 2 },
-          //   '2019-02-25': { soldOut: false, blocked: true, inventory: 0 },
-          //   '2019-02-26': { soldOut: true, blocked: true, inventory: 2 }
-          // }}
-          //   horizontal={this.state.horizontal}
-          //   onDayPress={this.onDayPress}
         />
         <View style={styles.upcomingContainer}>
           <Button

@@ -33,6 +33,7 @@ export const SIZES = {
   60: Normalize(60),
   62: Normalize(62),
   74: Normalize(74),
+  80: Normalize(80),
   90: Normalize(90),
   95: Normalize(95),
   98: Normalize(98),

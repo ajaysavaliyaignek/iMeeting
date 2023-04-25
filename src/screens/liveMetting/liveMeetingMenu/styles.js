@@ -68,5 +68,54 @@ export const styles = StyleSheet.create({
     color: Colors.white,
     ...Fonts.PoppinsSemiBold[12],
     fontSize: 9
+  },
+  modal: {
+    alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 8,
+
+    backgroundColor: 'rgba(100, 100, 100, 0.7)'
+  },
+
+  mainBoxView: {
+    paddingVertical: 16,
+    backgroundColor: Colors.white,
+    shadowColor: Colors.gray,
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderRadius: 14,
+
+    // marginTop: 160
+    position: 'absolute',
+    bottom: '35%',
+    height: 265,
+    width: 280
+  },
+  txtClose: {
+    alignSelf: 'center',
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.bold
+  },
+  txtWarn: {
+    ...Fonts.PoppinsSemiBold[12],
+    color: Colors.secondary,
+    textAlign: 'center'
+  },
+  textContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 16
+  },
+  alertBtn: {
+    paddingVertical: 12
+  },
+  txtFinalCloseBtn: {
+    alignSelf: 'center',
+    ...Fonts.PoppinsBold[14],
+    color: Colors.Rejected
   }
 });

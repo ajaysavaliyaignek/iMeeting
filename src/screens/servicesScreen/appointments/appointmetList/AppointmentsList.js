@@ -31,6 +31,7 @@ const AppointmentsList = () => {
   const [visibleIndex, setVisibleIndex] = useState(-1);
   // get ALL appointment
   const Appointment = useQuery(GET_All_APPOINTMENT, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       searchValue: searchText,
       page: -1,
@@ -51,7 +52,15 @@ const AppointmentsList = () => {
     <SafeAreaView style={styles.container}>
       {/* header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            height: SIZES[24],
+            width: SIZES[24],
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
           <Icon
             name={IconName.Arrow_Left}
             height={SIZES[14]}
@@ -71,11 +80,17 @@ const AppointmentsList = () => {
               setSelectedUsers([]);
               setAppointmentsData([]);
 
-              navigation.navigate('AddAppointmentGeneral');
+              navigation.navigate('AddEditMeetingAppointmentVideoConference', {
+                screenName: 'Add appointment',
+                type: 'Appointment',
+                screensArray: ['general', 'users', 'dateandtime', 'location'],
+                isEdit: false,
+                details: null
+              });
             }}
             style={{
-              height: 20,
-              width: 20,
+              height: SIZES[24],
+              width: SIZES[24],
               alignItems: 'center',
               justifyContent: 'center'
             }}
@@ -145,11 +160,13 @@ const AppointmentsList = () => {
         ) : Appointment.error ? (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>
-              {Appointment.error.message}
+              {Appointment?.error?.message == 'Network request failed'
+                ? 'No Internet connection'
+                : Appointment?.error?.message}
             </Text>
           </View>
         ) : Appointment.loading ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ ...Fonts.PoppinsBold[20], color: Colors.primary }}>

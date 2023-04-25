@@ -1,47 +1,33 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Platform,
-  ToastAndroid
-} from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import { View, SafeAreaView, Alert } from 'react-native';
+import React, { useContext, useState } from 'react';
 import moment from 'moment';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import momentDurationFormatSetup from 'moment-duration-format';
+import { Divider } from 'react-native-paper';
 
 import Header from '../../../../component/header/Header';
-import { Icon, IconName } from '../../../../component';
+import { IconName } from '../../../../component';
 import { styles } from './styles';
-import { SIZES } from '../../../../themes/Sizes';
 import { Colors } from '../../../../themes/Colors';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
 import { Fonts } from '../../../../themes';
-
 import {
-  GET_ALL_LOCATION_BY_ID,
   GET_All_MEETING,
-  GET_ANSWER,
-  GET_COMMITTEE_BY_ID,
-  GET_FILE,
-  GET_MEETING_BY_ID,
-  GET_PLATFORMLINK,
-  GET_USER_PAYLOAD
+  GET_LIVE_MEETING_TAB_COUNT,
+  GET_MEETING_STATUS
 } from '../../../../graphql/query';
-
-import { DELETE_MEETING } from '../../../../graphql/mutation';
-import AttachFiles from '../../../../component/attachFiles/AttachFiles';
+import {
+  DELETE_MEETING,
+  UPDATE_MEETING_STATUS
+} from '../../../../graphql/mutation';
 import DetailsComponent from '../../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 import { UserContext } from '../../../../context';
+import { SIZES } from '../../../../themes/Sizes';
 
 const MeetingDetails = () => {
   const navigation = useNavigation();
+
   const {
     setMeetingsData
     // setSelectedSubjects
@@ -49,146 +35,10 @@ const MeetingDetails = () => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item } = route?.params;
-  console.log('item', item);
 
-  const [fileResponse, setFileResponse] = useState(null);
-  const [meeting, setMeeting] = useState(null);
-  const [location, setLocation] = useState(null);
-  const [committe, setCommittee] = useState(null);
-  const [platform, setPlatform] = useState(null);
-  const [role, setRole] = useState('');
-  const [user, setUser] = useState(null);
-  const [answer, setAnswer] = useState(null);
-  let file = [];
-
-  item?.attachFileIds.map((id) => {
-    const getFile = useQuery(GET_FILE, {
-      variables: {
-        fileEntryId: id
-      },
-      onCompleted: (data) => {
-        console.log('file from meeting details', data);
-        setFileResponse((prev) => {
-          console.log('prev', prev);
-          const id = file.map((item) => {
-            return item.fileEnteryId;
-          });
-          console.log('id from inside', id);
-          console.log(
-            'fileEnteryId from inside',
-            data.uploadedFile.fileEnteryId
-          );
-          if (id != data.uploadedFile.fileEnteryId) {
-            file.push(data?.uploadedFile);
-            setFileResponse(file);
-          }
-        });
-      }
-    });
-    if (getFile.error) {
-      console.log('File error', getFile.error);
-    }
-  });
-
-  // get meeting
-  const { data, error, loading } = useQuery(GET_MEETING_BY_ID, {
-    variables: {
-      meetingId: item.meetingId
-    },
-    onCompleted: (data) => {
-      console.log('meeting by id', data.meeting);
-      if (data) {
-        setMeeting(data.meeting);
-        setRole(data.meeting.yourRoleName);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-  console.log('user', user);
-
-  const [getAnswer, getAnswerType] = useLazyQuery(GET_ANSWER, {
-    onCompleted: (data) => {
-      console.log('answer data', data.answer);
-      setAnswer(data.answer);
-    }
-  });
-
-  const getUserDetails = useQuery(GET_USER_PAYLOAD, {
-    onCompleted: (data) => {
-      console.log('user data', data.userPayload.userId);
-      setUser(data.userPayload.userId);
-      getAnswer({
-        variables: {
-          id: +item?.meetingId,
-          userId: +data.userPayload.userId,
-          type: 1
-        }
-      });
-    }
-  });
-
-  const DurationTime = moment(`${meeting?.endDate} ${meeting?.endTime}`, [
-    'YYYY-MM-DD hh:mm A'
-  ]).diff(
-    moment(`${meeting?.setDate} ${meeting?.setTime}`, ['YYYY-MM-DD hh:mm A']),
-    'minutes'
-  );
-  const durationHourMin = moment
-    .duration(DurationTime, 'minutes')
-    .format('h [hrs], m [min]');
-
-  // Calculate the duration
-  // Keep in mind you can get the duration in seconds, days, etc.
-
-  console.log('file id', meeting?.attachFileIds);
-
-  // get location
-  const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
-    variables: {
-      locationId: item.locationId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setLocation(data.location);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-
-  // get link
-  const Link = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: meeting?.platformId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        console.log('platform link', data.videoConferencePlatformLink);
-        setPlatform(data.videoConferencePlatformLink);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get meeting by id', data);
-    }
-  });
-
-  // get committee
-  const Committee = useQuery(GET_COMMITTEE_BY_ID, {
-    variables: {
-      organizationId: item.committeeId
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setCommittee(data.committee);
-      }
-    },
-    onError: (data) => {
-      console.log('error in get committee by id', data);
-    }
-  });
+  const [role, setRole] = useState(item?.yourRoleName);
+  const [meetingStatus, setMeetingStatus] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // delete meeting
   const [deleteMeeting] = useMutation(DELETE_MEETING, {
@@ -236,6 +86,44 @@ const MeetingDetails = () => {
     ]);
   };
 
+  // getMeetingSubjects for meeting
+  const getMeetingSubjects = useQuery(GET_MEETING_STATUS, {
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data) => {
+      if (data) {
+        setMeetingStatus(data.meetingStatus.items);
+      }
+    },
+    onError: (data) => {
+      console.log('error getMeetingSubjects ', data.message);
+    }
+  });
+
+  const [updateMeetingStatus] = useMutation(UPDATE_MEETING_STATUS, {
+    refetchQueries: ['meetings'],
+    onCompleted: (data) => {
+      console.log('updateMeetingSttaus', data.updateMeetingStatus.status[0]);
+      if (data.updateMeetingStatus.status[0].statusCode == '200') {
+        navigation.navigate('LiveMeetingMenu', {
+          item,
+          meetingStatus: meetingStatus
+        });
+      }
+    },
+    onError: (data) => {
+      console.log('updateMeetingSttaus', data.message);
+    }
+  });
+
+  let date = new Date();
+  let newdate = moment(
+    date.toLocaleString('en-Us', { timeZone: item.timeZone })
+  )
+    .add(15, 'm')
+    .format('YYYY-MM-DD hh:mm A');
+
+  let meetingDate = `${item.setDate} ${item.setTime}`;
+
   return (
     <SafeAreaView style={styles.container}>
       <Header
@@ -244,41 +132,121 @@ const MeetingDetails = () => {
         onLeftPress={() => navigation.goBack()}
       />
 
-      <DetailsComponent item={item} isLiveMeetingDetails={true} />
+      <View style={{ flex: 1 }}>
+        <DetailsComponent
+          item={item}
+          isLiveMeetingDetails={true}
+          setLoading={setLoading}
+        />
 
-      {role == 'Head' || role == 'Secretory' ? (
-        <View style={styles.bottomContainer}>
-          <Divider style={styles.divider} />
-          {item.meetingStatusTitle !== 'Deleted' && (
-            <View style={styles.btnContainer}>
-              <Button
-                title={'Edit'}
-                layoutStyle={[styles.btnLayout, { backgroundColor: '#F3F6F9' }]}
-                textStyle={{
-                  ...Fonts.PoppinsSemiBold[14],
-                  color: Colors.primary
-                }}
-                onPress={() => {
-                  navigation.navigate('EditMeetingGeneral', { item: item });
-                  setMeetingsData([]);
-                }}
-              />
-              <Button
-                title={'Delete'}
-                layoutStyle={[styles.btnLayout, { backgroundColor: '#DD7878' }]}
-                onPress={onDeleteHandler}
-              />
+        {role == 'Head' || role == 'Secretary' ? (
+          <View style={styles.bottomContainer}>
+            <Divider style={styles.divider} />
+            {item.meetingStatusTitle !== 'Deleted' && (
+              <View style={styles.btnContainer}>
+                {item.meetingStatusTitle !== 'Closed' && (
+                  <Button
+                    title={'Edit'}
+                    layoutStyle={[
+                      styles.btnLayout,
+                      { backgroundColor: '#F3F6F9' }
+                    ]}
+                    textStyle={{
+                      ...Fonts.PoppinsSemiBold[14],
+                      color: Colors.primary
+                    }}
+                    onPress={() => {
+                      navigation.navigate(
+                        'AddEditMeetingAppointmentVideoConference',
+                        {
+                          screenName: 'Edit meeting',
+                          type: 'Meeting',
+                          screensArray: [
+                            'general',
+                            'users',
+                            'dateandtime',
+                            'location',
+                            'subjects'
+                          ],
+                          isEdit: true,
+                          details: item
+                        }
+                      );
+                      setMeetingsData([]);
+                    }}
+                  />
+                )}
+                <Button
+                  title={'Delete'}
+                  layoutStyle={[
+                    styles.btnLayout,
+                    {
+                      backgroundColor: '#DD7878',
+                      width:
+                        item.meetingStatusTitle == 'Closed' ? '100%' : '30%'
+                    }
+                  ]}
+                  onPress={onDeleteHandler}
+                />
+                {item.status.canStart &&
+                  moment(newdate, 'YYYY-MM-DD hh:mm A').isSameOrAfter(
+                    moment(meetingDate, 'YYYY-MM-DD hh:mm A')
+                  ) && (
+                    <Button
+                      title={'Start'}
+                      layoutStyle={[styles.btnLayout]}
+                      onPress={() => {
+                        if (item.meetingStatusTitle !== 'Soft-Closed') {
+                          const filterStatus = meetingStatus?.filter(
+                            (status) => {
+                              if (status.meetingStatusTitle == 'Live') {
+                                return status;
+                              }
+                            }
+                          );
+
+                          console.log(
+                            'filterstatus for live meeting',
+                            filterStatus
+                          );
+                          updateMeetingStatus({
+                            variables: {
+                              meeting: {
+                                meetingId: item?.meetingId,
+                                meetingStatusId:
+                                  filterStatus[0]?.meetingStatusId
+                              }
+                            }
+                          });
+                        } else {
+                          navigation.navigate('LiveMeetingMenu', {
+                            item,
+                            meetingStatus: meetingStatus
+                          });
+                        }
+                      }}
+                    />
+                  )}
+              </View>
+            )}
+          </View>
+        ) : (
+          <View style={{ padding: SIZES[16] }}>
+            {item.meetingStatusTitle == 'Live' && (
               <Button
                 title={'Start'}
-                layoutStyle={[styles.btnLayout]}
+                layoutStyle={[styles.btnLayout, { width: '100%' }]}
                 onPress={() => {
-                  // navigation.navigate('LiveMeetingMenu', { item });
+                  navigation.navigate('LiveMeetingMenu', {
+                    item,
+                    meetingStatus: meetingStatus
+                  });
                 }}
               />
-            </View>
-          )}
-        </View>
-      ) : null}
+            )}
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 };

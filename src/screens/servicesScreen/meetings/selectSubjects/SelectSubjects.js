@@ -26,7 +26,13 @@ const SelectSubjects = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { committee, onUpdateSelection, previosSubjects } = route?.params;
+  const {
+    meetingName,
+    committee,
+    onUpdateSelection,
+    previosSubjects,
+    meetingId
+  } = route?.params;
   console.log('committee from select subjects', committee.toString());
   const [searchText, setSearchText] = useState('');
   const [subjectData, setSubjectData] = useState([]);
@@ -41,6 +47,7 @@ const SelectSubjects = () => {
     error: SubjectsError,
     data: SubjectsData
   } = useQuery(GET_All_SUBJECTS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       searchValue: searchText,
       screen: 1,
@@ -108,7 +115,16 @@ const SelectSubjects = () => {
         rightIconName={IconName.Add}
         leftIconName={IconName.Arrow_Left}
         onLeftPress={() => navigation.goBack()}
-        onRightPress={() => navigation.navigate('AddSubject', { committee })}
+        onRightPress={() =>
+          navigation.navigate('AddSubject', {
+            committee: committee,
+            isEdit: false,
+            subjectDetails: null,
+            screenName: 'Add subject',
+            meetingName: meetingName,
+            meetingId: null
+          })
+        }
       />
       <View style={styles.subContainer}>
         <View style={styles.searchContainer}>
@@ -126,7 +142,7 @@ const SelectSubjects = () => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.committeeView}
           activeOpacity={0.5}
           onPress={() => navigation.navigate('Role')}
@@ -140,10 +156,10 @@ const SelectSubjects = () => {
               width={SIZES[6]}
             />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Divider style={styles.divider} />
         {SubjectsLoading ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : SubjectsError ? (
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text>{SubjectsError.message}</Text>

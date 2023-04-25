@@ -6,12 +6,14 @@ import {
   ScrollView,
   ToastAndroid,
   Platform,
-  Alert
+  Alert,
+  Linking
 } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { Divider } from 'react-native-paper';
+import { useQuery } from '@apollo/client';
 
 import { styles } from './styles';
 import Header from '../../../../component/header/Header';
@@ -20,14 +22,14 @@ import { SIZES } from '../../../../themes/Sizes';
 import { Button } from '../../../../component/button/Button';
 import { Colors } from '../../../../themes/Colors';
 import { GET_ALL_LOCATION_BY_ID } from '../../../../graphql/query';
-import { useQuery } from '@apollo/client';
 
 const LocationDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { locationId, platform, locationType } = route?.params;
+  const { locationId, platform, locationType, role, isLiveMeeting } =
+    route?.params;
+  console.log({ locationId, platform, locationType, role, isLiveMeeting });
   const [location, setLocation] = useState({});
-  const [role, setRole] = useState('Head');
 
   // get location by id
 
@@ -36,6 +38,7 @@ const LocationDetails = () => {
     error: LocationError,
     data: LocationData
   } = useQuery(GET_ALL_LOCATION_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       locationId: locationId
     },
@@ -102,7 +105,13 @@ const LocationDetails = () => {
               marginVertical: SIZES[10]
             }}
           >
-            <Text style={styles.txtUrl}>{location.googleMapURL}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(location.googleMapURL);
+              }}
+            >
+              <Text style={styles.txtUrl}>{location.googleMapURL}</Text>
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 Clipboard.setString(location.googleMapURL);
@@ -131,8 +140,9 @@ const LocationDetails = () => {
           <Divider style={styles.divider} />
         </View>
       </ScrollView>
-      {role == 'Head' || role == 'Secretory' ? (
+      {(role == 'Head' || role == 'Secretary') && !isLiveMeeting ? (
         <View
+          View
           style={{
             backgroundColor: Colors.white,
             justifyContent: 'flex-end'
@@ -149,6 +159,7 @@ const LocationDetails = () => {
               layoutStyle={styles.cancelBtnLayout}
               textStyle={styles.txtCancelButton}
             />
+
             <Button
               title={'Edit'}
               onPress={() =>

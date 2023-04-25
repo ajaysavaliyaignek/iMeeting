@@ -2,22 +2,19 @@ import { View, Text, SafeAreaView } from 'react-native';
 import React, { useContext, useState } from 'react';
 import * as Progress from 'react-native-progress';
 import DeviceInfo from 'react-native-device-info';
-import { Dropdown } from 'react-native-element-dropdown';
+import { Divider } from 'react-native-paper';
+import { useQuery } from '@apollo/client';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Header from '../../../../component/header/Header';
 import { IconName } from '../../../../component';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { SIZES } from '../../../../themes/Sizes';
-import { Fonts } from '../../../../themes';
-import { Divider } from 'react-native-paper';
 import { Button } from '../../../../component/button/Button';
-import { useQuery } from '@apollo/client';
 import {
   GET_ALL_LOCATION,
-  GET_ALL_LOCATION_BY_ID,
-  GET_PLATFORMLINK
+  GET_ALL_LOCATION_BY_ID
 } from '../../../../graphql/query';
 import { UserContext } from '../../../../context';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
@@ -29,12 +26,9 @@ const EditMeetingLocation = () => {
   const { item } = route?.params;
   console.log('meeting data from Editmeetinglocation', data);
   console.log('item from Editmeetinglocation', item);
-  const [openLocation, setOpenLocation] = useState(false);
-  const [onFocus, setIsFocus] = useState(false);
   const [valueLocation, setValueLocation] = useState(
     meetingsData?.location ? meetingsData?.location : item.locationId
   );
-  const [openVideoConference, setOpenVideoConference] = useState(false);
   const [valueVideoConference, setValueVideoConference] = useState(
     item?.platformlink?.includes('google') ? 1 : 2
   );
@@ -65,28 +59,6 @@ const EditMeetingLocation = () => {
   });
   if (LocationError) {
     console.log('LocationError', LocationError);
-  }
-
-  // get platform link
-  const {
-    loading: platformLoading,
-    error: platformError,
-    data: platformData
-  } = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: valueVideoConference
-    },
-
-    onCompleted: (data) => {
-      console.log('get platform link', data.videoConferencePlatformLink);
-      // setSubjectData(data?.subjects.items);
-      if (data) {
-        setPlatform(data?.videoConferencePlatformLink);
-      }
-    }
-  });
-  if (platformError) {
-    console.log('platformError', platformError);
   }
 
   const Location = useQuery(GET_ALL_LOCATION_BY_ID, {
@@ -148,8 +120,9 @@ const EditMeetingLocation = () => {
             onPress={() =>
               navigation.navigate('LocationDetails', {
                 locationId: valueLocation,
-                platform: platform,
-                locationType: 1
+
+                locationType: 1,
+                role: item?.yourRoleName
               })
             }
             layoutStyle={styles.cancelBtnLayout}
@@ -182,7 +155,7 @@ const EditMeetingLocation = () => {
               label: 'Microsoft Teams'
             }
           ]}
-          disable={false}
+          disable={item?.platformlink == null ? false : true}
           placeholder={''}
           setData={setValueVideoConference}
           title={'VIDEO CONFERENCING PLATFORM'}
@@ -206,7 +179,7 @@ const EditMeetingLocation = () => {
               navigation.goBack();
               setMeetingsData({
                 ...meetingsData,
-                platform: platform,
+
                 location: valueLocation,
                 videoConference: valueVideoConference
               });
@@ -219,9 +192,10 @@ const EditMeetingLocation = () => {
             onPress={() => {
               setMeetingsData({
                 ...meetingsData,
-                platform: platform,
+
                 location: valueLocation,
-                videoConference: valueVideoConference
+                videoConference:
+                  item?.platformlink == null ? valueVideoConference : 0
               });
               navigation.navigate('EditMeetingSubjects', {
                 item

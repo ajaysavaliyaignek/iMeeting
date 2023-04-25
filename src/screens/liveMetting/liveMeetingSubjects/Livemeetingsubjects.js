@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList
-} from 'react-native';
+import { View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Voice from '@react-native-community/voice';
 
@@ -14,65 +8,15 @@ import { SIZES } from '../../../themes/Sizes';
 import { Button } from '../../../component/button/Button';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
-import { subjectData } from '../../../Constans/data';
-import SubjectsCard from '../../../component/Cards/subjectCard/SubjectsCard';
 import { GET_SUBJECT_BY_ID } from '../../../graphql/query';
-import Loader from '../../../component/Loader/Loader';
-import { Fonts } from '../../../themes';
-import { Colors } from '../../../themes/Colors';
 import SubjectListComponent from '../../../component/detailsComponent/subjectsListComponent/SubjectListComponent';
+import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponent/SerachAndButtoncomponent';
 
-const Livemeetingsubjects = ({ item }) => {
-  // console.log('item from LM Subjects', item);
+const Livemeetingsubjects = ({ item, socketEventUpdateMessage }) => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
-
-  const searchFilterSubject = (text) => {
-    // if (text) {
-    //   const newData = selectedSubjects.filter((item) => {
-    //     const itemData = item.subjectTitle ? item.subjectTitle : '';
-    //     const textData = text;
-    //     return itemData.indexOf(textData) > -1;
-    //   });
-    //   setSearchText(text);
-    //   setFilterData(newData);
-    // } else {
-    //   setSearchText(text);
-    //   setFilterData(selectedSubjects);
-    // }
-  };
-
-  useEffect(() => {
-    Voice.onSpeechStart = onSpeechStartHandler;
-    Voice.onSpeechEnd = onSpeechEndHandler;
-    Voice.onSpeechResults = onSpeechResultsHandler;
-
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStartHandler = (e) => {
-    console.log('startHandler', e);
-  };
-
-  const onSpeechEndHandler = (e) => {
-    console.log('onSpeechEndHandler', e);
-  };
-
-  const onSpeechResultsHandler = (e) => {
-    console.log('onSpeechResultsHandler', e);
-    let text = e.value[0];
-    setSearchText(text);
-  };
-  const startRecording = async () => {
-    try {
-      await Voice.start('en-US');
-    } catch (error) {
-      console.log('voice error', error);
-    }
-  };
+  console.log('meeting', item);
 
   return (
     <TouchableOpacity
@@ -82,30 +26,69 @@ const Livemeetingsubjects = ({ item }) => {
       }}
       activeOpacity={1}
     >
-      <View style={styles.searchContainer}>
+      <SerachAndButtoncomponent
+        buttonText={'Add subject'}
+        onPress={() => {
+          navigation.navigate('AddSubject', {
+            committee: item?.committeeId,
+            isEdit: false,
+            subjectDetails: null,
+            screenName: 'Add subject',
+            meetingName: item?.meetingTitle,
+            meetingId: item?.meetingId,
+            isLiveMeetingSubject: true
+          });
+        }}
+        setSearchText={setSearchText}
+        role={item.yourRoleName}
+        onChangeText={(text) => {
+          setSearchText(text);
+        }}
+      />
+      {/* <View style={styles.searchContainer}>
         <Icon name={IconName.Search} height={SIZES[12]} width={SIZES[12]} />
         <TextInput
           style={styles.textInput}
           placeholder={'Search subjects'}
-          onChangeText={(text) => setSearchText(text)}
+          onChangeText={(text) => searchFilterSubject(text)}
         />
-        <TouchableOpacity onPress={() => startRecording()}>
+        <TouchableOpacity onPress={() => {}}>
           <Icon name={IconName.Speaker} height={SIZES[15]} width={SIZES[10]} />
         </TouchableOpacity>
-      </View>
-      <Button
+      </View> */}
+      {/* <Button
         title={'Add subject'}
-        onPress={() => navigation.navigate('AddSubject', { committee: null })}
+        onPress={() =>
+          navigation.navigate('AddSubject', {
+            committee: item?.committeeId,
+            isEdit: false,
+            subjectDetails: null,
+            screenName: 'Add subject',
+            meetingName: item?.meetingTitle,
+            meetingId: item?.meetingId
+          })
+        }
         layoutStyle={styles.cancelBtnLayout}
         textStyle={styles.txtCancelButton}
-      />
+      /> */}
       <Divider style={styles.divider} />
       <SubjectListComponent
+        isLiveMeetingSubject={true}
+        isDecisionSubject={false}
         committeeIds={''}
+        deleted={false}
         meetingId={item.meetingId}
         searchText={searchText}
         isSubjectStatus={false}
         editable={false}
+        setSearchText={setSearchText}
+        onPressView={(items) => {
+          navigation.navigate('LiveMeetingSubjectDetails', {
+            item: items,
+            meetingData: item
+          });
+        }}
+        socketEventUpdateMessage={socketEventUpdateMessage}
       />
     </TouchableOpacity>
   );

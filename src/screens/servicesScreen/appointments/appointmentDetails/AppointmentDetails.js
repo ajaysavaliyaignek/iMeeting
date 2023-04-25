@@ -7,7 +7,8 @@ import {
   Alert,
   FlatList,
   ToastAndroid,
-  Platform
+  Platform,
+  Linking
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
@@ -42,7 +43,7 @@ const AppointmentsDetails = () => {
   momentDurationFormatSetup(moment);
   const route = useRoute();
   const { item, isDisable } = route?.params;
-  console.log(item);
+  console.log('item from appoinment details', item);
   console.log(isDisable);
   const [fileResponse, setFileResponse] = useState([]);
   const [appointment, setAppointment] = useState(null);
@@ -54,6 +55,7 @@ const AppointmentsDetails = () => {
 
   // get mappointment by id
   const { data, error, loading } = useQuery(GET_APPOINTMENT_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       id: item.appointmentId
     },
@@ -77,6 +79,7 @@ const AppointmentsDetails = () => {
   });
 
   const getUserDetails = useQuery(GET_USER_PAYLOAD, {
+    fetchPolicy: 'cache-and-network',
     onCompleted: (data) => {
       console.log('user data', data.userPayload.userId);
       setUser(data.userPayload.userId);
@@ -84,7 +87,7 @@ const AppointmentsDetails = () => {
         variables: {
           id: +item?.appointmentId,
           userId: +data.userPayload.userId,
-          type: 2
+          type: 4
         }
       });
     }
@@ -92,6 +95,7 @@ const AppointmentsDetails = () => {
 
   fileId?.map((id) => {
     const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -110,6 +114,7 @@ const AppointmentsDetails = () => {
       console.log('file error', error);
     }
   });
+  console.log('file response', fileResponse);
 
   const DurationTime = moment(
     `${appointment?.endDate} ${appointment?.endTime}`,
@@ -221,7 +226,8 @@ const AppointmentsDetails = () => {
               ? 'Repeat monthly'
               : 'Repeat yearly'
           )}
-          {role == 'Member' && details('Required', 'Yes')}
+          {role == 'Member' &&
+            details('Required', item?.isRequired ? 'Yes' : 'No')}
           {role == 'Member' && (
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               {item.answers == 'Suggest time' ? (
@@ -253,23 +259,27 @@ const AppointmentsDetails = () => {
                     : `Your suggestion time - ${user?.suggestionTime}`
                 )
               )}
-              <TouchableOpacity
-                style={{
-                  marginLeft: SIZES[16],
-                  borderBottomWidth: 1,
-                  borderBottomColor: Colors.primary
-                }}
-                onPress={() => navigation.navigate('YourAnswer', { item })}
-              >
-                <Text
+              {!item?.isDisable && (
+                <TouchableOpacity
                   style={{
-                    ...Fonts.PoppinsSemiBold[14],
-                    color: Colors.primary
+                    marginLeft: SIZES[16],
+                    borderBottomWidth: 1,
+                    borderBottomColor: Colors.primary
                   }}
+                  onPress={() =>
+                    navigation.navigate('YourAnswer', { item, userID: user })
+                  }
                 >
-                  Edit
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      ...Fonts.PoppinsSemiBold[14],
+                      color: Colors.primary
+                    }}
+                  >
+                    Edit
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
@@ -290,7 +300,8 @@ const AppointmentsDetails = () => {
                   navigation.navigate('LocationDetails', {
                     locationId: appointment?.locationId,
                     platform: appointment?.platformName,
-                    locationType: 2
+                    locationType: 4,
+                    role: item?.yourRoleName
                   })
                 }
               >
@@ -301,7 +312,7 @@ const AppointmentsDetails = () => {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-between' }}
           >
-            {details('Vi-nce platform', appointment?.platformName)}
+            {details('Platform', appointment?.platformName)}
 
             {appointment?.platformlink && (
               <View
@@ -314,9 +325,16 @@ const AppointmentsDetails = () => {
                   marginBottom: fileResponse?.length > 0 ? 0 : SIZES[24]
                 }}
               >
-                <Text style={[styles.txtLink, { width: '80%' }]}>
-                  {appointment?.platformlink}
-                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    Linking.openURL(appointment?.platformlink);
+                  }}
+                  style={{ width: '80%' }}
+                >
+                  <Text style={[styles.txtLink]} numberOfLines={1}>
+                    {appointment?.platformlink}
+                  </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={{ marginTop: 32, marginLeft: 14 }}
                   onPress={() => {
@@ -355,6 +373,7 @@ const AppointmentsDetails = () => {
               showAttachButton={false}
               deleted={false}
               download={true}
+              isShowAttchTitle={true}
             />
           )}
         </View>
@@ -373,7 +392,7 @@ const AppointmentsDetails = () => {
           setVisibleIndex={() => {}}
         />
       </ScrollView>
-      {role == 'Head' || role == 'Secretory' ? (
+      {role == 'Head' || role == 'Secretary' ? (
         <View style={styles.bottomContainer}>
           <Divider style={styles.divider} />
           {!isDisable && (
@@ -386,9 +405,21 @@ const AppointmentsDetails = () => {
                   color: Colors.primary
                 }}
                 onPress={() =>
-                  navigation.navigate('EditAppointmentGeneral', {
-                    data: appointment
-                  })
+                  navigation.navigate(
+                    'AddEditMeetingAppointmentVideoConference',
+                    {
+                      screenName: 'Edit appointment',
+                      type: 'Appointment',
+                      screensArray: [
+                        'general',
+                        'users',
+                        'dateandtime',
+                        'location'
+                      ],
+                      isEdit: true,
+                      details: item
+                    }
+                  )
                 }
               />
               <Button

@@ -47,6 +47,7 @@ const CommitteeScreen = () => {
 
   const { loading: CommitteeLoadingByRole, error: CommitteeErrorByRole } =
     useQuery(GET_COMMITTEES_BY_ROLE, {
+      fetchPolicy: 'cache-and-network',
       variables: { head: true, secretary: true, member: false },
       onCompleted: (data) => {
         if (data) {
@@ -126,7 +127,7 @@ const CommitteeScreen = () => {
           Committees
         </Text>
         {CommitteeLoadingByRole ? (
-          <Loader />
+          <Loader color={Colors.primary} />
         ) : CommitteeErrorByRole ? (
           <View
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}

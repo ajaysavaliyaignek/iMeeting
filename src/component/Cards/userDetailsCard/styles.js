@@ -63,5 +63,15 @@ export const styles = StyleSheet.create({
     borderRadius: SIZES[4],
     height: SIZES[24],
     width: SIZES[24]
+  },
+  item: {
+    padding: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  textItem: {
+    flex: 1,
+    fontSize: 16
   }
 });

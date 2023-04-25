@@ -1,5 +1,85 @@
 import { gql } from '@apollo/client';
 
+export const UPDATE_SECRETARY_PERMISSION = gql`
+  mutation ($taskSecretaryPermission: InputTaskSecretaryPermission!) {
+    updateTaskSecretaryPermission(
+      taskSecretaryPermission: $taskSecretaryPermission
+    ) {
+      committeeId
+      status
+    }
+  }
+`;
+
+export const UPDATE_MEETING_STATUS = gql`
+  mutation ($meeting: InputMeeting!) {
+    updateMeetingStatus(meeting: $meeting) {
+      meetingId
+      status
+    }
+  }
+`;
+
+export const UPDATE_DECISION = gql`
+  mutation updateDecision($decision: InputSubject!) {
+    updateDecision(subject: $decision) {
+      id
+      status
+    }
+  }
+`;
+
+export const UPDATE_CHAT = gql`
+  mutation updateMeetingChat($meetingChat: InputMeetingChat!) {
+    updateMeetingChat(meetingChat: $meetingChat) {
+      chatId
+      status
+    }
+  }
+`;
+
+export const DELETE_TASK = gql`
+  mutation deleteTask($id: Long!) {
+    deleteTask(id: $id) {
+      status
+    }
+  }
+`;
+
+export const UPDATE_TASK = gql`
+  mutation updateTask($task: InputTask!) {
+    updateTask(task: $task) {
+      taskId
+      status
+    }
+  }
+`;
+
+export const UPDATE_USER_ANSWER = gql`
+  mutation addUserAnswer($voting: InputVoting!) {
+    addUserAnswer(voting: $voting) {
+      status
+    }
+  }
+`;
+export const UPDATE_VOTING = gql`
+  mutation addVotingQuestion($voting: InputVoting!) {
+    addVotingQuestion(voting: $voting) {
+      votingId
+      status
+    }
+  }
+`;
+
+export const UPDATE_SPEAKER = gql`
+  mutation updateSpeaker($userDetail: InputUserDetail!) {
+    updateSpeaker(userDetail: $userDetail) {
+      userId
+      status
+    }
+  }
+`;
+
 export const UPDATE_SUBJECT_STATUS = gql`
   mutation updateSubjectStatus($subject: InputSubject!) {
     updateSubjectStatus(subject: $subject) {

@@ -48,5 +48,32 @@ export const styles = StyleSheet.create({
     ...Fonts.PoppinsRegular[14],
     color: Colors.bold,
     marginLeft: SIZES[16]
+  },
+  buttonContainer: {
+    paddingHorizontal: SIZES[16],
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  cancelBtnLayout: {
+    backgroundColor: '#F3F6F9',
+    marginVertical: SIZES[12],
+    width: '48%'
+  },
+  txtCancelButton: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.primary
+  },
+  nextBtnLayout: {
+    marginVertical: SIZES[12],
+    width: '48%'
+  },
+  txtNextBtn: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.white
+  },
+  divider: {
+    width: '100%',
+    height: SIZES[1],
+    backgroundColor: Colors.line
   }
 });

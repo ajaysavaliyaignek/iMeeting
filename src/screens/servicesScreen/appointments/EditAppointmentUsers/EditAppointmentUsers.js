@@ -21,7 +21,6 @@ import Header from '../../../../component/header/Header';
 import { Button } from '../../../../component/button/Button';
 import { styles } from './styles';
 import { UserContext } from '../../../../context';
-import { useQuery } from '@apollo/client';
 import { GET_APPOINTMENT_BY_ID } from '../../../../graphql/query';
 import UserDetailsComponent from '../../../../component/userDetailsComponent/UserDetailsComponent';
 
@@ -36,6 +35,7 @@ const EditAppointmentUsers = () => {
   console.log({ attachFiles, committee, title, discription, item });
   const { selectedUsers, appointmentsData, setAppointmentsData } =
     useContext(UserContext);
+  console.log('appointmentdata from edit app user', appointmentsData);
   const [previousUser, setPreviousUser] = useState([]);
   const [appointment, setAppointment] = useState([]);
   let backUpUser = [];
@@ -48,8 +48,10 @@ const EditAppointmentUsers = () => {
       backUpUser.push(JSON.parse(JSON.stringify(user)));
       userData.push(JSON.parse(JSON.stringify(user)));
     });
-    setPreviousUser(userData);
-    setPreviousUser(userData);
+    setPreviousUser(
+      appointmentsData?.userData ? appointmentsData?.userData : userData
+    );
+    // setPreviousUser(userData);
   }, []);
 
   useEffect(() => {
@@ -176,14 +178,10 @@ const EditAppointmentUsers = () => {
     ]);
   };
 
-  useEffect(() => {
-    console.log('pre data', previousUser);
-
-    users = previousUser?.map((item) => item.userId);
-    console.log('userId', users);
-    requiredUsers = previousUser?.map((item) => item.isRequired);
-    console.log('userRequired', requiredUsers);
-  }, [previousUser]);
+  users = previousUser?.map((item) => item.userId);
+  console.log('userId', users);
+  requiredUsers = previousUser?.map((item) => item.isRequired);
+  console.log('userRequired', requiredUsers);
 
   return (
     <SafeAreaView style={styles.container}>

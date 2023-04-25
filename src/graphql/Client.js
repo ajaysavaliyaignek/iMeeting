@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, resetCaches } from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ApolloLink } from 'apollo-link';
 import { setContext } from 'apollo-link-context';
@@ -9,15 +9,15 @@ import { UserContext } from '../context';
 
 export const Client = () => {
   const [url, setUrl] = useState('');
-  // const { companyUrl, setCompanyUrl } = useContext(UserContext);
 
   useEffect(() => {
     DeviceEventEmitter.addListener('urlChanged', getUrl);
 
-    // return () => {
-    //   DeviceEventEmitter.removeAllListeners('urlChanged');
-    // };
+    return () => {
+      DeviceEventEmitter.removeAllListeners('urlChanged');
+    };
   }, []);
+  console.log('url from client', url);
 
   useEffect(() => {
     getUrl();
@@ -25,12 +25,10 @@ export const Client = () => {
 
   const getUrl = () => {
     AsyncStorage.getItem('@url').then((data) => {
-      console.log('url', data);
+      console.log('url from client inside function', data);
       setUrl(data);
     });
   };
-
-  console.log('url from client', url);
 
   const httpLink = createUploadLink({
     uri: `https://${url}//o/graphql`
@@ -51,29 +49,12 @@ export const Client = () => {
 
   const client = new ApolloClient({
     link: ApolloLink.from([authLink, httpLink]),
-    cache: new InMemoryCache()
+    cache: new InMemoryCache(),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'network-only'
+      }
+    }
   });
   return client;
 };
-// export const BASE_URL = 'finance2.imeetingpro.com';
-// const httpLink = createUploadLink({
-//   uri: `https://${BASE_URL}//o/graphql`
-// });
-
-// const authLink = setContext(async (req, { headers }) => {
-//   // get the authentication token from local storage if it exists
-//   const token = await AsyncStorage.getItem('@token');
-
-//   // return the headers to the context so httpLink can read them
-//   return {
-//     headers: {
-//       // ...headers,
-//       Authorization: `Bearer ${token}`
-//     }
-//   };
-// });
-
-// export const client = new ApolloClient({
-//   link: ApolloLink.from([authLink, httpLink]),
-//   cache: new InMemoryCache()
-// });

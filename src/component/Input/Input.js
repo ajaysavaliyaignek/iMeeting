@@ -1,4 +1,4 @@
-import { Text } from 'react-native';
+import { Text, useColorScheme } from 'react-native';
 import React from 'react';
 import { TextInput } from 'react-native-paper';
 
@@ -15,13 +15,17 @@ const Input = ({
   onChange,
   onPressOut,
   labelStyle,
-  placeholder
+  placeholder,
+  keyboardType
 }) => {
+  const scheme = useColorScheme();
   return (
     <TextInput
       onPressOut={onPressOut}
+      autoCapitalize={false}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
+      keyboardType={keyboardType}
       onBlur={onChange}
       value={value}
       label={
@@ -37,7 +41,13 @@ const Input = ({
       right={right}
       underlineColor={Colors.line}
       activeUnderlineColor={Colors.line}
-      style={style}
+      style={[
+        {
+          ...Fonts.PoppinsRegular[14],
+          color: scheme === 'dark' ? '#000' : Colors.bold
+        },
+        style
+      ]}
       placeholder={placeholder}
     />
   );

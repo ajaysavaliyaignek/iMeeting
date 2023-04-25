@@ -47,6 +47,7 @@ const EditMeetingGeneralScreen = () => {
     error: MeetingError,
     loading
   } = useQuery(GET_MEETING_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: item.meetingId
     },
@@ -62,6 +63,7 @@ const EditMeetingGeneralScreen = () => {
 
   // get committee by id
   const Committee = useQuery(GET_COMMITTEE_BY_ID, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       organizationId: item.committeeId
     },
@@ -80,6 +82,7 @@ const EditMeetingGeneralScreen = () => {
     error: CommitteeError,
     data: CommitteeData
   } = useQuery(GET_COMMITTEES_BY_ROLE, {
+    fetchPolicy: 'cache-and-network',
     variables: { head: true, secretary: true, member: false },
     onCompleted: (data) => {
       if (data) {
@@ -94,6 +97,7 @@ const EditMeetingGeneralScreen = () => {
   item?.attachFileIds?.map((id) => {
     console.log('id', id);
     const { loading, error } = useQuery(GET_FILE, {
+      fetchPolicy: 'cache-and-network',
       variables: {
         fileEntryId: id
       },
@@ -196,6 +200,7 @@ const EditMeetingGeneralScreen = () => {
             }}
             deleted={true}
             download={true}
+            isShowAttchTitle={true}
           />
         </ScrollView>
       </View>

@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SIZES } from '../../../themes/Sizes';
 import { Icon, IconName } from '../../../component';
 import { Button } from '../../../component/button/Button';
@@ -7,43 +7,73 @@ import { styles } from './styles';
 import { Divider } from 'react-native-paper';
 import { Colors } from '../../../themes/Colors';
 import UserDetailsComponent from '../../../component/userDetailsComponent/UserDetailsComponent';
-import { useQuery } from '@apollo/client';
+import { useApolloClient, useQuery } from '@apollo/client';
 import { GET_LIVE_MEETING_USERS } from '../../../graphql/query';
 import { Fonts } from '../../../themes';
+import { useNavigation } from '@react-navigation/native';
+import Avatar from '../../../component/Avatar/Avatar';
 
-const LiveMeetingUsers = ({ item }) => {
-  console.log('item from LM Users', item);
+const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
+  const navigation = useNavigation();
+
   const [searchText, setSearchText] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [activeTab, setActiveTab] = useState('AllUsers');
-  const [filterData, setFilterData] = useState(item.userDetails);
   const [userData, setUserData] = useState(item.userDetails);
-
-  const searchFilterUsers = (text) => {
-    console.log('text', text);
-    if (text) {
-      const newData = filterData?.filter((item) => {
-        const itemData = item.userName ? item.userName : '';
-        const textData = text;
-        return itemData.indexOf(textData) > -1;
-      });
-      setSearchText(text);
-      setUserData(newData);
-    } else {
-      setSearchText(text);
-      setUserData(filterData);
-    }
-  };
+  const [speakerData, setSpeekerData] = useState([]);
+  const [filterSpeakerData, setFilterSpeakerData] = useState([]);
+  const client = useApolloClient();
 
   const getMeetingUser = useQuery(GET_LIVE_MEETING_USERS, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       meetingId: item.meetingId,
       isSpeaker: true
     },
     onCompleted: (data) => {
-      console.log('is speaker data', data.liveMeetingUsers.userDetails);
+      setSpeekerData(data.liveMeetingUsers.userDetails);
+      setFilterSpeakerData(data.liveMeetingUsers.userDetails);
     }
   });
+
+  const searchFilterUsers = (text) => {
+    if (text) {
+      const newData = filterSpeakerData?.filter((item) => {
+        const itemData = item.userName ? item.userName : '';
+        const textData = text;
+        return itemData.indexOf(textData) > -1;
+      });
+      setSearchText(text);
+      setSpeekerData(newData);
+    } else {
+      setSearchText(text);
+      setSpeekerData(filterSpeakerData);
+    }
+  };
+
+  useEffect(() => {
+    if (socketEventUpdateMessage == 'liveMeetingUsers') {
+      client.refetchQueries({
+        include: ['liveMeetingUsers']
+      });
+    }
+  }, [socketEventUpdateMessage]);
+
+  let liveSpeaker = speakerData?.filter((speaker) => {
+    if (speaker.status == 'Speaking') {
+      return speaker;
+    } else {
+      return;
+    }
+  });
+
+  const navigateToEditSpeaker = (items) => {
+    navigation.navigate('AddSpeaker', {
+      meetingId: item.meetingId,
+      activeScreen: 'EditSpeaker',
+      speaker: items
+    });
+  };
   return (
     <TouchableOpacity
       style={styles.container}
@@ -95,7 +125,7 @@ const LiveMeetingUsers = ({ item }) => {
           }}
         />
       </View>
-      {activeTab == 'Speaker' && (
+      {activeTab == 'Speaker' && item?.yourRoleName !== 'Member' && (
         <Button
           title={'Add speaker'}
           layoutStyle={{
@@ -105,6 +135,13 @@ const LiveMeetingUsers = ({ item }) => {
             // marginVertical: SIZES[12]
           }}
           textStyle={{ ...Fonts.PoppinsSemiBold[14], color: Colors.primary }}
+          onPress={() => {
+            navigation.navigate('AddSpeaker', {
+              meetingId: item.meetingId,
+              activeScreen: 'AddSpeaker',
+              speaker: null
+            });
+          }}
         />
       )}
       <Divider style={styles.divider} />
@@ -119,14 +156,53 @@ const LiveMeetingUsers = ({ item }) => {
         />
       )}
       {activeTab == 'Speaker' && (
-        <UserDetailsComponent
-          users={userData}
-          isSpeaker={true}
-          openPopup={true}
-          visibleIndex={visibleIndex}
-          setVisibleIndex={setVisibleIndex}
-          searchText={searchText}
-        />
+        <View style={{ flex: 1 }}>
+          <UserDetailsComponent
+            users={speakerData}
+            isSpeaker={true}
+            openPopup={item?.yourRoleName !== 'Member' ? true : false}
+            visibleIndex={visibleIndex}
+            setVisibleIndex={setVisibleIndex}
+            searchText={searchText}
+            editable={true}
+            onPressEdit={navigateToEditSpeaker}
+            meetingData={item}
+          />
+          {liveSpeaker.length > 0 && (
+            <View style={styles.activeSpeakerContainer}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: '40%'
+                }}
+              >
+                <Avatar name={liveSpeaker[0]?.userName} size={SIZES[32]} />
+                <View style={styles.nameContainer}>
+                  <Text style={styles.txtName} numberOfLines={1}>
+                    {liveSpeaker[0]?.userName}
+                  </Text>
+                  <Text style={styles.txtSpeaker}>Speaker</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={styles.txtRunningTime}>
+                  {liveSpeaker[0]?.speakingDuration} /{' '}
+                  <Text style={styles.txtTimeDuration}>
+                    {`${liveSpeaker[0]?.duration}:00`}
+                  </Text>
+                </Text>
+                <View style={styles.iconView}>
+                  <Icon
+                    name={IconName.Arrow_Right}
+                    height={SIZES[12]}
+                    width={SIZES[6]}
+                  />
+                </View>
+              </View>
+            </View>
+          )}
+        </View>
       )}
       {/* <UserDetailsComponent users={item.userDetails} /> */}
     </TouchableOpacity>

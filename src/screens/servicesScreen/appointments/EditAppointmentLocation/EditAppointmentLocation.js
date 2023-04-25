@@ -76,6 +76,7 @@ const EditAppointmentLocation = () => {
     error: LocationError,
     data: LocationData
   } = useQuery(GET_ALL_LOCATION, {
+    fetchPolicy: 'cache-and-network',
     variables: {
       locationType: 2
     },
@@ -85,26 +86,6 @@ const EditAppointmentLocation = () => {
     },
     onError: (data) => {
       console.log('LocationError', data);
-    }
-  });
-
-  // get platform link
-  const {
-    loading: platformLoading,
-    error: platformError,
-    data: platformData
-  } = useQuery(GET_PLATFORMLINK, {
-    variables: {
-      platformId: valueVideoConference
-    },
-
-    onCompleted: (data) => {
-      if (data) {
-        setPlatform(data?.videoConferencePlatformLink);
-      }
-    },
-    onError: (data) => {
-      console.log('platformError', data);
     }
   });
 
@@ -133,8 +114,9 @@ const EditAppointmentLocation = () => {
   const handleViewDetails = () => {
     navigation.navigate('LocationDetails', {
       locationId: valueLocation,
-      platform: platform,
-      locationType: 2
+
+      locationType: 2,
+      role: item?.yourRoleName
     });
   };
 
