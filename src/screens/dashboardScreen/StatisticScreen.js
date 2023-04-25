@@ -154,16 +154,6 @@ const StatisticScreen = () => {
                 width={SIZES[10]}
               />
             </View>
-            {/* <Divider style={[styles.divider]} /> */}
-            {/* <DropDownPicker
-              title={'PERIOD'}
-              data={itemsPeriod}
-              placeholder={valuePeriod}
-              disable={true}
-              setData={setValuePeriod}
-              value={valuePeriod}
-              // styleContainer={{ width: '48%', marginBottom: SIZES[16] }}
-            /> */}
           </TouchableOpacity>
         </View>
         {open && (

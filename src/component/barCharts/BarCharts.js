@@ -116,7 +116,7 @@ const BarCharts = ({
       >
         {title}
       </Text>
-      {loading && Platform.OS == 'android' ? (
+      {loading ? (
         <View
           style={{
             flex: 1,
