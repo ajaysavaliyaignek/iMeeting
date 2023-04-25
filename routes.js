@@ -278,38 +278,7 @@ const MainStack = ({ initialRouteName }) => {
       <Stack.Screen name="AppointmentsList" component={AppointmentsList} />
       <Stack.Screen name="YourAnswer" component={YourAnswer} />
       <Stack.Screen name="subjects" component={Subjects} />
-      <Stack.Screen
-        name="AddAppointmentGeneral"
-        component={AddAppointmentGeneral}
-      />
-      <Stack.Screen
-        name="EditAppointmentGeneral"
-        component={EditAppointmentGeneral}
-      />
-      <Stack.Screen
-        name="AddAppointmentUsers"
-        component={AddAppointmentUsers}
-      />
-      <Stack.Screen
-        name="EditAppointmentUsers"
-        component={EditAppointmentUsers}
-      />
-      <Stack.Screen
-        name="AddAppointmentDateAndTime"
-        component={AddAppointmentDateAndTime}
-      />
-      <Stack.Screen
-        name="EditAppointmentDateAndTime"
-        component={EditAppointmentDateAndTime}
-      />
-      <Stack.Screen
-        name="AddAppointmentLocation"
-        component={AddAppointmentLocation}
-      />
-      <Stack.Screen
-        name="EditAppointmentLocation"
-        component={EditAppointmentLocation}
-      />
+
       <Stack.Screen name="Users" component={Users} />
       <Stack.Screen name="TasksList" component={TasksList} />
       <Stack.Screen name="FilterTask" component={FilterTask} />
