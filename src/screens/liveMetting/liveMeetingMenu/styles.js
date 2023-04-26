@@ -13,6 +13,13 @@ export const styles = StyleSheet.create({
     height: SIZES[1],
     backgroundColor: Colors.line
   },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES[16],
+    marginVertical: SIZES[10]
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -113,5 +120,40 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     ...Fonts.PoppinsBold[14],
     color: Colors.Rejected
+  },
+  tinyLogo: {
+    height: 20,
+    width: 20
+  },
+  notification: {
+    height: SIZES[24],
+    width: SIZES[24],
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  countView: {
+    borderColor: Colors.white,
+    borderWidth: 1,
+    height: SIZES[16],
+    width: SIZES[16],
+    borderRadius: SIZES[8],
+    backgroundColor: Colors.primary,
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1
+  },
+  txtCount: {
+    color: Colors.white,
+    ...Fonts.PoppinsSemiBold[12],
+    fontSize: 8
+  },
+  closeButtonView: {
+    height: SIZES[24],
+    width: SIZES[24],
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });

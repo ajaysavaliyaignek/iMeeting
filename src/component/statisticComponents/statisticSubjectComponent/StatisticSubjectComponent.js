@@ -65,7 +65,7 @@ const StatisticSubjectComponent = ({
                 : 'By study'
             }
             type={
-              activeTab == 'By status' ? 2 : activeTab == 'By decision' ? 7 : 2
+              activeTab == 'By status' ? 2 : activeTab == 'By decision' ? 7 : 18
             }
           />
         </View>

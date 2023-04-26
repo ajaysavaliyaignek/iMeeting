@@ -136,45 +136,14 @@ const AddSpeaker = () => {
               value={valueUser}
               placeholder={''}
             />
-            {/* <Text style={styles.txtTitle}>SELECT USER</Text>
-            <DropDownPicker
-              disabled={activeScreen == 'AddSpeaker' ? false : true}
-              items={users?.map((item) => ({
-                label: item.userName,
-                value: item.userId
-                // disabled: activeScreen == 'AddSpeaker' ? item.isSpeaker : false
-              }))}
-              value={valueUser}
-              setValue={setValueUser}
-              open={open}
-              setOpen={setOpen}
-              style={{ borderWidth: 0, paddingLeft: 0 }}
-              placeholder={''}
-              disabledItemLabelStyle={{ color: Colors.line }}
-            /> */}
 
-            {/* <Divider style={styles.divider} />
-            <Text style={[styles.txtTitle, { marginTop: SIZES[24] }]}>
-              SELECT SUBJECT
-            </Text>
             <DropDownPicker
-              items={subjectList}
-              value={valueSubject}
-              setValue={setValueSubject}
-              open={openSubject}
-              setOpen={setOpenSubject}
-              style={{ borderWidth: 0, paddingLeft: 0 }}
-              placeholder={''}
-              disabledItemLabelStyle={{ color: Colors.line }}
-            />
-            <Divider style={styles.divider} /> */}
-            {/* <DropDownPicker
               title={'SELECT SUBJECT'}
               data={subjectList}
               setData={setValueSubject}
               value={valueSubject}
               placeholder={''}
-            /> */}
+            />
 
             <View style={styles.timeContainer}>
               <Text style={styles.txtTitle}>TIME - IN - MINUTES</Text>
@@ -268,6 +237,7 @@ const AddSpeaker = () => {
                 updateSpeaker({
                   variables: {
                     userDetail: {
+                      subjectId: valueSubject,
                       userId: valueUser,
                       meetingId: meetingId,
                       duration: time,
@@ -305,7 +275,7 @@ const AddSpeaker = () => {
                 updateSpeaker({
                   variables: {
                     userDetail: {
-                      // subjectId: valueSubject,
+                      subjectId: valueSubject,
                       userId: valueUser,
                       meetingId: meetingId,
                       duration: time,

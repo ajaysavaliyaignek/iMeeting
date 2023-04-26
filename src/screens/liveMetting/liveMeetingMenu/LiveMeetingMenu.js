@@ -7,7 +7,8 @@ import {
   Alert,
   Modal,
   Platform,
-  useWindowDimensions
+  useWindowDimensions,
+  Image
 } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -33,12 +34,14 @@ import { useQuery } from '@apollo/client';
 import {
   GET_All_MEETING,
   GET_LIVE_MEETING_TAB_COUNT,
-  GET_MEETING_BY_ID
+  GET_MEETING_BY_ID,
+  GET_NOTIFICATION_COUNT
 } from '../../../graphql/query';
 import DetailsComponent from '../../../component/detailsComponent/meetingDetailsComponent/MeetingDetailsComponent';
 import { UserContext } from '../../../context';
 import { UPDATE_MEETING_STATUS } from '../../../graphql/mutation';
 import { Fonts } from '../../../themes';
+import style from '../../../component/Avatar/styles';
 
 const LiveMeetingMenu = () => {
   const navigation = useNavigation();
@@ -54,7 +57,18 @@ const LiveMeetingMenu = () => {
   const client = useApolloClient();
   const socketEventUpdate = useRef(null);
   const { width, height } = useWindowDimensions();
-  console.log({ height });
+  const [count, setCount] = useState(0);
+
+  const { loading } = useQuery(GET_NOTIFICATION_COUNT, {
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data) => {
+      setCount(data.notificationsCount.count);
+    },
+    onError: (data) => {
+      console.log('get all notification count error', data.message);
+    }
+  });
+
   useEffect(() => {
     socketEventUpdate.current = new WebSocket(
       `wss://${companyUrl}//o/live-meeting?meetingId=${item?.meetingId}`
@@ -256,17 +270,57 @@ const LiveMeetingMenu = () => {
       }
     },
     onError: (data) => {
-      console.log('updateMeetingStaus error', data.message);
+      console.log('updateMeetingStatus error', data.message);
     }
   });
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        name={'Live meeting'}
-        rightIconName={IconName.Close}
-        onRightPress={() => setOpenModal(true)}
-      />
+
+      {/* header */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Notifications');
+          }}
+          style={styles.notification}
+        >
+          <Image
+            style={styles.tinyLogo}
+            source={require('../../../assets/Icons/bell.png')}
+          />
+          {count > 0 && (
+            <View style={styles.countView}>
+              <Text
+                style={styles.txtCount}
+              >
+                {count < 10 ? `0${count}` : count}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
+        <Text
+          style={{
+            ...Fonts.PoppinsSemiBold[14],
+            color: Colors.bold
+            // marginLeft: '45%'
+          }}
+        >
+          Live meeting
+        </Text>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={styles.closeButtonView}
+          onPress={() => setOpenModal(true)}
+        >
+          <Icon
+            name={IconName.Close}
+            height={Platform.isPad ? SIZES[10] : SIZES[14]}
+            width={Platform.isPad ? SIZES[10] : SIZES[14]}
+          />
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.subContainer}>
         {activeTab == 'Details' && (

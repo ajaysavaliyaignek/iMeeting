@@ -252,13 +252,13 @@ const CalendarScheduleViewComponent = () => {
             initialNumToRender={eventDetails?.length ?? 0}
             onScrollToIndexFailed={(info) => {
               flatListRef.current.scrollToOffset({
-                offset: error.averageItemLength * error.index,
+                offset: info.averageItemLength * info.index,
                 animated: true
               });
               setTimeout(() => {
                 if (eventDetails.length !== 0 && flatListRef !== null) {
                   flatListRef.current.scrollToIndex({
-                    index: error.index,
+                    index: info.index,
                     animated: true
                   });
                 }
