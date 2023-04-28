@@ -112,7 +112,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
       appointmentId: isEdit ? details?.appointmentId : 0,
       appointmentTitle: generaldData?.title,
       attachFileIds: generaldData?.filesId,
-      committeeId: generaldData?.valueCommitee,
+      // committeeId: generaldData?.valueCommitee,
       locationId: generaldData?.valueLocation,
       platformId:
         generaldData?.valueVideoConference == null
@@ -132,8 +132,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
       videoConferenceId: isEdit ? details?.videoConferenceId : 0,
       videoConferenceTitle: generaldData?.title,
       videoConferenceDescription: generaldData?.discription,
-      committeeId:
-        generaldData?.valueCommitee == null ? 0 : generaldData?.valueCommitee,
+      // committeeId:
+      //   generaldData?.valueCommitee == null ? 0 : generaldData?.valueCommitee,
       attachFileIds: generaldData?.filesId,
       repeat: generaldData?.valueRepeat,
       setDate: moment(generaldData?.startDateTime).format('YYYY-MM-DD'),
@@ -257,7 +257,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
       },
       onCompleted: (data) => {
         if (data) {
-          // setAppointment(data.appointment);
           let videoConference = data.videoConference;
           setGeneralData({
             title: videoConference.videoConferenceTitle,
@@ -297,31 +296,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
   const [addMeeting, { data, loading: loadingMeeting, error }] = useMutation(
     UPDATE_MEETING,
     {
-      // export const GET_All_SUBJECTS = gql`
-      refetchQueries: [
-        'meetings',
-        'counts'
-        // {
-        //   query: GET_All_MEETING,
-        //   variables: {
-        //     onlyMyMeeting: false,
-        //     committeeIds: '',
-        //     screen: 0,
-        //     searchValue: '',
-        //     page: -1,
-        //     pageSize: -1,
-        //     sort: '',
-        //     date: ''
-
-        //     // onlyMyMeeting: false,
-        //     // committeeIds: '',
-        //     // screen: 0,
-        //     // searchValue: '',
-        //     // page: -1,
-        //     // pageSize: -1
-        //   }
-        // }
-      ],
+      refetchQueries: ['meetings', 'counts'],
       onCompleted: (data) => {
         console.log('update meeting', data);
         if (data.updateMeeting.status.statusCode == '200') {
@@ -341,7 +316,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
   const [addAppointment, { loading: loadingAppointment }] = useMutation(
     UPDATE_APPOINTMENT,
     {
-      // export const GET_All_SUBJECTS = gql`
       refetchQueries: [
         {
           query: GET_All_APPOINTMENT,
@@ -352,8 +326,6 @@ const AddEditMeetingAppointmentVideoConference = () => {
       onCompleted: (data) => {
         if (data.updateAppointment.status.statusCode == '200') {
           navigation.navigate('AppointmentsList');
-          setSelectedUsers([]);
-          setAppointmentsData([]);
         }
       },
       onError: (data) => {
@@ -366,21 +338,9 @@ const AddEditMeetingAppointmentVideoConference = () => {
   const [addVideoConference, { loading: loadingVideoConference }] = useMutation(
     UPDATE_VIDEO_CONFERENCE,
     {
-      // export const GET_All_SUBJECTS = gql`
-      refetchQueries: [
-        {
-          query: GET_ALL_VIDEO_CONFERENCES,
-          variables: {
-            date: '',
-            page: -1,
-            pageSize: -1,
-            searchValue: '',
-            sort: ''
-          }
-        },
-        'counts'
-      ],
+      refetchQueries: ['videoConferences', 'counts'],
       onCompleted: (data) => {
+        console.log('add video conference', data.updateVideoConference.status);
         if (data.updateVideoConference.status.statusCode == '200') {
           navigation.navigate('VideoConferenceList');
         }

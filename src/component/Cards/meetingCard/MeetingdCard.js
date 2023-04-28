@@ -200,7 +200,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
                 ? true
                 : false
             }
-            download={true}
+            download={false}
             isViewable={true}
           />
         </View>

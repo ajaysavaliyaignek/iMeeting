@@ -2,8 +2,8 @@ import {
   View,
   Text,
   SafeAreaView,
-  TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
 import React, { useState } from 'react';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -13,7 +13,7 @@ import moment from 'moment';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Header from '../../../../component/header/Header';
-import { IconName } from '../../../../component';
+import { Icon, IconName } from '../../../../component';
 import { styles } from './styles';
 import { SIZES } from '../../../../themes/Sizes';
 import { Fonts } from '../../../../themes';
@@ -34,8 +34,9 @@ const YourAnswer = () => {
   const route = useRoute();
   const { item, userID } = route?.params;
   const [valueAnswer, setValue] = useState(null);
-  const [suggestedTime, setSuggestedTime] = useState('');
-  const [openTimePicker, setOpenTimePicker] = useState(false);
+  const [suggestedDateAndTime, setSuggestedDateAndTime] = useState(new Date());
+  const [openCalendar, setOpenCalendar] = useState(false);
+  const [openClock, setOpenClock] = useState(false);
   const [items, setItems] = useState([
     { label: 'Yes', value: 'Yes' },
     { label: 'No', value: 'No' },
@@ -117,10 +118,20 @@ const YourAnswer = () => {
     }
   });
 
+  const handleConfirmCalendar = (date) => {
+    setSuggestedDateAndTime(date);
+
+    setOpenCalendar(false);
+  };
+
+  // set date time from calendar model
   const handleConfirmClock = (date) => {
-    const time = moment(date).format('LT');
-    setSuggestedTime(time);
-    setOpenTimePicker(false);
+    date = moment(date)
+      .hour(moment(suggestedDateAndTime).hour)
+      .minute(moment(suggestedDateAndTime).minute);
+
+    setSuggestedDateAndTime(date);
+    setOpenClock(false);
   };
 
   return (
@@ -141,25 +152,66 @@ const YourAnswer = () => {
         />
         {valueAnswer == 'Suggest time' ? (
           <View>
-            <TouchableOpacity
-              style={styles.inputContainer}
-              onPress={() => setOpenTimePicker(!openTimePicker)}
-            >
-              <Text style={styles.txtTitle}>YOUR SUGGESTION TIME</Text>
-              <TextInput
-                onChangeText={(text) => setSuggestedTime(text)}
-                style={styles.input}
-                editable={false}
-                value={suggestedTime}
-              />
-            </TouchableOpacity>
+            <Text style={styles.txtTitle}>YOUR SUGGESTION TIME</Text>
+            <View style={styles.dateTimeRowView}>
+              {/* select start date */}
+              <TouchableOpacity
+                style={styles.dateContainer}
+                onPress={() => {
+                  setOpenCalendar(!openCalendar);
+                  setOpenClock(false);
+                  // setValue('startDate');
+                }}
+              >
+                <Text style={styles.textInput}>
+                  {moment(suggestedDateAndTime).format('DD MMM,YYYY')}
+                </Text>
+
+                <Icon
+                  name={IconName.Calendar}
+                  height={SIZES[20]}
+                  width={SIZES[18]}
+                />
+              </TouchableOpacity>
+
+              {/* for select start time */}
+              <TouchableOpacity
+                style={styles.dateContainer}
+                onPress={() => {
+                  setOpenClock(!openClock);
+                  setOpenCalendar(false);
+                }}
+              >
+                <Text style={styles.textInput}>
+                  {moment(suggestedDateAndTime).format('LT')}
+                </Text>
+
+                <Icon
+                  name={IconName.Arrow_Down}
+                  height={SIZES[6]}
+                  width={SIZES[12]}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* date  picker modal */}
             <DateTimePickerModal
-              isVisible={openTimePicker}
+              isVisible={openCalendar}
+              mode="date"
+              onConfirm={handleConfirmCalendar}
+              onCancel={() => setOpenCalendar(false)}
+              minimumDate={new Date()}
+              date={new Date(suggestedDateAndTime)}
+              timePickerModeAndroid="spinner"
+            />
+
+            {/* time picker modal */}
+            <DateTimePickerModal
+              isVisible={openClock}
               mode="time"
               onConfirm={handleConfirmClock}
-              onCancel={() => setOpenTimePicker(false)}
-              minimumDate={new Date()}
-              date={new Date()}
+              onCancel={() => setOpenClock(false)}
+              date={new Date(suggestedDateAndTime)}
             />
           </View>
         ) : null}
@@ -193,7 +245,11 @@ const YourAnswer = () => {
                         ? 0
                         : item?.appointmentId,
                     suggestionTime:
-                      valueAnswer == 'Suggest time' ? suggestedTime : '',
+                      valueAnswer == 'Suggest time'
+                        ? moment(suggestedDateAndTime).format(
+                            'YYYY-MM-DD hh:mm A'
+                          )
+                        : '',
                     meetingId:
                       item?.meetingId == undefined ? 0 : item?.meetingId,
                     videoConferenceId:

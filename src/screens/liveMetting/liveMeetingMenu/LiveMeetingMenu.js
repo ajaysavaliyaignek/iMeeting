@@ -13,12 +13,13 @@ import {
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useApolloClient, useMutation } from '@apollo/client';
+import { useQuery } from '@apollo/client';
+import { Divider } from 'react-native-paper';
 
 import { styles } from './styles';
 import Header from '../../../component/header/Header';
 import { Icon, IconName } from '../../../component';
 import { Button } from '../../../component/button/Button';
-import { Divider } from 'react-native-paper';
 import { Colors } from '../../../themes/Colors';
 import { SIZES } from '../../../themes/Sizes';
 import { act } from 'react-test-renderer';
@@ -30,7 +31,6 @@ import LiveMeetingTasks from '../liveMeetingTasks/LiveMeetingTasks';
 import LiveMeetingOnline from '../liveMeetingOnline/LiveMeetingOnline';
 import LiveMeetingDecisions from '../liveMeetingDecisions/LiveMeetingDecisions';
 import LiveMeetingChats from '../liveMeetingChats/LiveMeetingChats';
-import { useQuery } from '@apollo/client';
 import {
   GET_All_MEETING,
   GET_LIVE_MEETING_TAB_COUNT,
@@ -276,7 +276,6 @@ const LiveMeetingMenu = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-
       {/* header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity
@@ -291,9 +290,7 @@ const LiveMeetingMenu = () => {
           />
           {count > 0 && (
             <View style={styles.countView}>
-              <Text
-                style={styles.txtCount}
-              >
+              <Text style={styles.txtCount}>
                 {count < 10 ? `0${count}` : count}
               </Text>
             </View>

@@ -37,7 +37,6 @@ const CalendarScheduleViewComponent = () => {
     'Friday',
     'Saturday'
   ];
-  // let recentUsedMonth = CalanderDate.format('YYYY-MM-01');
 
   useEffect(() => {
     recentUsedMonth = CalanderDate.format('YYYY-MM-01');
@@ -319,7 +318,6 @@ const CalendarScheduleViewComponent = () => {
           />
         )
       )}
-      {/* {loading && <Loader color={Colors.primary} />} */}
     </View>
   );
 };

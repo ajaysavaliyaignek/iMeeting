@@ -18,16 +18,12 @@ export const styles = StyleSheet.create({
     borderBottomColor: Colors.line,
     zIndex: 20
   },
-  txtTitle: { ...Fonts.PoppinsRegular[12], color: Colors.secondary },
-  inputContainer: {
-    marginTop: SIZES[24],
-    borderBottomColor: Colors.line,
-    borderBottomWidth: SIZES[1]
+  txtTitle: {
+    ...Fonts.PoppinsRegular[12],
+    color: Colors.secondary,
+    marginTop: SIZES[24]
   },
-  input: {
-    marginTop: SIZES[4],
-    paddingVertical: SIZES[10]
-  },
+
   buttonContainer: {
     paddingHorizontal: SIZES[16],
     flexDirection: 'row',
@@ -54,5 +50,26 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: SIZES[1],
     backgroundColor: Colors.line
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '48%',
+    borderBottomColor: Colors.line,
+    borderBottomWidth: 1,
+    paddingRight: SIZES[16],
+    paddingVertical: SIZES[10]
+  },
+  textInput: {
+    flex: 1,
+    marginRight: SIZES[12],
+    ...Fonts.PoppinsRegular[14],
+    color: Colors.bold
+  },
+  dateTimeRowView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   }
 });

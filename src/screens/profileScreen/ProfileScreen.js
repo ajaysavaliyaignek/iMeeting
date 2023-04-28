@@ -53,7 +53,6 @@ const ProfileScreen = ({ navigation }) => {
             routes: [{ name: 'Login' }]
           })
         );
-      // .then(NativeModules.DevSettings.reload());
     } catch (error) {
       console.log(error);
     }
@@ -61,7 +60,7 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Header name={'Profile'} /> */}
+      {/* header */}
       <View
         style={{
           flexDirection: 'row',
@@ -96,8 +95,8 @@ const ProfileScreen = ({ navigation }) => {
                 borderRadius: SIZES[8],
                 backgroundColor: Colors.primary,
                 position: 'absolute',
-                top: -10,
-                right: -10,
+                top: -8,
+                right: -8,
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 1
@@ -115,44 +114,7 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           )}
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Notifications');
-          }}
-        >
-          <Icon
-            name={IconName.Notification_Focused}
-            height={SIZES[20]}
-            width={SIZES[20]}
-          />
 
-          <View
-            style={{
-              borderColor: Colors.white,
-              borderWidth: 1,
-              height: SIZES[16],
-              width: SIZES[16],
-              borderRadius: SIZES[8],
-              backgroundColor: Colors.primary,
-              position: 'absolute',
-              top: -10,
-              right: -10,
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.white,
-                ...Fonts.PoppinsSemiBold[12],
-                fontSize: 9
-              }}
-            >
-              {count < 10 ? `0${count}` : count > 0 && count}
-            </Text>
-          </View>
-        </TouchableOpacity> */}
         <Text
           style={{
             ...Fonts.PoppinsSemiBold[14],
