@@ -498,7 +498,8 @@ export const GET_LIVE_MEETING_USERS = gql`
         isSpeaker
         roleId
         roleName
-
+subjectId
+isPublished
         status
         userId
         userName

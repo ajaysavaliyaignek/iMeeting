@@ -24,7 +24,9 @@ const UserDetailsComponent = ({
   onPressDelete,
   editable,
   onPressEdit,
-  meetingData
+  meetingData,
+
+  onPressPublish
 }) => {
   return (
     <View style={styles.container}>
@@ -57,6 +59,8 @@ const UserDetailsComponent = ({
                 editable={editable}
                 onPressEdit={onPressEdit}
                 meetingData={meetingData}
+               
+                onPressPublish={onPressPublish}
               />
             );
           }}

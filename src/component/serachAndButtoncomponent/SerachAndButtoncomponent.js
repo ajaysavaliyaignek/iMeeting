@@ -16,7 +16,9 @@ const SerachAndButtoncomponent = ({
   onPress,
   value,
   isButtonShow,
-  containerStyle
+  containerStyle,
+  isPublishButtonShow,
+  onPressPublish
 }) => {
   const [start, setStart] = useState(false);
   useEffect(() => {
@@ -100,12 +102,20 @@ const SerachAndButtoncomponent = ({
         )}
       </View>
       {(role !== 'Member' || isButtonShow) && (
+        <View style={styles.btnContainer}>
         <Button
           title={buttonText}
-          layoutStyle={styles.cancelBtnLayout}
+          layoutStyle={[styles.cancelBtnLayout,{width:isPublishButtonShow?"48%":'100%'}]}
           textStyle={styles.txtCancelButton}
           onPress={onPress}
         />
+        {isPublishButtonShow&&<Button
+          title={"Publish"}
+          layoutStyle={[styles.publishBtnLayout,{width:isPublishButtonShow?"48%":'100%'}]}
+          textStyle={styles.txtPublishButton}
+          onPress={onPressPublish}
+        />}
+        </View>
       )}
       <Divider style={styles.divider} />
     </View>

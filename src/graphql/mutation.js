@@ -1,5 +1,16 @@
 import { gql } from '@apollo/client';
 
+export const PUBLISH_EVENTS=gql`
+mutation ($meeting: InputMeeting!) {
+  publishEvent(meeting: $meeting) {
+    status {
+      entitys
+      statusCode
+      statusMessage
+    }
+  }
+}`
+
 export const DELETE_NOTIFICATIONS = gql`
   mutation deleteNotification($userNotificationEventId: Long) {
     deleteNotification(userNotificationEventId: $userNotificationEventId) {

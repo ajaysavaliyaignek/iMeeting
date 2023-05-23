@@ -28,9 +28,27 @@ export const styles = StyleSheet.create({
     ...Fonts.PoppinsSemiBold[14],
     color: Colors.primary
   },
+  publishBtnLayout: {
+    backgroundColor: Colors.primary,
+
+    marginHorizontal: SIZES[16],
+    marginBottom: SIZES[24]
+  },
+  txtPublishButton: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.white
+  },
   divider: {
     width: '100%',
     height: SIZES[1],
     color: Colors.line
+  },
+  btnContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingRight: SIZES[50],
+   
   }
 });

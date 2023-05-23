@@ -82,5 +82,56 @@ export const styles = StyleSheet.create({
   txtTimeDuration: {
     ...Fonts.PoppinsSemiBold[20],
     color: Colors.secondary
+  },
+  modal: {
+    alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 8,
+    backgroundColor: 'rgba(100, 100, 100, 0.7)'
+  },
+
+  mainBoxView: {
+    padding: 16,
+    backgroundColor: Colors.white,
+    shadowColor: Colors.gray,
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderRadius: 14,
+    position: 'absolute',
+    bottom: '30%',
+    width: SIZES[280]
+  },
+  cancelBtnLayout: {
+    backgroundColor: '#F3F6F9',
+    marginVertical: SIZES[16],
+    width: '48%'
+  },
+  txtCancelButton: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.primary
+  },
+  buttonContainer: {
+    
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+
+  nextBtnLayout: {
+    marginVertical: SIZES[12],
+    width: '48%'
+  },
+  txtNextBtn: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.white
+  },
+  txtTitle:{
+    ...Fonts.PoppinsSemiBold[20],
+    color:Colors.bold,
+    marginBottom:SIZES[10]
   }
 });

@@ -46,8 +46,11 @@ const UserDetailsCard = ({
   visibleIndex,
   setVisibleIndex,
   isDeletable,
-  meetingData
+  meetingData,
+ 
+  onPressPublish
 }) => {
+ 
   const [userDetails, setUserDetails] = useState(null);
 
   // get user by id
@@ -413,6 +416,8 @@ const UserDetailsCard = ({
               onPressDelete(item);
               setVisibleIndex(-1);
             }}
+            isPublish={item.isPublished == true ? false : true}
+            onPressPublish={() => onPressPublish(item)}
             download={false}
             deleted={isDeletable}
             editable={editable}

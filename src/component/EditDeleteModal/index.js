@@ -17,7 +17,9 @@ const EditDeleteModal = ({
   download,
   editable,
   deleted,
-  isViewable
+  isViewable,
+  onPressPublish,
+  isPublish
 }) => {
   return (
     <View style={styles.container}>
@@ -75,6 +77,19 @@ const EditDeleteModal = ({
           >
             <Text style={styles.txtDeleteBtn}>Delete</Text>
             <Icon name={IconName.Delete} height={SIZES[20]} width={SIZES[18]} />
+          </TouchableOpacity>
+        </View>
+      )}
+      {subjectStatus !== 'Deleted' && isPublish && (
+        <View>
+          <Divider style={styles.divider} />
+          <TouchableOpacity
+            style={styles.btnView}
+            onPress={onPressPublish}
+            activeOpacity={0.6}
+          >
+            <Text style={styles.txtEditBtn}>Publish</Text>
+            
           </TouchableOpacity>
         </View>
       )}
