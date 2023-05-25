@@ -47,7 +47,7 @@
     "react-native-events-calendar": "^1.0.8",
     "react-native-file-viewer": "^2.1.5",
     "react-native-final-tree-view": "^3.0.0",
-    "react-native-gesture-handler": "^2.6.0",
+    "react-native-gesture-handler": "^2.9.0",
     "react-native-gtoast": "^0.0.2",
     "react-native-image-picker": "^4.10.2",
     "react-native-mentions": "^1.1.4",

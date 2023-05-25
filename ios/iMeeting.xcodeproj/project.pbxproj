@@ -519,9 +519,9 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SU2X3DVUA6;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = iMeeting/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = iMeeting;
@@ -557,9 +557,9 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SU2X3DVUA6;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = iMeeting/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = iMeeting;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
