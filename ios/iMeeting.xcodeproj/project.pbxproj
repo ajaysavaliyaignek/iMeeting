@@ -19,6 +19,7 @@
 		6121C32128DC31A50047CC36 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6121C31C28DC31A50047CC36 /* Poppins-SemiBold.ttf */; };
 		6121C32228DC31A50047CC36 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6121C31C28DC31A50047CC36 /* Poppins-SemiBold.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		81D296742A1F8052003BFBDD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 81D296732A1F8052003BFBDD /* GoogleService-Info.plist */; };
 		E2011BAB3A2ABB1F8F105D03 /* libPods-iMeeting-iMeetingTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F3B70D3210D5666EB63987C9 /* libPods-iMeeting-iMeetingTests.a */; };
 /* End PBXBuildFile section */
 
@@ -48,8 +49,8 @@
 		6121C31A28DC31A50047CC36 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		6121C31B28DC31A50047CC36 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Bold.ttf"; sourceTree = "<group>"; };
 		6121C31C28DC31A50047CC36 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
-		616709DB29E7DED400AD364B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = iMeeting/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		81D296732A1F8052003BFBDD /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-iMeeting-iMeetingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iMeeting-iMeetingTests.release.xcconfig"; path = "Target Support Files/Pods-iMeeting-iMeetingTests/Pods-iMeeting-iMeetingTests.release.xcconfig"; sourceTree = "<group>"; };
 		9068344B4D481723F39AD3DE /* libPods-iMeeting.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-iMeeting.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B033346B2454361F0C362554 /* Pods-iMeetingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iMeetingTests.debug.xcconfig"; path = "Target Support Files/Pods-iMeetingTests/Pods-iMeetingTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -105,7 +106,6 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				616709DB29E7DED400AD364B /* GoogleService-Info.plist */,
 			);
 			name = iMeeting;
 			sourceTree = "<group>";
@@ -140,6 +140,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				81D296732A1F8052003BFBDD /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* iMeeting */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* iMeetingTests */,
@@ -276,6 +277,7 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				6121C31F28DC31A50047CC36 /* Poppins-Bold.ttf in Resources */,
+				81D296742A1F8052003BFBDD /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -519,9 +521,11 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SU2X3DVUA6;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = SU2X3DVUA6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = iMeeting/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = iMeeting;
@@ -539,6 +543,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.iMeeting;
 				PRODUCT_NAME = iMeeting;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "imeeting dist";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -557,9 +562,11 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SU2X3DVUA6;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = SU2X3DVUA6;
 				INFOPLIST_FILE = iMeeting/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = iMeeting;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
@@ -576,6 +583,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.iMeeting;
 				PRODUCT_NAME = iMeeting;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "imeeting dist";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
