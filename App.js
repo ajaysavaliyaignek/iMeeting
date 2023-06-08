@@ -13,6 +13,7 @@ import { Client } from './src/graphql/Client';
 
 const App = () => {
   const [token, setToken] = useState(null);
+  // const netInfo = useNetInfo();
 
   useEffect(() => {
     SplashScreen.hide();

@@ -242,9 +242,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
       {activeTab == 'Speaker' && (
         <View style={{ flex: 1 }}>
           <UserDetailsComponent
-           
             onPressPublish={(ite) => {
-             
               publishEvent({
                 variables: {
                   meeting: {
@@ -256,6 +254,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
                 }
               });
             }}
+            isAddPublishUser={true}
             users={speakerData}
             isSpeaker={true}
             openPopup={item?.yourRoleName !== 'Member' ? true : false}

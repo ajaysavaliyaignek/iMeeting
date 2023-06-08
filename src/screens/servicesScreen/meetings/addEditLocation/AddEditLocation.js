@@ -8,8 +8,15 @@ import { styles } from './styles';
 import { Button } from '../../../../component/button/Button';
 import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
+import { Fonts } from '../../../../themes';
 
-const AddEditLocation = ({ generaldData, setGeneralData, type }) => {
+const AddEditLocation = ({
+  generaldData,
+  setGeneralData,
+  type,
+  showRequired,
+  setShowRequired
+}) => {
   const navigation = useNavigation();
   const [location, setLocation] = useState([]);
   const [error, setError] = useState(null);
@@ -65,10 +72,17 @@ const AddEditLocation = ({ generaldData, setGeneralData, type }) => {
           placeholder={''}
           setData={(item) => {
             setGeneralData({ ...generaldData, valueLocation: item });
+            setError('');
+            setShowRequired(false);
           }}
           title={'LOCATION'}
           value={generaldData?.valueLocation}
         />
+        {showRequired && generaldData?.generaldData?.valueLocation == null ? (
+          <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+            *This field is required
+          </Text>
+        ) : null}
 
         <View style={styles.buttonContainer}>
           <Button

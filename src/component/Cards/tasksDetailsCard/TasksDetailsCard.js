@@ -34,7 +34,9 @@ const TasksDetailsCard = ({
           style={[{ flexDirection: 'row', alignItems: 'center' }, layoutStyle]}
         >
           <View style={style} />
-          <Text style={[styles.discription, styleText]}>{discription}</Text>
+          <Text style={[styles.discription, styleText]} numberOfLines={1}>
+            {discription}
+          </Text>
         </View>
       </View>
     );
@@ -75,7 +77,11 @@ const TasksDetailsCard = ({
               marginRight: SIZES[8]
             }}
           />
-          <RowData name={'Executor'} discription={item.executorName} />
+          <RowData
+            name={'Executor'}
+            discription={item.executorName}
+            layoutStyle={{ width: '70%' }}
+          />
           <RowData
             name={'Deadline'}
             discription={moment(item.deadlineDate).format('DD MMM YYYY')}

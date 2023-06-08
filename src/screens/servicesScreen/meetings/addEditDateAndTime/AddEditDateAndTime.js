@@ -18,8 +18,16 @@ import { SIZES } from '../../../../themes/Sizes';
 import { GET_TIMEZONE } from '../../../../graphql/query';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 import { currentTimeZone } from '../../../../component/currentTimeZone/CurrentTimezone';
+import { Colors } from '../../../../themes/Colors';
+import { Fonts } from '../../../../themes';
 
-const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
+const AddEditDateAndTime = ({
+  generaldData,
+  setGeneralData,
+  details,
+  showRequired,
+  setShowRequired
+}) => {
   const [isStartDate, setIsStartDate] = useState(false);
   const [timezone, setTimeZone] = useState([]);
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -64,14 +72,16 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
         startDateTime: date,
         endDateTime: date
       });
+      setShowRequired(false);
     } else {
-
       if (moment(date).isBefore(moment(generaldData?.startDateTime))) {
         setGeneralData({ ...generaldData, endDateTime: date });
+        setShowRequired(false);
         setOpenCalendar(false);
         return;
       }
       setGeneralData({ ...generaldData, endDateTime: date });
+      setShowRequired(false);
     }
 
     setOpenCalendar(false);
@@ -85,7 +95,6 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
         .minute(moment(generaldData?.startDateTime).minute);
       if (moment(date).isBefore(moment(new Date()))) {
         Alert.alert('Invalid start time');
-       
 
         setOpenClock(false);
         return;
@@ -126,6 +135,7 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
             ...generaldData,
             valueTimeZone: filterTimeZone[0]?.timeZoneId
           });
+          setShowRequired(false);
         }
       }
     },
@@ -140,107 +150,129 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
         <Text style={styles.txtAddSubjectTitle}>Date & Time</Text>
         <View style={styles.dateTimeContainer}>
           <Text style={styles.txtTitle}>START DATE</Text>
-          <View style={styles.dateTimeRowView}>
-            {/* select start date */}
-            <TouchableOpacity
-              style={styles.dateContainer}
-              onPress={() => {
-                setIsStartDate(true);
-                setOpenCalendar(!openCalendar);
-                setOpenClock(false);
-                // setValue('startDate');
-              }}
-            >
-              <TextInput
-                style={styles.textInput}
-                value={moment(generaldData?.startDateTime).format(
-                  'DD MMM,YYYY'
-                )}
-                editable={false}
-              />
+          <>
+            <View style={styles.dateTimeRowView}>
+              {/* select start date */}
+              <TouchableOpacity
+                style={styles.dateContainer}
+                onPress={() => {
+                  setIsStartDate(true);
+                  setOpenCalendar(!openCalendar);
+                  setOpenClock(false);
+                  // setValue('startDate');
+                }}
+              >
+                <TextInput
+                  style={styles.textInput}
+                  value={moment(generaldData?.startDateTime).format(
+                    'DD MMM,YYYY'
+                  )}
+                  editable={false}
+                />
 
-              <Icon
-                name={IconName.Calendar}
-                height={SIZES[20]}
-                width={SIZES[18]}
-              />
-            </TouchableOpacity>
+                <Icon
+                  name={IconName.Calendar}
+                  height={SIZES[20]}
+                  width={SIZES[18]}
+                />
+              </TouchableOpacity>
 
-            {/* for select start time */}
-            <TouchableOpacity
-              style={styles.dateContainer}
-              onPress={() => {
-                setIsStartDate(true);
+              {/* for select start time */}
+              <TouchableOpacity
+                style={styles.dateContainer}
+                onPress={() => {
+                  setIsStartDate(true);
 
-                setOpenClock(!openClock);
-                setOpenCalendar(false);
-                // setValue('startTime');
-              }}
-            >
-              <TextInput
-                style={styles.textInput}
-                value={moment(generaldData?.startDateTime).format('LT')}
-                editable={false}
-              />
+                  setOpenClock(!openClock);
+                  setOpenCalendar(false);
+                  // setValue('startTime');
+                }}
+              >
+                <TextInput
+                  style={styles.textInput}
+                  value={moment(generaldData?.startDateTime).format('LT')}
+                  editable={false}
+                />
 
-              <Icon
-                name={IconName.Arrow_Down}
-                height={SIZES[6]}
-                width={SIZES[12]}
-              />
-            </TouchableOpacity>
-          </View>
+                <Icon
+                  name={IconName.Arrow_Down}
+                  height={SIZES[6]}
+                  width={SIZES[12]}
+                />
+              </TouchableOpacity>
+            </View>
+            {showRequired &&
+            generaldData?.generaldData?.startDateTime == null ? (
+              <Text
+                style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+              >
+                *This fields are required
+              </Text>
+            ) : null}
+          </>
           <Text style={[styles.txtTitle, { marginTop: SIZES[24] }]}>
             END DATE
           </Text>
-          <View style={styles.dateTimeRowView}>
-            {/* for select end date */}
-            <TouchableOpacity
-              style={styles.dateContainer}
-              onPress={() => {
-                setIsStartDate(false);
 
-                setOpenCalendar(!openCalendar);
-                setOpenClock(false);
-                // setValue('endDate');
-              }}
+          <>
+            <View style={styles.dateTimeRowView}>
+              {/* for select end date */}
+              <TouchableOpacity
+                style={styles.dateContainer}
+                onPress={() => {
+                  setIsStartDate(false);
+
+                  setOpenCalendar(!openCalendar);
+                  setOpenClock(false);
+                  // setValue('endDate');
+                }}
+              >
+                <TextInput
+                  style={styles.textInput}
+                  value={moment(generaldData?.endDateTime).format(
+                    'DD MMM,YYYY'
+                  )}
+                  editable={false}
+                />
+
+                <Icon
+                  name={IconName.Calendar}
+                  height={SIZES[20]}
+                  width={SIZES[18]}
+                />
+              </TouchableOpacity>
+
+              {/* for select end time */}
+              <TouchableOpacity
+                style={styles.dateContainer}
+                onPress={() => {
+                  setIsStartDate(false);
+                  setOpenClock(!openClock);
+                  setOpenCalendar(false);
+                  // setValue('endTime');
+                }}
+              >
+                <TextInput
+                  style={styles.textInput}
+                  value={moment(generaldData?.endDateTime).format('LT')}
+                  editable={false}
+                />
+
+                <Icon
+                  name={IconName.Arrow_Down}
+                  height={SIZES[6]}
+                  width={SIZES[12]}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+          {showRequired && generaldData?.generaldData?.startDateTime == null ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
             >
-              <TextInput
-                style={styles.textInput}
-                value={moment(generaldData?.endDateTime).format('DD MMM,YYYY')}
-                editable={false}
-              />
-
-              <Icon
-                name={IconName.Calendar}
-                height={SIZES[20]}
-                width={SIZES[18]}
-              />
-            </TouchableOpacity>
-
-            {/* for select end time */}
-            <TouchableOpacity
-              style={styles.dateContainer}
-              onPress={() => {
-                setIsStartDate(false);
-                setOpenClock(!openClock);
-                setOpenCalendar(false);
-                // setValue('endTime');
-              }}
-            >
-              <TextInput
-                style={styles.textInput}
-                value={moment(generaldData?.endDateTime).format('LT')}
-                editable={false}
-              />
-
-              <Icon
-                name={IconName.Arrow_Down}
-                height={SIZES[6]}
-                width={SIZES[12]}
-              />
-            </TouchableOpacity>
-          </View>
+              *This fields are required
+            </Text>
+          ) : null}
 
           {/* dropdown timezone */}
           <DropDownPicker
@@ -259,6 +291,13 @@ const AddEditDateAndTime = ({ generaldData, setGeneralData, details }) => {
             title={'TIMEZONE'}
             value={generaldData?.valueTimeZone}
           />
+          {showRequired && generaldData?.generaldData?.valueTimeZone == null ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
 
           {/* dropdown repeat */}
           <DropDownPicker

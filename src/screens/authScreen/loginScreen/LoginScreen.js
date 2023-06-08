@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   DeviceEventEmitter
 } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { Divider, TextInput } from 'react-native-paper';
 import { useLazyQuery, useQuery } from '@apollo/client';
@@ -19,6 +19,10 @@ import { GET_AUTH } from '../../../graphql/query';
 import { SIZES } from '../../../themes/Sizes';
 import { styles } from './styles';
 import { UserContext } from '../../../context';
+import { Colors } from '../../../themes/Colors';
+import { Fonts } from '../../../themes';
+import { responsePathAsArray } from 'graphql';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 const LoginScreen = ({ navigation }) => {
   const [url, setUrl] = useState('');
@@ -30,6 +34,15 @@ const LoginScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [loadingLogin, setLoading] = useState(false);
   const { companyUrl, setCompanyUrl } = useContext(UserContext);
+  const netInfo = useNetInfo();
+
+  useEffect(() => {
+    if (!netInfo?.isConnected) {
+      setError('No internet connection');
+    } else {
+      setError('');
+    }
+  }, [netInfo]);
 
   // Query for get client id and client secret
   // For this query need company url
@@ -41,19 +54,19 @@ const LoginScreen = ({ navigation }) => {
 
       // set Client secret
       setClientSecret(data.oAuth2Application.clientSecret);
-      setError(data.error);
+      setError('Something went wrong...');
       setError('');
       if (
         data.oAuth2Application.clientId == '' &&
         data.oAuth2Application.clientId == ''
       ) {
-        setError('Please enter valid company url');
+        setError('Please enter valid company url ');
         setLoading(false);
       }
     },
     onError: (data) => {
       console.log('get aoth error', data);
-      setError(data.message);
+      setError('Please enter valid url or check internet connection');
       setLoading(false);
     }
   });
@@ -75,6 +88,7 @@ const LoginScreen = ({ navigation }) => {
       DeviceEventEmitter.emit('urlChanged');
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -114,7 +128,13 @@ const LoginScreen = ({ navigation }) => {
           .then((response) => response.json())
           .then((responseData) => {
             if (responseData.error) {
-              setError(responseData.error);
+              console.log({ error: responseData.error });
+              if (responseData.error == 'invalid_grant') {
+                setError('Please enter valid username or password');
+              } else {
+                setError(responseData.error);
+              }
+
               setLoading(false);
             } else {
               const dataToken = responseData.access_token;
@@ -176,7 +196,14 @@ const LoginScreen = ({ navigation }) => {
           .then((response) => response.json())
           .then((responseData) => {
             if (responseData.error) {
-              setError(responseData.error);
+              console.log({ error: responseData.error });
+              if (responseData.error == 'invalid_grant') {
+                setError('Please enter valid username or pass');
+              } else {
+                setError(responseData.error);
+              }
+
+              setLoading(false);
             } else {
               const dataToken = responseData.access_token;
               let user = {
@@ -206,17 +233,14 @@ const LoginScreen = ({ navigation }) => {
         {/* header */}
         <Text style={styles.txtHeader}>Log in</Text>
 
-        {/* show error during login */}
-        {error && (
-          <View style={styles.errorView}>
-            <Text style={{ color: 'red' }}>{error}</Text>
-          </View>
-        )}
-
         {/* company url-input */}
         <Input
           onChangeText={(text) => {
             setUrl(text);
+            if (error !== '') {
+              setError('');
+            }
+            setLoading(false);
           }}
           keyboardType={'email-address'}
           onChange={() => {
@@ -259,6 +283,7 @@ const LoginScreen = ({ navigation }) => {
             if (error !== '') {
               setError('');
             }
+            setLoading(false);
           }}
           value={userName}
           label={'Username'}
@@ -287,6 +312,7 @@ const LoginScreen = ({ navigation }) => {
             if (error !== '') {
               setError('');
             }
+            setLoading(false);
           }}
           secureTextEntry={secureTextEntry}
           label={'Password'}
@@ -310,41 +336,56 @@ const LoginScreen = ({ navigation }) => {
         />
       </ScrollView>
 
-      <View
-        style={{
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Divider */}
-        <Divider style={styles.divider} />
-
-        {/* login button */}
-        <View style={styles.btnView}>
-          <Button
-            isLoading={loadingLogin}
-            onPress={Login}
-            title={'Log in'}
-            disable={
-              url === '' || userName === '' || password === '' || error !== ''
-                ? true
-                : false
-            }
-            layoutStyle={[
-              {
-                opacity:
-                  url === '' ||
-                  userName === '' ||
-                  password === '' ||
-                  error !== ''
-                    ? 0.5
-                    : null
-              },
-              styles.loginButton
-            ]}
-            textStyle={styles.txtButton}
-          />
+      {error ? (
+        <View
+          style={{
+            justifyContent: 'flex-end',
+            backgroundColor: Colors.bold,
+            alignItems: 'center',
+            padding: SIZES[12]
+          }}
+        >
+          <Text style={{ ...Fonts.PoppinsRegular[14], color: Colors.white }}>
+            {error}
+          </Text>
         </View>
-      </View>
+      ) : (
+        <View
+          style={{
+            justifyContent: 'flex-end'
+          }}
+        >
+          {/* Divider */}
+          <Divider style={styles.divider} />
+
+          {/* login button */}
+          <View style={styles.btnView}>
+            <Button
+              isLoading={loadingLogin}
+              onPress={Login}
+              title={'Log in'}
+              disable={
+                url === '' || userName === '' || password === '' || error !== ''
+                  ? true
+                  : false
+              }
+              layoutStyle={[
+                {
+                  opacity:
+                    url === '' ||
+                    userName === '' ||
+                    password === '' ||
+                    error !== ''
+                      ? 0.5
+                      : null
+                },
+                styles.loginButton
+              ]}
+              textStyle={styles.txtButton}
+            />
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

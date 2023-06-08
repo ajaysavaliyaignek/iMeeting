@@ -35,6 +35,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
   const [curentPosition, setCurrentPosition] = useState(0);
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const [fileResponse, setFileResponse] = useState([]);
+  const [showRequired, setShowRequired] = useState(isEdit ? false : true);
   // state for details for form data
   const [generaldData, setGeneralData] = useState({
     title: '',
@@ -205,6 +206,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
                 ).format('YYYY-MM-DD')
           });
         }
+
+        setShowRequired(false);
       },
       onError: (data) => {
         console.log('error in get meeting by id', data);
@@ -390,7 +393,9 @@ const AddEditMeetingAppointmentVideoConference = () => {
             setVisibleIndex,
             fileResponse,
             setFileResponse,
-            type
+            type,
+            showRequired,
+            setShowRequired
           )}
 
           {/* button container */}
@@ -426,6 +431,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                 onPress={() => {
                   if (curentPosition !== screensArray.length - 1) {
                     setCurrentPosition(curentPosition + 1);
+                    setShowRequired(isEdit ? showRequired : true);
                   }
 
                   if (curentPosition == screensArray.length - 1) {
@@ -471,13 +477,11 @@ const AddEditMeetingAppointmentVideoConference = () => {
                         : curentPosition == 2
                         ? generaldData?.startDateTime != '' &&
                           generaldData?.endDateTime != '' &&
-                          generaldData?.valueTimeZone != null &&
-                          generaldData?.valueRepeat != null
+                          generaldData?.valueTimeZone != null
                           ? 1
                           : 0.5
                         : curentPosition == 3
-                        ? generaldData?.valueLocation != null &&
-                          generaldData?.valueVideoConference !== null
+                        ? generaldData?.valueLocation != null
                           ? 1
                           : 0.5
                         : curentPosition == 4
@@ -498,13 +502,11 @@ const AddEditMeetingAppointmentVideoConference = () => {
                     : curentPosition == 2
                     ? generaldData?.startDateTime != '' &&
                       generaldData?.endDateTime != '' &&
-                      generaldData?.valueTimeZone != null &&
-                      generaldData?.valueRepeat != null
+                      generaldData?.valueTimeZone != null
                       ? false
                       : true
                     : curentPosition == 3
-                    ? generaldData?.valueLocation != null &&
-                      generaldData?.valueVideoConference !== null
+                    ? generaldData?.valueLocation != null
                       ? false
                       : true
                     : curentPosition == 4

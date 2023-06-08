@@ -18,11 +18,14 @@ import { Colors } from '../../../themes/Colors';
 import { SIZES } from '../../../themes/Sizes';
 import { GET_COMMITTEES_BY_ROLE } from '../../../graphql/query';
 import { useQuery } from '@apollo/client';
+import { Fonts } from '../../../themes';
 
 const AddGeneralVideoConference = ({
   generaldData,
   setGeneralData,
-  details
+  details,
+  showRequired,
+  setShowRequired
 }) => {
   const [committee, setCommittee] = useState(null);
 
@@ -156,9 +159,15 @@ const AddGeneralVideoConference = ({
               return { ...prev, title: text };
             });
             // setTitle(text);
+            setShowRequired(false);
           }}
         />
       </View>
+      {showRequired || generaldData?.title == '' ? (
+        <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+          *This field is required
+        </Text>
+      ) : null}
 
       {/* description */}
       <View style={styles.categoryContainer}>
@@ -174,6 +183,11 @@ const AddGeneralVideoConference = ({
           value={generaldData?.discription}
         />
       </View>
+      {showRequired || generaldData?.discription == '' ? (
+        <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+          *This field is required
+        </Text>
+      ) : null}
     </ScrollView>
   );
 };

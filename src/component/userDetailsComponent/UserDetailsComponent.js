@@ -25,7 +25,7 @@ const UserDetailsComponent = ({
   editable,
   onPressEdit,
   meetingData,
-
+  isAddPublishUser,
   onPressPublish
 }) => {
   return (
@@ -59,7 +59,7 @@ const UserDetailsComponent = ({
                 editable={editable}
                 onPressEdit={onPressEdit}
                 meetingData={meetingData}
-               
+                isAddPublishUser={isAddPublishUser}
                 onPressPublish={onPressPublish}
               />
             );

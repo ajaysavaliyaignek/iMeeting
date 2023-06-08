@@ -10,6 +10,7 @@ import { GET_COMMITTEES_BY_ROLE, GET_FILE } from '../../../../graphql/query';
 import Loader from '../../../../component/Loader/Loader';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 import AttachFiles from '../../../../component/attachFiles/AttachFiles';
+import { Fonts } from '../../../../themes';
 
 const AddEditGeneralScreen = ({
   generaldData,
@@ -17,7 +18,9 @@ const AddEditGeneralScreen = ({
   details,
   fileResponse,
   setFileResponse,
-  type
+  type,
+  showRequired,
+  setShowRequired
 }) => {
   const [committee, setCommittee] = useState(null);
   const [token, setToken] = useState('');
@@ -118,12 +121,19 @@ const AddEditGeneralScreen = ({
                 setGeneralData((prev) => {
                   return { ...prev, valueCommitee: item };
                 });
+                setShowRequired(false);
               }}
               title={'CHOOSE COMMITTEE'}
               value={generaldData?.valueCommitee}
             />
           </View>
         )}
+        {(showRequired || generaldData?.valueCommitee == null) &&
+        type !== 'Appointment' ? (
+          <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+            *This field is required
+          </Text>
+        ) : null}
 
         <View style={styles.discriptionContainer}>
           <Text style={styles.txtTitle}>TITLE</Text>
@@ -134,10 +144,16 @@ const AddEditGeneralScreen = ({
               setGeneralData((prev) => {
                 return { ...prev, title: text };
               });
+              setShowRequired(false);
               // setTitle(text);
             }}
           />
         </View>
+        {showRequired || generaldData?.title == '' ? (
+          <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+            *This field is required
+          </Text>
+        ) : null}
         <View style={styles.categoryContainer}>
           <Text style={styles.txtTitle}>DESCRIPTION</Text>
           <TextInput
@@ -151,6 +167,11 @@ const AddEditGeneralScreen = ({
             value={generaldData?.discription}
           />
         </View>
+        {showRequired || generaldData?.discription == '' ? (
+          <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+            *This field is required
+          </Text>
+        ) : null}
 
         {/* attach files */}
         <AttachFiles

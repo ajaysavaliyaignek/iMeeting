@@ -15,7 +15,9 @@ export const screenRender = (
   setVisibleIndex,
   fileResponse,
   setFileResponse,
-  type
+  type,
+  showRequired,
+  setShowRequired
 ) => {
   switch (screen) {
     case 'general':
@@ -27,6 +29,8 @@ export const screenRender = (
           fileResponse={fileResponse}
           setFileResponse={setFileResponse}
           type={type}
+          showRequired={showRequired}
+          setShowRequired={setShowRequired}
         />
       );
       break;
@@ -36,6 +40,8 @@ export const screenRender = (
           generaldData={generaldData}
           setGeneralData={setGeneralData}
           details={details}
+          showRequired={showRequired}
+          setShowRequired={setShowRequired}
         />
       );
       break;
@@ -57,6 +63,8 @@ export const screenRender = (
           generaldData={generaldData}
           setGeneralData={setGeneralData}
           details={details}
+          showRequired={showRequired}
+          setShowRequired={setShowRequired}
         />
       );
       break;
@@ -67,6 +75,8 @@ export const screenRender = (
           generaldData={generaldData}
           setGeneralData={setGeneralData}
           type={type}
+          showRequired={showRequired}
+          setShowRequired={setShowRequired}
         />
       );
       break;

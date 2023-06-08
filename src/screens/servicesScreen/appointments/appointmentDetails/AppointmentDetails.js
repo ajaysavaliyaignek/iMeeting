@@ -175,7 +175,6 @@ const AppointmentsDetails = () => {
     <SafeAreaView style={styles.container}>
       <Header
         name={'Appointment details'}
-        rightIconName={IconName.Search}
         leftIconName={IconName.Arrow_Left}
         onLeftPress={() => navigation.goBack()}
       />

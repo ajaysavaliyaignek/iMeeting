@@ -88,7 +88,7 @@ const AddEditUser = ({ generaldData, setGeneralData, type }) => {
           const filterData = generaldData?.previousUser.filter(
             (user) => user.userId !== item.userId
           );
-          setPreviousUser(filterData);
+          setGeneralData({ ...generaldData, previousUser: filterData });
         },
         style: 'destructive'
       },
@@ -177,6 +177,7 @@ const AddEditUser = ({ generaldData, setGeneralData, type }) => {
         onPressDelete={onDeleteHandler}
         visibleIndex={visibleIndex}
         setVisibleIndex={setVisibleIndex}
+        
       />
     </TouchableOpacity>
   );
