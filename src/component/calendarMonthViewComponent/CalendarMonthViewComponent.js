@@ -169,8 +169,9 @@ const CalendarMonthViewComponent = () => {
             </TouchableOpacity>
           );
         }}
+        eventMinHeightForMonthView={20}
         events={events}
-        height={height - 170}
+        height={height - 140}
         mode="month"
         date={new Date(monthCalenderView)}
         swipeEnabled={false}

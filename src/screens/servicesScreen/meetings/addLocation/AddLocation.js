@@ -83,6 +83,13 @@ const AddLocation = () => {
             onChangeText={(text) => setTitle(text)}
           />
           <Divider style={styles.divider} />
+          {title == '' ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
 
           <Text style={styles.txtTitle}>PEOPLE CAPACITY</Text>
           <TextInput
@@ -91,6 +98,13 @@ const AddLocation = () => {
             keyboardType="numeric"
           />
           <Divider style={styles.divider} />
+          {capacity == '' ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
         </View>
 
         <View style={styles.addressContainer}>
@@ -102,6 +116,13 @@ const AddLocation = () => {
             onChangeText={(text) => setCity(text)}
           />
           <Divider style={styles.divider} />
+          {city == '' ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
 
           <Text style={styles.txtTitle}>STREET</Text>
           <TextInput
@@ -109,6 +130,13 @@ const AddLocation = () => {
             onChangeText={(text) => setStreet(text)}
           />
           <Divider style={styles.divider} />
+          {street == '' ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
 
           <View style={styles.buildingContainer}>
             <View style={{ width: '30%' }}>
@@ -119,6 +147,16 @@ const AddLocation = () => {
                 keyboardType="numeric"
               />
               <Divider style={styles.divider} />
+              {building == '' ? (
+                <Text
+                  style={{
+                    color: Colors.Rejected,
+                    ...Fonts.PoppinsRegular[10]
+                  }}
+                >
+                  *This field is required
+                </Text>
+              ) : null}
             </View>
             <View style={{ width: '30%' }}>
               <Text style={styles.txtTitle}>FLOOR</Text>
@@ -128,6 +166,16 @@ const AddLocation = () => {
                 keyboardType="numeric"
               />
               <Divider style={styles.divider} />
+              {floor == '' ? (
+                <Text
+                  style={{
+                    color: Colors.Rejected,
+                    ...Fonts.PoppinsRegular[10]
+                  }}
+                >
+                  *This field is required
+                </Text>
+              ) : null}
             </View>
             <View style={{ width: '30%' }}>
               <Text style={styles.txtTitle}>ROOM</Text>
@@ -137,6 +185,16 @@ const AddLocation = () => {
                 keyboardType="numeric"
               />
               <Divider style={styles.divider} />
+              {room == '' ? (
+                <Text
+                  style={{
+                    color: Colors.Rejected,
+                    ...Fonts.PoppinsRegular[10]
+                  }}
+                >
+                  *This field is required
+                </Text>
+              ) : null}
             </View>
           </View>
 
@@ -219,10 +277,30 @@ const AddLocation = () => {
                 }
               });
             }}
+            disable={
+              title === '' ||
+              capacity === '' ||
+              city === '' ||
+              street === '' ||
+              building === '' ||
+              floor === '' ||
+              room === ''
+                ? true
+                : false
+            }
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity:
+                  title === '' ||
+                  capacity === '' ||
+                  city === '' ||
+                  street === '' ||
+                  building === '' ||
+                  floor === '' ||
+                  room === ''
+                    ? 0.5
+                    : null
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}

@@ -146,7 +146,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
       {/* dotsView */}
       <TouchableOpacity
         onPress={() => {
-          setVisibleIndex(!showModal ? index : -1);
+          setVisibleIndex(visibleIndex == -1 ? index : -1);
           setShowModal(!showModal);
         }}
         style={styles.dotsView}
@@ -154,7 +154,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
       >
         <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
-      {visibleIndex === index && showModal && (
+      {visibleIndex === index && (
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDelete={() => {

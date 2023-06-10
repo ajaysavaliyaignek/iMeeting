@@ -27,6 +27,7 @@ import {
   GET_TASK_PRIORITY
 } from '../../../graphql/query';
 import { UPDATE_TASK, UPDATE_VOTING } from '../../../graphql/mutation';
+import { Fonts } from '../../../themes';
 
 const AddTask = () => {
   const navigation = useNavigation();
@@ -170,6 +171,16 @@ const AddTask = () => {
             }}
           />
           <Divider style={styles.divider} />
+          {titleTask == '' ? (
+            <Text
+              style={{
+                color: Colors.Rejected,
+                ...Fonts.PoppinsRegular[10]
+              }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
         </View>
 
         <DropDownPicker
@@ -183,6 +194,16 @@ const AddTask = () => {
           value={valueExecutor}
           setData={setValueExecutor}
         />
+        {valueExecutor == null ? (
+          <Text
+            style={{
+              color: Colors.Rejected,
+              ...Fonts.PoppinsRegular[10]
+            }}
+          >
+            *This field is required
+          </Text>
+        ) : null}
 
         <View style={styles.optionsContainer}>
           <Text style={styles.txtTitleVoting}>DESCRIPTION</Text>
@@ -224,6 +245,16 @@ const AddTask = () => {
             />
           </TouchableOpacity>
           <Divider style={styles.divider} />
+          {calendarValue.calendarValue == null ? (
+            <Text
+              style={{
+                color: Colors.Rejected,
+                ...Fonts.PoppinsRegular[10]
+              }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
         </View>
 
         <DropDownPicker
@@ -237,6 +268,16 @@ const AddTask = () => {
           value={valuePriority}
           setData={setValuePriority}
         />
+        {valuePriority == null ? (
+          <Text
+            style={{
+              color: Colors.Rejected,
+              ...Fonts.PoppinsRegular[10]
+            }}
+          >
+            *This field is required
+          </Text>
+        ) : null}
 
         <AttachFiles
           fileResponse={fileResponse}
