@@ -25,6 +25,7 @@ const SerachAndButtoncomponent = ({
     Voice.onSpeechStart = onSpeechStartHandler;
     Voice.onSpeechEnd = onSpeechEndHandler;
     Voice.onSpeechResults = onSpeechResultsHandler;
+    Voice.onSpeechError = onSpeechError;
 
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
@@ -43,6 +44,7 @@ const SerachAndButtoncomponent = ({
     console.log('onSpeechResultsHandler', e);
     let text = e.value[0];
     onChangeText(text);
+    setStart(false);
   };
   const startRecording = async () => {
     try {
@@ -61,6 +63,13 @@ const SerachAndButtoncomponent = ({
       console.log('voice error', error);
     }
   };
+
+  const onSpeechError = (e: SpeechErrorEvent) => {
+    console.log({
+      error: JSON.stringify(e.error)
+    });
+  };
+
   return (
     <View>
       <View style={[styles.searchContainer, containerStyle]}>
@@ -103,18 +112,26 @@ const SerachAndButtoncomponent = ({
       </View>
       {(role !== 'Member' || isButtonShow) && (
         <View style={styles.btnContainer}>
-        <Button
-          title={buttonText}
-          layoutStyle={[styles.cancelBtnLayout,{width:isPublishButtonShow?"48%":'100%'}]}
-          textStyle={styles.txtCancelButton}
-          onPress={onPress}
-        />
-        {isPublishButtonShow&&<Button
-          title={"Publish"}
-          layoutStyle={[styles.publishBtnLayout,{width:isPublishButtonShow?"48%":'100%'}]}
-          textStyle={styles.txtPublishButton}
-          onPress={onPressPublish}
-        />}
+          <Button
+            title={buttonText}
+            layoutStyle={[
+              styles.cancelBtnLayout,
+              { width: isPublishButtonShow ? '48%' : '100%' }
+            ]}
+            textStyle={styles.txtCancelButton}
+            onPress={onPress}
+          />
+          {isPublishButtonShow && (
+            <Button
+              title={'Publish'}
+              layoutStyle={[
+                styles.publishBtnLayout,
+                { width: isPublishButtonShow ? '48%' : '100%' }
+              ]}
+              textStyle={styles.txtPublishButton}
+              onPress={onPressPublish}
+            />
+          )}
         </View>
       )}
       <Divider style={styles.divider} />

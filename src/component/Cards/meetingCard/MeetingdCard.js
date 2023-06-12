@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { useMutation, useQuery } from '@apollo/client';
@@ -21,8 +21,16 @@ import { styles } from './styles';
 import { UserContext } from '../../../context';
 import MeetingStatusDropdown from '../../meetingStatusDropdown/MeetingStatusDropdown';
 
-const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
+const MeetingsCard = ({
+  item,
+  text,
+  index,
+  visibleIndex,
+  setVisibleIndex,
+  openModel
+}) => {
   const navigation = useNavigation();
+
   const { setSelectedUsers, setSelectedSubjects, setMeetingsData } =
     useContext(UserContext);
 
@@ -56,6 +64,8 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
       }
     }
   );
+
+  useEffect(() => {}, [item.modelOpen]);
 
   const onDeleteHandler = () => {
     Alert.alert('Delete meeting', 'Are you sure you want to delete this?', [
@@ -100,7 +110,7 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
   return (
     <TouchableOpacity
       activeOpacity={1}
-      onPress={() => setVisibleIndex(-1)}
+      onPress={() => (item.modelOpen = false)}
       key={index.toString()}
       style={{ flex: 1 }}
     >
@@ -146,15 +156,15 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
       {/* dotsView */}
       <TouchableOpacity
         onPress={() => {
-          setVisibleIndex(visibleIndex == -1 ? index : -1);
-          setShowModal(!showModal);
+          openModel(item);
+          // setVisibleIndex(visibleIndex == -1 ? index : -1);
         }}
         style={styles.dotsView}
         activeOpacity={0.6}
       >
         <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
-      {visibleIndex === index && (
+      {item.modelOpen == true && (
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDelete={() => {

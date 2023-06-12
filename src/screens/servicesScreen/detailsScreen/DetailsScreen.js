@@ -44,6 +44,7 @@ const DetailsScreen = () => {
   const [visibleIndex, setVisibleIndex] = useState(-1);
   const { setSelectedUsers, setMeetingsData, setSelectedSubjects } =
     useContext(UserContext);
+  let newMeetings = null;
 
   useEffect(() => {
     const committeeId = committee?.map((com) => {
@@ -74,15 +75,28 @@ const DetailsScreen = () => {
     },
     onCompleted: (data) => {
       if (data) {
-        setFilterMeetingData(data?.meetings.items);
+        newMeetings = data?.meetings.items?.map((item) => {
+          let modelOpen = false;
+          return { ...item, modelOpen };
+        });
+        if (newMeetings) {
+          setFilterMeetingData(newMeetings);
 
-        setMeetingData(data?.meetings.items);
+          setMeetingData(newMeetings);
+        }
       }
     },
     onError: (data) => {
       console.log('GetMeetings error---', data.message);
     }
   });
+
+  const openModel = (item) => {
+    console.log(item);
+    item.modelOpen = !item.modelOpen;
+    setFilterMeetingData([...filterMeetingData]);
+    setMeetingData([...meetingData]);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -378,6 +392,7 @@ const DetailsScreen = () => {
                       text={searchText}
                       visibleIndex={visibleIndex}
                       setVisibleIndex={setVisibleIndex}
+                      openModel={openModel}
                     />
                   )}
                 />
