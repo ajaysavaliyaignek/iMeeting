@@ -3,7 +3,8 @@ import {
   Text,
   useWindowDimensions,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'react-native-big-calendar';
@@ -169,9 +170,10 @@ const CalendarMonthViewComponent = () => {
             </TouchableOpacity>
           );
         }}
-        eventMinHeightForMonthView={20}
+        eventMinHeightForMonthView={18}
         events={events}
-        height={height - 140}
+        maxVisibleEventCount={2}
+        height={height - 80}
         mode="month"
         date={new Date(monthCalenderView)}
         swipeEnabled={false}

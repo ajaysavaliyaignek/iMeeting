@@ -316,10 +316,7 @@ const AddTask = () => {
             title={'Save'}
             isLoading={addTaskLoading}
             disable={
-              titleTask == '' ||
-              valueExecutor == null ||
-              taskDescription == '' ||
-              valuePriority == null
+              titleTask == '' || valueExecutor == null || valuePriority == null
                 ? true
                 : false
             }
@@ -351,7 +348,6 @@ const AddTask = () => {
                 opacity:
                   titleTask == '' ||
                   valueExecutor == null ||
-                  taskDescription == '' ||
                   valuePriority == null
                     ? 0.5
                     : 1
