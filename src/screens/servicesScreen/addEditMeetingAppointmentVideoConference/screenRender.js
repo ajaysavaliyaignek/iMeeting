@@ -17,7 +17,8 @@ export const screenRender = (
   setFileResponse,
   type,
   showRequired,
-  setShowRequired
+  setShowRequired,
+  isEdit
 ) => {
   switch (screen) {
     case 'general':
@@ -42,6 +43,7 @@ export const screenRender = (
           details={details}
           showRequired={showRequired}
           setShowRequired={setShowRequired}
+          isEdit={isEdit}
         />
       );
       break;
@@ -77,6 +79,7 @@ export const screenRender = (
           type={type}
           showRequired={showRequired}
           setShowRequired={setShowRequired}
+          isEdit={isEdit}
         />
       );
       break;

@@ -395,7 +395,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
             setFileResponse,
             type,
             showRequired,
-            setShowRequired
+            setShowRequired,
+            isEdit
           )}
 
           {/* button container */}

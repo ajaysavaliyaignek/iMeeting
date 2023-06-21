@@ -25,7 +25,8 @@ const AddGeneralVideoConference = ({
   setGeneralData,
   details,
   showRequired,
-  setShowRequired
+  setShowRequired,
+  isEdit
 }) => {
   const [committee, setCommittee] = useState(null);
 
@@ -77,7 +78,13 @@ const AddGeneralVideoConference = ({
             label: 'Microsoft Teams'
           }
         ]}
-        disable={generaldData.valueVideoConference !== null ? true : false}
+        disable={
+          isEdit
+            ? generaldData.valueVideoConference !== null
+              ? true
+              : false
+            : false
+        }
         placeholder={''}
         setData={(item) =>
           setGeneralData({ ...generaldData, valueVideoConference: item })
