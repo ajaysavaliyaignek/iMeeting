@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { useMutation, useQuery } from '@apollo/client';
@@ -21,16 +21,8 @@ import { styles } from './styles';
 import { UserContext } from '../../../context';
 import MeetingStatusDropdown from '../../meetingStatusDropdown/MeetingStatusDropdown';
 
-const MeetingsCard = ({
-  item,
-  text,
-  index,
-  visibleIndex,
-  setVisibleIndex,
-  openModel
-}) => {
+const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
   const navigation = useNavigation();
-
   const { setSelectedUsers, setSelectedSubjects, setMeetingsData } =
     useContext(UserContext);
 
@@ -64,8 +56,6 @@ const MeetingsCard = ({
       }
     }
   );
-
-  useEffect(() => {}, [item.modelOpen]);
 
   const onDeleteHandler = () => {
     Alert.alert('Delete meeting', 'Are you sure you want to delete this?', [
@@ -110,7 +100,7 @@ const MeetingsCard = ({
   return (
     <TouchableOpacity
       activeOpacity={1}
-      onPress={() => (item.modelOpen = false)}
+      onPress={() => setVisibleIndex(-1)}
       key={index.toString()}
       style={{ flex: 1 }}
     >
@@ -156,15 +146,15 @@ const MeetingsCard = ({
       {/* dotsView */}
       <TouchableOpacity
         onPress={() => {
-          openModel(item);
-          // setVisibleIndex(visibleIndex == -1 ? index : -1);
+          setVisibleIndex(visibleIndex == -1 ? index : -1);
+          setShowModal(!showModal);
         }}
         style={styles.dotsView}
         activeOpacity={0.6}
       >
         <Icon name={IconName.Dots} height={SIZES[16]} width={SIZES[6]} />
       </TouchableOpacity>
-      {item.modelOpen == true && (
+      {visibleIndex === index && (
         <View style={styles.modalView}>
           <EditDeleteModal
             onPressDelete={() => {

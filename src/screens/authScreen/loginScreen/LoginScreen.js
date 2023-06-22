@@ -281,7 +281,13 @@ const LoginScreen = ({ navigation }) => {
           onChangeText={(text) => {
             setUserName(text);
             if (error !== '') {
-              setError('');
+              if (
+                error == 'Please enter valid url or check internet connection'
+              ) {
+                return;
+              } else {
+                setError('');
+              }
             }
             setLoading(false);
           }}
@@ -310,7 +316,13 @@ const LoginScreen = ({ navigation }) => {
           onChangeText={(text) => {
             setPassword(text);
             if (error !== '') {
-              setError('');
+              if (
+                error == 'Please enter valid url or check internet connection'
+              ) {
+                return;
+              } else {
+                setError('');
+              }
             }
             setLoading(false);
           }}

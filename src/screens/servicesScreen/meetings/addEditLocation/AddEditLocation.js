@@ -15,7 +15,8 @@ const AddEditLocation = ({
   setGeneralData,
   type,
   showRequired,
-  setShowRequired
+  setShowRequired,
+  isEdit
 }) => {
   const navigation = useNavigation();
   const [location, setLocation] = useState([]);
@@ -125,7 +126,13 @@ const AddEditLocation = ({
               label: 'Microsoft Teams'
             }
           ]}
-          disable={false}
+          disable={
+            isEdit
+              ? generaldData.valueVideoConference !== null
+                ? true
+                : false
+              : false
+          }
           placeholder={''}
           setData={(item) =>
             setGeneralData({ ...generaldData, valueVideoConference: item })

@@ -395,7 +395,8 @@ const AddEditMeetingAppointmentVideoConference = () => {
             setFileResponse,
             type,
             showRequired,
-            setShowRequired
+            setShowRequired,
+            isEdit
           )}
 
           {/* button container */}
@@ -469,7 +470,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                   styles.nextBtnLayout,
                   {
                     opacity:
-                      type !== 'VideoConference' && curentPosition == 0
+                      curentPosition == 0
                         ? generaldData?.title !== '' &&
                           generaldData?.discription !== ''
                           ? 1
@@ -494,7 +495,7 @@ const AddEditMeetingAppointmentVideoConference = () => {
                 ]}
                 textStyle={styles.txtNextBtn}
                 disable={
-                  type !== 'VideoConference' && curentPosition == 0
+                  curentPosition == 0
                     ? generaldData?.title !== '' &&
                       generaldData?.discription !== ''
                       ? false

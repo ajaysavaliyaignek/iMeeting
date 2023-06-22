@@ -177,7 +177,6 @@ const AddEditUser = ({ generaldData, setGeneralData, type }) => {
         onPressDelete={onDeleteHandler}
         visibleIndex={visibleIndex}
         setVisibleIndex={setVisibleIndex}
-        
       />
     </TouchableOpacity>
   );

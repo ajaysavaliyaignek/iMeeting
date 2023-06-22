@@ -103,10 +103,16 @@ const SerachAndButtoncomponent = ({
               height: SIZES[20],
               width: SIZES[20],
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              backgroundColor: 'red',
+              borderRadius: 100
             }}
           >
-            <Icon name={IconName.Close} height={SIZES[15]} width={SIZES[10]} />
+            <Icon
+              name={IconName.Speaker}
+              height={SIZES[15]}
+              width={SIZES[10]}
+            />
           </TouchableOpacity>
         )}
       </View>
