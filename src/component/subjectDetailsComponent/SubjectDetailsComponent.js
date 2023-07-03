@@ -151,27 +151,27 @@ const SubjectDetailsComponent = ({
                     commentId: commentId,
                     parentCommentId: comments?.commentId
                   });
-                  // if (commentId == null) {
-                  //   addComment({
-                  //     variables: {
-                  //       comment: {
-                  //         comment: commenttext,
-                  //         commentId: 0,
-                  //         parentCommentId: comments?.commentId
-                  //       }
-                  //     }
-                  //   });
-                  // } else {
-                  //   addComment({
-                  //     variables: {
-                  //       comment: {
-                  //         comment: commenttext,
-                  //         commentId: commentId,
-                  //         parentCommentId: 0
-                  //       }
-                  //     }
-                  //   });
-                  // }
+                  if (commentId == null) {
+                    addComment({
+                      variables: {
+                        comment: {
+                          comment: commenttext,
+                          commentId: 0,
+                          parentCommentId: comments?.commentId
+                        }
+                      }
+                    });
+                  } else {
+                    addComment({
+                      variables: {
+                        comment: {
+                          comment: commenttext,
+                          commentId: commentId,
+                          parentCommentId: 0
+                        }
+                      }
+                    });
+                  }
 
                   setCommentText('');
                 }}

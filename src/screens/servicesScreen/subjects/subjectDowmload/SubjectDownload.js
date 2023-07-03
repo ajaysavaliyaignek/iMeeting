@@ -96,9 +96,17 @@ const SubjectDownload = () => {
                   ? +item?.subjectId
                   : downloadType == 'Task'
                   ? item?.taskId
+                  : downloadType == 'Meeting'
+                  ? item?.meetingId
                   : 0,
               type:
-                downloadType == 'Subject' ? 2 : downloadType == 'Task' ? 3 : 0
+                downloadType == 'Subject'
+                  ? 2
+                  : downloadType == 'Task'
+                  ? 3
+                  : downloadType == 'Meeting'
+                  ? 1
+                  : 0
             }
           });
         } else {

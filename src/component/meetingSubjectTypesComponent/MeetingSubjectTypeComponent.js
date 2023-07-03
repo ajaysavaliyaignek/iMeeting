@@ -5,6 +5,8 @@ import { styles } from './styles';
 import { GET_All_SUBJECTS } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
 import { SIZES } from '../../themes/Sizes';
+import { Colors } from '../../themes/Colors';
+import { Fonts } from '../../themes';
 
 const MeetingSubjectTypeComponent = ({
   valueType,
@@ -51,6 +53,12 @@ const MeetingSubjectTypeComponent = ({
         setData={setValueType}
         placeholder={''}
       />
+      {valueType == null ? (
+        <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+          *This field is required
+        </Text>
+      ) : null}
+
       {valueType == 'Subject' && (
         <DropDownPicker
           data={subjects?.map((item) => ({
@@ -64,6 +72,11 @@ const MeetingSubjectTypeComponent = ({
           styleContainer={{ marginTop: SIZES[24] }}
         />
       )}
+      {valueType == 'Subject' && valueSubject == null ? (
+        <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+          *This field is required
+        </Text>
+      ) : null}
     </View>
   );
 };

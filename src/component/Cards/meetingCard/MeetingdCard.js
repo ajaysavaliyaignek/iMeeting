@@ -21,7 +21,14 @@ import { styles } from './styles';
 import { UserContext } from '../../../context';
 import MeetingStatusDropdown from '../../meetingStatusDropdown/MeetingStatusDropdown';
 
-const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
+const MeetingsCard = ({
+  item,
+  text,
+  index,
+  visibleIndex,
+  setVisibleIndex,
+  onPressDownload
+}) => {
   const navigation = useNavigation();
   const { setSelectedUsers, setSelectedSubjects, setMeetingsData } =
     useContext(UserContext);
@@ -200,8 +207,9 @@ const MeetingsCard = ({ item, text, index, visibleIndex, setVisibleIndex }) => {
                 ? true
                 : false
             }
-            download={false}
+            download={true}
             isViewable={true}
+            onPressDownload={onPressDownload}
           />
         </View>
       )}

@@ -53,6 +53,7 @@ const AddSubjectScreen = () => {
   const [subjectStatus, setSubjectStatus] = useState(
     isEdit ? subjectDetails?.statusTitle : null
   );
+  const [showRequired, setShowRequired] = useState(true);
   const [subjectData, setSubjectData] = useState({
     title: isEdit ? subjectDetails?.subjectTitle : '',
     discription: isEdit ? subjectDetails?.description : '',
@@ -479,6 +480,11 @@ const AddSubjectScreen = () => {
           title={'SELECT COMMITTEE'}
           value={subjectData.valueCommittee}
         />
+        {subjectData.valueCommittee == null ? (
+          <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+            *This field is required
+          </Text>
+        ) : null}
 
         {/* select meeting */}
         <DropDownPicker
@@ -506,6 +512,12 @@ const AddSubjectScreen = () => {
             }
           />
         </View>
+        {subjectData?.title == '' ? (
+          <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+            *This field is required
+          </Text>
+        ) : null}
+
         <View style={styles.discriptionContainer}>
           <Text style={styles.txtTitle}>DESCRIPTION</Text>
           <TextInput
@@ -517,6 +529,11 @@ const AddSubjectScreen = () => {
             }
           />
         </View>
+        {subjectData?.discription == '' ? (
+          <Text style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}>
+            *This field is required
+          </Text>
+        ) : null}
         <View>
           {/* select category */}
           <DropDownPicker
@@ -532,6 +549,13 @@ const AddSubjectScreen = () => {
             title={'SUBJECT CATEGORY'}
             value={subjectData?.valueCategory}
           />
+          {subjectData?.valueCategory == null ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
           <Button
             title={'Add category'}
             textStyle={{ ...Fonts.PoppinsRegular[12] }}

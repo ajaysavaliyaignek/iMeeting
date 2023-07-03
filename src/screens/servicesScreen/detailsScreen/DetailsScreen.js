@@ -378,6 +378,13 @@ const DetailsScreen = () => {
                       text={searchText}
                       visibleIndex={visibleIndex}
                       setVisibleIndex={setVisibleIndex}
+                      onPressDownload={() => {
+                        navigation.navigate('SubjectDownload', {
+                          item,
+                          downloadType: 'Meeting'
+                        });
+                        setVisibleIndex(-1);
+                      }}
                     />
                   )}
                 />

@@ -21,6 +21,7 @@ import { Colors } from '../../../themes/Colors';
 import { UPDATE_VOTING } from '../../../graphql/mutation';
 import { useMutation } from '@apollo/client';
 import { GET_VOTING_DETAILS } from '../../../graphql/query';
+import { Fonts } from '../../../themes';
 
 const AddVoting = () => {
   const navigation = useNavigation();
@@ -101,6 +102,7 @@ const AddVoting = () => {
           setValueSubject={setValueSubject}
           meetingDetails={meetingDetails}
         />
+
         <View style={styles.optionsContainer}>
           <Text style={styles.txtTitleVoting}>TITLE VOTING</Text>
           <TextInput
@@ -111,6 +113,13 @@ const AddVoting = () => {
             }}
           />
           <Divider style={styles.divider} />
+          {titleVoting == '' ? (
+            <Text
+              style={{ color: Colors.Rejected, ...Fonts.PoppinsRegular[10] }}
+            >
+              *This field is required
+            </Text>
+          ) : null}
         </View>
         <View style={styles.optionsContainer}>
           <Text style={styles.txtTitleVoting}>ANSWERS</Text>
@@ -258,10 +267,11 @@ const AddVoting = () => {
                 }
               });
             }}
+            disable={titleVoting === '' || valueType === null ? true : false}
             layoutStyle={[
-              // {
-              //     opacity: title === "" || discription === "" ? 0.5 : null,
-              // },
+              {
+                opacity: titleVoting === '' || valueType === null ? 0.5 : null
+              },
               styles.nextBtnLayout
             ]}
             textStyle={styles.txtNextBtn}

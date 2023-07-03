@@ -14,6 +14,7 @@ import { Button } from '../../../component/button/Button';
 import { MultipleSelectList } from 'react-native-dropdown-select-list';
 import { PUBLISH_EVENTS } from '../../../graphql/mutation';
 import { SIZES } from '../../../themes/Sizes';
+import { GToastContainer, showToast } from 'react-native-gtoast';
 
 const LiveMeetingVotings = ({
   item: meetingData,
@@ -60,13 +61,14 @@ const LiveMeetingVotings = ({
   }, [socketEventUpdateMessage]);
 
   const [publishEvent, { loading }] = useMutation(PUBLISH_EVENTS, {
-    refetchQueries: ['liveMeetingUsers'],
+    refetchQueries: ['liveMeetingUsers', 'votingDetails'],
     onCompleted: (data) => {
       console.log({ data: data.publishEvent.status });
       if (data.publishEvent.status.statusCode == '200') {
         setOpenModal(false);
-       
-        alert('Publish successfully.');
+        showToast('Published successfully', {
+          duration: 10
+        });
       }
     },
     onError: (data) => {
@@ -78,8 +80,8 @@ const LiveMeetingVotings = ({
   return (
     <View style={styles.container}>
       <SerachAndButtoncomponent
-      isPublishButtonShow={true}
-      onPressPublish={()=>setOpenModal(true)}
+        isPublishButtonShow={true}
+        onPressPublish={() => setOpenModal(true)}
         role={meetingData?.yourRoleName}
         isButtonShow={meetingData?.yourRoleName != 'Member' ? true : false}
         buttonText={'Add voting'}
@@ -94,7 +96,6 @@ const LiveMeetingVotings = ({
           setSearchText(text);
         }}
       />
-    
 
       {votingDetails?.length > 0 ? (
         <FlatList
@@ -141,7 +142,7 @@ const LiveMeetingVotings = ({
           </View>
         )
       )}
-       <Modal
+      <Modal
         animationType="fade"
         transparent={true}
         visible={openModal}
@@ -168,7 +169,7 @@ const LiveMeetingVotings = ({
                 color: Colors.bold
               }}
             />
-
+            <GToastContainer paddingBottom={30} />
             <View style={styles.buttonContainer}>
               <Button
                 title={'Cancel'}

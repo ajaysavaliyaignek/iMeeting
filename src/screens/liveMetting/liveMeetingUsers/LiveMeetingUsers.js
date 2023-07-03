@@ -23,6 +23,7 @@ import SerachAndButtoncomponent from '../../../component/serachAndButtoncomponen
 import SpeakerDetails from '../../../component/speakerDetails/SpeakerDetails';
 import { PUBLISH_EVENTS } from '../../../graphql/mutation';
 import { MultipleSelectList } from 'react-native-dropdown-select-list';
+import { GToastContainer, showToast } from 'react-native-gtoast';
 
 const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
   const navigation = useNavigation();
@@ -130,7 +131,10 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
       if (data.publishEvent.status.statusCode == '200') {
         setOpenModal(false);
         setVisibleIndex(-1);
-        alert('Publish successfully.');
+
+        showToast('Published successfully', {
+          duration: 10
+        });
       }
     },
     onError: (data) => {
@@ -230,14 +234,16 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
       )}
       <Divider style={styles.divider} />
       {activeTab == 'AllUsers' && (
-        <UserDetailsComponent
-          users={userData}
-          isGeneralUser={true}
-          openPopup={false}
-          visibleIndex={visibleIndex}
-          setVisibleIndex={setVisibleIndex}
-          searchText={searchText}
-        />
+        <View style={{ flex: 1 }}>
+          <UserDetailsComponent
+            users={userData}
+            isGeneralUser={true}
+            openPopup={false}
+            visibleIndex={visibleIndex}
+            setVisibleIndex={setVisibleIndex}
+            searchText={searchText}
+          />
+        </View>
       )}
       {activeTab == 'Speaker' && (
         <View style={{ flex: 1 }}>
@@ -265,6 +271,7 @@ const LiveMeetingUsers = ({ item, socketEventUpdateMessage }) => {
             onPressEdit={navigateToEditSpeaker}
             meetingData={item}
           />
+          <GToastContainer paddingBottom={30} />
           {
             <SpeakerDetails
               speakerData={speakerData}
