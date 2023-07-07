@@ -64,6 +64,7 @@ const AddVoting = () => {
   const answersText = answerObject?.map((answer) => {
     return answer?.text;
   });
+  console.log({ answerObject });
 
   const [
     addVoting,
@@ -267,10 +268,21 @@ const AddVoting = () => {
                 }
               });
             }}
-            disable={titleVoting === '' || valueType === null ? true : false}
+            disable={
+              titleVoting === '' ||
+              valueType === null ||
+              answerObject[0]?.text == ''
+                ? true
+                : false
+            }
             layoutStyle={[
               {
-                opacity: titleVoting === '' || valueType === null ? 0.5 : null
+                opacity:
+                  titleVoting === '' ||
+                  valueType === null ||
+                  answerObject[0]?.text == ''
+                    ? 0.5
+                    : null
               },
               styles.nextBtnLayout
             ]}
