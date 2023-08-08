@@ -131,7 +131,7 @@ const AttachFiles = ({
             ...Fonts.PoppinsSemiBold[14],
             color: Colors.primary
           }}
-          onPress={() => handleDocumentSelection()}
+          onPress={() => { handleDocumentSelection();setError('') }}
         />
       )}
     </View>
