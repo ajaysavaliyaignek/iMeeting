@@ -218,7 +218,7 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-         release {
+        release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
                 storeFile file(MYAPP_UPLOAD_STORE_FILE)
                 storePassword MYAPP_UPLOAD_STORE_PASSWORD
@@ -226,7 +226,7 @@ android {
                 keyPassword MYAPP_UPLOAD_KEY_PASSWORD
             }
         }
-       
+
     }
     buildTypes {
         debug {
@@ -239,7 +239,7 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
 
-         
+
         }
     }
 
@@ -267,7 +267,7 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
 // Import the Firebase BoM
-  
+
 
 
   // TODO: Add the dependencies for Firebase products you want to use

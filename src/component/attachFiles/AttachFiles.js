@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import DocumentPicker from 'react-native-document-picker';
 
 import { styles } from './styles';
@@ -24,7 +24,7 @@ const AttachFiles = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     getToken();
   }, [token]);
 
@@ -36,6 +36,7 @@ const AttachFiles = ({
   };
 
   const handleDocumentSelection = useCallback(async () => {
+
     try {
       const response = await DocumentPicker.pickMultiple({
         presentationStyle: 'fullScreen',
@@ -43,16 +44,21 @@ const AttachFiles = ({
       });
 
       const url = await AsyncStorage.getItem('@url');
+      const user = await AsyncStorage.getItem('@user')
+      const newToken=JSON.parse(user)?.dataToken
+      console.log({ url })
+      console.log({newToken})
       response.map((res) => {
-        if (res !== null) {
+        if (res !== null && newToken !=="") {
           const formData = new FormData();
           formData.append('file', res);
+          console.log({formData})
 
           setLoading(true);
           fetch(`https://${url}//o/imeeting-rest/v1.0/file-upload`, {
             method: 'POST',
             headers: {
-              Authorization: 'Bearer ' + `${token}`,
+              Authorization: 'Bearer ' + `${newToken}`,
               'Content-Type': 'multipart/form-data'
             },
             body: formData
@@ -60,6 +66,7 @@ const AttachFiles = ({
             .then((response) => response.json())
             .then((responseData) => {
               if (responseData) {
+                console.log({responseData})
                 setFileResponse((prev) => {
                   const pevDaa = prev?.filter((ite) => {
                     return ite.fileEnteryId !== responseData.fileEnteryId;
