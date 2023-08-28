@@ -1,5 +1,18 @@
 import { gql } from '@apollo/client';
 
+export const GET_GOOGLE_AUTHORIZATION = gql`
+query {
+  googleAuthURL{
+    googleAuthURL
+    isAuthorized
+    status {
+      entitys
+      statusCode
+      statusMessage
+    }
+  }
+}`
+
 export const GET_MAP_COMMITTEES = gql`
   query mapCommittees($type: Int) {
     mapCommittees(type: $type) {

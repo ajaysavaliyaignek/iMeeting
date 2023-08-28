@@ -16,9 +16,11 @@ import { styles } from './styles';
 import { Icon, IconName } from '../../../component';
 import { Colors } from '../../../themes/Colors';
 import { SIZES } from '../../../themes/Sizes';
-import { GET_COMMITTEES_BY_ROLE } from '../../../graphql/query';
+import { GET_COMMITTEES_BY_ROLE, GET_GOOGLE_AUTHORIZATION } from '../../../graphql/query';
 import { useQuery } from '@apollo/client';
 import { Fonts } from '../../../themes';
+import { Button } from '../../../component/button/Button';
+import { Linking } from 'react-native';
 
 const AddGeneralVideoConference = ({
   generaldData,
@@ -47,6 +49,20 @@ const AddGeneralVideoConference = ({
       console.log('commitee error', data);
     }
   });
+
+    // fetch google authorization
+    const {data:googleAuthData} = useQuery(GET_GOOGLE_AUTHORIZATION, {
+      fetchPolicy: 'cache-and-network',
+      onCompleted: (data) => {
+        console.log({data})
+        // if (data) {
+        //   setCommittee(data?.committeesByRole?.items);
+        // }
+      },
+      onError: (data) => {
+        console.log('google auth error', data);
+      }
+    });
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.txtAddSubjectTitle}>General</Text>
@@ -92,7 +108,20 @@ const AddGeneralVideoConference = ({
         title={'VIDEO CONFERENCING PLATFORM'}
         value={generaldData?.valueVideoConference}
       />
+      {generaldData?.valueVideoConference===1&&<Button
 
+onPress={() => Linking.openURL(googleAuthData?.googleAuthURL?.googleAuthURL)}
+        title={googleAuthData?.googleAuthURL?.isAuthorized ? "Authorized" : "Authorize"}
+        disable={googleAuthData?.googleAuthURL?.isAuthorized ? true : false}
+        layoutStyle={[
+
+          styles.loginButton,
+          {
+            backgroundColor: googleAuthData?.googleAuthURL?.isAuthorized ? "green" : Colors.primary
+          },
+        ]}
+        textStyle={styles.txtButton}
+      />}
       {/* platformlink */}
       {generaldData.platformlink !== null && (
         <View

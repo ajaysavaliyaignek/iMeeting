@@ -10,6 +10,14 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     flex: 1
   },
+  loginButton: {
+    marginVertical: SIZES[12],
+    width: '100%'
+  },
+  txtButton: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.white
+  },
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',

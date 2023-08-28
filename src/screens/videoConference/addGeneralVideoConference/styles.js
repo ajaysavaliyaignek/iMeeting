@@ -12,6 +12,14 @@ export const styles = StyleSheet.create({
     ...Fonts.PoppinsBold[24],
     color: Colors.bold
   },
+  loginButton: {
+    marginVertical: SIZES[12],
+    width: '100%'
+  },
+  txtButton: {
+    ...Fonts.PoppinsSemiBold[14],
+    color: Colors.white
+  },
   txtLink: {
     ...Fonts.PoppinsSemiBold[14],
     color: Colors.primary

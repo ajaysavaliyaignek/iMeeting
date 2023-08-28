@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, Linking } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@apollo/client';
@@ -6,7 +6,7 @@ import { useQuery } from '@apollo/client';
 import { Colors } from '../../../../themes/Colors';
 import { styles } from './styles';
 import { Button } from '../../../../component/button/Button';
-import { GET_ALL_LOCATION, GET_PLATFORMLINK } from '../../../../graphql/query';
+import { GET_ALL_LOCATION, GET_GOOGLE_AUTHORIZATION, GET_PLATFORMLINK } from '../../../../graphql/query';
 import DropDownPicker from '../../../../component/DropDownPicker/DropDownPicker';
 import { Fonts } from '../../../../themes';
 
@@ -53,6 +53,20 @@ const AddEditLocation = ({
       isLiveMeeting: false
     });
   };
+
+      // fetch google authorization
+      const {data:googleAuthData} = useQuery(GET_GOOGLE_AUTHORIZATION, {
+        fetchPolicy: 'cache-and-network',
+        onCompleted: (data) => {
+          console.log({data})
+          // if (data) {
+          //   setCommittee(data?.committeesByRole?.items);
+          // }
+        },
+        onError: (data) => {
+          console.log('google auth error', data);
+        }
+      });
 
   return (
     <View style={{ flex: 1 }}>
@@ -140,6 +154,20 @@ const AddEditLocation = ({
           title={'VIDEO CONFERENCING PLATFORM'}
           value={generaldData?.valueVideoConference}
         />
+          {generaldData?.valueVideoConference===1&&<Button
+
+onPress={() => Linking.openURL(googleAuthData?.googleAuthURL?.googleAuthURL)}
+        title={googleAuthData?.googleAuthURL?.isAuthorized ? "Authorized" : "Authorize"}
+        disable={googleAuthData?.googleAuthURL?.isAuthorized ? true : false}
+        layoutStyle={[
+
+          styles.loginButton,
+          {
+            backgroundColor: googleAuthData?.googleAuthURL?.isAuthorized ? "green" : Colors.primary
+          },
+        ]}
+        textStyle={styles.txtButton}
+      />}
       </View>
     </View>
   );
